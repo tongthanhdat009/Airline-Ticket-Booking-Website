@@ -1,0 +1,458 @@
+{
+  "home_page": {
+    "announcement_title": "🎉 Special Promotion 2025",
+    "announcement_desc": "Up to 30% off on all flights. Book your ticket today!",
+    "book_now": "Book Now",
+    "close": "Close",
+    "why_choose": "Why choose",
+    "why_choose_desc": "We are committed to providing the best flight experience with professional service and reasonable prices",
+    "best_price": "Best Prices",
+    "best_price_desc": "Book early for the best prices, many attractive promotions",
+    "fast_booking": "Fast Booking",
+    "fast_booking_desc": "Simple interface, easy to use, secure payment",
+    "support_247": "24/7 Support",
+    "support_247_desc": "Customer care team always ready to support you",
+    "quick_services": "Quick Services",
+    "service_booking": "Book Flight",
+    "service_buy_more": "Buy Baggage, Meals...",
+    "service_checkin": "Quick Check-in",
+    "service_hotel_car": "Hotel & Car",
+    "service_insurance": "Insurance",
+    "promotions_title": "Deals & Promotions",
+    "promo_airline_title": "CHOOSE SGU AIRLINE TICKET",
+    "promo_airline_desc": "Includes passenger insurance and 7KG carry-on baggage",
+    "promo_fast_title": "Express Package",
+    "promo_fast_desc": "Super fast North - Central - South delivery, 24/7 deals",
+    "promo_card_title": "HiBank SGU Airline Card",
+    "promo_card_desc": "All-month deals when flying and shopping with card",
+    "view_now": "View Now",
+    "buy_now": "Buy Now",
+    "register_card": "Register New Card",
+    "popular_destinations": "Popular",
+    "popular_destinations_highlight": "Destinations",
+    "popular_destinations_desc": "Explore the hottest travel destinations with great fares",
+    "from_price": "From",
+    "faq_title": "Frequently Asked",
+    "faq_highlight": "Questions",
+    "faq_contact": "Can't find the answer you're looking for?",
+    "faq_contact_team": "Contact our support team",
+    "faq_contact_help": "for assistance.",
+    "faq_q1": "How to book a flight ticket?",
+    "faq_a1": "You can book tickets online via website, mobile app or contact hotline 1900 1886. Just select departure, destination, flight date and number of passengers, then pay securely through various methods.",
+    "faq_q2": "What is the carry-on and checked baggage policy?",
+    "faq_a2": "Free carry-on baggage up to 7kg (size 56cm x 36cm x 23cm). Checked baggage depends on ticket class, you can buy additional baggage online at better prices than at airport.",
+    "faq_q3": "Can I change or cancel my ticket?",
+    "faq_a3": "Yes, you can change or cancel tickets according to each ticket class regulations. Change/cancellation fees vary depending on time and ticket type. Early changes are recommended to save costs.",
+    "faq_q4": "What is the check-in time online and at airport?",
+    "faq_a4": "Online check-in opens 24h before flight and closes 1h before departure. At airport, check-in counter opens 2h and closes 40 minutes before flight. Please arrive early to complete procedures.",
+    "faq_q5": "What payment methods are available?",
+    "faq_a5": "We accept multiple payment methods: credit/debit cards (Visa, Mastercard, JCB), e-wallets (MoMo, ZaloPay, VNPay), bank transfer and payment at agents."
+  },
+  "destinations": {
+    "tphcm": {
+      "price": "From 399,000 VND",
+      "title": "Ho Chi Minh City",
+      "desc": "A bustling economic center with rich cuisine and diverse culture"
+    },
+    "hanoi": {
+      "price": "From 499,000 VND",
+      "title": "Hanoi",
+      "desc": "A thousand-year-old capital with cultural heritage and traditional cuisine"
+    },
+    "danang": {
+      "price": "From 599,000 VND",
+      "title": "Da Nang",
+      "desc": "A livable city with blue seas, Golden Bridge and great food"
+    },
+    "phuquoc": {
+      "price": "From 699,000 VND",
+      "title": "Phu Quoc",
+      "desc": "An island paradise with beautiful beaches and luxury resorts"
+    },
+    "nhatrang": {
+      "price": "From 549,000 VND",
+      "title": "Nha Trang",
+      "desc": "A beach paradise with diving activities and fun"
+    },
+    "dalat": {
+      "price": "From 649,000 VND",
+      "title": "Da Lat",
+      "desc": "A romantic flower city with cool climate year-round"
+    }
+  },
+  "common": {
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "support": "Support",
+    "my_account": "My Account",
+    "home": "Home",
+    "continue": "Continue",
+    "back": "Back",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "close": "Close",
+    "save": "Save",
+    "update": "Update",
+    "search": "Search",
+    "total_price": "Total Price",
+    "currency": "VND",
+    "success": "Success",
+    "error": "Error",
+    "loading": "Loading...",
+    "processing": "Processing..."
+  },
+  "common_extra": {
+    "or": "or"
+  },
+  "payment": {
+    "vnpay_title": "Pay via VNPay",
+    "vnpay_desc": "Supports ATM cards, credit cards and QR Code payments"
+  },
+  "navbar": {
+    "lookup_flight": "My Booking",
+    "online_checkin": "Online Check-in",
+    "flight_services": "Flight Services",
+    "other_services": "Other Services",
+    "my_flights": "My Flights"
+  },
+  "footer": {
+    "about_us": "About SGU Airline",
+    "contact": "Contact Us",
+    "policy": "Terms & Policies",
+    "follow_us": "Follow Us",
+    "download_app": "Download App"
+  ,
+    "download_app_desc": "Download the SGU Airline mobile app to book and pay faster",
+    "payment_help_title": "Payment Guide",
+    "payment_help_desc": "Pay easily and securely with multiple methods"
+  },
+  "auth": {
+    "welcome_back": "Welcome Back!",
+    "email_phone": "Phone / Email",
+    "password": "Password",
+    "forgot_password": "Forgot Password?",
+    "remember_me": "Remember me",
+    "login_google": "Login with Google",
+    "no_account": "No account yet?",
+    "register_now": "Register now",
+    "full_name": "Full Name",
+    "phone": "Phone Number",
+    "dob": "Date of Birth",
+    "confirm_password": "Confirm Password",
+    "otp_sent": "OTP has been sent to your email",
+    "verify_email": "Verify Email",
+    "register_intro": "Start your journey",
+    "password_hint": "At least 6 characters",
+    "has_account": "Already have an account?"
+  },
+  "home": {
+    "banner_title": "Tet 2026 Ticket Sale",
+    "banner_subtitle": "Book early, save more!",
+    "why_choose_us": "Why choose SGU Airline?",
+    "reason_price": "Best Prices",
+    "reason_fast": "Fast Booking",
+    "reason_support": "24/7 Support",
+    "popular_destinations": "Popular Destinations",
+    "promotions": "Deals & Promotions"
+  },
+  "pages": {
+    "tra_cuu": {
+      "title": "Manage Booking",
+      "subtitle": "Search and manage your flights",
+      "label_booking_code": "Booking Code",
+      "label_passenger_name": "Passenger Name",
+      "placeholder_booking_code": "Enter booking code",
+      "placeholder_passenger_name": "Enter passenger name",
+      "error_empty": "Please enter both booking code and passenger name",
+      "error_not_found": "Booking information not found. Please check booking code and passenger name.",
+      "search_btn": "Search Flights",
+      "searching": "Searching...",
+      "booking_info_title": "Booking Information",
+      "no_result": "No booking information found",
+      "booking_code_label": "Booking Code",
+      "booking_date_label": "Booking Date",
+      "passenger_label": "Passenger",
+      "flight_info_label": "Flight Information",
+      "flight_number_prefix": "Flight:",
+      "flight_date_label": "Flight Date:",
+      "departure_time_label": "Departure Time:",
+      "route_label": "Route:",
+      "fare_class_label": "Fare Class",
+      "payment_status_label": "Payment Status",
+      "total_label": "Total Amount:",
+      "paid_label": "Paid",
+      "unpaid_label": "Unpaid",
+      "payment_deadline_label": "Payment Deadline:"
+    },
+    "shared_ui": {
+      "booking_details_title": "Booking Details",
+      "info_card_view_details_title": "View Details",
+      "info_card_view_details_desc": "Check flight info, baggage, seats",
+      "info_card_change_booking_title": "Modify Booking",
+      "info_card_change_booking_desc": "Edit information, change flights",
+      "info_card_payment_title": "Payment",
+      "info_card_payment_desc": "Complete payments for add-on services"
+    },
+    
+    "dich_vu_chuyen_bay_extra": {
+      "info_banner_title": "Add-on Services for Your Flight",
+      "info_banner_desc": "Browse and add baggage, meals, seat selection and more to improve your trip"
+    },
+    "other_services_list": {
+      "hotel": { "title": "Hotel Booking", "desc": "Quality hotels with special rates" },
+      "car": { "title": "Car Rental", "desc": "Self-drive or chauffeur-driven car rental at destination" },
+      "tour": { "title": "Tours", "desc": "Attractive tour packages across Vietnam and worldwide" },
+      "tickets": { "title": "Attraction Tickets", "desc": "Tickets for attractions and theme parks" },
+      "visa": { "title": "Visa & Passport", "desc": "Visa assistance and fast passport renewal" },
+      "sim": { "title": "Travel SIM", "desc": "Unlimited 4G data SIM for your trip" },
+      "currency": { "title": "Currency Exchange", "desc": "Currency exchange with the best rates" },
+      "vouchers": { "title": "Gifts & Vouchers", "desc": "Buy travel vouchers as meaningful gifts" }
+    },
+    "dich_vu_chuyen_bay": {
+      "title": "Flight Services",
+      "subtitle": "Enhance your flight experience with add-on services",
+      "label_booking_code": "Booking Code",
+      "placeholder_booking_code": "Enter your booking code",
+      "search_btn": "Search Services",
+      "searching": "Searching...",
+      "error_not_found": "Unable to load service list. Please check booking code.",
+      "booking_info_title": "Booking Information",
+      "booking_code_label": "Booking Code:",
+      "passenger_label": "Passenger:",
+      "flight_code_label": "Flight Code:",
+      "available_services_title": "Available Services",
+      "booked_services_title": "Booked Services",
+      "quantity_label": "Quantity:",
+      "selected_label": "Selected",
+      "total_label": "Total",
+      "process_btn": "Add to Booking",
+      "processing": "Processing...",
+      "select_service_error": "Please select at least one service",
+      "special_offer_title": "Special Offers",
+      "special_offer_desc": "Pre-book services to get the best prices and secure your spot on the flight",
+      "info_enter_code": "Enter booking code above to see available services for your flight"
+    },
+    "dich_vu_khac": {
+      "title": "Other Services",
+      "subtitle": "Supportive services for your perfect trip",
+      "learn_more": "Learn more →",
+      "partners_title": "Our Partners",
+      "cta_title": "🌟 Combo Savings",
+      "cta_desc": "Book flight + hotel to get up to 30% off",
+      "cta_btn": "Explore Now"
+    },
+    "online_checkin": {
+      "title": "Online Check-in",
+      "subtitle": "Fast and convenient online check-in",
+      "passenger_info_title": "Passenger Information",
+      "label_booking_code": "Booking Code",
+      "label_last_name": "Last Name (as on passport)",
+      "placeholder_booking_code": "Enter booking code (e.g. 123)",
+      "placeholder_last_name": "Enter full name (e.g. John Smith)",
+      "checkin_btn": "Start Check-in",
+      "searching": "Searching...",
+      "processing": "Processing...",
+      "error_required": "Please fill in all required information",
+      "error_connection": "Connection error. Please try again later.",
+      "booking_code_display": "Booking Code",
+      "passenger_info_section": "Passenger Information",
+      "full_name": "Full Name:",
+      "email": "Email:",
+      "phone": "Phone:",
+      "flight_info_section": "Flight Information",
+      "seat_info_section": "Seat Information",
+      "seat_number": "Seat Number:",
+      "fare_class": "Fare Class:",
+      "confirm_checkin_btn": "✓ Confirm Check-in",
+      "cancel_btn": "Cancel",
+      "success_title": "Check-in Successful!",
+      "success_message": "Please arrive at the airport 90 minutes early for baggage check-in (if applicable)",
+      "flight_label": "Flight:",
+      "route_label": "Route:",
+      "departure_time": "Departure Time:",
+      "seat_label": "Seat:",
+      "search_another": "Search Another Flight",
+      "benefit_time": "Save Time",
+      "benefit_boarding_pass": "E-boarding pass",
+      "benefit_seat": "Choose Seat",
+      "benefit_baggage": "Buy Extra Baggage",
+      "note_title": "Note:",
+      "note": "Online check-in opens from 24 hours to 1 hour before departure"
+    }
+    ,
+    "online_checkin_extra": {
+      "benefit_time_desc": "Skip queues at the airport; check-in in just a few minutes",
+      "benefit_boarding_pass_desc": "Receive your boarding pass on your phone or print at home",
+      "benefit_seat_desc": "Select your preferred seat for the flight",
+      "benefit_baggage_desc": "Easily purchase extra checked baggage at discounted rates",
+      "note": "Online check-in opens from 24 hours to 1 hour before departure"
+    },
+    "support_page": {
+      "title": "Customer Support",
+      "subtitle": "We are ready to support you 24/7. Choose a method to contact the SGU Airline support team.",
+      "phone_title": "Hotline",
+      "phone_desc": "Call us for quick assistance with fares, changes or refunds.",
+      "phone_cta": "Call: +84 0123 456 789",
+      "chat_title": "Live Chat",
+      "chat_desc": "Talk with our agents instantly via chat.",
+      "chat_cta": "Open chat",
+      "email_title": "Email",
+      "email_desc": "Send detailed requests and we'll respond within 24 hours.",
+      "email_cta": "Send email",
+      "faq_title": "Frequently Asked Questions (FAQ)",
+      "faq_q1": "How to change or refund a ticket?",
+      "faq_a1": "You can change/cancel tickets in 'Manage Booking' or contact our hotline for guidance and to check fare rules.",
+      "faq_q2": "How much luggage can I bring?",
+      "faq_a2": "Each fare class has different baggage allowance. Please check your ticket details or our baggage services page.",
+      "faq_q3": "When should I arrive for check-in?",
+      "faq_a3": "We recommend arriving at least 2 hours for domestic and 3 hours for international flights."
+    }
+  },
+  "booking": {
+    "errors": {
+      "select_flight_first": "Please select a flight before continuing!"
+    },
+    "flight_class": {
+      "business": "Business",
+      "first": "First Class",
+      "deluxe": "Deluxe",
+      "economy": "Economy"
+    },
+    "flight": {
+      "direct": "Direct",
+      "departure_label": "Departure:",
+      "arrival_label": "Arrival:",
+      "duration_label": "Duration:"
+    },
+    "flight_info": {
+      "flight_number": "Flight number:"
+    },
+    "search_form": {
+      "round_trip": "Round Trip",
+      "one_way": "One Way",
+      "from": "From",
+      "to": "To",
+      "departure_date": "Departure Date",
+      "return_date": "Return Date",
+      "passengers": "Passengers",
+      "adults": "Adults",
+      "children": "Children",
+      "infants": "Infants",
+      "btn_search": "Search Flights"
+    },
+    
+    "flight_selection": {
+      "outbound": "Outbound Flight",
+      "inbound": "Return Flight",
+      "flight_number": "Flight No.",
+      "duration": "Duration",
+      "direct_flight": "Direct",
+      "price_from": "From",
+      "sold_out": "Sold Out",
+      "select": "Select",
+      "class_economy": "Economy",
+      "class_business": "Business",
+      "class_deluxe": "Deluxe",
+      "class_first": "First Class"
+    },
+    "flight_row": {
+      "price_label": "Fare",
+      "tax_fee_label": "Taxes & Fees",
+      "service_label": "Services"
+    },
+    "includes": {
+      "title": "Includes:"
+    },
+    "no_flights": "No flights available",
+    "summary": {
+      "header": "Booking Details",
+      "passenger_info": "Passenger Information",
+      "outbound": "Outbound",
+      "return": "Return",
+      "flight_details_missing": "--- | --- | --- | ---",
+      "fare": "Fare",
+      "taxes_fees": "Taxes & Fees",
+      "services": "Services",
+      "fees": {
+        "security_screening": "Security screening fee",
+        "domestic_airport": "Domestic airport fee",
+        "system_service": "System service charge",
+        "admin_fee": "Administration fee",
+        "vat": "VAT"
+      },
+      "edit": "Edit",
+      "not_selected": "Not selected"
+    },
+    "header": {
+      "flight_prefix": "Flight",
+      "passenger_label": "Passengers",
+      "departure_label": "Departure",
+      "destination_label": "Destination"
+    },
+    "flight_type": {
+      "round": "Round Trip",
+      "one_way": "One Way"
+    },
+    "passenger_info": {
+      "title": "Passenger Information",
+      "passenger": "Passenger",
+      "gender": "Gender",
+      "male": "Male",
+      "female": "Female",
+      "other": "Other",
+      "nationality": "Nationality",
+      "id_card": "ID Card / Passport",
+      "address": "Address",
+      "use_account_info": "Use current account info",
+      "contact_info": "Contact Information",
+      "privacy_ack": "By selecting \"Continue\", you confirm that you have read, understood and agree to the processing of personal data according to",
+      "of": "of",
+      "full_name": "Full Name"
+    },
+    "services": {
+      "reminder": "Don't forget to add baggage, meals, seat selection and more...",
+      "title": "Add-on Services",
+      "seat_selection": "Seat Selection",
+      "select_seat_desc": "Choose your preferred seat on the flight",
+      "baggage": "Checked Baggage",
+      "meals": "Meals",
+      "insurance": "Travel Insurance",
+      "added": "Added",
+      "error_select_seats_round": "Please select {{count}} seats for both outbound and return flights.",
+      "error_select_seats_oneway": "Please select {{count}} seats for the outbound flight."
+    },
+    "payment": {
+      "title": "Payment",
+      "payment_method": "Payment Method",
+      "flight_summary": "Flight Summary",
+      "ticket_price": "Fare",
+      "tax_fee": "Taxes & Fees",
+      "total": "Total Amount",
+      "pay_now": "Pay Now",
+      "status_success": "Payment Successful",
+      "status_failed": "Payment Failed",
+      "transaction_id": "Transaction ID"
+      ,
+      "vnpay_title": "Pay via VNPay",
+      "vnpay_desc": "Supports ATM cards, credit cards and QR Code payments"
+    }
+    ,
+    "booking_payment_errors": {
+      "error_create_payment": "Unable to create payment link. Please try again.",
+      "error_create_booking": "Unable to create booking. Please try again.",
+      "error_processing_booking": "An error occurred while processing the booking. Please try again later.",
+      "error_missing_passenger_info": "Please provide passenger information"
+    }
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalid_email": "Invalid email format",
+    "invalid_phone": "Invalid phone number",
+    "password_mismatch": "Passwords do not match",
+    "min_length": "Minimum length is {{count}} characters",
+    "required_gender": "Please select a gender",
+    "invalid_name": "Full name must contain letters and be at least 2 characters",
+    "invalid_idcard": "ID card / passport is invalid (minimum 9 characters)"
+  }  
+}

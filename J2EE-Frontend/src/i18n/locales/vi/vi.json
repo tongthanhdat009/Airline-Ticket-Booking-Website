@@ -1,0 +1,466 @@
+{
+  "home_page": {
+    "announcement_title": "🎉 Khuyến mãi đặc biệt 2025",
+    "announcement_desc": "Giảm giá lên đến 30% cho tất cả các chuyến bay. Đặt vé ngay hôm nay!",
+    "book_now": "Đặt vé ngay",
+    "close": "Đóng",
+    "why_choose": "Tại sao chọn",
+    "why_choose_desc": "Chúng tôi cam kết mang đến trải nghiệm bay tốt nhất với dịch vụ chuyên nghiệp và giá cả hợp lý",
+    "best_price": "Giá vé ưu đãi",
+    "best_price_desc": "Đặt vé sớm với giá tốt nhất, nhiều chương trình khuyến mãi hấp dẫn",
+    "fast_booking": "Đặt vé nhanh chóng",
+    "fast_booking_desc": "Giao diện đơn giản, dễ sử dụng, thanh toán an toàn",
+    "support_247": "Hỗ trợ 24/7",
+    "support_247_desc": "Đội ngũ chăm sóc khách hàng luôn sẵn sàng hỗ trợ bạn",
+    "quick_services": "Dịch vụ tiện ích",
+    "service_booking": "Đặt chuyến bay",
+    "service_buy_more": "Mua hành lý, suất ăn...",
+    "service_checkin": "Làm thủ tục nhanh",
+    "service_hotel_car": "Khách sạn & Xe",
+    "service_insurance": "Bảo hiểm",
+    "promotions_title": "Khuyến mãi & Ưu đãi",
+    "promo_airline_title": "CHỌN MUA VÉ SGU AIRLINE",
+    "promo_airline_desc": "Đã bao gồm bảo hiểm KH và 7KG hành lý xách tay",
+    "promo_fast_title": "Gói hàng nhanh",
+    "promo_fast_desc": "Vận chuyển Bắc - Trung - Nam siêu tốc, ưu đãi 24/7",
+    "promo_card_title": "Thẻ HiBank SGU Airline",
+    "promo_card_desc": "Ưu đãi cả tháng khi bay và mua sắm với thẻ",
+    "view_now": "Xem ngay",
+    "buy_now": "Mua ngay",
+    "register_card": "Đăng ký thẻ mới",
+    "popular_destinations": "Điểm đến",
+    "popular_destinations_highlight": "nổi tiếng",
+    "popular_destinations_desc": "Khám phá những địa điểm du lịch hot nhất với giá vé ưu đãi",
+    "from_price": "Từ",
+    "faq_title": "Câu hỏi",
+    "faq_highlight": "thường gặp",
+    "faq_contact": "Không tìm thấy câu trả lời bạn cần?",
+    "faq_contact_team": "Liên hệ đội ngũ hỗ trợ",
+    "faq_contact_help": "của chúng tôi để được giúp đỡ.",
+    "faq_q1": "Làm thế nào để đặt vé máy bay?",
+    "faq_a1": "Bạn có thể đặt vé trực tuyến qua website, ứng dụng di động hoặc liên hệ tổng đài 1900 1886. Chỉ cần chọn điểm đi, điểm đến, ngày bay và số lượng hành khách, sau đó thanh toán an toàn qua nhiều hình thức khác nhau.",
+    "faq_q2": "Chính sách hành lý xách tay và ký gửi như thế nào?",
+    "faq_a2": "Hành lý xách tay miễn phí tối đa 7kg (kích thước 56cm x 36cm x 23cm). Hành lý ký gửi tùy thuộc vào hạng vé, bạn có thể mua thêm hành lý trực tuyến với giá ưu đãi hơn so với mua tại sân bay.",
+    "faq_q3": "Tôi có thể thay đổi hoặc hủy vé không?",
+    "faq_a3": "Có, bạn có thể thay đổi hoặc hủy vé theo quy định của từng hạng vé. Phí thay đổi/hủy sẽ khác nhau tùy thuộc vào thời gian và loại vé. Khuyến nghị thay đổi sớm để tiết kiệm chi phí.",
+    "faq_q4": "Thời gian check-in trực tuyến và tại sân bay là bao lâu?",
+    "faq_a4": "Check-in trực tuyến mở từ 24h trước giờ bay và đóng 1h trước giờ khởi hành. Tại sân bay, quầy check-in mở 2h và đóng 40 phút trước giờ bay. Vui lòng có mặt sớm để hoàn tất thủ tục.",
+    "faq_q5": "Có những hình thức thanh toán nào?",
+    "faq_a5": "Chúng tôi chấp nhận nhiều hình thức thanh toán: thẻ tín dụng/ghi nợ (Visa, Mastercard, JCB), ví điện tử (MoMo, ZaloPay, VNPay), chuyển khoản ngân hàng và thanh toán tại các đại lý."
+  },
+  "destinations": {
+    "tphcm": {
+      "price": "Từ 399,000 VNĐ",
+      "title": "TP. Hồ Chí Minh",
+      "desc": "Trung tâm kinh tế sôi động với ẩm thực phong phú và văn hóa đa dạng"
+    },
+    "hanoi": {
+      "price": "Từ 499,000 VNĐ",
+      "title": "Hà Nội",
+      "desc": "Thủ đô nghìn năm văn hiến với di sản văn hóa và ẩm thực truyền thống"
+    },
+    "danang": {
+      "price": "Từ 599,000 VNĐ",
+      "title": "Đà Nẵng",
+      "desc": "Thành phố đáng sống với biển xanh, cầu Vàng và ẩm thực tuyệt vời"
+    },
+    "phuquoc": {
+      "price": "Từ 699,000 VNĐ",
+      "title": "Phú Quốc",
+      "desc": "Đảo ngọc thiên đường với bãi biển tuyệt đẹp và resort sang trọng"
+    },
+    "nhatrang": {
+      "price": "Từ 549,000 VNĐ",
+      "title": "Nha Trang",
+      "desc": "Thiên đường biển đảo với hoạt động lặn biển và vui chơi phong phú"
+    },
+    "dalat": {
+      "price": "Từ 649,000 VNĐ",
+      "title": "Đà Lạt",
+      "desc": "Thành phố ngàn hoa lãng mạn với khí hậu mát mẻ quanh năm"
+    }
+  },
+  "common": {
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "logout": "Đăng xuất",
+    "support": "Hỗ trợ",
+    "my_account": "Tài khoản",
+    "home": "Trang chủ",
+    "continue": "Đi tiếp",
+    "back": "Quay lại",
+    "confirm": "Xác nhận",
+    "cancel": "Hủy",
+    "close": "Đóng",
+    "save": "Lưu",
+    "update": "Cập nhật",
+    "search": "Tìm kiếm",
+    "total_price": "Tổng tiền",
+    "currency": "VND",
+    "success": "Thành công",
+    "error": "Lỗi",
+    "loading": "Đang tải...",
+    "processing": "Đang xử lý..."
+  },
+  "common_extra": {
+    "or": "hoặc"
+  },
+  "payment": {
+    "vnpay_title": "Thanh toán qua VNPay",
+    "vnpay_desc": "Hỗ trợ thanh toán bằng thẻ ATM, thẻ tín dụng và mã QR"
+  },
+  "navbar": {
+    "lookup_flight": "Tra cứu chuyến bay",
+    "online_checkin": "Online Check-in",
+    "flight_services": "Dịch vụ chuyến bay",
+    "other_services": "Dịch vụ khác",
+    "my_flights": "Chuyến bay của tôi"
+  },
+  "footer": {
+    "about_us": "Về SGU Airline",
+    "contact": "Liên hệ",
+    "policy": "Điều khoản & Chính sách",
+    "follow_us": "Kết nối với chúng tôi",
+    "download_app": "Tải ứng dụng"
+  ,
+    "download_app_desc": "Tải ứng dụng di động SGU Airline để đặt chuyến và thanh toán nhanh chóng",
+    "payment_help_title": "Hướng dẫn thanh toán",
+    "payment_help_desc": "Thanh toán dễ dàng, an toàn với nhiều phương thức"
+  },
+  "auth": {
+    "welcome_back": "Chào mừng bạn trở lại!",
+    "email_phone": "Số điện thoại / Email",
+    "password": "Mật khẩu",
+    "forgot_password": "Quên mật khẩu?",
+    "remember_me": "Ghi nhớ đăng nhập",
+    "login_google": "Đăng nhập với Google",
+    "no_account": "Chưa có tài khoản?",
+    "register_now": "Đăng ký ngay",
+    "full_name": "Họ và tên",
+    "phone": "Số điện thoại",
+    "dob": "Ngày sinh",
+    "confirm_password": "Xác nhận mật khẩu",
+    "otp_sent": "Mã OTP đã được gửi đến email",
+    "verify_email": "Xác thực email"
+  ,
+  "register_intro": "Bắt đầu hành trình của bạn",
+  "password_hint": "Tối thiểu 6 ký tự",
+  "has_account": "Đã có tài khoản?"
+  },
+  "home": {
+    "banner_title": "Mở bán vé Tết 2026",
+    "banner_subtitle": "Mua vé sớm, bay siêu tiết kiệm!",
+    "why_choose_us": "Tại sao chọn SGU Airline?",
+    "reason_price": "Giá vé ưu đãi",
+    "reason_fast": "Đặt vé nhanh chóng",
+    "reason_support": "Hỗ trợ 24/7",
+    "popular_destinations": "Điểm đến nổi tiếng",
+    "promotions": "Khuyến mãi & Ưu đãi"
+  },
+  "pages": {
+    "tra_cuu": {
+      "title": "Quản lý đặt chỗ",
+      "subtitle": "Tra cứu và quản lý chuyến bay của bạn",
+      "label_booking_code": "Mã đặt chỗ",
+      "label_passenger_name": "Tên hành khách",
+      "placeholder_booking_code": "Nhập mã đặt chỗ",
+      "placeholder_passenger_name": "Nhập tên hành khách",
+      "error_empty": "Vui lòng nhập đầy đủ mã đặt chỗ và tên hành khách",
+      "error_not_found": "Không tìm thấy thông tin đặt chỗ. Vui lòng kiểm tra lại mã đặt chỗ và tên hành khách.",
+      "search_btn": "Tìm kiếm chuyến bay",
+      "searching": "Đang tìm kiếm...",
+      "booking_info_title": "Thông tin đặt chỗ",
+      "no_result": "Không tìm thấy thông tin đặt chỗ",
+      "booking_code_label": "Mã đặt chỗ",
+      "booking_date_label": "Ngày đặt",
+      "passenger_label": "Hành khách",
+      "flight_info_label": "Thông tin chuyến bay",
+      "flight_number_prefix": "Chuyến bay:",
+      "flight_date_label": "Ngày bay:",
+      "departure_time_label": "Giờ khởi hành:",
+      "route_label": "Tuyến:",
+      "fare_class_label": "Hạng vé",
+      "payment_status_label": "Trạng thái thanh toán",
+      "total_label": "Tổng tiền:",
+      "paid_label": "Đã thanh toán",
+      "unpaid_label": "Chưa thanh toán",
+      "payment_deadline_label": "Hạn thanh toán:"
+    },
+    "shared_ui": {
+      "booking_details_title": "Thông tin đặt chỗ",
+      "info_card_view_details_title": "Xem chi tiết",
+      "info_card_view_details_desc": "Kiểm tra thông tin chuyến bay, hành lý, ghế ngồi",
+      "info_card_change_booking_title": "Thay đổi đặt chỗ",
+      "info_card_change_booking_desc": "Sửa đổi thông tin, thay đổi chuyến bay",
+      "info_card_payment_title": "Thanh toán",
+      "info_card_payment_desc": "Hoàn tất thanh toán các dịch vụ bổ sung"
+    },
+    "dich_vu_chuyen_bay": {
+      "title": "Dịch vụ chuyến bay",
+      "subtitle": "Nâng cao trải nghiệm bay của bạn với các dịch vụ bổ sung",
+      "label_booking_code": "Mã đặt chỗ",
+      "placeholder_booking_code": "Nhập mã đặt chỗ của bạn",
+      "search_btn": "Tìm dịch vụ",
+      "searching": "Đang tìm kiếm...",
+      "error_not_found": "Không thể tải danh sách dịch vụ. Vui lòng kiểm tra lại mã đặt chỗ.",
+      "booking_info_title": "Thông tin đặt chỗ",
+      "booking_code_label": "Mã đặt chỗ:",
+      "passenger_label": "Hành khách:",
+      "flight_code_label": "Mã chuyến bay:",
+      "available_services_title": "Dịch vụ có sẵn",
+      "booked_services_title": "Dịch vụ đã đặt",
+      "quantity_label": "Số lượng:",
+      "selected_label": "Đã chọn",
+      "total_label": "Tổng cộng",
+      "process_btn": "Thêm vào đặt chỗ",
+      "processing": "Đang xử lý...",
+      "select_service_error": "Vui lòng chọn ít nhất một dịch vụ",
+      "special_offer_title": "Ưu đãi đặc biệt",
+      "special_offer_desc": "Đặt trước các dịch vụ để nhận giá tốt nhất và đảm bảo có chỗ trên chuyến bay của bạn",
+      "info_enter_code": "Nhập mã đặt chỗ ở trên để xem các dịch vụ có sẵn cho chuyến bay của bạn"
+    },
+    "dich_vu_khac": {
+      "title": "Dịch vụ khác",
+      "subtitle": "Các dịch vụ hỗ trợ cho chuyến đi hoàn hảo của bạn",
+      "learn_more": "Tìm hiểu thêm →",
+      "partners_title": "Đối tác của chúng tôi",
+      "cta_title": "🌟 Gói combo tiết kiệm",
+      "cta_desc": "Đặt vé máy bay kèm khách sạn để nhận ưu đãi lên đến 30%",
+      "cta_btn": "Khám phá ngay"
+    },
+    "online_checkin": {
+      "title": "Online Check-in",
+      "subtitle": "Làm thủ tục trực tuyến nhanh chóng, tiện lợi",
+      "passenger_info_title": "Thông tin hành khách",
+      "label_booking_code": "Mã đặt chỗ",
+      "label_last_name": "Họ (Như trên passport)",
+      "placeholder_booking_code": "Nhập mã đặt chỗ (VD: 123)",
+      "placeholder_last_name": "Nhập họ tên (VD: Nguyễn Văn A)",
+      "checkin_btn": "Bắt đầu Check-in",
+      "searching": "Đang tìm kiếm...",
+      "processing": "Đang xử lý...",
+      "error_required": "Vui lòng nhập đầy đủ thông tin",
+      "error_connection": "Lỗi kết nối. Vui lòng thử lại sau.",
+      "booking_code_display": "Mã đặt chỗ",
+      "passenger_info_section": "Thông tin hành khách",
+      "full_name": "Họ tên:",
+      "email": "Email:",
+      "phone": "SĐT:",
+      "flight_info_section": "Thông tin chuyến bay",
+      "seat_info_section": "Thông tin ghế",
+      "seat_number": "Số ghế:",
+      "fare_class": "Hạng vé:",
+      "confirm_checkin_btn": "✓ Xác nhận Check-in",
+      "cancel_btn": "Hủy",
+      "success_title": "Check-in thành công!",
+      "success_message": "Vui lòng đến sân bay trước 90 phút để làm thủ tục ký gửi hành lý (nếu có)",
+      "flight_label": "Chuyến bay:",
+      "route_label": "Tuyến bay:",
+      "departure_time": "Giờ khởi hành:",
+      "seat_label": "Ghế:",
+      "search_another": "Tìm kiếm chuyến bay khác",
+      "benefit_time": "Tiết kiệm thời gian",
+      "benefit_boarding_pass": "Thẻ lên máy bay điện tử",
+      "benefit_seat": "Chọn chỗ ngồi",
+      "benefit_baggage": "Mua thêm hành lý",
+      "note_title": "Lưu ý:",
+      "note": "Check-in trực tuyến mở từ 24 giờ đến 1 giờ trước giờ khởi hành"
+    }
+  ,
+  "online_checkin_extra": {
+    "benefit_time_desc": "Không cần xếp hàng tại sân bay, làm thủ tục chỉ trong vài phút",
+    "benefit_boarding_pass_desc": "Nhận thẻ lên máy bay ngay trên điện thoại, in tại nhà",
+    "benefit_seat_desc": "Tự do lựa chọn vị trí ghế ngồi yêu thích của bạn",
+    "benefit_baggage_desc": "Dễ dàng mua thêm hành lý ký gửi với giá ưu đãi",
+    "note": "Check-in trực tuyến mở từ 24 giờ đến 1 giờ trước giờ khởi hành"
+  },
+  "dich_vu_chuyen_bay_extra": {
+    "info_banner_title": "Dịch vụ bổ sung cho chuyến bay của bạn",
+    "info_banner_desc": "Duyệt và thêm hành lý, suất ăn, chọn chỗ và hơn thế nữa để nâng cao chuyến đi của bạn"
+  }
+  ,
+  "support_page": {
+    "title": "Hỗ trợ khách hàng",
+    "subtitle": "Chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7. Chọn một phương thức để liên hệ với đội ngũ hỗ trợ của SGU Airline.",
+    "phone_title": "Tổng đài",
+    "phone_desc": "Gọi ngay để được hỗ trợ nhanh chóng về vé, thay đổi hay hoàn vé.",
+    "phone_cta": "Gọi: 0123 456 789",
+    "chat_title": "Chat trực tuyến",
+    "chat_desc": "Nói chuyện với nhân viên ngay lập tức qua chat.",
+    "chat_cta": "Mở chat",
+    "email_title": "Email",
+    "email_desc": "Gửi yêu cầu chi tiết, chúng tôi sẽ phản hồi trong 24 giờ.",
+    "email_cta": "Gửi email",
+    "faq_title": "Câu hỏi thường gặp (FAQ)",
+    "faq_q1": "Làm sao để đổi hoặc hoàn vé?",
+    "faq_a1": "Bạn có thể đổi/hủy vé trong phần \"Quản lý đặt chỗ\" hoặc liên hệ tổng đài để được hướng dẫn cụ thể và kiểm tra điều kiện vé.",
+    "faq_q2": "Tôi có thể mang bao nhiêu hành lý?",
+    "faq_a2": "Mỗi hạng vé có quy định hành lý khác nhau. Vui lòng kiểm tra thông tin hành lý trên vé hoặc trang dịch vụ hành lý của chúng tôi.",
+    "faq_q3": "Thời gian làm thủ tục trước chuyến bay?",
+    "faq_a3": "Chúng tôi khuyến nghị có mặt tại sân bay ít nhất 2 giờ cho chuyến nội địa và 3 giờ cho chuyến quốc tế."
+  }
+  },
+  "online_checkin_extra": {
+    "benefit_time_desc": "Không cần xếp hàng tại sân bay, làm thủ tục chỉ trong vài phút",
+    "benefit_boarding_pass_desc": "Nhận thẻ lên máy bay ngay trên điện thoại, in tại nhà",
+    "benefit_seat_desc": "Tự do lựa chọn vị trí ghế ngồi yêu thích của bạn",
+    "benefit_baggage_desc": "Dễ dàng mua thêm hành lý ký gửi với giá ưu đãi",
+    "note": "Check-in trực tuyến mở từ 24 giờ đến 1 giờ trước giờ khởi hành"
+  },
+  "other_services_list": {
+    "hotel": { "title": "Đặt khách sạn", "desc": "Khách sạn chất lượng với giá ưu đãi đặc biệt" },
+    "car": { "title": "Thuê xe", "desc": "Thuê xe tự lái hoặc có tài xế tại điểm đến" },
+    "tour": { "title": "Tour du lịch", "desc": "Các gói tour hấp dẫn khắp Việt Nam và thế giới" },
+    "tickets": { "title": "Vé tham quan", "desc": "Vé các điểm tham quan, công viên giải trí" },
+    "visa": { "title": "Visa & Passport", "desc": "Hỗ trợ làm visa, gia hạn passport nhanh chóng" },
+    "sim": { "title": "SIM du lịch", "desc": "SIM 4G data không giới hạn cho chuyến đi" },
+    "currency": { "title": "Đổi ngoại tệ", "desc": "Dịch vụ đổi ngoại tệ với tỷ giá tốt nhất" },
+    "vouchers": { "title": "Quà tặng & Voucher", "desc": "Mua voucher du lịch làm quà tặng ý nghĩa" }
+  },
+  "booking": {
+    "errors": {
+      "select_flight_first": "Vui lòng chọn chuyến bay trước khi tiếp tục!"
+    },
+    "flight_class": {
+      "business": "Business",
+      "first": "First Class",
+      "deluxe": "Deluxe",
+      "economy": "Economy"
+    },
+    "flight": {
+      "direct": "Bay thẳng",
+      "departure_label": "Khởi hành:",
+      "arrival_label": "Đến:",
+      "duration_label": "Thời gian:"
+    },
+    "flight_info": {
+      "flight_number": "Số hiệu chuyến bay:"
+    },
+    "search_form": {
+      "round_trip": "Khứ hồi",
+      "one_way": "Một chiều",
+      "from": "Điểm khởi hành",
+      "to": "Điểm đến",
+      "departure_date": "Ngày đi",
+      "return_date": "Ngày về",
+      "passengers": "Hành khách",
+      "adults": "Người lớn",
+      "children": "Trẻ em",
+      "infants": "Em bé",
+      "btn_search": "Tìm chuyến bay"
+    },
+    "flight_selection": {
+      "outbound": "Chuyến đi",
+      "inbound": "Chuyến về",
+      "flight_number": "Số hiệu",
+      "duration": "Thời gian bay",
+      "direct_flight": "Bay thẳng",
+      "price_from": "Giá từ",
+      "sold_out": "Hết chỗ",
+      "select": "Chọn",
+      "class_economy": "Phổ thông",
+      "class_business": "Thương gia",
+      "class_deluxe": "Phổ thông đặc biệt",
+      "class_first": "Hạng nhất"
+    },
+    "flight_row": {
+      "price_label": "Giá vé",
+      "tax_fee_label": "Thuế, phí",
+      "service_label": "Dịch vụ"
+    },
+    "includes": {
+      "title": "Bao gồm:"
+    },
+    "no_flights": "Không có chuyến bay",
+    "summary": {
+      "header": "THÔNG TIN ĐẶT CHỖ",
+      "passenger_info": "Thông tin hành khách",
+      "outbound": "Chuyến đi",
+      "return": "Chuyến về",
+      "flight_details_missing": "--- | --- | --- | ---",
+      "fare": "Giá vé",
+      "taxes_fees": "Thuế, phí",
+      "services": "Dịch vụ",
+      "fees": {
+        "security_screening": "Phí an ninh soi chiếu",
+        "domestic_airport": "Phí sân bay quốc nội",
+        "system_service": "Phụ thu dịch vụ hệ thống",
+        "admin_fee": "Phụ phí quản trị hệ thống",
+        "vat": "Thuế VAT"
+      },
+      "edit": "Chỉnh sửa",
+      "not_selected": "Chưa chọn"
+    },
+    "header": {
+      "flight_prefix": "Chuyến bay",
+      "passenger_label": "Người",
+      "departure_label": "Điểm khởi hành",
+      "destination_label": "Điểm đến"
+    },
+    "flight_type": {
+      "round": "khứ hồi",
+      "one_way": "một chiều"
+    },
+    "passenger_info": {
+      "title": "Thông tin hành khách",
+      "passenger": "Hành khách",
+      "gender": "Giới tính",
+      "male": "Nam",
+      "female": "Nữ",
+      "other": "Khác",
+      "nationality": "Quốc gia",
+      "id_card": "CCCD / Hộ chiếu",
+      "address": "Địa chỉ cư trú",
+      "use_account_info": "Sử dụng thông tin tài khoản hiện tại",
+      "contact_info": "Thông tin liên hệ",
+      "privacy_ack": "Bằng cách chọn \u201cĐi tiếp\u201d, Quý khách xác nhận đã đọc, hiểu và đồng ý với việc xử lý dữ liệu cá nhân theo",
+      "of": "của",
+      "full_name": "Họ và tên"
+    },
+    "services": {
+      "reminder": "Đừng quên mua hành lý, suất ăn, chọn chỗ ngồi và hơn thế nữa...",
+      "title": "Dịch vụ bổ sung",
+      "seat_selection": "Chọn chỗ ngồi",
+      "select_seat_desc": "Chọn chỗ ngồi yêu thích của bạn trên chuyến bay",
+      "baggage": "Hành lý ký gửi",
+      "meals": "Suất ăn",
+      "insurance": "Bảo hiểm du lịch",
+      "added": "Đã thêm",
+      "error_select_seats_round": "Vui lòng chọn đủ {{count}} ghế cho cả chuyến đi và chuyến về.",
+      "error_select_seats_oneway": "Vui lòng chọn đủ {{count}} ghế cho chuyến đi."
+    },
+    "payment": {
+      "title": "Thanh toán",
+      "payment_method": "Phương thức thanh toán",
+      "flight_summary": "Tóm tắt chuyến bay",
+      "ticket_price": "Giá vé",
+      "tax_fee": "Thuế và phí",
+      "total": "Tổng cộng",
+      "pay_now": "Thanh toán ngay",
+      "status_success": "Thanh toán thành công",
+      "status_failed": "Thanh toán thất bại",
+      "transaction_id": "Mã giao dịch",
+      "payment_details": "Chi tiết thanh toán"
+      ,
+      "vnpay_title": "Thanh toán qua VNPay",
+      "vnpay_desc": "Hỗ trợ thanh toán bằng thẻ ATM, thẻ tín dụng và mã QR"
+    }
+    ,
+    "booking_payment_errors": {
+      "error_create_payment": "Không thể tạo liên kết thanh toán. Vui lòng thử lại.",
+      "error_create_booking": "Không thể tạo đặt chỗ. Vui lòng thử lại.",
+      "error_processing_booking": "Đã xảy ra lỗi khi xử lý đặt chỗ. Vui lòng thử lại sau.",
+      "error_missing_passenger_info": "Vui lòng nhập thông tin hành khách"
+    }
+  },
+  "validation": {
+    "required": "Vui lòng nhập thông tin này",
+    "invalid_email": "Email không hợp lệ",
+    "invalid_phone": "Số điện thoại không hợp lệ",
+    "password_mismatch": "Mật khẩu không khớp",
+    "min_length": "Độ dài tối thiểu là {{count}} ký tự",
+    "required_gender": "Vui lòng chọn giới tính",
+    "invalid_name": "Họ và tên chỉ được chứa chữ cái và tối thiểu 2 ký tự",
+    "invalid_idcard": "CCCD/Hộ chiếu không hợp lệ (ít nhất 9 ký tự)"
+  }
+}

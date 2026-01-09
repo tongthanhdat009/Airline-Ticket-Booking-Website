@@ -1,0 +1,43 @@
+package com.example.j2ee.config;
+
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestClientCustomizer; // Import this
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.reactive.function.client.WebClient;
+
+@Configuration
+public class OpenRouterConfig {
+
+    // DELETE or Keep WebClient.Builder (it is NOT used by ChatModel)
+    @Bean
+    public WebClient.Builder webClientBuilder() {
+        return WebClient.builder()
+                .defaultHeader("HTTP-Referer", "http://localhost:8080")
+                .defaultHeader("X-Title", "chat bot máy bay");
+    }
+
+    // ADD THIS BEAN to configure RestClient for ChatModel
+    @Bean
+    public RestClientCustomizer restClientCustomizer() {
+        return restClientBuilder -> restClientBuilder
+                .defaultHeader("HTTP-Referer", "http://localhost:8080")
+                .defaultHeader("X-Title", "chat bot máy bay");
+    }
+
+    @Bean
+    public ChatClient chatClient(@Autowired(required = false) ChatModel chatModel) {
+        if (chatModel == null) {
+            throw new IllegalStateException(
+                "ChatModel bean không được khởi tạo. " +
+                "Vui lòng kiểm tra: \n" +
+                "1. spring.ai.openai.api-key có hợp lệ không\n" +
+                "2. spring.ai.openai.base-url đúng format (không có /v1 ở cuối)\n" +
+                "3. Dependency spring-ai-starter-model-openai đã được thêm vào pom.xml"
+            );
+        }
+        return ChatClient.builder(chatModel).build();
+    }
+}

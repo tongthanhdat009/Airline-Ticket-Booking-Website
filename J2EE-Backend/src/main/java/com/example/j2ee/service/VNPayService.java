@@ -1,0 +1,365 @@
+package com.example.j2ee.service;
+
+import com.example.j2ee.config.VNPayConfig;
+import com.example.j2ee.model.DatCho;
+import com.example.j2ee.model.TrangThaiThanhToan;
+import com.example.j2ee.repository.DatChoRepository;
+import com.example.j2ee.repository.TrangThaiThanhToanRepository;
+import com.example.j2ee.util.VNPayUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.*;
+
+@Service
+@RequiredArgsConstructor
+public class VNPayService {
+
+    private final VNPayConfig vnPayConfig;
+    private final TrangThaiThanhToanRepository trangThaiThanhToanRepository;
+    private final DatChoRepository datChoRepository;
+    private final JasperTicketService jasperTicketService;
+    private final EmailService emailService;
+
+    /**
+     * Lấy frontend URL
+     */
+    public String getFrontendUrl() {
+        return vnPayConfig.getFrontendUrl();
+    }
+
+    /**
+     * Tạo URL thanh toán VNPay
+     */
+    public String createPaymentUrl(int maThanhToan, HttpServletRequest request) throws UnsupportedEncodingException {
+        // Lấy thông tin thanh toán
+        TrangThaiThanhToan thanhToan = trangThaiThanhToanRepository.findById(maThanhToan)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thông tin thanh toán"));
+
+        if (thanhToan.getDaThanhToan() == 'Y') {
+            throw new IllegalArgumentException("Giao dịch này đã được thanh toán");
+        }
+
+        if (thanhToan.getDaThanhToan() == 'H') {
+            throw new IllegalArgumentException("Giao dịch này đã bị hủy");
+        }
+
+        // Số tiền (VNPay yêu cầu nhân 100)
+        long amount = thanhToan.getSoTien().multiply(new BigDecimal("100")).longValue();
+
+        // Tạo dữ liệu thanh toán
+        Map<String, String> vnpParams = new HashMap<>();
+        vnpParams.put("vnp_Version", VNPayConfig.VERSION);
+        vnpParams.put("vnp_Command", VNPayConfig.COMMAND);
+        vnpParams.put("vnp_TmnCode", vnPayConfig.getTmnCode());
+        vnpParams.put("vnp_Amount", String.valueOf(amount));
+        vnpParams.put("vnp_CurrCode", VNPayConfig.CURRENCY_CODE);
+        
+        // Sử dụng maThanhToan làm txnRef để VNPay trả về
+        String txnRef = "MAT" + maThanhToan + "_" + System.currentTimeMillis();
+        vnpParams.put("vnp_TxnRef", txnRef);
+        vnpParams.put("vnp_OrderInfo", "Thanh toan ve may bay - Ma thanh toan: " + maThanhToan);
+        vnpParams.put("vnp_OrderType", VNPayConfig.ORDER_TYPE);
+        vnpParams.put("vnp_Locale", VNPayConfig.LOCALE);
+        
+        // Return URL sẽ redirect về frontend với maThanhToan
+        vnpParams.put("vnp_ReturnUrl", vnPayConfig.getReturnUrl());
+        vnpParams.put("vnp_IpAddr", VNPayUtil.getIpAddress(request));
+
+        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        String vnpCreateDate = formatter.format(cld.getTime());
+        vnpParams.put("vnp_CreateDate", vnpCreateDate);
+        
+        cld.add(Calendar.MINUTE, 15);
+        String vnpExpireDate = formatter.format(cld.getTime());
+        vnpParams.put("vnp_ExpireDate", vnpExpireDate);
+
+        // Sắp xếp params và tạo query string
+        List<String> fieldNames = new ArrayList<>(vnpParams.keySet());
+        Collections.sort(fieldNames);
+        
+        StringBuilder hashData = new StringBuilder();
+        StringBuilder query = new StringBuilder();
+        
+        Iterator<String> itr = fieldNames.iterator();
+        while (itr.hasNext()) {
+            String fieldName = itr.next();
+            String fieldValue = vnpParams.get(fieldName);
+            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+                // Build hash data
+                hashData.append(fieldName);
+                hashData.append('=');
+                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                // Build query
+                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
+                query.append('=');
+                query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                if (itr.hasNext()) {
+                    query.append('&');
+                    hashData.append('&');
+                }
+            }
+        }
+        
+        String queryUrl = query.toString();
+        String vnpSecureHash = VNPayUtil.hmacSHA512(vnPayConfig.getSecretKey(), hashData.toString());
+        queryUrl += "&vnp_SecureHash=" + vnpSecureHash;
+        
+        return vnPayConfig.getPayUrl() + "?" + queryUrl;
+    }
+
+    /**
+     * Xử lý kết quả trả về từ VNPay (BỎ QUA VERIFY CHỮ KÝ)
+     */
+    @Transactional
+    public Map<String, Object> handlePaymentReturn(Map<String, String> params) {
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            String responseCode = params.get("vnp_ResponseCode");
+            String txnRef = params.get("vnp_TxnRef");
+            
+            // Trích xuất maThanhToan từ txnRef (format: MAT{maThanhToan}_{timestamp})
+            int maThanhToan;
+            try {
+                String[] parts = txnRef.split("_");
+                maThanhToan = Integer.parseInt(parts[0].substring(3)); // Bỏ "MAT" prefix
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Mã giao dịch không hợp lệ");
+            }
+            
+            TrangThaiThanhToan thanhToan = trangThaiThanhToanRepository.findById(maThanhToan)
+                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thông tin thanh toán"));
+            
+            if ("00".equals(responseCode)) {
+                // Thanh toán thành công
+                thanhToan.setDaThanhToan('Y');
+                trangThaiThanhToanRepository.save(thanhToan);
+                
+                // Generate ticket PDF and send email
+                try {
+                    sendTicketConfirmationEmail(thanhToan);
+                } catch (Exception e) {
+                    // Log error but don't fail the payment process
+                    System.err.println("Failed to send ticket email: " + e.getMessage());
+                }
+                
+                result.put("success", true);
+                result.put("message", "Thanh toán thành công");
+                result.put("data", thanhToan);
+            } else {
+                // Thanh toán thất bại
+                result.put("success", false);
+                result.put("message", "Thanh toán thất bại. Mã lỗi: " + responseCode);
+                result.put("data", null);
+            }
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "Lỗi xử lý kết quả thanh toán: " + e.getMessage());
+            result.put("data", null);
+        }
+        
+        return result;
+    }
+
+    /**
+     * Generate ticket PDF and send confirmation email to ALL passengers in the group booking.
+     * For round-trip bookings, sends 1 email with BOTH PDFs attached (outbound + return).
+     * For one-way bookings, sends 1 email with 1 PDF.
+     * Formula: 1 email per passenger (containing all their flight tickets).
+     */
+    private void sendTicketConfirmationEmail(TrangThaiThanhToan thanhToan) throws Exception {
+        if (thanhToan.getDatCho() == null) {
+            System.err.println("No booking associated with payment: " + thanhToan.getMaThanhToan());
+            return;
+        }
+        
+        DatCho mainBooking = thanhToan.getDatCho();
+        Date bookingTime = mainBooking.getNgayDatCho();
+        
+        // Search for ALL bookings within 5 seconds (regardless of flight)
+        // This captures both outbound and return flights for round-trip bookings
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(bookingTime);
+        cal.add(Calendar.SECOND, -5);
+        Date startTime = cal.getTime();
+        
+        cal.setTime(bookingTime);
+        cal.add(Calendar.SECOND, 5);
+        Date endTime = cal.getTime();
+        
+        // Find all bookings in the same time window (captures all flights in group booking)
+        List<DatCho> allBookings = datChoRepository.findAllBookingsByTime(startTime, endTime);
+        
+        // If no bookings found, just process the main booking
+        if (allBookings.isEmpty()) {
+            allBookings = new ArrayList<>();
+            allBookings.add(mainBooking);
+        }
+        
+        System.out.println("Found " + allBookings.size() + " bookings in time window");
+        
+        // Group bookings by passenger (same email and name)
+        Map<String, List<DatCho>> bookingsByPassenger = new HashMap<>();
+        
+        for (DatCho booking : allBookings) {
+            if (booking.getHanhKhach() != null) {
+                String passengerKey = booking.getHanhKhach().getEmail() + "_" + 
+                                     booking.getHanhKhach().getHoVaTen();
+                bookingsByPassenger.computeIfAbsent(passengerKey, k -> new ArrayList<>()).add(booking);
+            }
+        }
+        
+        int totalEmailsSent = 0;
+        int totalEmailsFailed = 0;
+        
+        // Process each passenger's bookings - send 1 email per passenger with all their tickets
+        for (Map.Entry<String, List<DatCho>> entry : bookingsByPassenger.entrySet()) {
+            List<DatCho> passengerBookings = entry.getValue();
+            
+            // Sort bookings by flight date to ensure correct order (outbound first, then return)
+            passengerBookings.sort((b1, b2) -> {
+                LocalDate d1 = b1.getChiTietGhe() != null && 
+                          b1.getChiTietGhe().getChiTietChuyenBay() != null ?
+                          b1.getChiTietGhe().getChiTietChuyenBay().getNgayDi() : LocalDate.MIN;
+                LocalDate d2 = b2.getChiTietGhe() != null && 
+                          b2.getChiTietGhe().getChiTietChuyenBay() != null ?
+                          b2.getChiTietGhe().getChiTietChuyenBay().getNgayDi() : LocalDate.MIN;
+                return d1.compareTo(d2);
+            });
+            
+            // Determine if round-trip: passenger has 2+ bookings
+            boolean isRoundTrip = passengerBookings.size() >= 2;
+            
+            System.out.println("Processing passenger: " + entry.getKey() + 
+                             " | Bookings: " + passengerBookings.size() + 
+                             " | Round-trip: " + isRoundTrip + 
+                             " | Emails to send: 1");
+            
+            try {
+                // Get passenger information from first booking
+                DatCho firstBooking = passengerBookings.get(0);
+                String email = "";
+                String passengerName = "";
+                
+                if (firstBooking.getHanhKhach() != null) {
+                    email = firstBooking.getHanhKhach().getEmail();
+                    passengerName = firstBooking.getHanhKhach().getHoVaTen();
+                }
+                
+                if (email == null || email.isEmpty()) {
+                    totalEmailsFailed++;
+                    System.err.println("✗ No email found for passenger: " + entry.getKey());
+                    continue;
+                }
+                
+                // Generate PDFs for all bookings (flights) of this passenger
+                List<byte[]> ticketPdfs = new ArrayList<>();
+                List<String> flightInfo = new ArrayList<>();
+                
+                for (int i = 0; i < passengerBookings.size(); i++) {
+                    DatCho booking = passengerBookings.get(i);
+                    
+                    // Generate PDF for this flight
+                    byte[] ticketPdf = jasperTicketService.generateTicketPdfByBooking(booking.getMaDatCho());
+                    ticketPdfs.add(ticketPdf);
+                    
+                    // Build flight info string
+                    String bookingCode = String.valueOf(booking.getMaDatCho());
+                    String flightNumber = "-";
+                    String route = "-";
+                    String flightType = "";
+                    
+                    if (isRoundTrip) {
+                        flightType = (i == 0 ? " (Chiều đi)" : " (Chiều về)");
+                    }
+                    
+                    if (booking.getChiTietGhe() != null && booking.getChiTietGhe().getChiTietChuyenBay() != null) {
+                        var flight = booking.getChiTietGhe().getChiTietChuyenBay();
+                        flightNumber = flight.getSoHieuChuyenBay() + flightType;
+                        
+                        if (flight.getTuyenBay() != null) {
+                            String departure = flight.getTuyenBay().getSanBayDi() != null ? 
+                                flight.getTuyenBay().getSanBayDi().getTenSanBay() : "-";
+                            String arrival = flight.getTuyenBay().getSanBayDen() != null ? 
+                                flight.getTuyenBay().getSanBayDen().getTenSanBay() : "-";
+                            route = departure + " → " + arrival;
+                        }
+                    }
+                    
+                    flightInfo.add("Booking: " + bookingCode + " | Flight: " + flightNumber + " | Route: " + route);
+                }
+                
+                // Prepare summary info for email
+                String bookingCodes = passengerBookings.stream()
+                    .map(b -> String.valueOf(b.getMaDatCho()))
+                    .reduce((a, b) -> a + ", " + b)
+                    .orElse("-");
+                
+                String flightNumbers = passengerBookings.stream()
+                    .map(b -> {
+                        if (b.getChiTietGhe() != null && b.getChiTietGhe().getChiTietChuyenBay() != null) {
+                            return b.getChiTietGhe().getChiTietChuyenBay().getSoHieuChuyenBay();
+                        }
+                        return "-";
+                    })
+                    .reduce((a, b) -> a + ", " + b)
+                    .orElse("-");
+                
+                String routes = passengerBookings.stream()
+                    .map(b -> {
+                        if (b.getChiTietGhe() != null && 
+                            b.getChiTietGhe().getChiTietChuyenBay() != null &&
+                            b.getChiTietGhe().getChiTietChuyenBay().getTuyenBay() != null) {
+                            var tuyenBay = b.getChiTietGhe().getChiTietChuyenBay().getTuyenBay();
+                            String dep = tuyenBay.getSanBayDi() != null ? 
+                                tuyenBay.getSanBayDi().getTenSanBay() : "-";
+                            String arr = tuyenBay.getSanBayDen() != null ? 
+                                tuyenBay.getSanBayDen().getTenSanBay() : "-";
+                            return dep + " → " + arr;
+                        }
+                        return "-";
+                    })
+                    .reduce((a, b) -> a + " | " + b)
+                    .orElse("-");
+                
+                // Send ONE email with ALL PDFs attached
+                emailService.sendTicketEmailWithMultiplePdfs(
+                    email, 
+                    passengerName, 
+                    bookingCodes, 
+                    flightNumbers, 
+                    routes, 
+                    ticketPdfs
+                );
+                
+                totalEmailsSent++;
+                System.out.println("✓ Sent email with " + ticketPdfs.size() + " ticket(s) to: " + email);
+                for (String info : flightInfo) {
+                    System.out.println("  - " + info);
+                }
+                
+            } catch (Exception e) {
+                totalEmailsFailed++;
+                System.err.println("✗ Failed to send ticket to passenger " + entry.getKey() + 
+                                 ": " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        
+        System.out.println("=== Email Summary ===");
+        System.out.println("Total passengers: " + bookingsByPassenger.size());
+        System.out.println("Total emails sent: " + totalEmailsSent);
+        System.out.println("Total emails failed: " + totalEmailsFailed);
+        System.out.println("====================");
+    }
+}

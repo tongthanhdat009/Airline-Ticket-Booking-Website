@@ -1,0 +1,219 @@
+package com.example.j2ee.controller;
+
+import com.example.j2ee.dto.ApiResponse;
+import com.example.j2ee.model.DichVuCungCap;
+import com.example.j2ee.model.LuaChonDichVu;
+import com.example.j2ee.service.DichVuCungCapService;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.net.URLConnection;
+import java.util.List;
+
+@RestController
+@RequestMapping("/admin/dashboard/dichvu")
+public class DichVuCungCapController {
+    private final DichVuCungCapService dichVuCungCapService;
+    public DichVuCungCapController(DichVuCungCapService dichVuCungCapService) {
+        this.dichVuCungCapService = dichVuCungCapService;
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<DichVuCungCap>>> getAllDichVuCungCap(){
+        return ResponseEntity.ok(ApiResponse.success(dichVuCungCapService.getAllDichVuCungCap()));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<DichVuCungCap>> getById(@PathVariable int id){
+        DichVuCungCap dv = dichVuCungCapService.getDichVuCungCapById(id);
+        if (dv == null) return ResponseEntity.status(404).body(ApiResponse.error("Không tìm thấy dịch vụ"));
+        return ResponseEntity.ok(ApiResponse.success(dv));
+    }
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<DichVuCungCap>> create(
+            @RequestBody DichVuCungCap dichVuCungCap){
+        try {
+            DichVuCungCap created = dichVuCungCapService.createDichVu(dichVuCungCap);
+            return ResponseEntity.ok(ApiResponse.success("Tạo dịch vụ thành công", created));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Lỗi lưu ảnh: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<DichVuCungCap>> update(
+            @PathVariable int id,
+            @RequestBody DichVuCungCap dichVuCungCap){
+        try {
+            DichVuCungCap updated = dichVuCungCapService.updateDichVu(id, dichVuCungCap);
+            if (updated == null) return ResponseEntity.status(404).body(ApiResponse.error("Không tìm thấy dịch vụ"));
+            return ResponseEntity.ok(ApiResponse.success("Cập nhật dịch vụ thành công", updated));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Lỗi lưu ảnh: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping(value = "/{id}/anh", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<DichVuCungCap>> uploadAnh(
+            @PathVariable("id") int dichVuId,
+            @RequestPart("anh") MultipartFile anh) {
+        if (anh.isEmpty()) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Vui lòng chọn một file ảnh."));
+        }
+        try {
+            DichVuCungCap updated = dichVuCungCapService.addOrUpdateAnh(dichVuId, anh);
+            return ResponseEntity.ok(ApiResponse.success("Tải ảnh lên thành công", updated));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Lỗi khi lưu ảnh: " + e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable int id){
+        boolean ok = dichVuCungCapService.deleteDichVu(id);
+        if (!ok) return ResponseEntity.status(404).body(ApiResponse.error("Không tìm thấy dịch vụ"));
+        return ResponseEntity.ok(ApiResponse.successMessage("Xóa dịch vụ thành công"));
+    }
+
+    @GetMapping("/{id}/luachon")
+    public ResponseEntity<ApiResponse<List<LuaChonDichVu>>> getLuaChon(@PathVariable int id){
+        List<LuaChonDichVu> options = dichVuCungCapService.getLuaChonByDichVuId(id);
+        return ResponseEntity.ok(ApiResponse.success(options));
+    }
+
+    @PostMapping("/{id}/luachon")
+    public ResponseEntity<ApiResponse<LuaChonDichVu>> addLuaChon(@PathVariable int id, @RequestBody LuaChonDichVu request){
+        if (request.getTenLuaChon() == null || request.getTenLuaChon().trim().isEmpty()){
+            return ResponseEntity.badRequest().body(ApiResponse.error("Tên lựa chọn không được để trống"));
+        }
+        try{
+            LuaChonDichVu created = dichVuCungCapService.addLuaChonToDichVu(id, request);
+            if (created == null) return ResponseEntity.status(404).body(ApiResponse.error("Không tìm thấy dịch vụ"));
+            return ResponseEntity.ok(ApiResponse.success("Thêm lựa chọn thành công", created));
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}/luachon/{luachonId}")
+    public ResponseEntity<ApiResponse<LuaChonDichVu>> updateLuaChon(
+            @PathVariable int id,
+            @PathVariable int luachonId,
+            @RequestBody LuaChonDichVu request) {
+        try {
+            if (dichVuCungCapService.isLuaChonInUse(luachonId)) {
+                return ResponseEntity.badRequest().body(ApiResponse.error("Lựa chọn đang được sử dụng trong chuyến bay, không thể sửa."));
+            }
+            LuaChonDichVu updated = dichVuCungCapService.updateLuaChon(id, luachonId, request);
+            if (updated == null) {
+                return ResponseEntity.status(404).body(ApiResponse.error("Không tìm thấy lựa chọn hoặc dịch vụ."));
+            }
+            return ResponseEntity.ok(ApiResponse.success("Cập nhật lựa chọn thành công", updated));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{id}/luachon/{luachonId}")
+    public ResponseEntity<ApiResponse<Void>> deleteLuaChon(
+            @PathVariable int id,
+            @PathVariable int luachonId) {
+        try {
+            if (dichVuCungCapService.isLuaChonInUse(luachonId)) {
+                return ResponseEntity.badRequest().body(ApiResponse.error("Lựa chọn đang được sử dụng trong chuyến bay, không thể xóa."));
+            }
+            boolean deleted = dichVuCungCapService.deleteLuaChon(id, luachonId);
+            if (!deleted) {
+                return ResponseEntity.status(404).body(ApiResponse.error("Không tìm thấy lựa chọn hoặc dịch vụ."));
+            }
+            return ResponseEntity.ok(ApiResponse.successMessage("Xóa lựa chọn thành công"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+    
+    @GetMapping("/anh/{filename:.+}")
+    public ResponseEntity<Resource> getAnh(@PathVariable String filename) {
+        try {
+            Resource resource = new ClassPathResource("static/AnhDichVuCungCap/" + filename);
+            if (resource.exists() && resource.isReadable()) {
+                String contentType = URLConnection.guessContentTypeFromName(filename);
+                if (contentType == null) {
+                    if (filename.toLowerCase().endsWith(".svg")) {
+                        contentType = "image/svg+xml";
+                    } else {
+                        contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+                    }
+                }
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType(contentType))
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @PostMapping(value = "/{id}/luachon/{luachonId}/anh", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<LuaChonDichVu>> uploadAnhLuaChon(
+            @PathVariable("id") int dichVuId,
+            @PathVariable("luachonId") int luachonId,
+            @RequestPart("anh") MultipartFile anh) {
+        if (anh.isEmpty()) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Vui lòng chọn một file ảnh."));
+        }
+        try {
+            LuaChonDichVu updated = dichVuCungCapService.addOrUpdateAnhLuaChon(dichVuId, luachonId, anh);
+            return ResponseEntity.ok(ApiResponse.success("Tải ảnh lên thành công", updated));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Lỗi khi lưu ảnh: " + e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    @GetMapping("/luachon/anh/{filename:.+}")
+    public ResponseEntity<Resource> getAnhLuaChon(@PathVariable String filename) {
+        try {
+            Resource resource = new ClassPathResource("static/AnhLuaChonDichVu/" + filename);
+            if (resource.exists() && resource.isReadable()) {
+                String contentType = URLConnection.guessContentTypeFromName(filename);
+                if (contentType == null) {
+                    if (filename.toLowerCase().endsWith(".svg")) {
+                        contentType = "image/svg+xml";
+                    } else if (filename.toLowerCase().endsWith(".png")) {
+                        contentType = "image/png";
+                    } else if (filename.toLowerCase().endsWith(".jpg") || filename.toLowerCase().endsWith(".jpeg")) {
+                        contentType = "image/jpeg";
+                    } else {
+                        contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+                    }
+                }
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType(contentType))
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+}

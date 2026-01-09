@@ -1,0 +1,66 @@
+import React from 'react'
+import { useTranslation } from 'react-i18next'
+import Footer from '../../components/common/Footer'
+import Chatbot from '../../components/common/Chatbot'
+
+function HoTro() {
+  const { t } = useTranslation()
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-yellow-50">
+      <div className="container mx-auto px-4 lg:px-20 py-16">
+        <div className="max-w-4xl mx-auto text-center mb-12">
+          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">{t('pages.support_page.title')}</h1>
+          <p className="text-lg text-gray-600">{t('pages.support_page.subtitle')}</p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-3 mb-12">
+          <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all border-t-4 border-red-600">
+            <div className="text-3xl mb-3">📞</div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">{t('pages.support_page.phone_title')}</h3>
+            <p className="text-gray-600 mb-4">{t('pages.support_page.phone_desc')}</p>
+            <a href="tel:+840123456789" className="inline-block px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700">{t('pages.support_page.phone_cta')}</a>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all border-t-4 border-yellow-400">
+            <div className="text-3xl mb-3">💬</div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">{t('pages.support_page.chat_title')}</h3>
+            <p className="text-gray-600 mb-4">{t('pages.support_page.chat_desc')}</p>
+            <a href="/" className="inline-block px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg font-semibold hover:bg-yellow-500">{t('pages.support_page.chat_cta')}</a>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all border-t-4 border-pink-600">
+            <div className="text-3xl mb-3">✉️</div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">{t('pages.support_page.email_title')}</h3>
+            <p className="text-gray-600 mb-4">{t('pages.support_page.email_desc')}</p>
+            <a href="mailto:support@sguairline.example" className="inline-block px-4 py-2 bg-pink-600 text-white rounded-lg font-semibold hover:bg-pink-700">{t('pages.support_page.email_cta')}</a>
+          </div>
+        </div>
+
+        <div className="max-w-4xl mx-auto bg-white rounded-2xl p-8 shadow-lg">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">{t('pages.support_page.faq_title')}</h2>
+          <div className="space-y-4">
+            <details className="p-4 border border-gray-100 rounded-lg">
+              <summary className="font-semibold cursor-pointer">{t('pages.support_page.faq_q1')}</summary>
+              <p className="mt-2 text-gray-600">{t('pages.support_page.faq_a1')}</p>
+            </details>
+
+            <details className="p-4 border border-gray-100 rounded-lg">
+              <summary className="font-semibold cursor-pointer">{t('pages.support_page.faq_q2')}</summary>
+              <p className="mt-2 text-gray-600">{t('pages.support_page.faq_a2')}</p>
+            </details>
+
+            <details className="p-4 border border-gray-100 rounded-lg">
+              <summary className="font-semibold cursor-pointer">{t('pages.support_page.faq_q3')}</summary>
+              <p className="mt-2 text-gray-600">{t('pages.support_page.faq_a3')}</p>
+            </details>
+          </div>
+        </div>
+      </div>
+
+      <Chatbot />
+      <Footer />
+    </div>
+  )
+}
+
+export default HoTro

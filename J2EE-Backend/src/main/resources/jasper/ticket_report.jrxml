@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports 
+              http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="ticket_report" pageWidth="595" pageHeight="842" columnWidth="555" 
+              leftMargin="20" rightMargin="20" topMargin="15" bottomMargin="15">
+
+    <parameter name="bookingCode" class="java.lang.String"/>
+    <parameter name="issueDate" class="java.lang.String"/>
+    <parameter name="passengerName" class="java.lang.String"/>
+    <parameter name="flightNumber" class="java.lang.String"/>
+    <parameter name="bookingDate" class="java.lang.String"/>
+    <parameter name="travelType" class="java.lang.String"/>
+    <parameter name="departureDate" class="java.lang.String"/>
+    <parameter name="departureTime" class="java.lang.String"/>
+    <parameter name="arrivalTime" class="java.lang.String"/>
+    <parameter name="departureCity" class="java.lang.String"/>
+    <parameter name="arrivalCity" class="java.lang.String"/>
+    <parameter name="departureAirport" class="java.lang.String"/>
+    <parameter name="arrivalAirport" class="java.lang.String"/>
+    <parameter name="ticketClass" class="java.lang.String"/>
+    <parameter name="seatNumber" class="java.lang.String"/>
+    <parameter name="totalAmount" class="java.math.BigDecimal"/>
+    <parameter name="passengerCount" class="java.lang.String"/>
+
+    <field name="description" class="java.lang.String"/>
+    <field name="quantity" class="java.lang.String"/>
+    <field name="unitPrice" class="java.math.BigDecimal"/>
+    <field name="amount" class="java.math.BigDecimal"/>
+
+    <variable name="subtotal" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{amount}]]></variableExpression>
+    </variable>
+
+    <title>
+        <band height="812" splitType="Stretch">
+            <!-- ============ HEADER ============ -->
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="70" backcolor="#1E40AF"/>
+                <graphicElement><pen lineWidth="0"/></graphicElement>
+            </rectangle>
+            
+            <staticText>
+                <reportElement x="15" y="12" width="350" height="46" forecolor="#FFFFFF"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="24" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <text><![CDATA[✈ SGU AIRLINES]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="380" y="20" width="160" height="30" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="9" isBold="false" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <text><![CDATA[24/7 Support: 19001886
+www.sguairlines.vn]]></text>
+            </staticText>
+
+            <!-- ============ E-TICKET BANNER ============ -->
+            <rectangle>
+                <reportElement x="0" y="70" width="555" height="35" backcolor="#F59E0B"/>
+                <graphicElement><pen lineWidth="0"/></graphicElement>
+            </rectangle>
+            
+            <staticText>
+                <reportElement x="0" y="70" width="555" height="35" forecolor="#000000"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="12" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <text><![CDATA[E-TICKET]]></text>
+            </staticText>
+
+            <!-- ============ BOOKING REFERENCE ============ -->
+            <rectangle>
+                <reportElement x="0" y="115" width="555" height="50" backcolor="#EFF6FF"/>
+                <graphicElement><pen lineWidth="1" lineColor="#BFDBFE"/></graphicElement>
+            </rectangle>
+            
+            <staticText>
+                <reportElement x="20" y="125" width="180" height="15"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="8" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <text><![CDATA[BOOKING REFERENCE / MÃ ĐẶT CHỖ]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="20" y="140" width="180" height="20"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="12" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{bookingCode}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="220" y="125" width="160" height="15"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="8" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <text><![CDATA[ISSUE DATE / NGÀY XUẤT VÉ]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="220" y="140" width="160" height="20"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="10" isBold="false" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{issueDate}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="400" y="125" width="135" height="15"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="8" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <text><![CDATA[E-TICKET NUMBER]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="400" y="140" width="135" height="20"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="10" isBold="false" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["SGU-" + $P{bookingCode}]]></textFieldExpression>
+            </textField>
+
+            <!-- ============ PASSENGER INFORMATION ============ -->
+            <rectangle>
+                <reportElement x="0" y="175" width="555" height="25" backcolor="#1E40AF"/>
+                <graphicElement><pen lineWidth="0"/></graphicElement>
+            </rectangle>
+            
+            <staticText>
+                <reportElement x="10" y="175" width="200" height="25" forecolor="#FFFFFF"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="10" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <text><![CDATA[PASSENGER INFORMATION | HÀNH KHÁCH]]></text>
+            </staticText>
+
+            <line>
+                <reportElement x="0" y="200" width="555" height="1"/>
+                <graphicElement><pen lineWidth="0.5" lineColor="#CCCCCC"/></graphicElement>
+            </line>
+
+            <staticText>
+                <reportElement x="20" y="210" width="120" height="15"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" size="8" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <text><![CDATA[PASSENGER NAME]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="20" y="225" width="250" height="20"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" size="10" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{passengerName}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="300" y="210" width="100" height="15"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" size="8" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <text><![CDATA[TICKET TYPE]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="300" y="225" width="235" height="20"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" size="10" isBold="false" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{travelType} != null ? $P{travelType} : "One Way | Một chiều"]]></textFieldExpression>
+            </textField>
+
+            <!-- ============ FLIGHT ITINERARY ============ -->
+            <rectangle>
+                <reportElement x="0" y="260" width="555" height="25" backcolor="#1E40AF"/>
+                <graphicElement><pen lineWidth="0"/></graphicElement>
+            </rectangle>
+            
+            <staticText>
+                <reportElement x="10" y="260" width="200" height="25" forecolor="#FFFFFF"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="10" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <text><![CDATA[FLIGHT ITINERARY | HÀNH TRÌNH]]></text>
+            </staticText>
+
+            <!-- Flight Route Visual -->
+            <rectangle>
+                <reportElement x="0" y="295" width="555" height="120" backcolor="#F9FAFB"/>
+                <graphicElement><pen lineWidth="1" lineColor="#E5E7EB"/></graphicElement>
+            </rectangle>
+
+            <!-- Departure Info -->
+            <staticText>
+                <reportElement x="40" y="305" width="150" height="15" forecolor="#6B7280"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" size="8" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <text><![CDATA[FROM | KHỞI HÀNH]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="40" y="320" width="180" height="30"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" size="12" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{departureCity}]]></textFieldExpression>
+            </textField>
+            
+            <textField>
+                <reportElement x="40" y="350" width="180" height="15"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" size="8" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{departureAirport}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="40" y="370" width="180" height="20"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" size="10" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{departureDate}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="40" y="390" width="180" height="18" forecolor="#DC2626"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" size="12" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{departureTime}]]></textFieldExpression>
+            </textField>
+
+            <!-- Arrow -->
+            <staticText>
+                <reportElement x="235" y="330" width="85" height="40" forecolor="#1E40AF"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="18" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <text><![CDATA[✈ ──→]]></text>
+            </staticText>
+
+            <!-- Flight Number in center -->
+            <textField>
+                <reportElement x="235" y="375" width="85" height="25" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="10" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{flightNumber}]]></textFieldExpression>
+            </textField>
+            
+            <rectangle>
+                <reportElement x="235" y="375" width="85" height="25" backcolor="#1E40AF"/>
+                <graphicElement><pen lineWidth="0"/></graphicElement>
+            </rectangle>
+            
+            <textField>
+                <reportElement x="235" y="375" width="85" height="25" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="10" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{flightNumber}]]></textFieldExpression>
+            </textField>
+
+            <!-- Arrival Info -->
+            <staticText>
+                <reportElement x="335" y="305" width="180" height="15" forecolor="#6B7280"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" size="8" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <text><![CDATA[TO | ĐẾN]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="335" y="320" width="180" height="30"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" size="12" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{arrivalCity}]]></textFieldExpression>
+            </textField>
+            
+            <textField>
+                <reportElement x="335" y="350" width="180" height="15"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" size="8" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{arrivalAirport}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="335" y="370" width="180" height="20"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" size="10" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{departureDate}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="335" y="390" width="180" height="18" forecolor="#059669"/>
+                <textElement>
+                <font fontName="DejaVu Sans" size="12" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{arrivalTime}]]></textFieldExpression>
+            </textField>
+
+            <!-- ============ BOOKING DETAILS ============ -->
+            <rectangle>
+                <reportElement x="0" y="425" width="555" height="25" backcolor="#1E40AF"/>
+                <graphicElement><pen lineWidth="0"/></graphicElement>
+            </rectangle>
+            
+            <staticText>
+                <reportElement x="10" y="425" width="200" height="25" forecolor="#FFFFFF"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="10" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <text><![CDATA[BOOKING DETAILS | CHI TIẾT ĐẶT CHỖ]]></text>
+            </staticText>
+
+            <rectangle>
+                <reportElement x="0" y="450" width="555" height="80" backcolor="#F9FAFB"/>
+                <graphicElement><pen lineWidth="1" lineColor="#E5E7EB"/></graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement x="15" y="460" width="100" height="15" forecolor="#6B7280"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" size="8" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <text><![CDATA[CLASS | HẠNG VÉ]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="15" y="475" width="120" height="20"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" size="10" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{ticketClass}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="150" y="460" width="110" height="15" forecolor="#6B7280"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" size="8" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <text><![CDATA[SEAT | GHẾ NGỒI]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="150" y="475" width="110" height="20"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" size="10" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{seatNumber}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="15" y="500" width="120" height="15" forecolor="#6B7280"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" size="8" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <text><![CDATA[BOOKING DATE]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="15" y="515" width="240" height="15"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" size="10" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{bookingDate}]]></textFieldExpression>
+            </textField>
+
+
+
+            <!-- ============ IMPORTANT INFORMATION ============ -->
+            <rectangle>
+                <reportElement x="0" y="540" width="555" height="25" backcolor="#DC2626"/>
+                <graphicElement><pen lineWidth="0"/></graphicElement>
+            </rectangle>
+            
+            <staticText>
+                <reportElement x="10" y="540" width="300" height="25" forecolor="#FFFFFF"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="10" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <text><![CDATA[⚠ IMPORTANT INFORMATION | LƯU Ý QUAN TRỌNG]]></text>
+            </staticText>
+
+            <rectangle>
+                <reportElement x="0" y="565" width="555" height="140" backcolor="#FEF2F2"/>
+                <graphicElement><pen lineWidth="1" lineColor="#FEE2E2"/></graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement x="15" y="575" width="525" height="120"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" size="8" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                    <paragraph lineSpacing="1_1_2"/>
+                </textElement>
+                <text><![CDATA[✓ Please arrive at the airport at least 2 hours before departure for domestic flights and 3 hours for international flights.
+  Vui lòng có mặt tại sân bay ít nhất 2 giờ trước giờ bay nội địa và 3 giờ cho chuyến bay quốc tế.
+
+✓ This e-ticket must be presented along with valid ID/passport at check-in.
+  Vé điện tử này phải được xuất trình cùng với CMND/Hộ chiếu hợp lệ khi làm thủ tục.
+
+✓ Check-in counters close 40 minutes before departure time.
+  Quầy làm thủ tục đóng cửa trước 40 phút giờ bay.
+
+✓ Baggage allowance: Economy 20kg, Business 30kg. Cabin baggage: 7kg.
+  Hành lý ký gửi: Phổ thông 20kg, Thương gia 30kg. Hành lý xách tay: 7kg.]]></text>
+            </staticText>
+
+            <!-- ============ FOOTER ============ -->
+            <line>
+                <reportElement x="0" y="720" width="555" height="1"/>
+                <graphicElement><pen lineWidth="1" lineColor="#CCCCCC"/></graphicElement>
+            </line>
+
+            <staticText>
+                <reportElement x="0" y="730" width="555" height="40" forecolor="#6B7280"/>
+                <textElement textAlignment="Center">
+                    <font fontName="DejaVu Sans" size="8" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                    <paragraph lineSpacing="1_1_2"/>
+                </textElement>
+                <text><![CDATA[SGU AIRLINES - Saigon University Airlines
+Địa chỉ: 273 An Dương Vương, Phường 3, Quận 5, TP.HCM
+Email: support@sguairlines.vn | Website: www.sguairlines.vn | Hotline: 19001886]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="0" y="775" width="555" height="25" forecolor="#9CA3AF"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="7" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+                </textElement>
+                <text><![CDATA[© 2025 SGU Airlines. All rights reserved. | This is an electronic ticket and does not require a signature.]]></text>
+            </staticText>
+        </band>
+    </title>
+
+</jasperReport>
+
+
