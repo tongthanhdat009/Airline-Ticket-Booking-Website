@@ -27,7 +27,7 @@ public class SanBay {
     @Column(name = "ma_iata", length = 3, unique = true)
     private String maIATA;
 
-    @Column(name = "ma_icao", length = 4, unique = true)
+    @Column(name = "ma_icao", length = 4)
     private String maICAO;
 
     @Column(name = "tensanbay", nullable = false)

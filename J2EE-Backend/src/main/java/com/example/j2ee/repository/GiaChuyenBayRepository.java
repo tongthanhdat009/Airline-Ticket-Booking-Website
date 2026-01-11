@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface GiaChuyenBayRepository extends JpaRepository<GiaChuyenBay, Integer> {
@@ -27,13 +27,10 @@ public interface GiaChuyenBayRepository extends JpaRepository<GiaChuyenBay, Inte
     List<GiaChuyenBay> findOverlappedByTuyenBayAndHangVe(
             @Param("tuyenBay") TuyenBay tuyenBay,
             @Param("hangVe") HangVe hangVe,
-            @Param("ngayApDungTu") Date ngayApDungTu,
-            @Param("ngayApDungDen") Date ngayApDungDen
+            @Param("ngayApDungTu") LocalDate ngayApDungTu,
+            @Param("ngayApDungDen") LocalDate ngayApDungDen
     );
 
-    /**
-     * Tương tự như trên nhưng loại trừ bản ghi có maGia cụ thể (dùng khi sửa)
-     */
     @Query("SELECT g FROM GiaChuyenBay g WHERE g.tuyenBay = :tuyenBay " +
             "AND g.hangVe = :hangVe " +
             "AND g.maGia <> :maGia " +
@@ -48,12 +45,17 @@ public interface GiaChuyenBayRepository extends JpaRepository<GiaChuyenBay, Inte
     List<GiaChuyenBay> findOverlappedByTuyenBayAndHangVeExcludingId(
             @Param("tuyenBay") TuyenBay tuyenBay,
             @Param("hangVe") HangVe hangVe,
-            @Param("ngayApDungTu") Date ngayApDungTu,
-            @Param("ngayApDungDen") Date ngayApDungDen,
+            @Param("ngayApDungTu") LocalDate ngayApDungTu,
+            @Param("ngayApDungDen") LocalDate ngayApDungDen,
             @Param("maGia") int maGia
     );
 
-        @Query(value = """
+    /**
+     * Tìm giá theo tuyến bay và hạng vé
+     */
+    GiaChuyenBay findByTuyenBay_MaTuyenBayAndHangVe_MaHangVe(int maTuyenBay, int maHangVe);
+
+    @Query(value = """
         SELECT gcb.*
         FROM hangve hv
         JOIN giachuyenbay gcb ON hv.mahangve = gcb.mahangve 

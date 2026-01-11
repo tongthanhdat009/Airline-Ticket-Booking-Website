@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,8 +29,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
     public JwtFilter(
             JwtUtil jwtUtil,
-            @Qualifier("userAccountDetailsService") UserDetailsService userService,
-            @Qualifier("adminAccountDetailsService") UserDetailsService adminService
+            @Lazy @Qualifier("userAccountDetailsService") UserDetailsService userService,
+            @Lazy @Qualifier("adminAccountDetailsService") UserDetailsService adminService
     ) {
         this.jwtUtil = jwtUtil;
         this.userService = userService;

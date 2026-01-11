@@ -37,8 +37,8 @@ public class ClientDichVuController {
                 return ResponseEntity.status(404).body(errorResponse);
             }
             
-            // Lấy mã chuyến bay từ đặt chỗ
-            int maChuyenBay = datCho.getChiTietGhe().getChiTietChuyenBay().getMaChuyenBay();
+            // Lấy mã chuyến bay trực tiếp từ đặt chỗ
+            int maChuyenBay = datCho.getChuyenBay().getMaChuyenBay();
             
             // Lấy danh sách dịch vụ của chuyến bay
             List<DichVuChuyenBay> dichVuChuyenBay = dichVuChuyenBayRepository.findByChiTietChuyenBay_MaChuyenBay(maChuyenBay);

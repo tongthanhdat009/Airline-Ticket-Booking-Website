@@ -9,12 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.List;
 
 @Service
 public class CheckInService {
@@ -52,16 +48,20 @@ public class CheckInService {
                 return new CheckInResponse(false, "Họ tên không khớp với mã đặt chỗ", null);
             }
             
-            // Lấy thông tin ghế và chuyến bay
-            ChiTietGhe chiTietGhe = datCho.getChiTietGhe();
-            if (chiTietGhe == null) {
-                return new CheckInResponse(false, "Thông tin ghế không tồn tại", null);
-            }
-            
-            ChiTietChuyenBay chuyenBay = chiTietGhe.getChiTietChuyenBay();
+            // Lấy thông tin chuyến bay trực tiếp từ đặt chỗ
+            ChiTietChuyenBay chuyenBay = datCho.getChuyenBay();
             if (chuyenBay == null) {
                 return new CheckInResponse(false, "Thông tin chuyến bay không tồn tại", null);
             }
+            
+            // Lấy hạng vé trực tiếp từ đặt chỗ
+            HangVe hangVe = datCho.getHangVe();
+            if (hangVe == null) {
+                return new CheckInResponse(false, "Thông tin hạng vé không tồn tại", null);
+            }
+            
+            // Lấy ghế đã chọn (có thể null nếu chưa chọn ghế cụ thể)
+            ChiTietGhe chiTietGhe = datCho.getChiTietGhe();
             
             // Kiểm tra trạng thái chuyến bay
             if (!"Đang mở bán".equals(chuyenBay.getTrangThai())) {
@@ -105,9 +105,6 @@ public class CheckInService {
             SanBay sanBayDi = tuyenBay.getSanBayDi();
             SanBay sanBayDen = tuyenBay.getSanBayDen();
             
-            // Lấy hạng vé
-            HangVe hangVe = chiTietGhe.getHangVe();
-            
             // Format time
             DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm");
             String gioDi = chuyenBay.getGioDi().format(timeFormat);
@@ -125,19 +122,19 @@ public class CheckInService {
             bookingInfo.setNgaySinh(hanhKhach.getNgaySinh());
             bookingInfo.setGioiTinh(hanhKhach.getGioiTinh());
             
-            // Chuyến bay - Convert LocalDate to Date
+            // Chuyến bay
             bookingInfo.setSoHieuChuyenBay(chuyenBay.getSoHieuChuyenBay());
-            bookingInfo.setNgayDi(Date.from(chuyenBay.getNgayDi().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            bookingInfo.setNgayDi(chuyenBay.getNgayDi());
             bookingInfo.setGioDi(gioDi);
-            bookingInfo.setNgayDen(Date.from(chuyenBay.getNgayDen().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            bookingInfo.setNgayDen(chuyenBay.getNgayDen());
             bookingInfo.setGioDen(gioDen);
             bookingInfo.setTenSanBayDi(sanBayDi.getTenSanBay());
             bookingInfo.setMaSanBayDi(sanBayDi.getMaIATA());
             bookingInfo.setTenSanBayDen(sanBayDen.getTenSanBay());
             bookingInfo.setMaSanBayDen(sanBayDen.getMaIATA());
             
-            // Ghế
-            bookingInfo.setMaGhe(chiTietGhe.getMaGhe());
+            // Ghế (có thể null nếu chưa chọn ghế cụ thể)
+            bookingInfo.setMaGhe(chiTietGhe != null ? chiTietGhe.getMaGhe() : 0);
             bookingInfo.setTenHangVe(hangVe.getTenHangVe());
             
             // Thanh toán
@@ -173,7 +170,7 @@ public class CheckInService {
             
             // Cập nhật trạng thái check-in
             datCho.setCheckInStatus(true);
-            datCho.setCheckInTime(new java.util.Date());
+            datCho.setCheckInTime(java.time.LocalDateTime.now());
             datChoRepository.save(datCho);
             
             logger.info("Check-in confirmed for booking: {}", maDatCho);

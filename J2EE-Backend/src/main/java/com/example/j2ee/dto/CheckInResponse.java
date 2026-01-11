@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -19,7 +21,7 @@ public class CheckInResponse {
     @AllArgsConstructor
     public static class BookingInfo {
         private int maDatCho;
-        private Date ngayDatCho;
+        private LocalDateTime ngayDatCho;
         
         // Thông tin hành khách
         private String hoVaTen;
@@ -30,9 +32,9 @@ public class CheckInResponse {
         
         // Thông tin chuyến bay
         private String soHieuChuyenBay;
-        private Date ngayDi;
+        private LocalDate ngayDi;
         private String gioDi;
-        private Date ngayDen;
+        private LocalDate ngayDen;
         private String gioDen;
         private String tenSanBayDi;
         private String maSanBayDi;

@@ -78,8 +78,9 @@ public class ThanhToanController {
                     if (datCho.getChiTietGhe() != null) {
                         Map<String, Object> gheInfo = new HashMap<>();
                         gheInfo.put("maGhe", datCho.getChiTietGhe().getMaGhe());
+                        gheInfo.put("soGhe", datCho.getChiTietGhe().getSoGhe());
                         
-                        // Thông tin hạng vé
+                        // Thông tin hạng vé từ ghế
                         if (datCho.getChiTietGhe().getHangVe() != null) {
                             Map<String, Object> hangVeInfo = new HashMap<>();
                             hangVeInfo.put("maHangVe", datCho.getChiTietGhe().getHangVe().getMaHangVe());
@@ -88,51 +89,60 @@ public class ThanhToanController {
                             gheInfo.put("hangVe", hangVeInfo);
                         }
                         
-                        // Thông tin chuyến bay
-                        if (datCho.getChiTietGhe().getChiTietChuyenBay() != null) {
-                            Map<String, Object> chuyenBayInfo = new HashMap<>();
-                            chuyenBayInfo.put("maChuyenBay", datCho.getChiTietGhe().getChiTietChuyenBay().getMaChuyenBay());
-                            chuyenBayInfo.put("soHieuChuyenBay", datCho.getChiTietGhe().getChiTietChuyenBay().getSoHieuChuyenBay());
-                            chuyenBayInfo.put("ngayDi", datCho.getChiTietGhe().getChiTietChuyenBay().getNgayDi());
-                            chuyenBayInfo.put("gioDi", datCho.getChiTietGhe().getChiTietChuyenBay().getGioDi());
-                            chuyenBayInfo.put("ngayDen", datCho.getChiTietGhe().getChiTietChuyenBay().getNgayDen());
-                            chuyenBayInfo.put("gioDen", datCho.getChiTietGhe().getChiTietChuyenBay().getGioDen());
-                            chuyenBayInfo.put("trangThai", datCho.getChiTietGhe().getChiTietChuyenBay().getTrangThai());
+                        datChoInfo.put("chiTietGhe", gheInfo);
+                    }
+                    
+                    // Thông tin hạng vé từ đặt chỗ
+                    if (datCho.getHangVe() != null) {
+                        Map<String, Object> hangVeInfo = new HashMap<>();
+                        hangVeInfo.put("maHangVe", datCho.getHangVe().getMaHangVe());
+                        hangVeInfo.put("tenHangVe", datCho.getHangVe().getTenHangVe());
+                        hangVeInfo.put("sucChua", datCho.getHangVe().getSucChua());
+                        datChoInfo.put("hangVe", hangVeInfo);
+                    }
+                    
+                    // Thông tin chuyến bay - lấy trực tiếp từ datCho
+                    if (datCho.getChuyenBay() != null) {
+                        Map<String, Object> chuyenBayInfo = new HashMap<>();
+                        chuyenBayInfo.put("maChuyenBay", datCho.getChuyenBay().getMaChuyenBay());
+                        chuyenBayInfo.put("soHieuChuyenBay", datCho.getChuyenBay().getSoHieuChuyenBay());
+                        chuyenBayInfo.put("ngayDi", datCho.getChuyenBay().getNgayDi());
+                        chuyenBayInfo.put("gioDi", datCho.getChuyenBay().getGioDi());
+                        chuyenBayInfo.put("ngayDen", datCho.getChuyenBay().getNgayDen());
+                        chuyenBayInfo.put("gioDen", datCho.getChuyenBay().getGioDen());
+                        chuyenBayInfo.put("trangThai", datCho.getChuyenBay().getTrangThai());
+                        
+                        // Thông tin tuyến bay
+                        if (datCho.getChuyenBay().getTuyenBay() != null) {
+                            Map<String, Object> tuyenBayInfo = new HashMap<>();
+                            tuyenBayInfo.put("maTuyenBay", datCho.getChuyenBay().getTuyenBay().getMaTuyenBay());
                             
-                            // Thông tin tuyến bay
-                            if (datCho.getChiTietGhe().getChiTietChuyenBay().getTuyenBay() != null) {
-                                Map<String, Object> tuyenBayInfo = new HashMap<>();
-                                tuyenBayInfo.put("maTuyenBay", datCho.getChiTietGhe().getChiTietChuyenBay().getTuyenBay().getMaTuyenBay());
-                                
-                                // Sân bay đi
-                                if (datCho.getChiTietGhe().getChiTietChuyenBay().getTuyenBay().getSanBayDi() != null) {
-                                    Map<String, Object> sanBayDi = new HashMap<>();
-                                    sanBayDi.put("maSanBay", datCho.getChiTietGhe().getChiTietChuyenBay().getTuyenBay().getSanBayDi().getMaSanBay());
-                                    sanBayDi.put("tenSanBay", datCho.getChiTietGhe().getChiTietChuyenBay().getTuyenBay().getSanBayDi().getTenSanBay());
-                                    sanBayDi.put("maIATA", datCho.getChiTietGhe().getChiTietChuyenBay().getTuyenBay().getSanBayDi().getMaIATA());
-                                    sanBayDi.put("thanhPho", datCho.getChiTietGhe().getChiTietChuyenBay().getTuyenBay().getSanBayDi().getThanhPhoSanBay());
-                                    sanBayDi.put("quocGia", datCho.getChiTietGhe().getChiTietChuyenBay().getTuyenBay().getSanBayDi().getQuocGiaSanBay());
-                                    tuyenBayInfo.put("sanBayDi", sanBayDi);
-                                }
-                                
-                                // Sân bay đến
-                                if (datCho.getChiTietGhe().getChiTietChuyenBay().getTuyenBay().getSanBayDen() != null) {
-                                    Map<String, Object> sanBayDen = new HashMap<>();
-                                    sanBayDen.put("maSanBay", datCho.getChiTietGhe().getChiTietChuyenBay().getTuyenBay().getSanBayDen().getMaSanBay());
-                                    sanBayDen.put("tenSanBay", datCho.getChiTietGhe().getChiTietChuyenBay().getTuyenBay().getSanBayDen().getTenSanBay());
-                                    sanBayDen.put("maIATA", datCho.getChiTietGhe().getChiTietChuyenBay().getTuyenBay().getSanBayDen().getMaIATA());
-                                    sanBayDen.put("thanhPho", datCho.getChiTietGhe().getChiTietChuyenBay().getTuyenBay().getSanBayDen().getThanhPhoSanBay());
-                                    sanBayDen.put("quocGia", datCho.getChiTietGhe().getChiTietChuyenBay().getTuyenBay().getSanBayDen().getQuocGiaSanBay());
-                                    tuyenBayInfo.put("sanBayDen", sanBayDen);
-                                }
-                                
-                                chuyenBayInfo.put("tuyenBay", tuyenBayInfo);
+                            // Sân bay đi
+                            if (datCho.getChuyenBay().getTuyenBay().getSanBayDi() != null) {
+                                Map<String, Object> sanBayDi = new HashMap<>();
+                                sanBayDi.put("maSanBay", datCho.getChuyenBay().getTuyenBay().getSanBayDi().getMaSanBay());
+                                sanBayDi.put("tenSanBay", datCho.getChuyenBay().getTuyenBay().getSanBayDi().getTenSanBay());
+                                sanBayDi.put("maIATA", datCho.getChuyenBay().getTuyenBay().getSanBayDi().getMaIATA());
+                                sanBayDi.put("thanhPho", datCho.getChuyenBay().getTuyenBay().getSanBayDi().getThanhPhoSanBay());
+                                sanBayDi.put("quocGia", datCho.getChuyenBay().getTuyenBay().getSanBayDi().getQuocGiaSanBay());
+                                tuyenBayInfo.put("sanBayDi", sanBayDi);
                             }
                             
-                            gheInfo.put("chuyenBay", chuyenBayInfo);
+                            // Sân bay đến
+                            if (datCho.getChuyenBay().getTuyenBay().getSanBayDen() != null) {
+                                Map<String, Object> sanBayDen = new HashMap<>();
+                                sanBayDen.put("maSanBay", datCho.getChuyenBay().getTuyenBay().getSanBayDen().getMaSanBay());
+                                sanBayDen.put("tenSanBay", datCho.getChuyenBay().getTuyenBay().getSanBayDen().getTenSanBay());
+                                sanBayDen.put("maIATA", datCho.getChuyenBay().getTuyenBay().getSanBayDen().getMaIATA());
+                                sanBayDen.put("thanhPho", datCho.getChuyenBay().getTuyenBay().getSanBayDen().getThanhPhoSanBay());
+                                sanBayDen.put("quocGia", datCho.getChuyenBay().getTuyenBay().getSanBayDen().getQuocGiaSanBay());
+                                tuyenBayInfo.put("sanBayDen", sanBayDen);
+                            }
+                            
+                            chuyenBayInfo.put("tuyenBay", tuyenBayInfo);
                         }
                         
-                        datChoInfo.put("chiTietGhe", gheInfo);
+                        datChoInfo.put("chuyenBay", chuyenBayInfo);
                     }
                     
                     // Thông tin dịch vụ đã chọn (nếu có)

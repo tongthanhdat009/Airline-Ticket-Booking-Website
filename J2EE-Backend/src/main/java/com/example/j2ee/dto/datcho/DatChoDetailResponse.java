@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -15,7 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class DatChoDetailResponse {
     private Integer maDatCho;
-    private Date ngayDatCho;
+    private LocalDateTime ngayDatCho;
     private HanhKhach hanhKhach;
     private ChiTietGhe chiTietGhe;
     private ThanhToanInfo thanhToan;

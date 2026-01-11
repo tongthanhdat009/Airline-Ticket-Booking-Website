@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -30,9 +31,9 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
 
     public SecurityConfig(
-            JwtFilter jwtFilter,
-            @Qualifier("userAccountDetailsService") UserDetailsService userDetailsService,
-            @Qualifier("adminAccountDetailsService") UserDetailsService adminDetailsService,
+            @Lazy JwtFilter jwtFilter,
+            @Lazy @Qualifier("userAccountDetailsService") UserDetailsService userDetailsService,
+            @Lazy @Qualifier("adminAccountDetailsService") UserDetailsService adminDetailsService,
             OAuth2SuccessHandler oAuth2SuccessHandler,
             OAuth2FailureHandler oAuth2FailureHandler,
             PasswordEncoder passwordEncoder

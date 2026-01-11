@@ -13,8 +13,10 @@ import com.example.j2ee.repository.DatChoRepository;
 import com.example.j2ee.repository.HanhKhachRepository;
 import com.example.j2ee.repository.ChiTietGheRepository;
 import com.example.j2ee.repository.TrangThaiThanhToanRepository;
+import com.example.j2ee.repository.GheDaDatRepository;
 import com.example.j2ee.service.DatChoService;
 import jakarta.validation.Valid;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/client/datcho")
@@ -34,6 +35,7 @@ public class ClientDatChoController {
     private final HanhKhachRepository hanhKhachRepository;
     private final ChiTietGheRepository chiTietGheRepository;
     private final TrangThaiThanhToanRepository trangThaiThanhToanRepository;
+    private final GheDaDatRepository gheDaDatRepository;
 
     /**
      * Lấy danh sách đặt chỗ của hành khách theo mã hành khách
@@ -116,8 +118,10 @@ public class ClientDatChoController {
     /**
      * Tạo đặt chỗ mới với thông tin hành khách và thanh toán
      * Hỗ trợ đặt cho nhiều hành khách cùng lúc
+     * @Transactional: Đảm bảo dữ liệu nhất quán, rollback nếu có lỗi
      */
     @PostMapping("/create")
+    @Transactional
     public ResponseEntity<ApiResponse<CreateBookingResponse>> createBooking(
             @Valid @RequestBody CreateBookingRequest request) {
         // Validate input BEFORE starting transaction
@@ -163,17 +167,22 @@ public class ClientDatChoController {
                     return ResponseEntity.badRequest()
                         .body(ApiResponse.error("Không tìm thấy ghế với mã: " + maGhe));
                 }
-                if (ghe.getDatCho() != null) {
+                
+                // CHỐNG RACE CONDITION: Kiểm tra ghế đã được đặt chưa qua GheDaDat
+                if (gheDaDatRepository.existsByChuyenBay_MaChuyenBayAndGhe_MaGhe(
+                        request.getFlightInfo().getOutbound().getMaChuyenBay(), maGhe)) {
                     return ResponseEntity.badRequest()
                         .body(ApiResponse.error("Ghế " + maGhe + " đã được đặt. Vui lòng chọn ghế khác."));
                 }
+                
                 danhSachGhe.add(ghe);
             }
 
             // Create bookings for all passengers (OUTBOUND FLIGHT)
             List<Integer> danhSachMaDatCho = new ArrayList<>();
             List<Integer> danhSachMaHanhKhach = new ArrayList<>();
-            Date ngayDatCho = new Date(); // Same booking date for all
+            java.time.LocalDateTime ngayDatCho = java.time.LocalDateTime.now(); // Same booking date for all
+            
             
             for (int i = 0; i < request.getPassengerInfo().size(); i++) {
                 CreateBookingRequest.PassengerInfo passengerInfo = request.getPassengerInfo().get(i);
@@ -193,6 +202,9 @@ public class ClientDatChoController {
                 
                 DatCho savedDatCho = datChoRepository.save(datCho);
                 danhSachMaDatCho.add(savedDatCho.getMaDatCho());
+                
+                // GheDaDat sẽ được tạo sau khi booking hoàn thành và thanh toán
+                // Lúc này ta chỉ lưu DatCho tạm thời
             }
             
             // If round-trip, create bookings for RETURN FLIGHT
@@ -214,6 +226,8 @@ public class ClientDatChoController {
                         .body(ApiResponse.error("Số lượng ghế chiều về (" + danhSachMaGheVe.size() + ") phải bằng số lượng hành khách (" + request.getPassengerInfo().size() + ")"));
                 }
                 
+                int maChuyenBayReturn = request.getFlightInfo().getReturnFlight().getMaChuyenBay();
+                
                 List<ChiTietGhe> danhSachGheVe = new ArrayList<>();
                 for (Integer maGhe : danhSachMaGheVe) {
                     ChiTietGhe ghe = chiTietGheRepository.findById(maGhe).orElse(null);
@@ -221,10 +235,13 @@ public class ClientDatChoController {
                         return ResponseEntity.badRequest()
                             .body(ApiResponse.error("Không tìm thấy ghế chiều về với mã: " + maGhe));
                     }
-                    if (ghe.getDatCho() != null) {
+                    
+                    // CHỐNG RACE CONDITION: Kiểm tra ghế đã được đặt chưa
+                    if (gheDaDatRepository.existsByChuyenBay_MaChuyenBayAndGhe_MaGhe(maChuyenBayReturn, maGhe)) {
                         return ResponseEntity.badRequest()
                             .body(ApiResponse.error("Ghế chiều về " + maGhe + " đã được đặt. Vui lòng chọn ghế khác."));
                     }
+                    
                     danhSachGheVe.add(ghe);
                 }
                 
@@ -244,6 +261,8 @@ public class ClientDatChoController {
                     
                     DatCho savedDatChoVe = datChoRepository.save(datChoVe);
                     danhSachMaDatCho.add(savedDatChoVe.getMaDatCho());
+                    
+                    // GheDaDat sẽ được tạo sau khi booking hoàn thành và thanh toán
                 }
                 
                 System.out.println("DEBUG: Created " + danhSachMaGheVe.size() + " return flight bookings");

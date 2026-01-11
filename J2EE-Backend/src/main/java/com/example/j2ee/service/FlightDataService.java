@@ -171,11 +171,11 @@ public class FlightDataService {
                 
                 DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                 sb.append(String.format("   Áp dụng từ: %s", 
-                    new java.sql.Date(price.getNgayApDungTu().getTime()).toLocalDate().format(dateFormatter)));
+                    price.getNgayApDungTu().format(dateFormatter)));
                 
                 if (price.getNgayApDungDen() != null) {
                     sb.append(String.format(" đến %s", 
-                        new java.sql.Date(price.getNgayApDungDen().getTime()).toLocalDate().format(dateFormatter)));
+                        price.getNgayApDungDen().format(dateFormatter)));
                 }
                 sb.append("\n\n");
             }
@@ -383,9 +383,9 @@ public class FlightDataService {
                 .filter(gia -> gia.getTuyenBay().getMaTuyenBay() == flight.getTuyenBay().getMaTuyenBay())
                 .filter(gia -> {
                     LocalDate ngayDi = flight.getNgayDi();
-                    LocalDate ngayApDungTu = new java.sql.Date(gia.getNgayApDungTu().getTime()).toLocalDate();
+                    LocalDate ngayApDungTu = gia.getNgayApDungTu();
                     LocalDate ngayApDungDen = gia.getNgayApDungDen() != null
-                            ? new java.sql.Date(gia.getNgayApDungDen().getTime()).toLocalDate()
+                            ? gia.getNgayApDungDen()
                             : LocalDate.MAX;
                     return !ngayDi.isBefore(ngayApDungTu) && !ngayDi.isAfter(ngayApDungDen);
                 })

@@ -184,18 +184,12 @@ public class VNPayService {
         }
         
         DatCho mainBooking = thanhToan.getDatCho();
-        Date bookingTime = mainBooking.getNgayDatCho();
+        java.time.LocalDateTime bookingTime = mainBooking.getNgayDatCho();
         
         // Search for ALL bookings within 5 seconds (regardless of flight)
         // This captures both outbound and return flights for round-trip bookings
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(bookingTime);
-        cal.add(Calendar.SECOND, -5);
-        Date startTime = cal.getTime();
-        
-        cal.setTime(bookingTime);
-        cal.add(Calendar.SECOND, 5);
-        Date endTime = cal.getTime();
+        java.time.LocalDateTime startTime = bookingTime.minusSeconds(5);
+        java.time.LocalDateTime endTime = bookingTime.plusSeconds(5);
         
         // Find all bookings in the same time window (captures all flights in group booking)
         List<DatCho> allBookings = datChoRepository.findAllBookingsByTime(startTime, endTime);
@@ -228,12 +222,10 @@ public class VNPayService {
             
             // Sort bookings by flight date to ensure correct order (outbound first, then return)
             passengerBookings.sort((b1, b2) -> {
-                LocalDate d1 = b1.getChiTietGhe() != null && 
-                          b1.getChiTietGhe().getChiTietChuyenBay() != null ?
-                          b1.getChiTietGhe().getChiTietChuyenBay().getNgayDi() : LocalDate.MIN;
-                LocalDate d2 = b2.getChiTietGhe() != null && 
-                          b2.getChiTietGhe().getChiTietChuyenBay() != null ?
-                          b2.getChiTietGhe().getChiTietChuyenBay().getNgayDi() : LocalDate.MIN;
+                LocalDate d1 = b1.getChuyenBay() != null ?
+                          b1.getChuyenBay().getNgayDi() : LocalDate.MIN;
+                LocalDate d2 = b2.getChuyenBay() != null ?
+                          b2.getChuyenBay().getNgayDi() : LocalDate.MIN;
                 return d1.compareTo(d2);
             });
             
@@ -283,8 +275,8 @@ public class VNPayService {
                         flightType = (i == 0 ? " (Chiều đi)" : " (Chiều về)");
                     }
                     
-                    if (booking.getChiTietGhe() != null && booking.getChiTietGhe().getChiTietChuyenBay() != null) {
-                        var flight = booking.getChiTietGhe().getChiTietChuyenBay();
+                    if (booking.getChuyenBay() != null) {
+                        var flight = booking.getChuyenBay();
                         flightNumber = flight.getSoHieuChuyenBay() + flightType;
                         
                         if (flight.getTuyenBay() != null) {
@@ -307,8 +299,8 @@ public class VNPayService {
                 
                 String flightNumbers = passengerBookings.stream()
                     .map(b -> {
-                        if (b.getChiTietGhe() != null && b.getChiTietGhe().getChiTietChuyenBay() != null) {
-                            return b.getChiTietGhe().getChiTietChuyenBay().getSoHieuChuyenBay();
+                        if (b.getChuyenBay() != null) {
+                            return b.getChuyenBay().getSoHieuChuyenBay();
                         }
                         return "-";
                     })
@@ -317,10 +309,9 @@ public class VNPayService {
                 
                 String routes = passengerBookings.stream()
                     .map(b -> {
-                        if (b.getChiTietGhe() != null && 
-                            b.getChiTietGhe().getChiTietChuyenBay() != null &&
-                            b.getChiTietGhe().getChiTietChuyenBay().getTuyenBay() != null) {
-                            var tuyenBay = b.getChiTietGhe().getChiTietChuyenBay().getTuyenBay();
+                        if (b.getChuyenBay() != null &&
+                            b.getChuyenBay().getTuyenBay() != null) {
+                            var tuyenBay = b.getChuyenBay().getTuyenBay();
                             String dep = tuyenBay.getSanBayDi() != null ? 
                                 tuyenBay.getSanBayDi().getTenSanBay() : "-";
                             String arr = tuyenBay.getSanBayDen() != null ? 

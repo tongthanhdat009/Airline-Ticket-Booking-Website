@@ -1,17 +1,13 @@
 package com.example.j2ee.service;
 
 import com.example.j2ee.model.ChiTietChuyenBay;
-import com.example.j2ee.model.ChiTietGhe;
 import com.example.j2ee.model.DichVuChuyenBay;
 import com.example.j2ee.model.DichVuChuyenBayId;
 import com.example.j2ee.model.DichVuCungCap;
-import com.example.j2ee.model.HangVe;
 import com.example.j2ee.model.TuyenBay;
 import com.example.j2ee.repository.ChiTietChuyenBayRepository;
-import com.example.j2ee.repository.ChiTietGheRepository;
 import com.example.j2ee.repository.DichVuChuyenBayRepository;
 import com.example.j2ee.repository.DichVuCungCapRepository;
-import com.example.j2ee.repository.HangVeRepository;
 import com.example.j2ee.repository.TuyenBayRepository;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -20,7 +16,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -30,23 +25,17 @@ public class ChiTietChuyenBayService {
     private final TuyenBayRepository tuyenBayRepository;
     private final DichVuChuyenBayRepository dichVuChuyenBayRepository;
     private final DichVuCungCapRepository dichVuCungCapRepository;
-    private final ChiTietGheRepository chiTietGheRepository;
-    private final HangVeRepository hangVeRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
     public ChiTietChuyenBayService(ChiTietChuyenBayRepository chiTietChuyenBayRepository,
                                    TuyenBayRepository tuyenBayRepository,
                                    DichVuChuyenBayRepository dichVuChuyenBayRepository,
                                    DichVuCungCapRepository dichVuCungCapRepository,
-                                   ChiTietGheRepository chiTietGheRepository,
-                                   HangVeRepository hangVeRepository,
                                    SimpMessagingTemplate messagingTemplate) {
         this.chiTietChuyenBayRepository = chiTietChuyenBayRepository;
         this.tuyenBayRepository = tuyenBayRepository;
         this.dichVuChuyenBayRepository = dichVuChuyenBayRepository;
         this.dichVuCungCapRepository = dichVuCungCapRepository;
-        this.chiTietGheRepository = chiTietGheRepository;
-        this.hangVeRepository = hangVeRepository;
         this.messagingTemplate = messagingTemplate;
     }
 
@@ -128,7 +117,7 @@ public class ChiTietChuyenBayService {
             return "Chi tiết chuyến bay không tồn tại: " + ctUpdate.getMaChuyenBay();
         }
 
-        boolean hasSeats = ct.getDanhSachGhe() != null && !ct.getDanhSachGhe().isEmpty();
+        boolean hasSeats = ct.getDanhSachGheDaDat() != null && !ct.getDanhSachGheDaDat().isEmpty();
         boolean hasServices = ct.getDichVuCungCap() != null && !ct.getDichVuCungCap().isEmpty();
         boolean changingRoute = ctUpdate.getTuyenBay() != null
                 && ctUpdate.getTuyenBay().getMaTuyenBay() != 0
@@ -211,8 +200,8 @@ public class ChiTietChuyenBayService {
             return "Chi tiết chuyến bay không tồn tại: " + maChuyenBay;
         }
 
-        // Kiểm tra dữ liệu liên quan: ghế, đặt chỗ, dịch vụ chuyến bay
-        boolean hasSeats = existing.getDanhSachGhe() != null && !existing.getDanhSachGhe().isEmpty();
+        // Kiểm tra dữ liệu liên quan: ghế đã đặt, đặt chỗ, dịch vụ chuyến bay
+        boolean hasSeats = existing.getDanhSachGheDaDat() != null && !existing.getDanhSachGheDaDat().isEmpty();
         boolean hasServices = existing.getDichVuCungCap() != null && !existing.getDichVuCungCap().isEmpty();
         // Nếu có bảng đặt chỗ tham chiếu ghế, nên kiểm tra thông qua quan hệ ghế -> đặt chỗ (tùy model).
         if (hasSeats) {

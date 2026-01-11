@@ -99,7 +99,7 @@ public class JasperTicketService {
         
         DatCho booking = payment.getDatCho();
         ChiTietGhe chiTietGhe = booking != null ? booking.getChiTietGhe() : null;
-        ChiTietChuyenBay flight = chiTietGhe != null ? chiTietGhe.getChiTietChuyenBay() : null;
+        ChiTietChuyenBay flight = booking != null ? booking.getChuyenBay() : null;
 
         // Invoice information
         parameters.put("invoiceNumber", String.format("INV-%06d", payment.getMaThanhToan()));
@@ -147,10 +147,10 @@ public class JasperTicketService {
             parameters.put("route", "-");
         }
 
-        // Ticket class
-        if (chiTietGhe != null && chiTietGhe.getHangVe() != null) {
-            parameters.put("ticketClass", chiTietGhe.getHangVe().getTenHangVe() != null ? 
-                chiTietGhe.getHangVe().getTenHangVe() : "-");
+        // Ticket class - lấy từ DatCho.getHangVe()
+        if (booking != null && booking.getHangVe() != null) {
+            parameters.put("ticketClass", booking.getHangVe().getTenHangVe() != null ? 
+                booking.getHangVe().getTenHangVe() : "-");
         } else {
             parameters.put("ticketClass", "-");
         }
@@ -245,8 +245,8 @@ public class JasperTicketService {
         // Calculate payment amount (you may need to adjust this based on your business logic)
         // For now, use a default or calculate from flight price
         BigDecimal amount = BigDecimal.ZERO;
-        if (booking.getChiTietGhe() != null && booking.getChiTietGhe().getChiTietChuyenBay() != null) {
-            var flight = booking.getChiTietGhe().getChiTietChuyenBay();
+        if (booking.getChuyenBay() != null) {
+            var flight = booking.getChuyenBay();
             // Assuming there's a price field in flight or you can calculate it
             amount = new BigDecimal("1000000"); // Default value, adjust as needed
         }
@@ -301,7 +301,7 @@ public class JasperTicketService {
         
         DatCho booking = payment.getDatCho();
         ChiTietGhe chiTietGhe = booking != null ? booking.getChiTietGhe() : null;
-        ChiTietChuyenBay flight = chiTietGhe != null ? chiTietGhe.getChiTietChuyenBay() : null;
+        ChiTietChuyenBay flight = booking != null ? booking.getChuyenBay() : null;
 
         // Booking code
         String bookingCode = String.format("%d", booking != null ? booking.getMaDatCho() : 0);
@@ -385,18 +385,19 @@ public class JasperTicketService {
         }
 
         // Ticket class and seat
-        if (chiTietGhe != null) {
-            if (chiTietGhe.getHangVe() != null) {
-                parameters.put("ticketClass", chiTietGhe.getHangVe().getTenHangVe() != null ? 
-                    chiTietGhe.getHangVe().getTenHangVe() : "-");
-            } else {
-                parameters.put("ticketClass", "-");
-            }
-            
-            // Use seat ID as seat number (maghe)
-            parameters.put("seatNumber", String.valueOf(chiTietGhe.getMaGhe()));
+        // Lấy hạng vé từ DatCho
+        if (booking != null && booking.getHangVe() != null) {
+            parameters.put("ticketClass", booking.getHangVe().getTenHangVe() != null ? 
+                booking.getHangVe().getTenHangVe() : "-");
         } else {
             parameters.put("ticketClass", "-");
+        }
+        
+        // Lấy thông tin ghế nếu có
+        if (chiTietGhe != null) {
+            parameters.put("seatNumber", chiTietGhe.getSoGhe() != null ? 
+                chiTietGhe.getSoGhe() : String.valueOf(chiTietGhe.getMaGhe()));
+        } else {
             parameters.put("seatNumber", "-");
         }
 

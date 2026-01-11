@@ -24,7 +24,7 @@ public class GheChuyenBayController {
     }
 
     @GetMapping("/{maChuyenBay}")
-    public List<ChiTietGhe> getChiTietGheByGheId(@PathVariable int maChuyenBay){
-        return chiTietGheService.getChiTietGheByGheId(maChuyenBay);
+    public List<ChiTietGhe> getChiTietGheByChuyenBay(@PathVariable int maChuyenBay){
+        return chiTietGheService.getAvailableSeatsForFlight(maChuyenBay);
     }
 }

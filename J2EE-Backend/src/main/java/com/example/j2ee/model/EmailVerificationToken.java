@@ -18,21 +18,22 @@ public class EmailVerificationToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "token", nullable = false, unique = true, length = 255)
     private String token;
 
-    @Column(nullable = false)
+    @Column(name = "email", nullable = false, length = 100)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "expiry_date", nullable = false)
     private LocalDateTime expiryDate;
 
-    @Column(nullable = false)
+    @Column(name = "used", nullable = false)
     private boolean used = false;
 
-    @Column(nullable = false)
+    @Column(name = "created_date", nullable = false)
     private LocalDateTime createdDate;
 
     public EmailVerificationToken(String token, String email, LocalDateTime expiryDate) {

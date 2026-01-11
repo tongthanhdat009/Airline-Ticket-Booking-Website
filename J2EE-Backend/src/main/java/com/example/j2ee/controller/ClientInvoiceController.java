@@ -61,16 +61,17 @@ public class ClientInvoiceController {
             // Booking info
             parameters.put("bookingId", String.format("BK-%06d", datCho.getMaDatCho()));
             
-            // Flight info
-            ChiTietGhe chiTietGhe = datCho.getChiTietGhe();
-            ChiTietChuyenBay chuyenBay = chiTietGhe.getChiTietChuyenBay();
+            // Flight info - lấy trực tiếp từ datCho
+            ChiTietChuyenBay chuyenBay = datCho.getChuyenBay();
             TuyenBay tuyenBay = chuyenBay.getTuyenBay();
+            HangVe hangVe = datCho.getHangVe();
+            ChiTietGhe chiTietGhe = datCho.getChiTietGhe();
             
             parameters.put("flightNumber", chuyenBay.getSoHieuChuyenBay());
             parameters.put("route", tuyenBay.getSanBayDi().getThanhPhoSanBay() + " → " + tuyenBay.getSanBayDen().getThanhPhoSanBay());
             parameters.put("departureDate", chuyenBay.getNgayDi().format(dateFormatter));
             parameters.put("departureTime", chuyenBay.getGioDi().format(timeFormatter));
-            parameters.put("ticketClass", chiTietGhe.getHangVe().getTenHangVe());
+            parameters.put("ticketClass", hangVe.getTenHangVe());
             
             // Prepare service items data
             List<Map<String, Object>> items = new ArrayList<>();
@@ -96,7 +97,7 @@ public class ClientInvoiceController {
             // Add flight ticket as first item
             Map<String, Object> ticketItem = new HashMap<>();
             ticketItem.put("rowNumber", rowNum++);
-            ticketItem.put("description", "Flight Ticket - Seat " + chiTietGhe.getMaGhe());
+            ticketItem.put("description", "Flight Ticket" + (chiTietGhe != null ? " - Seat " + chiTietGhe.getSoGhe() : ""));
             ticketItem.put("quantity", "1");
             ticketItem.put("unitPrice", ticketPrice);
             ticketItem.put("amount", ticketPrice);

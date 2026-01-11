@@ -37,6 +37,10 @@ public class ForgotPasswordService {
         TaiKhoan taiKhoan = taiKhoanRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Email không tồn tại trong hệ thống"));
 
+        if(taiKhoan.getHanhKhach() == null) {
+            throw new IllegalArgumentException("Tài khoản không liên kết với hành khách");
+        }
+        
         // Generate 6-digit OTP
         String otp = String.format("%06d", new Random().nextInt(999999));
         

@@ -46,8 +46,8 @@ public class GiaChuyenBayService {
                 .findOverlappedByTuyenBayAndHangVe(
                         tuyenBay,
                         hangVe,
-                        toDate(ngayApDungTu),
-                        toDateOrNull(ngayApDungDen)
+                        ngayApDungTu,
+                        ngayApDungDen
                 );
         if (!overlapped.isEmpty()) {
             throw new IllegalStateException("Khoảng thời gian áp dụng bị chồng lấn với vé cùng hạng.");
@@ -57,8 +57,8 @@ public class GiaChuyenBayService {
         entity.setTuyenBay(tuyenBay);
         entity.setHangVe(hangVe);
         entity.setGiaVe(giaVe);
-        entity.setNgayApDungTu(toDate(ngayApDungTu));
-        entity.setNgayApDungDen(toDateOrNull(ngayApDungDen));
+        entity.setNgayApDungTu(ngayApDungTu);
+        entity.setNgayApDungDen(ngayApDungDen);
 
         return giaChuyenBayRepository.save(entity);
     }
@@ -78,8 +78,8 @@ public class GiaChuyenBayService {
                 .findOverlappedByTuyenBayAndHangVeExcludingId(
                         current.getTuyenBay(),
                         current.getHangVe(),
-                        toDate(ngayApDungTuMoi),
-                        toDateOrNull(ngayApDungDenMoi),
+                        ngayApDungTuMoi,
+                        ngayApDungDenMoi,
                         current.getMaGia()
                 );
         if (!overlapped.isEmpty()) {
@@ -87,8 +87,8 @@ public class GiaChuyenBayService {
         }
 
         current.setGiaVe(giaVeMoi);
-        current.setNgayApDungTu(toDate(ngayApDungTuMoi));
-        current.setNgayApDungDen(toDateOrNull(ngayApDungDenMoi));
+        current.setNgayApDungTu(ngayApDungTuMoi);
+        current.setNgayApDungDen(ngayApDungDenMoi);
 
         return giaChuyenBayRepository.save(current);
     }
@@ -101,8 +101,8 @@ public class GiaChuyenBayService {
                 .orElseThrow(() -> new IllegalArgumentException("Gia chuyen bay khong ton tai: " + maGia));
 
         LocalDate today = LocalDate.now();
-        LocalDate from = toLocalDate(current.getNgayApDungTu());
-        LocalDate to = current.getNgayApDungDen() != null ? toLocalDate(current.getNgayApDungDen()) : null;
+        LocalDate from = current.getNgayApDungTu();
+        LocalDate to = current.getNgayApDungDen();
 
         boolean dangApDung = !today.isBefore(from) && (to == null || !today.isAfter(to));
         if (dangApDung) {

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.j2ee.dto.ApiResponse;
+import com.example.j2ee.dto.ChuyenBayWithSeatsDTO;
 import com.example.j2ee.model.GiaChuyenBay;
 import com.example.j2ee.model.SanBay;
 import com.example.j2ee.service.ChiTietGheService;
@@ -52,9 +53,23 @@ public class SanBayController {
         List<?> results = sanBayService.getChuyenBays(sanBayDi, sanBayDen, ngayDi);
         return ResponseEntity.ok(ApiResponse.success(results));
     }
+
+    /**
+     * API mới: Lấy danh sách chuyến bay kèm thông tin ghế trống
+     * Yêu cầu: Số ghế trống = Tổng ghế của máy bay - COUNT(ghe_da_dat của chuyến đó)
+     * Chỉ hiển thị chuyến bay còn ghế trống
+     */
+    @GetMapping("/{sanBayDi}/{sanBayDen}/{ngayDi}/with-seats")
+    public ResponseEntity<ApiResponse<List<ChuyenBayWithSeatsDTO>>> getChuyenBaysWithAvailableSeats(
+            @PathVariable String sanBayDi,
+            @PathVariable String sanBayDen,
+            @PathVariable LocalDate ngayDi) {
+        List<ChuyenBayWithSeatsDTO> results = sanBayService.getChuyenBaysWithSeats(sanBayDi, sanBayDen, ngayDi);
+        return ResponseEntity.ok(ApiResponse.success(results));
+    }
     @GetMapping("/chitiet/{maChuyenBay}")
     public ResponseEntity<ApiResponse<?>> getChiTietGheByChuyenBay(@PathVariable int maChuyenBay) {
-        Object result = chiTietGheService.getChiTietGheByGheId(maChuyenBay);
+        Object result = chiTietGheService.getAvailableSeatsForFlight(maChuyenBay);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 

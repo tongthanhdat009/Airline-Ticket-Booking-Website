@@ -37,6 +37,11 @@ public class ChiTietChuyenBay {
     @JsonIgnoreProperties({"chiTietChuyenBay", "giaChuyenBay"})
     private TuyenBay tuyenBay;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mamaybay")
+    @JsonIgnoreProperties({"chiTietChuyenBay"})
+    private MayBay mayBay;
+
     @Column(name = "ngaydi", nullable = false)
     private LocalDate ngayDi;
 
@@ -63,10 +68,12 @@ public class ChiTietChuyenBay {
     @Column(name = "lydoDelay", length = 255)
     private String lyDoDelay;
 
-        // Một chuyến bay có nhiều ghế
-        @OneToMany(mappedBy = "chiTietChuyenBay", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-        @JsonIgnore
-        private Set<ChiTietGhe> danhSachGhe;
+    /**
+     * Mối quan hệ Một-Nhiều: Một chuyến bay có nhiều ghế đã đặt
+     */
+    @OneToMany(mappedBy = "chuyenBay", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<GheDaDat> danhSachGheDaDat;
 
         @ManyToMany(fetch = FetchType.LAZY)
         @JoinTable(

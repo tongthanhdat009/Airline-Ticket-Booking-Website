@@ -3,13 +3,12 @@ package com.example.j2ee.repository;
 import com.example.j2ee.model.ChiTietChuyenBay;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.time.LocalTime;
 
 public interface ChiTietChuyenBayRepository extends JpaRepository<ChiTietChuyenBay, Integer> {
     
@@ -31,12 +30,49 @@ public interface ChiTietChuyenBayRepository extends JpaRepository<ChiTietChuyenB
            "JOIN c.tuyenBay t " +
            "JOIN t.sanBayDi sdi " +
            "JOIN t.sanBayDen sde " +
-            "WHERE sdi.maIATA = :sanBayDi " +
-            "AND sde.maIATA = :sanBayDen " +
-            "AND c.ngayDi = :ngayDi " +
-            "AND c.trangThai = 'Đang mở bán'")
+           "WHERE sdi.maIATA = :sanBayDi " +
+           "AND sde.maIATA = :sanBayDen " +
+           "AND c.ngayDi = :ngayDi " +
+           "AND c.trangThai = 'Đang mở bán'")
     List<ChiTietChuyenBay> findByRouteAndDate(
             @Param("sanBayDi") String sanBayDi,
             @Param("sanBayDen") String sanBayDen,
             @Param("ngayDi") LocalDate ngayDi);
+
+    /**
+     * Lấy danh sách chuyến bay với tính toán số ghế trống
+     * Số ghế trống = Tổng ghế của máy bay - COUNT(ghe_da_dat của chuyến đó)
+     * Chỉ hiển thị chuyến bay còn ghế trống
+     */
+    @Query("SELECT c FROM ChiTietChuyenBay c " +
+           "JOIN c.tuyenBay t " +
+           "JOIN t.sanBayDi sdi " +
+           "JOIN t.sanBayDen sde " +
+           "JOIN c.mayBay mb " +
+           "WHERE sdi.maIATA = :sanBayDi " +
+           "AND sde.maIATA = :sanBayDen " +
+           "AND c.ngayDi = :ngayDi " +
+           "AND c.trangThai = 'Đang mở bán' " +
+           "AND (SELECT COUNT(gdd) FROM GheDaDat gdd WHERE gdd.chuyenBay.maChuyenBay = c.maChuyenBay) < mb.tongSoGhe")
+    List<ChiTietChuyenBay> findAvailableFlightsWithAvailableSeats(
+            @Param("sanBayDi") String sanBayDi,
+            @Param("sanBayDen") String sanBayDen,
+            @Param("ngayDi") LocalDate ngayDi);
+
+    /**
+     * Tính số ghế trống của một chuyến bay
+     * Số ghế trống = Tổng ghế của máy bay - COUNT(ghe_da_dat của chuyến đó)
+     */
+    @Query("SELECT (mb.tongSoGhe - COALESCE(COUNT(gdd), 0)) " +
+           "FROM ChiTietChuyenBay c " +
+           "JOIN c.mayBay mb " +
+           "LEFT JOIN GheDaDat gdd ON gdd.chuyenBay.maChuyenBay = c.maChuyenBay " +
+           "WHERE c.maChuyenBay = :maChuyenBay")
+    long countAvailableSeats(@Param("maChuyenBay") int maChuyenBay);
+
+    /**
+     * Đếm số ghế đã đặt của một chuyến bay
+     */
+    @Query("SELECT COUNT(gdd) FROM GheDaDat gdd WHERE gdd.chuyenBay.maChuyenBay = :maChuyenBay")
+    long countBookedSeats(@Param("maChuyenBay") int maChuyenBay);
 }

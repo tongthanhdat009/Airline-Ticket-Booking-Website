@@ -1,8 +1,10 @@
 package com.example.j2ee.service;
 
+import com.example.j2ee.dto.ChuyenBayWithSeatsDTO;
 import com.example.j2ee.model.ChiTietChuyenBay;
 import com.example.j2ee.model.SanBay;
 import com.example.j2ee.repository.ChiTietChuyenBayRepository;
+import com.example.j2ee.repository.GheDaDatRepository;
 import com.example.j2ee.repository.SanBayRepository;
 import com.example.j2ee.repository.TuyenBayRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -10,6 +12,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -17,13 +20,16 @@ public class SanBayService {
     private final SanBayRepository sanBayRepository;
     private final TuyenBayRepository tuyenBayRepository;
     private final ChiTietChuyenBayRepository chiTietChuyenBayRepository;
+    private final GheDaDatRepository gheDaDatRepository;
 
     public SanBayService(SanBayRepository sanBayRepository,
                         TuyenBayRepository tuyenBayRepository,
-                        ChiTietChuyenBayRepository chiTietChuyenBayRepository) {
+                        ChiTietChuyenBayRepository chiTietChuyenBayRepository,
+                        GheDaDatRepository gheDaDatRepository) {
         this.sanBayRepository = sanBayRepository;
         this.tuyenBayRepository = tuyenBayRepository;
         this.chiTietChuyenBayRepository = chiTietChuyenBayRepository;
+        this.gheDaDatRepository = gheDaDatRepository;
     }
 
     public List<SanBay> getAllSanBay() {
@@ -82,6 +88,41 @@ public class SanBayService {
         return sanBayRepository.save(sanBay);
     }
 
+    /**
+     * Lấy danh sách chuyến bay kèm theo thông tin số ghế trống
+     * Yêu cầu: Số ghế trống = Tổng ghế của máy bay - COUNT(ghe_da_dat của chuyến đó)
+     * Nếu Số ghế trống <= 0, không hiển thị chuyến bay đó
+     */
+    public List<ChuyenBayWithSeatsDTO> getChuyenBaysWithSeats(String sanBayDi, String sanBayDen, LocalDate ngayDi) {
+        // Lấy danh sách chuyến bay theo tuyến và ngày
+        List<ChiTietChuyenBay> chuyenBays = chiTietChuyenBayRepository.findByRouteAndDate(sanBayDi, sanBayDen, ngayDi);
+        
+        List<ChuyenBayWithSeatsDTO> result = new ArrayList<>();
+        
+        for (ChiTietChuyenBay chuyenBay : chuyenBays) {
+            // Lấy tổng số ghế của máy bay
+            long tongSoGhe = chuyenBay.getMayBay() != null ? chuyenBay.getMayBay().getTongSoGhe() : 0;
+            
+            // Đếm số ghế đã đặt (sử dụng GheDaDatRepository)
+            long soGheDaDat = gheDaDatRepository.countByChuyenBay_MaChuyenBay(chuyenBay.getMaChuyenBay());
+            
+            // Tính số ghế trống
+            long soGheTrong = tongSoGhe - soGheDaDat;
+            
+            // Chỉ thêm chuyến bay còn ghế trống vào kết quả
+            if (soGheTrong > 0) {
+                result.add(new ChuyenBayWithSeatsDTO(chuyenBay, tongSoGhe, soGheDaDat));
+            }
+        }
+        
+        return result;
+    }
+
+    /**
+     * Lấy danh sách chuyến bay (giữ nguyên để tương thích với code cũ)
+     * @deprecated Dùng getChuyenBaysWithSeats() để có thông tin ghế trống
+     */
+    @Deprecated
     public List<ChiTietChuyenBay> getChuyenBays(String sanBayDi, String sanBayDen, LocalDate ngayDi) {
         return chiTietChuyenBayRepository.findByRouteAndDate(sanBayDi, sanBayDen, ngayDi);
     }

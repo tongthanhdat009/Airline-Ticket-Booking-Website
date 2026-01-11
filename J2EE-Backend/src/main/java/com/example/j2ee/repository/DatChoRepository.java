@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -27,21 +27,21 @@ public interface DatChoRepository extends JpaRepository<DatCho, Integer> {
     
     // Tìm tất cả bookings cùng chuyến bay và cùng thời điểm đặt (trong vòng 5 giây)
     @Query("SELECT dc FROM DatCho dc " +
-           "WHERE dc.chiTietGhe.chiTietChuyenBay.maChuyenBay = :maChuyenBay " +
+           "WHERE dc.chuyenBay.maChuyenBay = :maChuyenBay " +
            "AND dc.ngayDatCho BETWEEN :startTime AND :endTime")
     List<DatCho> findRelatedBookings(
         @Param("maChuyenBay") int maChuyenBay, 
-        @Param("startTime") Date startTime, 
-        @Param("endTime") Date endTime
+        @Param("startTime") LocalDateTime startTime, 
+        @Param("endTime") LocalDateTime endTime
     );
     
     // Tìm tất cả bookings trong cùng thời điểm đặt (bất kể chuyến bay nào)
     // Dùng cho vé khứ hồi - tìm cả chiều đi và chiều về
     @Query("SELECT dc FROM DatCho dc " +
            "WHERE dc.ngayDatCho BETWEEN :startTime AND :endTime " +
-           "ORDER BY dc.chiTietGhe.chiTietChuyenBay.ngayDi, dc.maDatCho")
+           "ORDER BY dc.chuyenBay.ngayDi, dc.maDatCho")
     List<DatCho> findAllBookingsByTime(
-        @Param("startTime") Date startTime, 
-        @Param("endTime") Date endTime
+        @Param("startTime") LocalDateTime startTime, 
+        @Param("endTime") LocalDateTime endTime
     );
 }

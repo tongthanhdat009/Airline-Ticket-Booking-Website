@@ -110,10 +110,9 @@ public class JasperInvoiceService {
         }
 
         // Flight information
-        if (booking != null && booking.getChiTietGhe() != null && 
-            booking.getChiTietGhe().getChiTietChuyenBay() != null) {
+        if (booking != null && booking.getChuyenBay() != null) {
             
-            var flight = booking.getChiTietGhe().getChiTietChuyenBay();
+            var flight = booking.getChuyenBay();
             var route = flight.getTuyenBay();
 
             parameters.put("flightNumber", flight.getSoHieuChuyenBay() != null ? 
@@ -132,8 +131,8 @@ public class JasperInvoiceService {
             parameters.put("departureTime", flight.getGioDi() != null ? 
                 flight.getGioDi().toString() : "-");
             
-            parameters.put("ticketClass", booking.getChiTietGhe().getHangVe() != null ? 
-                booking.getChiTietGhe().getHangVe().getTenHangVe() : "-");
+            parameters.put("ticketClass", booking.getHangVe() != null ? 
+                booking.getHangVe().getTenHangVe() : "-");
         } else {
             parameters.put("flightNumber", "-");
             parameters.put("route", "-");

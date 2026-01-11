@@ -57,7 +57,21 @@ public class QuanLyChuyenBayController {
             @PathVariable int maChuyenBay,
             @RequestBody Map<String, Integer> soGheTheoHangVe) {
         try {
-            String msg = gheService.addGheToChuyenBay(maChuyenBay, soGheTheoHangVe);
+            // Lấy thông tin chuyến bay để lấy mã máy bay
+            var chuyenBayOpt = chiTietChuyenBayService.getChiTietChuyenBayById(maChuyenBay);
+            if (chuyenBayOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(ApiResponse.error("Chuyến bay không tồn tại: " + maChuyenBay));
+            }
+            
+            ChiTietChuyenBay chuyenBay = chuyenBayOpt.get();
+            if (chuyenBay.getMayBay() == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(ApiResponse.error("Chuyến bay chưa có máy bay được gán"));
+            }
+            
+            int maMayBay = chuyenBay.getMayBay().getMaMayBay();
+            String msg = gheService.addGheToMayBay(maMayBay, soGheTheoHangVe);
             if (msg.contains("thành công")) {
                 return ResponseEntity.ok(ApiResponse.successMessage(msg));
             }

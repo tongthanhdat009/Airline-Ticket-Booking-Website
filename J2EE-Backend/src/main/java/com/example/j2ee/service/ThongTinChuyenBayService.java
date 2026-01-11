@@ -63,31 +63,34 @@ public class ThongTinChuyenBayService {
             map.put("maDatCho", datCho.getMaDatCho());
             map.put("ngayDatCho", datCho.getNgayDatCho());
 
-            // Bước 4: Lấy chitiêtghe
+            // Bước 4: Lấy hạng vé từ DatCho
+            if (datCho.getHangVe() != null) {
+                map.put("maHangVe", datCho.getHangVe().getMaHangVe());
+                map.put("tenHangVe", datCho.getHangVe().getTenHangVe());
+            }
+
+            // Bước 4.1: Lấy chitiêtghe nếu có
             ChiTietGhe chiTietGhe = datCho.getChiTietGhe();
             if (chiTietGhe != null) {
-                // Lấy thông tin hạng vé
-                if (chiTietGhe.getHangVe() != null) {
-                    map.put("maHangVe", chiTietGhe.getHangVe().getMaHangVe());
-                    map.put("tenHangVe", chiTietGhe.getHangVe().getTenHangVe());
-                }
+                map.put("tenGhe", chiTietGhe.getSoGhe());
+                map.put("viTriGhe", chiTietGhe.getViTriGhe());
+            }
 
-                // Bước 5: Lấy chitietchuyenbay từ ghế
-                ChiTietChuyenBay chiTietChuyenBay = chiTietGhe.getChiTietChuyenBay();
-                if (chiTietChuyenBay != null) {
-                    map.put("maChuyenBay", chiTietChuyenBay.getMaChuyenBay());
-                    map.put("soHieuChuyenBay", chiTietChuyenBay.getSoHieuChuyenBay());
-                    map.put("ngayDi", chiTietChuyenBay.getNgayDi());
-                    map.put("gioDi", chiTietChuyenBay.getGioDi());
-                    map.put("ngayDen", chiTietChuyenBay.getNgayDen());
-                    map.put("gioDen", chiTietChuyenBay.getGioDen());
+            // Bước 5: Lấy chitietchuyenbay từ DatCho
+            ChiTietChuyenBay chiTietChuyenBay = datCho.getChuyenBay();
+            if (chiTietChuyenBay != null) {
+                map.put("maChuyenBay", chiTietChuyenBay.getMaChuyenBay());
+                map.put("soHieuChuyenBay", chiTietChuyenBay.getSoHieuChuyenBay());
+                map.put("ngayDi", chiTietChuyenBay.getNgayDi());
+                map.put("gioDi", chiTietChuyenBay.getGioDi());
+                map.put("ngayDen", chiTietChuyenBay.getNgayDen());
+                map.put("gioDen", chiTietChuyenBay.getGioDen());
 
-                    // Lấy thông tin tuyến bay (nếu có)
-                    if (chiTietChuyenBay.getTuyenBay() != null) {
-                        map.put("maTuyenBay", chiTietChuyenBay.getTuyenBay().getMaTuyenBay());
-                        map.put("sanbayDi", chiTietChuyenBay.getTuyenBay().getSanBayDi());
-                        map.put("sanbayDen", chiTietChuyenBay.getTuyenBay().getSanBayDen());
-                    }
+                // Lấy thông tin tuyến bay (nếu có)
+                if (chiTietChuyenBay.getTuyenBay() != null) {
+                    map.put("maTuyenBay", chiTietChuyenBay.getTuyenBay().getMaTuyenBay());
+                    map.put("sanbayDi", chiTietChuyenBay.getTuyenBay().getSanBayDi());
+                    map.put("sanbayDen", chiTietChuyenBay.getTuyenBay().getSanBayDen());
                 }
             }
 
