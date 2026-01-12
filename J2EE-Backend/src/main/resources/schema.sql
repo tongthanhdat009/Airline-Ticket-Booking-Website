@@ -375,3 +375,81 @@ ALTER TABLE `hoantien` ADD CONSTRAINT `FK_hoantien_thanhtoan` FOREIGN KEY (`math
 ALTER TABLE `khuyenmai_datcho` ADD CONSTRAINT `FK_kmd_khuyenmai` FOREIGN KEY (`makhuyenmai`) REFERENCES `khuyenmai` (`makhuyenmai`);
 
 ALTER TABLE `khuyenmai_datcho` ADD CONSTRAINT `FK_kmd_datcho` FOREIGN KEY (`madatcho`) REFERENCES `datcho` (`madatcho`);
+
+-- =============================================
+-- BẢNG QUẢN LÝ PHÂN QUYỀN (RBAC - Role-Based Access Control)
+-- =============================================
+
+-- 1. Bảng Vai trò (Roles)
+-- Định nghĩa các nhóm quyền: Super Admin, Nhân viên vé, Kế toán...
+CREATE TABLE `vai_tro` (
+  `ma_vai_tro` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `ten_vai_tro` varchar(50) NOT NULL UNIQUE,
+  `mo_ta` varchar(255) DEFAULT null,
+  `trang_thai` tinyint(1) DEFAULT 1 COMMENT '1: Active, 0: Inactive'
+);
+
+-- 2. Bảng Chức năng (Features / Resources)
+-- Định nghĩa các màn hình hoặc module: Quản lý chuyến bay, Quản lý đơn hàng...
+CREATE TABLE `chuc_nang` (
+  `ma_chuc_nang` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `ma_code` varchar(50) NOT NULL UNIQUE COMMENT 'Mã code dùng trong Backend (VD: FLIGHT, ORDER, CUSTOMER)',
+  `ten_chuc_nang` varchar(100) NOT NULL COMMENT 'Tên hiển thị ra UI',
+  `nhom` varchar(50) DEFAULT null COMMENT 'Dùng để group menu (VD: Vận hành, Báo cáo)'
+);
+
+-- 3. Bảng Từ điển Hành động (Action Dictionary)
+-- Định nghĩa các key word hành động chuẩn.
+-- Dùng bảng này để tránh việc dev nhập lung tung (lúc thì 'READ', lúc thì 'VIEW')
+CREATE TABLE `hanh_dong` (
+  `ma_hanh_dong` varchar(50) PRIMARY KEY NOT NULL COMMENT 'Key word: VIEW, CREATE, UPDATE, DELETE, IMPORT, EXPORT, APPROVE...',
+  `mo_ta` varchar(100) DEFAULT null
+);
+
+-- 4. Bảng Phân quyền (Permissions) - BẢNG QUAN TRỌNG NHẤT
+-- Lưu trữ: Vai trò A - Tại Chức năng B - Được làm Hành động C
+CREATE TABLE `phan_quyen` (
+  `id` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `ma_vai_tro` int NOT NULL,
+  `ma_chuc_nang` int NOT NULL,
+  `ma_hanh_dong` varchar(50) NOT NULL,
+
+  -- Ràng buộc: Một vai trò tại 1 chức năng không được trùng hành động
+  UNIQUE KEY `UK_permission` (`ma_vai_tro`, `ma_chuc_nang`, `ma_hanh_dong`)
+);
+
+-- 5. Bảng liên kết Admin và Vai trò
+-- Gán tài khoản vào nhóm quyền
+CREATE TABLE `admin_vai_tro` (
+  `mataikhoan` int NOT NULL,
+  `ma_vai_tro` int NOT NULL,
+  PRIMARY KEY (`mataikhoan`, `ma_vai_tro`)
+);
+
+-- --- TẠO KHÓA NGOẠI (Foreign Keys) CHO RBAC ---
+
+ALTER TABLE `phan_quyen` ADD CONSTRAINT `FK_pq_vaitro` FOREIGN KEY (`ma_vai_tro`) REFERENCES `vai_tro` (`ma_vai_tro`);
+
+ALTER TABLE `phan_quyen` ADD CONSTRAINT `FK_pq_chucnang` FOREIGN KEY (`ma_chuc_nang`) REFERENCES `chuc_nang` (`ma_chuc_nang`);
+
+ALTER TABLE `phan_quyen` ADD CONSTRAINT `FK_pq_hanhdong` FOREIGN KEY (`ma_hanh_dong`) REFERENCES `hanh_dong` (`ma_hanh_dong`);
+
+ALTER TABLE `admin_vai_tro` ADD CONSTRAINT `FK_avt_admin` FOREIGN KEY (`mataikhoan`) REFERENCES `taikhoanadmin` (`mataikhoan`);
+
+ALTER TABLE `admin_vai_tro` ADD CONSTRAINT `FK_avt_vaitro` FOREIGN KEY (`ma_vai_tro`) REFERENCES `vai_tro` (`ma_vai_tro`);
+
+-- --- TẠO INDEX CHO RBAC ---
+
+CREATE INDEX `idx_vaitro_ten` ON `vai_tro` (`ten_vai_tro`);
+
+CREATE INDEX `idx_chucnang_code` ON `chuc_nang` (`ma_code`);
+
+CREATE INDEX `idx_chucnang_nhom` ON `chuc_nang` (`nhom`);
+
+CREATE INDEX `idx_pq_vaitro` ON `phan_quyen` (`ma_vai_tro`);
+
+CREATE INDEX `idx_pq_chucnang` ON `phan_quyen` (`ma_chuc_nang`);
+
+CREATE INDEX `idx_avt_admin` ON `admin_vai_tro` (`mataikhoan`);
+
+CREATE INDEX `idx_avt_vaitro` ON `admin_vai_tro` (`ma_vai_tro`);
