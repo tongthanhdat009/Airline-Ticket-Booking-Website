@@ -2,7 +2,8 @@ import React from "react";
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from "react-router-dom";
 import { DangNhapClientServices } from "../../services/DangNhapClientServices";
-import { getClientAccessToken, setClientAuthToken, setClientUserEmail } from "../../utils/cookieUtils";
+import { getClientAccessToken, setClientUserEmail } from "../../utils/cookieUtils";
+import { loginAndSetTokens } from "../../services/apiClient";
 
 function DangNhap() {
   const { t } = useTranslation()
@@ -53,11 +54,15 @@ function DangNhap() {
     try {
       const userData = { email, matKhau };
       const { accessToken, refreshToken, message } = await DangNhapClientServices(userData);
-      
-      // Lưu tokens vào cookies sử dụng cookieUtils
-      setClientAuthToken(accessToken, refreshToken);
+
+      // Lưu tokens - access token vào cookie, refresh token vào memory
+      loginAndSetTokens('customer', accessToken, refreshToken);
       setClientUserEmail(email);
-      
+
+      // Dispatch custom event để thông báo cho Navbar và các component khác
+      window.dispatchEvent(new Event('storage'));
+      localStorage.setItem('auth_update', Date.now().toString());
+
       setMessage(message || "🎉 Đăng nhập thành công!");
       setEmail("");
       setMatKhau("");

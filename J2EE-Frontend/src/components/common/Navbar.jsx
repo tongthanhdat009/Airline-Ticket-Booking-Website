@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { clearClientAuthCookies, getClientAccessToken, getClientUserEmail } from "../../utils/cookieUtils";
+import { getClientAccessToken, getClientUserEmail } from "../../utils/cookieUtils";
+import { logoutClient } from "../../services/ClientAuthService";
 import Cookies from "js-cookie";
 
 function Navbar() {
@@ -11,19 +12,57 @@ function Navbar() {
   const [userName, setUserName] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState(localStorage.getItem('language') || 'vi');
-  
-  useEffect(() => {
+  const [, setAuthUpdate] = useState(0); // Trigger re-render when auth state changes
+
+  // Hàm kiểm tra và cập nhật trạng thái đăng nhập
+  const checkAuthStatus = () => {
     const token = getClientAccessToken();
     const email = getClientUserEmail();
     if (token && email) {
       setIsLoggedIn(true);
       setUserName(email);
+    } else {
+      setIsLoggedIn(false);
+      setUserName("");
     }
+  };
+
+  useEffect(() => {
+    // Kiểm tra trạng thái ban đầu
+    checkAuthStatus();
+
+    // Lắng nghe sự kiện thay đổi storage/cookie từ các tab khác
+    const handleStorageChange = (e) => {
+      if (e.key === 'auth_update' || e.key === null) {
+        checkAuthStatus();
+        setAuthUpdate(prev => prev + 1);
+      }
+    };
+
+    // Polling để kiểm tra cookie mỗi 500ms (chỉ khi component mounted)
+    const pollingInterval = setInterval(() => {
+      checkAuthStatus();
+    }, 500);
+
+    window.addEventListener('storage', handleStorageChange);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(pollingInterval);
+    };
   }, []);
 
-  const handleLogout = () => {
-    clearClientAuthCookies();
+  const handleLogout = async () => {
+    // Gọi API logout để revoke refresh token trên server
+    await logoutClient();
+    
     setIsLoggedIn(false);
+
+    // Dispatch event để thông báo cho các component khác
+    window.dispatchEvent(new Event('storage'));
+    localStorage.setItem('auth_update', Date.now().toString());
+
     navigate("/");
     setMobileMenuOpen(false);
   };

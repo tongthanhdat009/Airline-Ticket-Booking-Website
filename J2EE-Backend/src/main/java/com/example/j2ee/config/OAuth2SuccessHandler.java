@@ -2,9 +2,11 @@ package com.example.j2ee.config;
 
 import com.example.j2ee.jwt.JwtUtil;
 import com.example.j2ee.model.HanhKhach;
+import com.example.j2ee.model.RefreshToken;
 import com.example.j2ee.model.TaiKhoan;
 import com.example.j2ee.repository.HanhKhachRepository;
 import com.example.j2ee.repository.TaiKhoanRepository;
+import com.example.j2ee.service.RefreshTokenService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,15 +30,18 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final TaiKhoanRepository taiKhoanRepository;
     private final HanhKhachRepository hanhKhachRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenService refreshTokenService;
 
-    public OAuth2SuccessHandler(JwtUtil jwtUtil, 
+    public OAuth2SuccessHandler(JwtUtil jwtUtil,
                                 TaiKhoanRepository taiKhoanRepository,
                                 HanhKhachRepository hanhKhachRepository,
-                                PasswordEncoder passwordEncoder) {
+                                PasswordEncoder passwordEncoder,
+                                RefreshTokenService refreshTokenService) {
         this.jwtUtil = jwtUtil;
         this.taiKhoanRepository = taiKhoanRepository;
         this.hanhKhachRepository = hanhKhachRepository;
         this.passwordEncoder = passwordEncoder;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @Override
@@ -79,10 +84,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 taiKhoanRepository.save(taiKhoan);
             }
         }
-        
-        // Tạo JWT tokens
-        String accessToken = jwtUtil.generateAccessToken(email, "USER");
-        String refreshToken = jwtUtil.generateRefreshToken(email);
+
+        // Tạo JWT tokens - Access token với role CUSTOMER cho OAuth2 users
+        String accessToken = jwtUtil.generateAccessToken(email, "CUSTOMER");
+
+        // Tạo và lưu refresh token vào database
+        RefreshToken refreshTokenEntity = refreshTokenService.createRefreshTokenForCustomer(email);
+        String refreshToken = refreshTokenEntity.getToken();
         
         // Redirect về frontend với tokens
         String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:5173/oauth2/callback")

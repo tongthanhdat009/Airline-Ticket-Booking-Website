@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { setClientAuthToken, setClientUserEmail } from '../utils/cookieUtils';
+import { loginAndSetTokens } from '../services/apiClient';
+import { setClientUserEmail } from '../utils/cookieUtils';
 import TaiKhoanService from '../services/TaiKhoanService';
 
 function OAuth2Callback() {
@@ -24,10 +25,14 @@ function OAuth2Callback() {
             }
 
             if (accessToken && refreshToken && email) {
-                // Lưu tokens vào cookies
-                setClientAuthToken(accessToken, refreshToken);
+                // Lưu tokens - access token vào cookie, refresh token vào memory
+                loginAndSetTokens('customer', accessToken, refreshToken);
                 setClientUserEmail(email);
-                
+
+                // Dispatch custom event để thông báo cho Navbar và các component khác
+                window.dispatchEvent(new Event('storage'));
+                localStorage.setItem('auth_update', Date.now().toString());
+
                 setMessage('✅ Đăng nhập thành công! Đang kiểm tra thông tin...');
                 
                 // Kiểm tra xem đã có đủ thông tin chưa
