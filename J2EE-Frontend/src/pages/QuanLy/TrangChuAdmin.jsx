@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { FaChartBar, FaUsers, FaRoute, FaPlaneDeparture, FaConciergeBell, FaSignOutAlt, FaBars, FaTimes, FaMoneyBillWave, FaDollarSign } from 'react-icons/fa';
+import { FaChartBar, FaUsers, FaRoute, FaPlaneDeparture, FaConciergeBell, FaSignOutAlt, FaBars, FaTimes, FaMoneyBillWave, FaDollarSign, FaTags, FaFighterJet, FaFileInvoice, FaUndo, FaHistory } from 'react-icons/fa';
 import { MdLocalAirport } from 'react-icons/md'; 
 import { logout } from '../../services/AuthService';
 import { getUserInfo, isAuthenticated } from '../../utils/cookieUtils';
@@ -36,7 +36,11 @@ function TrangChuAdmin() {
         { path: 'GiaBay', icon: <FaDollarSign size={20} />, text: 'Giá chuyến bay', color: 'from-teal-500 to-cyan-500' },
         { path: 'DichVu', icon: <FaConciergeBell size={20} />, text: 'Dịch vụ', color: 'from-yellow-500 to-orange-500' },
         { path: 'SanBay', icon: <MdLocalAirport size={20} />, text: 'Sân bay', color: 'from-indigo-500 to-blue-500' },
-        { path: 'ThanhToan', icon: <FaMoneyBillWave size={20} />, text: 'Thanh toán', color: 'from-green-600 to-emerald-600' },
+        { path: 'KhuyenMai', icon: <FaTags size={20} />, text: 'Khuyến mãi', color: 'from-pink-500 to-rose-500' },
+        { path: 'MayBay', icon: <FaFighterJet size={20} />, text: 'Máy bay', color: 'from-sky-500 to-blue-600' },
+        { path: 'HoaDon', icon: <FaFileInvoice size={20} />, text: 'Hóa đơn', color: 'from-teal-500 to-cyan-600' },
+        { path: 'HoanTien', icon: <FaUndo size={20} />, text: 'Hoàn tiền', color: 'from-lime-500 to-green-600' },
+        { path: 'LichSuThaoTac', icon: <FaHistory size={20} />, text: 'Lịch sử thao tác', color: 'from-green-500 to-emerald-600' },
         { path: 'QuanLyTKAdmin', icon: <FaUsers size={20} />, text: 'Quản lý TK Admin', color: 'from-purple-500 to-pink-500' },
     ];
 

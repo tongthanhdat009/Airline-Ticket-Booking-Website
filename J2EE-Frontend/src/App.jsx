@@ -14,8 +14,12 @@ import QuanLyChuyenBay from './pages/QuanLy/QuanLyChuyenBay';
 import QuanLyDichVu from './pages/QuanLy/QuanLyDichVu';
 import QuanLySanBay from "./pages/QuanLy/QuanLySanBay"
 import QuanLyTKAdmin from "./pages/QuanLy/QuanLyTKAdmin"
-import QuanLyThanhToan from "./pages/QuanLy/QuanLyThanhToan"
 import QuanLyGiaBay from "./pages/QuanLy/QuanLyGiaBay"
+import QuanLyKhuyenMai from "./pages/QuanLy/QuanLyKhuyenMai"
+import QuanLyMayBay from "./pages/QuanLy/QuanLyMayBay"
+import QuanLyHoaDon from "./pages/QuanLy/QuanLyHoaDon"
+import QuanLyHoanTien from "./pages/QuanLy/QuanLyHoanTien"
+import QuanLyLichSuThaoTac from "./pages/QuanLy/QuanLyLichSuThaoTac"
 import DichVuChuyenBay from "./pages/KhachHang/DichVuChuyenBay"
 import DichVuKhac from "./pages/KhachHang/DichVuKhac"
 import TraCuuChuyenBay from "./pages/KhachHang/TraCuuChuyenBay"
@@ -115,10 +119,14 @@ function AppContent() {
             <Route path="ThongKe" element={<ThongKeDoanhThu />} />
             <Route path="SanBay" element={<QuanLySanBay />} />
             <Route path="QuanLyTKAdmin" element={<QuanLyTKAdmin />} />
-            <Route path="ThanhToan" element={<QuanLyThanhToan />} />
             <Route path="GiaBay" element={<QuanLyGiaBay />} />
+            <Route path="KhuyenMai" element={<QuanLyKhuyenMai />} />
+            <Route path="MayBay" element={<QuanLyMayBay />} />
+            <Route path="HoaDon" element={<QuanLyHoaDon />} />
+            <Route path="HoanTien" element={<QuanLyHoanTien />} />
+            <Route path="LichSuThaoTac" element={<QuanLyLichSuThaoTac />} />
           </Route>
-          
+
           {/* Backward compatibility - redirect old routes */}
           <Route path="/admin" element={<AdminProtectedRoute><Admin /></AdminProtectedRoute>}>
             <Route path="KhachHang" element={<QuanLyKhachHang />} />
@@ -128,8 +136,12 @@ function AppContent() {
             <Route path="ThongKe" element={<ThongKeDoanhThu />} />
             <Route path="SanBay" element={<QuanLySanBay />} />
             <Route path="QuanLyTKAdmin" element={<QuanLyTKAdmin />} />
-            <Route path="ThanhToan" element={<QuanLyThanhToan />} />
             <Route path="GiaBay" element={<QuanLyGiaBay />} />
+            <Route path="KhuyenMai" element={<QuanLyKhuyenMai />} />
+            <Route path="MayBay" element={<QuanLyMayBay />} />
+            <Route path="HoaDon" element={<QuanLyHoaDon />} />
+            <Route path="HoanTien" element={<QuanLyHoanTien />} />
+            <Route path="LichSuThaoTac" element={<QuanLyLichSuThaoTac />} />
           </Route>
         </Routes>
       </main>
