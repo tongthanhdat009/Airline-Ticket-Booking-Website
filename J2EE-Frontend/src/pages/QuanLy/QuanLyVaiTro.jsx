@@ -1,116 +1,162 @@
-import React, { useState } from 'react';
-import { FaUserShield, FaPlus, FaEdit, FaTrash, FaSearch, FaCheck, FaTimes } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
+import { FaUserShield, FaPlus, FaEdit, FaTrash, FaSearch, FaCheck, FaTimes, FaSpinner } from 'react-icons/fa';
+import Toast from '../../components/common/Toast';
+import {
+    getAllVaiTro,
+    createVaiTro,
+    updateVaiTro,
+    deleteVaiTro
+} from '../../services/VaiTroService';
 
 const QuanLyVaiTro = () => {
-    // Hard code data theo schema
-    const [roles, setRoles] = useState([
-        {
-            maVaiTro: 1,
-            tenVaiTro: 'Super Admin',
-            moTa: 'Quản trị viên hệ thống - Full quyền',
-            trangThai: true,
-            soAdmin: 2,
-            createdAt: '2024-01-01'
-        },
-        {
-            maVaiTro: 2,
-            tenVaiTro: 'Nhân viên bán vé',
-            moTa: 'Nhân viên trực tiếp bán vé và xử lý đặt chỗ',
-            trangThai: true,
-            soAdmin: 5,
-            createdAt: '2024-01-15'
-        },
-        {
-            maVaiTro: 3,
-            tenVaiTro: 'Kế toán',
-            moTa: 'Quản lý hóa đơn, thanh toán, hoàn tiền',
-            trangThai: true,
-            soAdmin: 3,
-            createdAt: '2024-02-01'
-        },
-        {
-            maVaiTro: 4,
-            tenVaiTro: 'Quản lý vận hành',
-            moTa: 'Quản lý chuyến bay, tuyến bay, máy bay',
-            trangThai: true,
-            soAdmin: 4,
-            createdAt: '2024-02-15'
-        },
-        {
-            maVaiTro: 5,
-            tenVaiTro: 'Chăm sóc khách hàng',
-            moTa: 'Xử lý khiếu nại, hỗ trợ khách hàng',
-            trangThai: true,
-            soAdmin: 6,
-            createdAt: '2024-03-01'
-        },
-        {
-            maVaiTro: 6,
-            tenVaiTro: 'Báo cáo viên',
-            moTa: 'Chỉ xem báo cáo, thống kê',
-            trangThai: false,
-            soAdmin: 0,
-            createdAt: '2024-03-15'
-        }
-    ]);
-
+    const [roles, setRoles] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [editingRole, setEditingRole] = useState(null);
+    const [submitting, setSubmitting] = useState(false);
+    const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
     const [formData, setFormData] = useState({
         tenVaiTro: '',
         moTa: '',
         trangThai: true
     });
 
+    // Fetch roles from API
+    const fetchRoles = async () => {
+        try {
+            setLoading(true);
+            const response = await getAllVaiTro();
+            if (response.success && response.data) {
+                // Fetch số admin cho mỗi vai trò
+                const rolesWithAdminCount = await Promise.all(
+                    response.data.map(async (role) => {
+                        try {
+                            // Lấy số admin từ API count-admin
+                            const countResponse = await fetch(`http://localhost:8080/admin/dashboard/vai-tro/${role.maVaiTro}/count-admin`, {
+                                headers: {
+                                    'Authorization': `Bearer ${localStorage.getItem('admin_access_token') || document.cookie.match(/admin_access_token=([^;]+)/)?.[1]}`,
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+                            const countData = await countResponse.json();
+                            return {
+                                ...role,
+                                soAdmin: countData.data || 0,
+                                createdAt: role.createdAt || new Date().toISOString().split('T')[0]
+                            };
+                        } catch (error) {
+                            console.error('Error fetching admin count:', error);
+                            return {
+                                ...role,
+                                soAdmin: 0,
+                                createdAt: role.createdAt || new Date().toISOString().split('T')[0]
+                            };
+                        }
+                    })
+                );
+                setRoles(rolesWithAdminCount);
+            }
+        } catch (error) {
+            console.error('Error fetching roles:', error);
+            showToast('Lỗi khi tải danh sách vai trò', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchRoles();
+    }, []);
+
     // Statistics
     const stats = {
         total: roles.length,
         active: roles.filter(r => r.trangThai).length,
         inactive: roles.filter(r => !r.trangThai).length,
-        totalAdmin: roles.reduce((sum, r) => sum + r.soAdmin, 0)
+        totalAdmin: roles.reduce((sum, r) => sum + (r.soAdmin || 0), 0)
     };
 
     // Filter roles
     const filteredRoles = roles.filter(role =>
         role.tenVaiTro.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        role.moTa.toLowerCase().includes(searchTerm.toLowerCase())
+        (role.moTa && role.moTa.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
+    // Toast functions
+    const showToast = (message, type = 'success') => {
+        setToast({ isVisible: true, message, type });
+    };
+
+    const hideToast = () => {
+        setToast({ ...toast, isVisible: false });
+    };
+
     // Handle Add/Edit
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (editingRole) {
-            // Update existing role
-            setRoles(roles.map(role =>
-                role.maVaiTro === editingRole.maVaiTro
-                    ? { ...role, ...formData }
-                    : role
-            ));
-        } else {
-            // Add new role
-            const newRole = {
-                maVaiTro: Math.max(...roles.map(r => r.maVaiTro)) + 1,
-                ...formData,
-                soAdmin: 0,
-                createdAt: new Date().toISOString().split('T')[0]
-            };
-            setRoles([...roles, newRole]);
+        // Validation: Tên vai trò không được để trống
+        if (!formData.tenVaiTro || formData.tenVaiTro.trim() === '') {
+            showToast('Tên vai trò không được để trống', 'error');
+            return;
         }
 
-        closeModal();
+        try {
+            setSubmitting(true);
+
+            if (editingRole) {
+                // Update existing role
+                const response = await updateVaiTro(editingRole.maVaiTro, formData);
+                if (response.success) {
+                    showToast('Cập nhật vai trò thành công', 'success');
+                    await fetchRoles();
+                    closeModal();
+                } else {
+                    showToast(response.message || 'Cập nhật vai trò thất bại', 'error');
+                }
+            } else {
+                // Add new role
+                const response = await createVaiTro(formData);
+                if (response.success) {
+                    showToast('Thêm vai trò thành công', 'success');
+                    await fetchRoles();
+                    closeModal();
+                } else {
+                    showToast(response.message || 'Thêm vai trò thất bại', 'error');
+                }
+            }
+        } catch (error) {
+            console.error('Error saving role:', error);
+            const errorMessage = error.response?.data?.message || error.message || 'Lỗi khi lưu vai trò';
+            showToast(errorMessage, 'error');
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     // Handle Delete
-    const handleDelete = (role) => {
+    const handleDelete = async (role) => {
+        // Validation: Không được xóa khi có tài khoản đang sử dụng
         if (role.soAdmin > 0) {
-            alert('Không thể xóa vai trò này vì đang có ' + role.soAdmin + ' admin được gán!');
+            showToast(`Không thể xóa vai trò này vì đang có ${role.soAdmin} admin được gán!`, 'error');
             return;
         }
 
         if (window.confirm(`Bạn có chắc chắn muốn xóa vai trò "${role.tenVaiTro}"?`)) {
-            setRoles(roles.filter(r => r.maVaiTro !== role.maVaiTro));
+            try {
+                const response = await deleteVaiTro(role.maVaiTro);
+                if (response.success) {
+                    showToast('Xóa vai trò thành công', 'success');
+                    await fetchRoles();
+                } else {
+                    showToast(response.message || 'Xóa vai trò thất bại', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting role:', error);
+                const errorMessage = error.response?.data?.message || error.message || 'Lỗi khi xóa vai trò';
+                showToast(errorMessage, 'error');
+            }
         }
     };
 
@@ -119,7 +165,7 @@ const QuanLyVaiTro = () => {
         setEditingRole(role);
         setFormData({
             tenVaiTro: role.tenVaiTro,
-            moTa: role.moTa,
+            moTa: role.moTa || '',
             trangThai: role.trangThai
         });
         setShowModal(true);
@@ -131,7 +177,7 @@ const QuanLyVaiTro = () => {
         setFormData({
             tenVaiTro: '',
             moTa: '',
-            trangThai: true
+            trangThai: true  // Trạng thái mặc định là Active
         });
         setShowModal(true);
     };
@@ -149,6 +195,15 @@ const QuanLyVaiTro = () => {
 
     return (
         <div className="p-6 bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
+            {/* Toast Component */}
+            <Toast
+                message={toast.message}
+                type={toast.type}
+                isVisible={toast.isVisible}
+                onClose={hideToast}
+                duration={3000}
+            />
+
             <div className="max-w-7xl mx-auto">
 
                 {/* Header */}
@@ -234,68 +289,83 @@ const QuanLyVaiTro = () => {
                 </div>
 
                 {/* Roles Table */}
-                <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead className="bg-gradient-to-r from-violet-600 to-purple-600">
-                                <tr>
-                                    <th className="px-6 py-4 text-left text-white font-bold">Mã vai trò</th>
-                                    <th className="px-6 py-4 text-left text-white font-bold">Tên vai trò</th>
-                                    <th className="px-6 py-4 text-left text-white font-bold">Mô tả</th>
-                                    <th className="px-6 py-4 text-center text-white font-bold">Trạng thái</th>
-                                    <th className="px-6 py-4 text-center text-white font-bold">Số Admin</th>
-                                    <th className="px-6 py-4 text-center text-white font-bold">Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredRoles.map((role, index) => (
-                                    <tr key={role.maVaiTro} className={`border-b border-slate-200 hover:bg-violet-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-slate-50'}`}>
-                                        <td className="px-6 py-4 font-semibold text-violet-600">#{role.maVaiTro}</td>
-                                        <td className="px-6 py-4 font-semibold text-slate-800">{role.tenVaiTro}</td>
-                                        <td className="px-6 py-4 text-slate-600">{role.moTa}</td>
-                                        <td className="px-6 py-4 text-center">
-                                            <span className={`px-4 py-2 rounded-full text-sm font-semibold ${
-                                                role.trangThai
-                                                    ? 'bg-emerald-100 text-emerald-700'
-                                                    : 'bg-red-100 text-red-700'
-                                            }`}>
-                                                {role.trangThai ? 'Hoạt động' : 'Ngừng'}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-center">
-                                            <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
-                                                {role.soAdmin} admin
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-center">
-                                            <div className="flex items-center justify-center gap-2">
-                                                <button
-                                                    onClick={() => openEditModal(role)}
-                                                    className="p-2 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors"
-                                                    title="Sửa"
-                                                >
-                                                    <FaEdit />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(role)}
-                                                    className={`p-2 rounded-lg transition-colors ${
-                                                        role.soAdmin > 0
-                                                            ? 'text-slate-400 cursor-not-allowed'
-                                                            : 'text-red-600 hover:bg-red-100'
-                                                    }`}
-                                                    title={role.soAdmin > 0 ? 'Không thể xóa' : 'Xóa'}
-                                                    disabled={role.soAdmin > 0}
-                                                >
-                                                    <FaTrash />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                {loading ? (
+                    <div className="bg-white rounded-2xl shadow-lg p-12 flex items-center justify-center">
+                        <FaSpinner className="animate-spin text-violet-600 text-4xl" />
+                        <span className="ml-3 text-slate-600">Đang tải...</span>
                     </div>
-                </div>
+                ) : (
+                    <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gradient-to-r from-violet-600 to-purple-600">
+                                    <tr>
+                                        <th className="px-6 py-4 text-left text-white font-bold">Mã vai trò</th>
+                                        <th className="px-6 py-4 text-left text-white font-bold">Tên vai trò</th>
+                                        <th className="px-6 py-4 text-left text-white font-bold">Mô tả</th>
+                                        <th className="px-6 py-4 text-center text-white font-bold">Trạng thái</th>
+                                        <th className="px-6 py-4 text-center text-white font-bold">Số Admin</th>
+                                        <th className="px-6 py-4 text-center text-white font-bold">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredRoles.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="6" className="px-6 py-12 text-center text-slate-500">
+                                                Không tìm thấy vai trò nào
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        filteredRoles.map((role, index) => (
+                                            <tr key={role.maVaiTro} className={`border-b border-slate-200 hover:bg-violet-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-slate-50'}`}>
+                                                <td className="px-6 py-4 font-semibold text-violet-600">#{role.maVaiTro}</td>
+                                                <td className="px-6 py-4 font-semibold text-slate-800">{role.tenVaiTro}</td>
+                                                <td className="px-6 py-4 text-slate-600">{role.moTa || '-'}</td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <span className={`px-4 py-2 rounded-full text-sm font-semibold ${
+                                                        role.trangThai
+                                                            ? 'bg-emerald-100 text-emerald-700'
+                                                            : 'bg-red-100 text-red-700'
+                                                    }`}>
+                                                        {role.trangThai ? 'Hoạt động' : 'Ngừng'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+                                                        {role.soAdmin || 0} admin
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <div className="flex items-center justify-center gap-2">
+                                                        <button
+                                                            onClick={() => openEditModal(role)}
+                                                            className="p-2 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors"
+                                                            title="Sửa"
+                                                        >
+                                                            <FaEdit />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDelete(role)}
+                                                            className={`p-2 rounded-lg transition-colors ${
+                                                                (role.soAdmin || 0) > 0
+                                                                    ? 'text-slate-400 cursor-not-allowed'
+                                                                    : 'text-red-600 hover:bg-red-100'
+                                                            }`}
+                                                            title={(role.soAdmin || 0) > 0 ? 'Không thể xóa' : 'Xóa'}
+                                                            disabled={(role.soAdmin || 0) > 0}
+                                                        >
+                                                            <FaTrash />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
 
                 {/* Add/Edit Modal */}
                 {showModal && (
@@ -354,14 +424,23 @@ const QuanLyVaiTro = () => {
                                 <div className="flex gap-3 mt-6">
                                     <button
                                         type="submit"
-                                        className="flex-1 px-6 py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl hover:from-violet-700 hover:to-purple-700 transition-all font-semibold"
+                                        disabled={submitting}
+                                        className="flex-1 px-6 py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl hover:from-violet-700 hover:to-purple-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                     >
-                                        {editingRole ? 'Cập nhật' : 'Thêm mới'}
+                                        {submitting ? (
+                                            <>
+                                                <FaSpinner className="animate-spin" />
+                                                Đang lưu...
+                                            </>
+                                        ) : (
+                                            editingRole ? 'Cập nhật' : 'Thêm mới'
+                                        )}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={closeModal}
-                                        className="flex-1 px-6 py-3 bg-slate-200 text-slate-700 rounded-xl hover:bg-slate-300 transition-all font-semibold"
+                                        disabled={submitting}
+                                        className="flex-1 px-6 py-3 bg-slate-200 text-slate-700 rounded-xl hover:bg-slate-300 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         Hủy
                                     </button>

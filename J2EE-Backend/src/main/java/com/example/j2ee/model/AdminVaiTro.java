@@ -31,7 +31,7 @@ public class AdminVaiTro {
     /**
      * Mối quan hệ Nhiều-Một: NHIỀU admin_vai_tro thuộc về MỘT vai trò
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ma_vai_tro", insertable = false, updatable = false)
     @JsonIgnore
     private VaiTro vaiTro;

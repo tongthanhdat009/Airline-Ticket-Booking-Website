@@ -1,11 +1,13 @@
 package com.example.j2ee.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "taikhoanadmin")
@@ -42,4 +44,12 @@ public class TaiKhoanAdmin {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    // ==================== RELATIONSHIPS ====================
+    /**
+     * Mối quan hệ Một-Nhiều: Một admin có NHIỀU vai trò
+     */
+    @OneToMany(mappedBy = "taiKhoanAdmin", fetch = FetchType.EAGER)
+    @JsonIgnore
+    private Set<AdminVaiTro> cacVaiTro;
 }
