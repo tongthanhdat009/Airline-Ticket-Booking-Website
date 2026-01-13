@@ -332,6 +332,102 @@ INSERT INTO `dichvuchuyenbay` (`machuyenbay`, `madichvu`) VALUES
 -- INSERT INTO `trangthaithanhtoan` (`mathanhtoan`, `madatcho`, `sotien`, `dathanhtoan`, `ngayhethan`) VALUES
 
 -- =================================================================
+-- 7. BẢNG PHÂN QUYỀN (RBAC - Role-Based Access Control)
+-- =================================================================
+
+-- 7.1. Bảng Hành động (Actions Dictionary)
+INSERT INTO `hanh_dong` (`ma_hanh_dong`, `mo_ta`) VALUES
+('VIEW', 'Xem/Đọc dữ liệu'),
+('CREATE', 'Tạo mới'),
+('UPDATE', 'Cập nhật/Sửa'),
+('DELETE', 'Xóa'),
+('IMPORT', 'Import dữ liệu'),
+('EXPORT', 'Export/Tải xuống'),
+('APPROVE', 'Phê duyệt'),
+('CANCEL', 'Hủy bỏ'),
+('RESTORE', 'Khôi phục'),
+('MANAGE', 'Quản lý toàn bộ');
+
+-- 7.2. Bảng Vai trò (Roles)
+INSERT INTO `vai_tro` (`ma_vai_tro`, `ten_vai_tro`, `mo_ta`, `trang_thai`, `da_xoa`, `deleted_at`) VALUES
+(1, 'SUPER_ADMIN', 'Quản trị viên cao nhất - Toàn quyền', 1, 0, NULL),
+(2, 'QUAN_LY', 'Quản lý - Quyền quản lý hệ thống', 1, 0, NULL),
+(3, 'NHAN_VIEN_VE', 'Nhân viên bán vé - Quản lý đặt chỗ và vé', 1, 0, NULL),
+(4, 'KE_TOAN', 'Kế toán - Quản lý thanh toán và doanh thu', 1, 0, NULL),
+(5, 'VAN_HANH', 'Vận hành - Quản lý chuyến bay và máy bay', 1, 0, NULL);
+
+-- 7.3. Bảng Chức năng (Features/Resources)
+INSERT INTO `chuc_nang` (`ma_chuc_nang`, `ma_code`, `ten_chuc_nang`, `nhom`) VALUES
+(1, 'FLIGHT', 'Quản lý chuyến bay', 'Vận hành'),
+(2, 'ROUTE', 'Quản lý tuyến bay', 'Vận hành'),
+(3, 'AIRPORT', 'Quản lý sân bay', 'Vận hành'),
+(4, 'AIRCRAFT', 'Quản lý máy bay', 'Vận hành'),
+(5, 'BOOKING', 'Quản lý đặt chỗ', 'Bán vé'),
+(6, 'ORDER', 'Quản lý đơn hàng', 'Bán vé'),
+(7, 'CUSTOMER', 'Quản lý khách hàng', 'Bán vé'),
+(8, 'PAYMENT', 'Quản lý thanh toán', 'Tài chính'),
+(9, 'REFUND', 'Quản lý hoàn tiền', 'Tài chính'),
+(10, 'PROMOTION', 'Quản lý khuyến mãi', 'Marketing'),
+(11, 'SERVICE', 'Quản lý dịch vụ', 'Dịch vụ'),
+(12, 'PRICE', 'Quản lý giá vé', 'Tài chính'),
+(13, 'REPORT', 'Báo cáo thống kê', 'Báo cáo'),
+(14, 'USER', 'Quản lý người dùng', 'Hệ thống'),
+(15, 'ROLE', 'Quản lý vai trò', 'Hệ thống'),
+(16, 'PERMISSION', 'Quản lý phân quyền', 'Hệ thống');
+
+-- 7.4. Bảng Phân quyền (Permissions)
+-- SUPER_ADMIN: Toàn quyền tất cả
+INSERT INTO `phan_quyen` (`ma_vai_tro`, `ma_chuc_nang`, `ma_hanh_dong`) VALUES
+-- Super Admin có toàn quyền
+(1, 1, 'MANAGE'), (1, 2, 'MANAGE'), (1, 3, 'MANAGE'), (1, 4, 'MANAGE'),
+(1, 5, 'MANAGE'), (1, 6, 'MANAGE'), (1, 7, 'MANAGE'), (1, 8, 'MANAGE'),
+(1, 9, 'MANAGE'), (1, 10, 'MANAGE'), (1, 11, 'MANAGE'), (1, 12, 'MANAGE'),
+(1, 13, 'MANAGE'), (1, 14, 'MANAGE'), (1, 15, 'MANAGE'), (1, 16, 'MANAGE'),
+
+-- QUAN_LY: Quyền quản lý chính
+(2, 1, 'VIEW'), (2, 1, 'CREATE'), (2, 1, 'UPDATE'), (2, 1, 'DELETE'),
+(2, 2, 'VIEW'), (2, 2, 'CREATE'), (2, 2, 'UPDATE'),
+(2, 5, 'VIEW'), (2, 5, 'UPDATE'), (2, 5, 'CANCEL'),
+(2, 6, 'VIEW'), (2, 6, 'UPDATE'),
+(2, 7, 'VIEW'), (2, 7, 'CREATE'), (2, 7, 'UPDATE'),
+(2, 9, 'VIEW'), (2, 9, 'APPROVE'),
+(2, 13, 'VIEW'), (2, 13, 'EXPORT'),
+
+-- NHAN_VIEN_VE: Bán vé và quản lý booking
+(3, 5, 'VIEW'), (3, 5, 'CREATE'), (3, 5, 'UPDATE'), (3, 5, 'CANCEL'),
+(3, 6, 'VIEW'), (3, 6, 'CREATE'), (3, 6, 'UPDATE'),
+(3, 7, 'VIEW'), (3, 7, 'CREATE'), (3, 7, 'UPDATE'),
+(3, 1, 'VIEW'),
+(3, 11, 'VIEW'),
+
+-- KE_TOAN: Quản lý tài chính
+(4, 8, 'VIEW'), (4, 8, 'UPDATE'), (4, 8, 'APPROVE'),
+(4, 9, 'VIEW'), (4, 9, 'UPDATE'), (4, 9, 'APPROVE'),
+(4, 12, 'VIEW'), (4, 12, 'UPDATE'),
+(4, 13, 'VIEW'), (4, 13, 'EXPORT'),
+(4, 6, 'VIEW'),
+
+-- VAN_HANH: Quản lý chuyến bay
+(5, 1, 'VIEW'), (5, 1, 'CREATE'), (5, 1, 'UPDATE'), (5, 1, 'DELETE'),
+(5, 2, 'VIEW'), (5, 2, 'CREATE'), (5, 2, 'UPDATE'),
+(5, 3, 'VIEW'),
+(5, 4, 'VIEW'), (5, 4, 'UPDATE'),
+(5, 5, 'VIEW');
+
+-- 7.5. Tạo tài khoản Admin mẫu (mật khẩu: admin123)
+-- Mật khẩu đã được mã hóa bằng BCrypt
+INSERT INTO `taikhoanadmin` (`mataikhoan`, `tendangnhap`, `matkhaubam`, `email`, `hovaten`, `ngaytao`, `da_xoa`, `deleted_at`) VALUES
+(1, 'superadmin', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'superadmin@airline.com', 'Super Administrator', NOW(), 0, NULL),
+(2, 'quanly', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'quanly@airline.com', 'Quản lý hệ thống', NOW(), 0, NULL),
+(3, 'nhanvien', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'nhanvien@airline.com', 'Nhân viên bán vé', NOW(), 0, NULL);
+
+-- 7.6. Gán vai trò cho Admin
+INSERT INTO `admin_vai_tro` (`mataikhoan`, `ma_vai_tro`) VALUES
+(1, 1), -- superadmin có vai trò SUPER_ADMIN
+(2, 2), -- quanly có vai trò QUAN_LY
+(3, 3); -- nhanvien có vai trò NHAN_VIEN_VE
+
+-- =================================================================
 -- BẬT LẠI KIỂM TRA KHÓA NGOẠI
 -- =================================================================
 SET FOREIGN_KEY_CHECKS=1;
