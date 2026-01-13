@@ -1,5 +1,6 @@
 package com.example.j2ee.jwt;
 
+import com.example.j2ee.service.AdminRoleService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,15 +27,18 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserDetailsService userService;
     private final UserDetailsService adminService;
+    private final AdminRoleService adminRoleService;
 
     public JwtFilter(
             JwtUtil jwtUtil,
             @Lazy @Qualifier("userAccountDetailsService") UserDetailsService userService,
-            @Lazy @Qualifier("adminAccountDetailsService") UserDetailsService adminService
+            @Lazy @Qualifier("adminAccountDetailsService") UserDetailsService adminService,
+            @Lazy AdminRoleService adminRoleService
     ) {
         this.jwtUtil = jwtUtil;
         this.userService = userService;
         this.adminService = adminService;
+        this.adminRoleService = adminRoleService;
     }
 
     // [ADDED] Bỏ qua filter cho các endpoint public (login/refresh) và tài nguyên tĩnh
@@ -138,15 +142,19 @@ public class JwtFilter extends OncePerRequestFilter {
 
     /**
      * Kiểm tra xem người dùng có phải là admin dựa trên roles trong token
+     * Sử dụng AdminRoleService để load roles động từ database
      * Hỗ trợ multiple roles
      */
     private boolean hasAdminRole(String token) {
         try {
             List<String> roles = jwtUtil.getRoles(token);
+            // Lấy tất cả admin roles từ database (có cache)
+            var adminRoles = adminRoleService.getAllActiveRoleNames();
+
             return roles.stream().anyMatch(role -> {
                 String r = role.trim().toUpperCase();
-                return "ADMIN".equals(r) || "SUPER_ADMIN".equals(r) || "QUAN_LY".equals(r) ||
-                       "ROLE_ADMIN".equals(r) || "ROLE_SUPER_ADMIN".equals(r) || "ROLE_QUAN_LY".equals(r);
+                // Check cả dạng có ROLE_ prefix và không có prefix
+                return adminRoles.contains(r) || adminRoles.contains("ROLE_" + r);
             });
         } catch (Exception e) {
             return false;

@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { FaChartBar, FaUsers, FaRoute, FaPlaneDeparture, FaConciergeBell, FaSignOutAlt, FaBars, FaTimes, FaMoneyBillWave, FaDollarSign, FaTags, FaFighterJet, FaFileInvoice, FaUndo, FaHistory, FaUserShield, FaKey, FaTicketAlt } from 'react-icons/fa';
-import { MdLocalAirport } from 'react-icons/md'; 
+import { FaSignOutAlt, FaBars, FaTimes, FaUserCircle, FaChevronDown } from 'react-icons/fa';
 import { logout } from '../../services/AuthService';
-import { getUserInfo, isAuthenticated } from '../../utils/cookieUtils';
+import { getUserInfo, isAuthenticated, getAdminUserInfo } from '../../utils/cookieUtils';
+import { getMenuItemsGroupedByPermissions } from '../../data/adminMenuData';
 
 function TrangChuAdmin() {
     const navigate = useNavigate();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [userInfo, setUserInfo] = useState(null);
+    const [groupedMenuItems, setGroupedMenuItems] = useState({});
+    const [expandedGroups, setExpandedGroups] = useState({});
 
-    // Kiểm tra xác thực khi component mount
+    // Kiểm tra xác thực khi component mount và load menu theo permission
     useEffect(() => {
         if (!isAuthenticated()) {
             navigate('/admin/login');
@@ -18,8 +20,31 @@ function TrangChuAdmin() {
             // Lấy thông tin user từ cookie
             const user = getUserInfo();
             setUserInfo(user);
+
+            // Lấy permissions và filter menu items theo nhóm
+            const adminUserInfo = getAdminUserInfo();
+            if (adminUserInfo && adminUserInfo.permissions) {
+                const groupedMenu = getMenuItemsGroupedByPermissions(adminUserInfo.permissions);
+                setGroupedMenuItems(groupedMenu);
+
+                // Đóng tất cả groups mặc định
+                const initialExpanded = {};
+                Object.keys(groupedMenu).forEach(groupName => {
+                    initialExpanded[groupName] = false;
+                });
+                setExpandedGroups(initialExpanded);
+            }
         }
     }, [navigate]);
+
+
+    // Toggle collapse/expand group
+    const toggleGroup = (groupName) => {
+        setExpandedGroups(prev => ({
+            ...prev,
+            [groupName]: !prev[groupName]
+        }));
+    };
 
     const handleLogout = async () => {
         if (window.confirm('Bạn có chắc chắn muốn đăng xuất?')) {
@@ -27,25 +52,6 @@ function TrangChuAdmin() {
             navigate('/admin/login');
         }
     };
-
-    const menuItems = [
-        { path: 'ThongKe', icon: <FaChartBar size={20} />, text: 'Thống kê', color: 'from-blue-500 to-cyan-500' },
-        { path: 'KhachHang', icon: <FaUsers size={20} />, text: 'Khách hàng', color: 'from-purple-500 to-pink-500' },
-        { path: 'TuyenBay', icon: <FaRoute size={20} />, text: 'Tuyến bay', color: 'from-green-500 to-emerald-500' },
-        { path: 'ChuyenBay', icon: <FaPlaneDeparture size={20} />, text: 'Chuyến bay', color: 'from-orange-500 to-red-500' },
-        { path: 'GiaBay', icon: <FaDollarSign size={20} />, text: 'Giá chuyến bay', color: 'from-teal-500 to-cyan-500' },
-        { path: 'DichVu', icon: <FaConciergeBell size={20} />, text: 'Dịch vụ', color: 'from-yellow-500 to-orange-500' },
-        { path: 'SanBay', icon: <MdLocalAirport size={20} />, text: 'Sân bay', color: 'from-indigo-500 to-blue-500' },
-        { path: 'KhuyenMai', icon: <FaTags size={20} />, text: 'Khuyến mãi', color: 'from-pink-500 to-rose-500' },
-        { path: 'MayBay', icon: <FaFighterJet size={20} />, text: 'Máy bay', color: 'from-sky-500 to-blue-600' },
-        { path: 'HangVe', icon: <FaTicketAlt size={20} />, text: 'Hạng vé', color: 'from-violet-500 to-purple-600' },
-        { path: 'HoaDon', icon: <FaFileInvoice size={20} />, text: 'Hóa đơn', color: 'from-teal-500 to-cyan-600' },
-        { path: 'HoanTien', icon: <FaUndo size={20} />, text: 'Hoàn tiền', color: 'from-lime-500 to-green-600' },
-        { path: 'LichSuThaoTac', icon: <FaHistory size={20} />, text: 'Lịch sử thao tác', color: 'from-green-500 to-emerald-600' },
-        { path: 'QuanLyTKAdmin', icon: <FaUsers size={20} />, text: 'Quản lý TK Admin', color: 'from-purple-500 to-pink-500' },
-        { path: 'VaiTro', icon: <FaUserShield size={20} />, text: 'Quản lý Vai trò', color: 'from-violet-500 to-purple-600' },
-        { path: 'PhanQuyen', icon: <FaKey size={20} />, text: 'Phân quyền', color: 'from-amber-500 to-orange-600' },
-    ];
 
     // Lấy chữ cái đầu của username để hiển thị avatar
     const getInitial = () => {
@@ -66,36 +72,69 @@ function TrangChuAdmin() {
                     {/* Logo */}
                     <div className="flex items-center justify-center h-24 border-b border-slate-700/50 bg-slate-900/80">
                         <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 shadow-lg shadow-sky-500/50">
-                            <FaPlaneDeparture className="text-white" size={28} />
+                            <FaUserCircle className="text-white" size={28} />
                             <h1 className="text-2xl font-bold text-white tracking-tight">Admin</h1>
                         </div>
                     </div>
                     
                     {/* Navigation */}
                     <nav className="flex-1 mt-6 px-4 overflow-y-auto">
-                        <ul className="space-y-2">
-                            {menuItems.map(item => (
-                                <li key={item.path}>
-                                    <NavLink
-                                        to={item.path}
-                                        className={({ isActive }) =>
-                                            `group flex items-center gap-4 px-5 py-3.5 rounded-xl transition-all duration-200 relative overflow-hidden ${
-                                                isActive 
-                                                ? `bg-gradient-to-r ${item.color} text-white shadow-lg` 
-                                                : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
-                                            }`
-                                        }
-                                    >
-                                        <div className="relative z-10 flex items-center gap-4 w-full">
-                                            <span className="transform group-hover:scale-110 transition-transform duration-200">
-                                                {item.icon}
+                        <div className="space-y-3">
+                            {Object.entries(groupedMenuItems).map(([groupName, groupData]) => {
+                                const isExpanded = expandedGroups[groupName];
+
+                                return (
+                                    <div key={groupName} className="mb-2">
+                                        {/* Group Header - Collapsible */}
+                                        <button
+                                            onClick={() => toggleGroup(groupName)}
+                                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-slate-700/50 to-slate-600/50 hover:from-slate-700/70 hover:to-slate-600/70 text-white font-semibold text-sm tracking-wide transition-all duration-300 border border-slate-600/30"
+                                        >
+                                            <span className={`transform transition-transform duration-300 ${isExpanded ? 'rotate-0' : '-rotate-90'}`}>
+                                                <FaChevronDown size={14} />
                                             </span>
-                                            <span className="font-semibold text-sm tracking-wide">{item.text}</span>
+                                            <span className="flex-1 text-left">{groupName}</span>
+                                            <span className="text-xs bg-slate-800/50 px-2 py-0.5 rounded-full text-slate-400">
+                                                {groupData.items.length}
+                                            </span>
+                                        </button>
+
+                                        {/* Group Items - Collapsible Content with Animation */}
+                                        <div
+                                            className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                                                isExpanded ? 'max-h-[1000px] opacity-100 mt-2 ml-2' : 'max-h-0 opacity-0'
+                                            }`}
+                                        >
+                                            <div className="space-y-1">
+                                                {groupData.items.map(item => {
+                                                    const Icon = item.icon;
+                                                    return (
+                                                        <NavLink
+                                                            key={item.path}
+                                                            to={item.path}
+                                                            className={({ isActive }) =>
+                                                                `group flex items-center gap-4 px-5 py-3.5 rounded-xl transition-all duration-200 relative overflow-hidden ${
+                                                                    isActive
+                                                                    ? `bg-gradient-to-r ${item.color} text-white shadow-lg`
+                                                                    : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                                                                }`
+                                                            }
+                                                        >
+                                                            <div className="relative z-10 flex items-center gap-4 w-full">
+                                                                <span className="transform group-hover:scale-110 transition-transform duration-200">
+                                                                    <Icon size={18} />
+                                                                </span>
+                                                                <span className="font-medium text-sm">{item.text}</span>
+                                                            </div>
+                                                        </NavLink>
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
-                                    </NavLink>
-                                </li>
-                            ))}
-                        </ul>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </nav>
                 
                     {/* User Profile / Logout */}
