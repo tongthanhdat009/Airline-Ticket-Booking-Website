@@ -93,8 +93,8 @@ public class JwtFilter extends OncePerRequestFilter {
                         && SecurityContextHolder.getContext().getAuthentication() == null
                         && jwtUtil.validate(token)) {
 
-                    String role = jwtUtil.getRole(token); // có thể null
-                    UserDetailsService uds = isAdminRole(role) ? adminService : userService;
+                    // Xác định xem user là admin hay user thường bằng cách kiểm tra roles
+                    UserDetailsService uds = hasAdminRole(token) ? adminService : userService;
 
                     UserDetails userDetails = uds.loadUserByUsername(username);
                     UsernamePasswordAuthenticationToken auth =
@@ -134,6 +134,23 @@ public class JwtFilter extends OncePerRequestFilter {
         if (role == null) return false;
         String r = role.trim().toUpperCase();
         return "ADMIN".equals(r) || "ROLE_ADMIN".equals(r);
+    }
+
+    /**
+     * Kiểm tra xem người dùng có phải là admin dựa trên roles trong token
+     * Hỗ trợ multiple roles
+     */
+    private boolean hasAdminRole(String token) {
+        try {
+            List<String> roles = jwtUtil.getRoles(token);
+            return roles.stream().anyMatch(role -> {
+                String r = role.trim().toUpperCase();
+                return "ADMIN".equals(r) || "SUPER_ADMIN".equals(r) || "QUAN_LY".equals(r) ||
+                       "ROLE_ADMIN".equals(r) || "ROLE_SUPER_ADMIN".equals(r) || "ROLE_QUAN_LY".equals(r);
+            });
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private void unauthorized(HttpServletResponse response, String message) throws java.io.IOException {

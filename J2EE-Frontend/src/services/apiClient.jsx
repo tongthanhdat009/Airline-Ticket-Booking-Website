@@ -218,7 +218,7 @@ apiClient.interceptors.response.use(
         isRefreshing = true;
 
         const refreshEndpoint = getRefreshEndpoint(userType);
-        
+
         // Gọi API refresh token với refreshToken trong body
         const { data } = await axios.post(
           `${BASE_URL}${refreshEndpoint}`,
@@ -229,7 +229,6 @@ apiClient.interceptors.response.use(
         );
 
         const newAccessToken = data?.accessToken;
-        // Backend không trả về refresh token mới nữa, giữ nguyên refresh token cũ
 
         if (!newAccessToken) {
           throw new Error("No accessToken in response");
@@ -237,6 +236,21 @@ apiClient.interceptors.response.use(
 
         // Lưu access token mới (refresh token giữ nguyên trong memory)
         setTokensByType(userType, newAccessToken, refreshToken);
+
+        // Cập nhật userInfo trong cookie nếu có roles và permissions mới (cho admin)
+        if (userType === 'admin' && (data.roles || data.permissions)) {
+          const userInfoCookie = Cookies.get('admin_user_info');
+          if (userInfoCookie) {
+            try {
+              const userInfo = JSON.parse(userInfoCookie);
+              userInfo.roles = data.roles || userInfo.roles || [];
+              userInfo.permissions = data.permissions || userInfo.permissions || [];
+              Cookies.set('admin_user_info', JSON.stringify(userInfo), { expires: 1 });
+            } catch (e) {
+              console.error("Error updating user info in cookie:", e);
+            }
+          }
+        }
 
         // Xử lý các request đang chờ
         processQueue(newAccessToken, null);

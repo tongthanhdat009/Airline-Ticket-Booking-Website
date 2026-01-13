@@ -1,6 +1,7 @@
 package com.example.j2ee.config;
 
 import com.example.j2ee.jwt.JwtFilter;
+import com.example.j2ee.security.DynamicAdminAuthorizationManager;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +30,7 @@ public class SecurityConfig {
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2FailureHandler oAuth2FailureHandler;
     private final PasswordEncoder passwordEncoder;
+    private final DynamicAdminAuthorizationManager dynamicAdminAuthManager;
 
     public SecurityConfig(
             @Lazy JwtFilter jwtFilter,
@@ -36,7 +38,8 @@ public class SecurityConfig {
             @Lazy @Qualifier("adminAccountDetailsService") UserDetailsService adminDetailsService,
             OAuth2SuccessHandler oAuth2SuccessHandler,
             OAuth2FailureHandler oAuth2FailureHandler,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            DynamicAdminAuthorizationManager dynamicAdminAuthManager
     ) {
         this.jwtFilter = jwtFilter;
         this.userDetailsService = userDetailsService;
@@ -44,6 +47,7 @@ public class SecurityConfig {
         this.oAuth2SuccessHandler = oAuth2SuccessHandler;
         this.oAuth2FailureHandler = oAuth2FailureHandler;
         this.passwordEncoder = passwordEncoder;
+        this.dynamicAdminAuthManager = dynamicAdminAuthManager;
     }
 
     @Bean
@@ -72,10 +76,22 @@ public class SecurityConfig {
                         .requestMatchers("/admin/dashboard/dichvu/luachon/anh/**").permitAll()
                         // Allow fetching flight services images and service list for public client
                         .requestMatchers("/admin/dashboard/chuyenbay/**").permitAll()
-                        .requestMatchers("/ws/**").permitAll() 
+                        .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/countries").permitAll()
-                        // admin endpoints - yêu cầu ROLE_ADMIN
-                        .requestMatchers("/admin/dashboard/**").hasRole("ADMIN")
+                        // ================== ADMIN DASHBOARD ENDPOINTS ==================
+                        // Sử dụng Dynamic Admin Authorization Manager
+                        // Kiểm tra user có vai trò admin hợp lệ từ database không
+                        // Các vai trò được định nghĩa trong database: SUPER_ADMIN, QUAN_LY, NHAN_VIEN_VE, KE_TOAN, VAN_HANH
+                        //
+                        // Backend chỉ kiểm tra role级别的访问权限
+                        // Chi tiết permissions (VIEW, CREATE, UPDATE, DELETE) được xử lý bởi frontend
+                        //
+                        // Lợi ích:
+                        // 1. Giảm độ trễ - không cần query database mỗi request
+                        // 2. Đơn giản - chỉ check role, không check từng endpoint
+                        // 3. Hiệu suất - roles được cache trong JWT token
+                        // 4. Flexible - frontend ẩn/hiện UI dựa trên permissions
+                        .requestMatchers("/admin/dashboard/**").access(dynamicAdminAuthManager)
                         // rest yêu cầu authentication
                         .requestMatchers("/api/sanbay/**").permitAll()
                         .requestMatchers("/AnhDichVuCungCap/**").permitAll()

@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -46,11 +47,28 @@ public class JwtUtil {
         return build(subject, accessExpiration, Collections.singletonMap("typ", "access"));
     }
 
-    // [ADDED]
+    // [ADDED] Generate token với role đơn (legacy support)
     public String generateAccessToken(String subject, String role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("typ", "access");
         claims.put("role", role);
+        return build(subject, accessExpiration, claims);
+    }
+
+    // [ADDED] Generate token với multiple roles
+    public String generateAccessToken(String subject, Collection<String> roles) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("typ", "access");
+        claims.put("roles", roles);
+        return build(subject, accessExpiration, claims);
+    }
+
+    // [ADDED] Generate token với multiple roles và permissions
+    public String generateAccessToken(String subject, Collection<String> roles, Collection<String> permissions) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("typ", "access");
+        claims.put("roles", roles);
+        claims.put("permissions", permissions);
         return build(subject, accessExpiration, claims);
     }
 
@@ -108,6 +126,55 @@ public class JwtUtil {
             return roles.get(0).toString();
         }
         return null;
+    }
+
+    // [ADDED] Lấy danh sách roles từ token
+    @SuppressWarnings("unchecked")
+    public List<String> getRoles(String token) {
+        List<String> roles = getClaim(token, c -> c.get("roles", List.class));
+        if (roles != null) {
+            return roles;
+        }
+
+        // Fallback: nếu có role đơn, convert thành list
+        String singleRole = getClaim(token, c -> c.get("role", String.class));
+        if (singleRole != null) {
+            return Collections.singletonList(singleRole);
+        }
+
+        return Collections.emptyList();
+    }
+
+    // [ADDED] Lấy danh sách permissions từ token
+    @SuppressWarnings("unchecked")
+    public List<String> getPermissions(String token) {
+        List<String> permissions = getClaim(token, c -> c.get("permissions", List.class));
+        return permissions != null ? permissions : Collections.emptyList();
+    }
+
+    // [ADDED] Kiểm tra token có chứa role cụ thể không
+    public boolean hasRole(String token, String roleName) {
+        List<String> roles = getRoles(token);
+        return roles.stream().anyMatch(role -> role.equalsIgnoreCase(roleName));
+    }
+
+    // [ADDED] Kiểm tra token có chứa permission cụ thể không
+    public boolean hasPermission(String token, String permission) {
+        List<String> permissions = getPermissions(token);
+        return permissions.contains(permission);
+    }
+
+    // [ADDED] Kiểm tra token có bất kỳ role nào trong danh sách không
+    public boolean hasAnyRole(String token, String... roleNames) {
+        List<String> roles = getRoles(token);
+        return roles.stream().anyMatch(role -> {
+            for (String roleName : roleNames) {
+                if (role.equalsIgnoreCase(roleName)) {
+                    return true;
+                }
+            }
+            return false;
+        });
     }
 
     public Object getClaim(String token, String name) {

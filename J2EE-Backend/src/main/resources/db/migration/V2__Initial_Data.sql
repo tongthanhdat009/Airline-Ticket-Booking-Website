@@ -313,7 +313,7 @@ INSERT INTO `phan_quyen` (`ma_vai_tro`, `ma_chuc_nang`, `ma_hanh_dong`) VALUES
 (5, 4, 'VIEW'), (5, 4, 'UPDATE'),
 (5, 5, 'VIEW');
 
--- 6.5. Tạo tài khoản Admin mẫu (mật khẩu: admin123)
+-- 6.5. Tạo tài khoản Admin mẫu (mật khẩu: 123456)
 INSERT INTO `taikhoanadmin` (`mataikhoan`, `tendangnhap`, `matkhaubam`, `email`, `hovaten`, `ngaytao`, `da_xoa`, `deleted_at`) VALUES
 (1, 'admin', '$2a$10$G.BPF34LbTOmAwJnK6C/G.ZGSTSlK7Cdg6/IbBm6miGgcE75EYVT.', 'admin@airline.com', 'Administrator', NOW(), 0, NULL),
 (2, 'superadmin', '$2a$10$G.BPF34LbTOmAwJnK6C/G.ZGSTSlK7Cdg6/IbBm6miGgcE75EYVT.', 'superadmin@airline.com', 'Super Administrator', NOW(), 0, NULL),
