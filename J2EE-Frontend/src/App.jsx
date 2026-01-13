@@ -22,6 +22,7 @@ import QuanLyHoanTien from "./pages/QuanLy/QuanLyHoanTien"
 import QuanLyLichSuThaoTac from "./pages/QuanLy/QuanLyLichSuThaoTac"
 import QuanLyVaiTro from "./pages/QuanLy/QuanLyVaiTro"
 import QuanLyPhanQuyen from "./pages/QuanLy/QuanLyPhanQuyen"
+import QuanLyHangVe from "./pages/QuanLy/QuanLyHangVe"
 import DichVuChuyenBay from "./pages/KhachHang/DichVuChuyenBay"
 import DichVuKhac from "./pages/KhachHang/DichVuKhac"
 import TraCuuChuyenBay from "./pages/KhachHang/TraCuuChuyenBay"
@@ -129,6 +130,7 @@ function AppContent() {
             <Route path="LichSuThaoTac" element={<QuanLyLichSuThaoTac />} />
             <Route path="VaiTro" element={<QuanLyVaiTro />} />
             <Route path="PhanQuyen" element={<QuanLyPhanQuyen />} />
+            <Route path="HangVe" element={<QuanLyHangVe />} />
           </Route>
 
           {/* Backward compatibility - redirect old routes */}
@@ -148,6 +150,7 @@ function AppContent() {
             <Route path="LichSuThaoTac" element={<QuanLyLichSuThaoTac />} />
             <Route path="VaiTro" element={<QuanLyVaiTro />} />
             <Route path="PhanQuyen" element={<QuanLyPhanQuyen />} />
+            <Route path="HangVe" element={<QuanLyHangVe />} />
           </Route>
         </Routes>
       </main>

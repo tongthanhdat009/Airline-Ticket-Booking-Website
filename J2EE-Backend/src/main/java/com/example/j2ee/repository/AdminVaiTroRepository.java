@@ -23,6 +23,6 @@ public interface AdminVaiTroRepository extends JpaRepository<AdminVaiTro, AdminV
 
     void deleteById_MaVaiTro(int maVaiTro);
 
-    @Query("SELECT avt.maVaiTro FROM AdminVaiTro avt WHERE avt.mataikhoan = :mataikhoan")
+    @Query("SELECT avt.id.maVaiTro FROM AdminVaiTro avt WHERE avt.id.mataikhoan = :mataikhoan")
     List<Integer> findMaVaiTroByMataikhoan(@Param("mataikhoan") int mataikhoan);
 }

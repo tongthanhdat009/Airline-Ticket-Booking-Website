@@ -85,7 +85,6 @@ public class ThanhToanController {
                             Map<String, Object> hangVeInfo = new HashMap<>();
                             hangVeInfo.put("maHangVe", datCho.getChiTietGhe().getHangVe().getMaHangVe());
                             hangVeInfo.put("tenHangVe", datCho.getChiTietGhe().getHangVe().getTenHangVe());
-                            hangVeInfo.put("sucChua", datCho.getChiTietGhe().getHangVe().getSucChua());
                             gheInfo.put("hangVe", hangVeInfo);
                         }
                         
@@ -97,7 +96,6 @@ public class ThanhToanController {
                         Map<String, Object> hangVeInfo = new HashMap<>();
                         hangVeInfo.put("maHangVe", datCho.getHangVe().getMaHangVe());
                         hangVeInfo.put("tenHangVe", datCho.getHangVe().getTenHangVe());
-                        hangVeInfo.put("sucChua", datCho.getHangVe().getSucChua());
                         datChoInfo.put("hangVe", hangVeInfo);
                     }
                     

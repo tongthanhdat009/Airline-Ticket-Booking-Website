@@ -23,9 +23,6 @@ public class HangVe {
     @Column(name = "tenhangve", nullable = false, unique = true)
     private String tenHangVe;
 
-    @Column(name = "succhua", nullable = false)
-    private int sucChua;
-
     @OneToMany(mappedBy = "hangVe", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<GiaChuyenBay> giaChuyenBay;

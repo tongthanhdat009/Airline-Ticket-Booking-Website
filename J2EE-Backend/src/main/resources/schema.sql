@@ -33,8 +33,7 @@ CREATE TABLE `sanbay` (
 
 CREATE TABLE `hangve` (
   `mahangve` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `tenhangve` varchar(255) NOT NULL,
-  `succhua` int NOT NULL
+  `tenhangve` varchar(255) NOT NULL
 );
 
 CREATE TABLE `maybay` (

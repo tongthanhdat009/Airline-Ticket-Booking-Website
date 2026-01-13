@@ -14,12 +14,12 @@ INSERT INTO `sanbay` (`masanbay`, `ma_iata`, `ma_icao`, `tensanbay`, `thanhphosa
 (3, 'DAD', 'VVDN', 'Sân bay Quốc tế Đà Nẵng', 'Đà Nẵng', 'Việt Nam', 'ACTIVE');
 
 -- Bảng hạng vé
-INSERT INTO `hangve` (`mahangve`, `tenhangve`, `succhua`) VALUES
-(1, 'Economy', 25),
-(2, 'Economy Saver', 20),
-(3, 'Deluxe', 50),
-(4, 'Business', 75),
-(5, 'First Class', 100);
+INSERT INTO `hangve` (`mahangve`, `tenhangve`) VALUES
+(1, 'Economy'),
+(2, 'Economy Saver'),
+(3, 'Deluxe'),
+(4, 'Business'),
+(5, 'First Class');
 
 -- Bảng tuyến bay
 INSERT INTO `tuyenbay` (`matuyenbay`, `masanbaydi`, `masanbayden`) VALUES
