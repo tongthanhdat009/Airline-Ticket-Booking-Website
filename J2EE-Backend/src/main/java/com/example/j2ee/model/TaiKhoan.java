@@ -7,7 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -16,6 +19,8 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE taikhoan SET da_xoa = 1, deleted_at = NOW() WHERE mataikhoan = ?")
+@SQLRestriction("da_xoa = 0")
 public class TaiKhoan {
 
     @Id
@@ -47,4 +52,11 @@ public class TaiKhoan {
     @JoinColumn(name = "mahanhkhach", referencedColumnName = "mahanhkhach", nullable = false, unique = true)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private HanhKhach hanhKhach;
+
+    // ==================== SOFT DELETE FIELDS ====================
+    @Column(name = "da_xoa", nullable = false)
+    private Boolean daXoa = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 }

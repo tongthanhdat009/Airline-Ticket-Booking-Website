@@ -8,32 +8,32 @@ SET FOREIGN_KEY_CHECKS=0;
 -- =================================================================
 
 -- Bảng sân bay
-INSERT INTO `sanbay` (`masanbay`, `ma_iata`, `ma_icao`, `tensanbay`, `thanhphosanbay`, `quocgiasanbay`, `trangthaihoatdong`) VALUES
-(1, 'SGN', 'VVTS', 'Sân bay Quốc tế Tân Sơn Nhất', 'Thành phố Hồ Chí Minh', 'Việt Nam', 'ACTIVE'),
-(2, 'HAN', 'VVNB', 'Sân bay Quốc tế Nội Bài', 'Hà Nội', 'Việt Nam', 'ACTIVE'),
-(3, 'DAD', 'VVDN', 'Sân bay Quốc tế Đà Nẵng', 'Đà Nẵng', 'Việt Nam', 'ACTIVE');
+INSERT INTO `sanbay` (`masanbay`, `ma_iata`, `ma_icao`, `tensanbay`, `thanhphosanbay`, `quocgiasanbay`, `trangthaihoatdong`, `da_xoa`, `deleted_at`) VALUES
+(1, 'SGN', 'VVTS', 'Sân bay Quốc tế Tân Sơn Nhất', 'Thành phố Hồ Chí Minh', 'Việt Nam', 'ACTIVE', 0, NULL),
+(2, 'HAN', 'VVNB', 'Sân bay Quốc tế Nội Bài', 'Hà Nội', 'Việt Nam', 'ACTIVE', 0, NULL),
+(3, 'DAD', 'VVDN', 'Sân bay Quốc tế Đà Nẵng', 'Đà Nẵng', 'Việt Nam', 'ACTIVE', 0, NULL);
 
 -- Bảng hạng vé
-INSERT INTO `hangve` (`mahangve`, `tenhangve`) VALUES
-(1, 'Economy'),
-(2, 'Economy Saver'),
-(3, 'Deluxe'),
-(4, 'Business'),
-(5, 'First Class');
+INSERT INTO `hangve` (`mahangve`, `tenhangve`, `da_xoa`, `deleted_at`) VALUES
+(1, 'Economy', 0, NULL),
+(2, 'Economy Saver', 0, NULL),
+(3, 'Deluxe', 0, NULL),
+(4, 'Business', 0, NULL),
+(5, 'First Class', 0, NULL);
 
 -- Bảng tuyến bay
-INSERT INTO `tuyenbay` (`matuyenbay`, `masanbaydi`, `masanbayden`) VALUES
-(1, 1, 2), -- SGN -> HAN
-(2, 2, 1), -- HAN -> SGN
-(3, 1, 3), -- SGN -> DAD
-(4, 3, 1); -- DAD -> SGN
+INSERT INTO `tuyenbay` (`matuyenbay`, `masanbaydi`, `masanbayden`, `da_xoa`, `deleted_at`) VALUES
+(1, 1, 2, 0, NULL), -- SGN -> HAN
+(2, 2, 1, 0, NULL), -- HAN -> SGN
+(3, 1, 3, 0, NULL), -- SGN -> DAD
+(4, 3, 1, 0, NULL); -- DAD -> SGN
 
 -- Bảng máy bay
-INSERT INTO `maybay` (`mamaybay`, `tenmaybay`, `hangmaybay`, `loaimaybay`, `sohieu`, `tongsoghe`, `trangthai`, `namkhaithac`) VALUES
-(1, 'Airbus A320', 'Vietnam Airlines', 'Airbus A320', 'VN-A320', 180, 'Active', 2015),
-(2, 'Boeing 737', 'Vietnam Airlines', 'Boeing 737-800', 'VN-B737', 180, 'Active', 2016),
-(3, 'Airbus A321', 'Vietjet Air', 'Airbus A321', 'VJ-A321', 180, 'Active', 2017),
-(4, 'Boeing 787', 'Vietnam Airlines', 'Boeing 787-9', 'VN-B789', 280, 'Active', 2018);
+INSERT INTO `maybay` (`mamaybay`, `tenmaybay`, `hangmaybay`, `loaimaybay`, `sohieu`, `tongsoghe`, `trangthai`, `namkhaithac`, `da_xoa`, `deleted_at`) VALUES
+(1, 'Airbus A320', 'Vietnam Airlines', 'Airbus A320', 'VN-A320', 180, 'Active', 2015, 0, NULL),
+(2, 'Boeing 737', 'Vietnam Airlines', 'Boeing 737-800', 'VN-B737', 180, 'Active', 2016, 0, NULL),
+(3, 'Airbus A321', 'Vietjet Air', 'Airbus A321', 'VJ-A321', 180, 'Active', 2017, 0, NULL),
+(4, 'Boeing 787', 'Vietnam Airlines', 'Boeing 787-9', 'VN-B789', 280, 'Active', 2018, 0, NULL);
 
 -- Bảng chi tiết ghế (sơ đồ ghế cho mỗi máy bay)
 -- Máy bay 1 (VN-A320) - 180 ghế
@@ -105,159 +105,160 @@ INSERT INTO `chitietghe` (`maghe`, `mamaybay`, `mahangve`, `soghe`, `vitrighe`, 
 (178, 1, 5, '30D', 'AISLE', 30, 'D'), (179, 1, 5, '30E', 'MIDDLE', 30, 'E'), (180, 1, 5, '30F', 'WINDOW', 30, 'F');
 
 -- Bảng dịch vụ cung cấp
-INSERT INTO `dichvucungcap` (`madichvu`, `tendichvu`, `mota`, `anh`) VALUES
-(1, 'Hành lý ký gửi', 'Hãy lựa chọn gói hành lý phù hợp', '1.svg'),
-(2, 'Suất ăn trên máy bay', 'Chọn suất ăn cho chuyến bay', '2.svg'),
-(3, 'Bảo hiểm du lịch', 'Dịch vụ gồm: đón tiếp, tiễn khách tại sân bay; Hỗ trợ quá trình làm thủ tục, hướng dẫn chỉ đường đi tại sân bay, tiếp nhận và chuyển trả hành lý cho hành khách tại ga đi, ga đến.', '3.svg'),
-(4, 'Trẻ em bay một mình (12- dưới 14 tuổi)', 'Dịch vụ đồng hành cùng trẻ từ 12 tuổi đến dưới 14 tuổi,  bay một mình với cấp sự giám sát và hỗ trợ đặc biệt cho trẻ trong suốt hành trình, từ lúc làm thủ tục tại sân bay xuất phát cho đến khi được người giám hộ đón tại điểm đến.', '4.svg'),
-(5, 'Mang theo thú cưng', 'Cho phép mang thú cưng lên máy bay', '5.svg');
+INSERT INTO `dichvucungcap` (`madichvu`, `tendichvu`, `mota`, `anh`, `da_xoa`, `deleted_at`) VALUES
+(1, 'Hành lý ký gửi', 'Hãy lựa chọn gói hành lý phù hợp', '1.svg', 0, NULL),
+(2, 'Suất ăn trên máy bay', 'Chọn suất ăn cho chuyến bay', '2.svg', 0, NULL),
+(3, 'Bảo hiểm du lịch', 'Dịch vụ gồm: đón tiếp, tiễn khách tại sân bay; Hỗ trợ quá trình làm thủ tục, hướng dẫn chỉ đường đi tại sân bay, tiếp nhận và chuyển trả hành lý cho hành khách tại ga đi, ga đến.', '3.svg', 0, NULL),
+(4, 'Trẻ em bay một mình (12- dưới 14 tuổi)', 'Dịch vụ đồng hành cùng trẻ từ 12 tuổi đến dưới 14 tuổi,  bay một mình với cấp sự giám sát và hỗ trợ đặc biệt cho trẻ trong suốt hành trình, từ lúc làm thủ tục tại sân bay xuất phát cho đến khi được người giám hộ đón tại điểm đến.', '4.svg', 0, NULL),
+(5, 'Mang theo thú cưng', 'Cho phép mang thú cưng lên máy bay', '5.svg', 0, NULL);
 
 -- Bảng lựa chọn dịch vụ (chi tiết của dịch vụ cung cấp)
-INSERT INTO `luachondichvu` (`maluachon`, `madichvu`, `tenluachon`, `mota`, `gia`, `anh`) VALUES
-(1, 1, 'Gói 20kg', 'Hành lý ký gửi tiêu chuẩn', 250000.00, '1.jpg'),
-(2, 1, 'Gói 30kg', 'Hành lý ký gửi thêm', 400000.00, '2.jpg'),
-(3, 2, 'Combo Cơm chiên Thái + Hạt điều + Nước suối', 'Cơm chay và rau củ', 150000.00, '3.jpg'),
-(4, 2, 'Red Bull', 'Nước uống giải khát', 40000.00, '4.jpg'),
-(5, 2, 'Rượu vang đỏ', 'Rượu', 40000.00, '5.jpg'),
-(6, 3, 'Bảo hiểm du lịch', 'Áp dụng toàn bộ chuyến đi', 200000.00, '6.jpg'),
-(7, 4, 'Trẻ em bay một mình', 'Dịch vụ đồng hành cho trẻ em', 300000.00, '7.jpg'),
-(8, 5, 'Thú cưng dưới 7kg', 'Mang theo thú cưng dưới 7kg', 4000000.00, '8.jpg');
+INSERT INTO `luachondichvu` (`maluachon`, `madichvu`, `tenluachon`, `mota`, `gia`, `anh`, `da_xoa`, `deleted_at`) VALUES
+(1, 1, 'Gói 20kg', 'Hành lý ký gửi tiêu chuẩn', 250000.00, '1.jpg', 0, NULL),
+(2, 1, 'Gói 30kg', 'Hành lý ký gửi thêm', 400000.00, '2.jpg', 0, NULL),
+(3, 2, 'Combo Cơm chiên Thái + Hạt điều + Nước suối', 'Cơm chay và rau củ', 150000.00, '3.jpg', 0, NULL),
+(4, 2, 'Red Bull', 'Nước uống giải khát', 40000.00, '4.jpg', 0, NULL),
+(5, 2, 'Rượu vang đỏ', 'Rượu', 40000.00, '5.jpg', 0, NULL),
+(6, 3, 'Bảo hiểm du lịch', 'Áp dụng toàn bộ chuyến đi', 200000.00, '6.jpg', 0, NULL),
+(7, 4, 'Trẻ em bay một mình', 'Dịch vụ đồng hành cho trẻ em', 300000.00, '7.jpg', 0, NULL),
+(8, 5, 'Thú cưng dưới 7kg', 'Mang theo thú cưng dưới 7kg', 4000000.00, '8.jpg', 0, NULL);
 
 -- =================================================================
 -- 2. BẢNG KHUYẾN MẢI
 -- =================================================================
 
 -- Bảng khuyến mãi
-INSERT INTO `khuyenmai` (`makhuyenmai`, `makm`, `tenkhuyenmai`, `mota`, `loaikhuyenmai`, `giatrigiam`, `giatritoithieu`, `giatritoida`, `soluong`, `soluongdaduocdung`, `ngaybatdau`, `ngayketthuc`, `trangthai`, `ngaytao`) VALUES
+INSERT INTO `khuyenmai` (`makhuyenmai`, `makm`, `tenkhuyenmai`, `mota`, `loaikhuyenmai`, `giatrigiam`, `giatritoithieu`, `giatritoida`, `soluong`, `soluongdaduocdung`, `ngaybatdau`, `ngayketthuc`, `trangthai`, `ngaytao`, `da_xoa`, `deleted_at`) VALUES
 -- Mã khuyến mãi theo phần trăm (PERCENT)
-(1, 'SALE20', 'Giảm 20% giá vé', 'Giảm 20% tổng giá đơn hàng', 'PERCENT', 20.00, 500000.00, NULL, 100, 0, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 'ACTIVE', '2025-01-01 00:00:00'),
-(2, 'WEEKEND15', 'Giảm 15% cuối tuần', 'Áp dụng cho đặt vé ngày thứ 7, CN', 'PERCENT', 15.00, 1000000.00, NULL, 200, 0, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 'ACTIVE', '2025-01-01 00:00:00'),
-(3, 'ECONOMY10', 'Giảm 10% vé Economy', 'Áp dụng cho vé hạng Economy', 'PERCENT', 10.00, 300000.00, NULL, 150, 0, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 'ACTIVE', '2025-01-01 00:00:00'),
+(1, 'SALE20', 'Giảm 20% giá vé', 'Giảm 20% tổng giá đơn hàng', 'PERCENT', 20.00, 500000.00, NULL, 100, 0, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 'ACTIVE', '2025-01-01 00:00:00', 0, NULL),
+(2, 'WEEKEND15', 'Giảm 15% cuối tuần', 'Áp dụng cho đặt vé ngày thứ 7, CN', 'PERCENT', 15.00, 1000000.00, NULL, 200, 0, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 'ACTIVE', '2025-01-01 00:00:00', 0, NULL),
+(3, 'ECONOMY10', 'Giảm 10% vé Economy', 'Áp dụng cho vé hạng Economy', 'PERCENT', 10.00, 300000.00, NULL, 150, 0, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 'ACTIVE', '2025-01-01 00:00:00', 0, NULL),
 -- Mã khuyến mãi số tiền cố định (FIXED)
-(4, 'GIA100K', 'Giảm 100.000 VNĐ', 'Giảm trực tiếp 100.000 VNĐ', 'FIXED', 100000.00, 1500000.00, NULL, 500, 0, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 'ACTIVE', '2025-01-01 00:00:00'),
-(5, 'GIA200K', 'Giảm 200.000 VNĐ', 'Giảm trực tiếp 200.000 VNĐ', 'FIXED', 200000.00, 3000000.00, NULL, 300, 0, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 'ACTIVE', '2025-01-01 00:00:00'),
+(4, 'GIA100K', 'Giảm 100.000 VNĐ', 'Giảm trực tiếp 100.000 VNĐ', 'FIXED', 100000.00, 1500000.00, NULL, 500, 0, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 'ACTIVE', '2025-01-01 00:00:00', 0, NULL),
+(5, 'GIA200K', 'Giảm 200.000 VNĐ', 'Giảm trực tiếp 200.000 VNĐ', 'FIXED', 200000.00, 3000000.00, NULL, 300, 0, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 'ACTIVE', '2025-01-01 00:00:00', 0, NULL),
 -- Mã khuyến mãi giới hạn số lượng
-(6, 'VIP50', 'Giảm 50% cho VIP', 'Giảm 50%, giới hạn 50 lượt', 'PERCENT', 50.00, 2000000.00, 3000000.00, 50, 0, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 'ACTIVE', '2025-01-01 00:00:00'),
+(6, 'VIP50', 'Giảm 50% cho VIP', 'Giảm 50%, giới hạn 50 lượt', 'PERCENT', 50.00, 2000000.00, 3000000.00, 50, 0, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 'ACTIVE', '2025-01-01 00:00:00', 0, NULL),
 -- Mã khuyến mãi theo thời gian
-(7, 'CHRISTMAS25', 'Giảm 25% Giáng sinh', 'Áp dụng cho chuyến bay trong tháng 12', 'PERCENT', 25.00, 2000000.00, 4000000.00, 100, 0, '2025-12-01 00:00:00', '2025-12-31 23:59:59', 'ACTIVE', '2025-12-01 00:00:00'),
-(8, 'NEWYEAR30', 'Giảm 30% Năm mới', 'Áp dụng cho chuyến bay tháng 1', 'PERCENT', 30.00, 2000000.00, 4000000.00, 80, 0, '2026-01-01 00:00:00', '2026-01-31 23:59:59', 'ACTIVE', '2026-01-01 00:00:00');
+(7, 'CHRISTMAS25', 'Giảm 25% Giáng sinh', 'Áp dụng cho chuyến bay trong tháng 12', 'PERCENT', 25.00, 2000000.00, 4000000.00, 100, 0, '2025-12-01 00:00:00', '2025-12-31 23:59:59', 'ACTIVE', '2025-12-01 00:00:00', 0, NULL),
+(8, 'NEWYEAR30', 'Giảm 30% Năm mới', 'Áp dụng cho chuyến bay tháng 1', 'PERCENT', 30.00, 2000000.00, 4000000.00, 80, 0, '2026-01-01 00:00:00', '2026-01-31 23:59:59', 'ACTIVE', '2026-01-01 00:00:00', 0, NULL);
 
 -- =================================================================
 -- 3. BẢNG HÀNH KHÁCH VÀ TÀI KHOẢN
 -- =================================================================
 
 -- Bảng hành khách
-INSERT INTO `hanhkhach` (`mahanhkhach`, `hovaten`, `ngaysinh`, `gioitinh`, `sodienthoai`, `email`, `madinhdanh`, `diachi`, `quocgia`) VALUES
-(1, 'Nguyễn Văn A', '1990-05-15', 'Nam', '0909123456', 'nguyenvana@example.com', '001090001234', '123 Nguyễn Huệ, Q1', 'Việt Nam'),
-(2, 'Trần Thị B', '1995-11-20', 'Nu', '0987654321', 'tranthib@example.com', '001195005678', '456 Lê Lợi, Q3', 'Việt Nam'),
-(3, 'Lê Văn C', '1988-03-10', 'Nam', '0912345678', 'levanc@example.com', '001088003456', '789 Trần Hưng Đạo, Q5', 'Việt Nam'),
-(4, 'Phạm Thị D', '1992-07-25', 'Nu', '0987654322', 'phamthid@example.com', '001192007890', '321 Lý Tự Trọng, Q1', 'Việt Nam'),
-(5, 'Hoàng Minh E', '1985-12-05', 'Nam', '0909876543', 'hoangmine@example.com', '001085012345', '654 Nguyễn Thị Minh Khai, Q3', 'Việt Nam'),
-(6, 'Nguyễn Thị F', '1998-09-15', 'Nu', '0976543210', 'nguyenthif@example.com', '001198009876', '987 Đề Thám, Q1', 'Việt Nam'),
-(7, 'Trần Văn G', '1990-11-30', 'Nam', '0965432109', 'tranvang@example.com', '001090011234', '147 Pasteur, Q3', 'Việt Nam'),
-(8, 'Đạt Thành', '2004-05-14', 'Nam', '0395632027', '', '', '', 'Vietnam');
+-- Bảng hành khách
+INSERT INTO `hanhkhach` (`mahanhkhach`, `hovaten`, `ngaysinh`, `gioitinh`, `sodienthoai`, `email`, `madinhdanh`, `diachi`, `quocgia`, `da_xoa`, `deleted_at`) VALUES
+(1, 'Nguyễn Văn A', '1990-05-15', 'Nam', '0909123456', 'nguyenvana@example.com', '001090001234', '123 Nguyễn Huệ, Q1', 'Việt Nam', 0, NULL),
+(2, 'Trần Thị B', '1995-11-20', 'Nu', '0987654321', 'tranthib@example.com', '001195005678', '456 Lê Lợi, Q3', 'Việt Nam', 0, NULL),
+(3, 'Lê Văn C', '1988-03-10', 'Nam', '0912345678', 'levanc@example.com', '001088003456', '789 Trần Hưng Đạo, Q5', 'Việt Nam', 0, NULL),
+(4, 'Phạm Thị D', '1992-07-25', 'Nu', '0987654322', 'phamthid@example.com', '001192007890', '321 Lý Tự Trọng, Q1', 'Việt Nam', 0, NULL),
+(5, 'Hoàng Minh E', '1985-12-05', 'Nam', '0909876543', 'hoangmine@example.com', '001085012345', '654 Nguyễn Thị Minh Khai, Q3', 'Việt Nam', 0, NULL),
+(6, 'Nguyễn Thị F', '1998-09-15', 'Nu', '0976543210', 'nguyenthif@example.com', '001198009876', '987 Đề Thám, Q1', 'Việt Nam', 0, NULL),
+(7, 'Trần Văn G', '1990-11-30', 'Nam', '0965432109', 'tranvang@example.com', '001090011234', '147 Pasteur, Q3', 'Việt Nam', 0, NULL),
+(8, 'Đạt Thành', '2004-05-14', 'Nam', '0395632027', '', '', '', 'Vietnam', 0, NULL);
 
 -- Bảng tài khoản khách hàng
-INSERT INTO `taikhoan` (`mataikhoan`, `mahanhkhach`, `email`, `matkhaubam`, `trangthai`, `email_verified`, `ngaytao`, `oauth2_provider`) VALUES
-(1, 1, 'nguyenvana@example.com', '$2a$10$I5SiBaX8ndre0SwNPpZ0guVNr7vpOMCnq45zaZH.t3CtefC7UvwIK', 'ACTIVE', 1, '2025-09-12 10:00:00', NULL),
-(2, 3, 'levanc@example.com', '$2a$10$I5SiBaX8ndre0SwNPpZ0guVNr7vpOMCnq45zaZH.t3CtefC7UvwIK', 'ACTIVE', 0, '2025-10-30 08:00:00', NULL),
-(3, 4, 'phamthid@example.com', '$2a$10$I5SiBaX8ndre0SwNPpZ0guVNr7vpOMCnq45zaZH.t3CtefC7UvwIK', 'ACTIVE', 0, '2025-11-01 14:30:00', NULL),
-(4, 5, 'hoangmine@example.com', '$2a$10$I5SiBaX8ndre0SwNPpZ0guVNr7vpOMCnq45zaZH.t3CtefC7UvwIK', 'ACTIVE', 0, '2025-11-02 10:15:00', NULL),
-(5, 6, 'nguyenthif@example.com', '$2a$10$I5SiBaX8ndre0SwNPpZ0guVNr7vpOMCnq45zaZH.t3CtefC7UvwIK', 'ACTIVE', 0, '2025-11-03 16:45:00', NULL),
-(6, 7, 'tranvang@example.com', '$2a$10$I5SiBaX8ndre0SwNPpZ0guVNr7vpOMCnq45zaZH.t3CtefC7UvwIK', 'ACTIVE', 0, '2025-11-04 12:20:00', NULL),
-(7, 8, 'toiladat20041405@gmail.com', '$2a$10$7shXqLk5EsoVGtMT.18PweBSnEdhcbe5lK8wvFnau1.lHKP2ooU62', 'ACTIVE', 1, '2025-11-14 14:33:02.487000', 'GOOGLE');
+INSERT INTO `taikhoan` (`mataikhoan`, `mahanhkhach`, `email`, `matkhaubam`, `trangthai`, `email_verified`, `ngaytao`, `oauth2_provider`, `da_xoa`, `deleted_at`) VALUES
+(1, 1, 'nguyenvana@example.com', '$2a$10$I5SiBaX8ndre0SwNPpZ0guVNr7vpOMCnq45zaZH.t3CtefC7UvwIK', 'ACTIVE', 1, '2025-09-12 10:00:00', NULL, 0, NULL),
+(2, 3, 'levanc@example.com', '$2a$10$I5SiBaX8ndre0SwNPpZ0guVNr7vpOMCnq45zaZH.t3CtefC7UvwIK', 'ACTIVE', 0, '2025-10-30 08:00:00', NULL, 0, NULL),
+(3, 4, 'phamthid@example.com', '$2a$10$I5SiBaX8ndre0SwNPpZ0guVNr7vpOMCnq45zaZH.t3CtefC7UvwIK', 'ACTIVE', 0, '2025-11-01 14:30:00', NULL, 0, NULL),
+(4, 5, 'hoangmine@example.com', '$2a$10$I5SiBaX8ndre0SwNPpZ0guVNr7vpOMCnq45zaZH.t3CtefC7UvwIK', 'ACTIVE', 0, '2025-11-02 10:15:00', NULL, 0, NULL),
+(5, 6, 'nguyenthif@example.com', '$2a$10$I5SiBaX8ndre0SwNPpZ0guVNr7vpOMCnq45zaZH.t3CtefC7UvwIK', 'ACTIVE', 0, '2025-11-03 16:45:00', NULL, 0, NULL),
+(6, 7, 'tranvang@example.com', '$2a$10$I5SiBaX8ndre0SwNPpZ0guVNr7vpOMCnq45zaZH.t3CtefC7UvwIK', 'ACTIVE', 0, '2025-11-04 12:20:00', NULL, 0, NULL),
+(7, 8, 'toiladat20041405@gmail.com', '$2a$10$7shXqLk5EsoVGtMT.18PweBSnEdhcbe5lK8wvFnau1.lHKP2ooU62', 'ACTIVE', 1, '2025-11-14 14:33:02.487000', 'GOOGLE', 0, NULL);
 
 -- Bảng tài khoản Admin
-INSERT INTO `taikhoanadmin` (`mataikhoan`, `tendangnhap`, `matkhaubam`, `email`, `hovaten`, `ngaytao`) VALUES
-(1, 'admin', '$2a$10$I5SiBaX8ndre0SwNPpZ0guVNr7vpOMCnq45zaZH.t3CtefC7UvwIK', 'admin@example.com', 'Quản Trị Viên', NOW()),
-(2, 'admin2', '$2b$10$Z1guAXBVxEZxsj3mHXK5t.LU.L3bcjgg8dBNgqo4U5nJbR81yrpgG', 'test@gmaiil.com', 'nguyena', NOW());
+INSERT INTO `taikhoanadmin` (`mataikhoan`, `tendangnhap`, `matkhaubam`, `email`, `hovaten`, `ngaytao`, `da_xoa`, `deleted_at`) VALUES
+(1, 'admin', '$2a$10$I5SiBaX8ndre0SwNPpZ0guVNr7vpOMCnq45zaZH.t3CtefC7UvwIK', 'admin@example.com', 'Quản Trị Viên', NOW(), 0, NULL),
+(2, 'admin2', '$2b$10$Z1guAXBVxEZxsj3mHXK5t.LU.L3bcjgg8dBNgqo4U5nJbR81yrpgG', 'test@gmaiil.com', 'nguyena', NOW(), 0, NULL);
 
 -- =================================================================
 -- 4. BẢNG CHUYẾN BAY VÀ GIÁ VÉ
 -- =================================================================
 
 -- Bảng giá chuyến bay
-INSERT INTO `giachuyenbay` (`magia`, `matuyenbay`, `mahangve`, `giave`, `soluong_phanbo`, `soluong_daban`, `ngayapdungtu`, `ngayapdungden`) VALUES
+INSERT INTO `giachuyenbay` (`magia`, `matuyenbay`, `mahangve`, `giave`, `soluong_phanbo`, `soluong_daban`, `ngayapdungtu`, `ngayapdungden`, `da_xoa`, `deleted_at`) VALUES
 -- Giá cho các tuyến bay cơ bản
-(1, 1, 1, 1200000.00, 25, 0, '2025-01-01', NULL), -- SGN-HAN, Economy
-(2, 1, 2, 1000000.00, 20, 0, '2025-01-01', NULL), -- SGN-HAN, Economy Saver (rẻ hơn)
-(3, 1, 3, 2000000.00, 50, 0, '2025-01-01', NULL), -- SGN-HAN, Deluxe
-(4, 1, 4, 4000000.00, 75, 0, '2025-01-01', NULL), -- SGN-HAN, Business
-(5, 1, 5, 6000000.00, 100, 0, '2025-01-01', NULL), -- SGN-HAN, FirstClass
+(1, 1, 1, 1200000.00, 25, 0, '2025-01-01', NULL, 0, NULL), -- SGN-HAN, Economy
+(2, 1, 2, 1000000.00, 20, 0, '2025-01-01', NULL, 0, NULL), -- SGN-HAN, Economy Saver (rẻ hơn)
+(3, 1, 3, 2000000.00, 50, 0, '2025-01-01', NULL, 0, NULL), -- SGN-HAN, Deluxe
+(4, 1, 4, 4000000.00, 75, 0, '2025-01-01', NULL, 0, NULL), -- SGN-HAN, Business
+(5, 1, 5, 6000000.00, 100, 0, '2025-01-01', NULL, 0, NULL), -- SGN-HAN, FirstClass
 
-(6, 2, 1, 1200000.00, 25, 0, '2025-01-01', NULL), -- HAN-SGN, Economy
-(7, 2, 2, 1000000.00, 20, 0, '2025-01-01', NULL), -- HAN-SGN, Economy Saver
-(8, 2, 3, 2000000.00, 50, 0, '2025-01-01', NULL), -- HAN-SGN, Deluxe
-(9, 2, 4, 4000000.00, 75, 0, '2025-01-01', NULL), -- HAN-SGN, Business
-(10, 2, 5, 6000000.00, 100, 0, '2025-01-01', NULL), -- HAN-SGN, FirstClass
+(6, 2, 1, 1200000.00, 25, 0, '2025-01-01', NULL, 0, NULL), -- HAN-SGN, Economy
+(7, 2, 2, 1000000.00, 20, 0, '2025-01-01', NULL, 0, NULL), -- HAN-SGN, Economy Saver
+(8, 2, 3, 2000000.00, 50, 0, '2025-01-01', NULL, 0, NULL), -- HAN-SGN, Deluxe
+(9, 2, 4, 4000000.00, 75, 0, '2025-01-01', NULL, 0, NULL), -- HAN-SGN, Business
+(10, 2, 5, 6000000.00, 100, 0, '2025-01-01', NULL, 0, NULL), -- HAN-SGN, FirstClass
 
-(11, 3, 1, 900000.00, 25, 0, '2025-01-01', NULL), -- SGN-DAD, Economy
-(12, 3, 2, 750000.00, 20, 0, '2025-01-01', NULL), -- SGN-DAD, Economy Saver
-(13, 3, 3, 1500000.00, 50, 0, '2025-01-01', NULL), -- SGN-DAD, Deluxe
-(14, 3, 4, 3000000.00, 75, 0, '2025-01-01', NULL), -- SGN-DAD, Business
-(15, 3, 5, 4500000.00, 100, 0, '2025-01-01', NULL), -- SGN-DAD, FirstClass
+(11, 3, 1, 900000.00, 25, 0, '2025-01-01', NULL, 0, NULL), -- SGN-DAD, Economy
+(12, 3, 2, 750000.00, 20, 0, '2025-01-01', NULL, 0, NULL), -- SGN-DAD, Economy Saver
+(13, 3, 3, 1500000.00, 50, 0, '2025-01-01', NULL, 0, NULL), -- SGN-DAD, Deluxe
+(14, 3, 4, 3000000.00, 75, 0, '2025-01-01', NULL, 0, NULL), -- SGN-DAD, Business
+(15, 3, 5, 4500000.00, 100, 0, '2025-01-01', NULL, 0, NULL), -- SGN-DAD, FirstClass
 
-(16, 4, 1, 900000.00, 25, 0, '2025-01-01', NULL), -- DAD-SGN, Economy
-(17, 4, 2, 750000.00, 20, 0, '2025-01-01', NULL), -- DAD-SGN, Economy Saver
-(18, 4, 3, 1500000.00, 50, 0, '2025-01-01', NULL), -- DAD-SGN, Deluxe
-(19, 4, 4, 3000000.00, 75, 0, '2025-01-01', NULL), -- DAD-SGN, Business
-(20, 4, 5, 4500000.00, 100, 0, '2025-01-01', NULL); -- DAD-SGN, FirstClass
+(16, 4, 1, 900000.00, 25, 0, '2025-01-01', NULL, 0, NULL), -- DAD-SGN, Economy
+(17, 4, 2, 750000.00, 20, 0, '2025-01-01', NULL, 0, NULL), -- DAD-SGN, Economy Saver
+(18, 4, 3, 1500000.00, 50, 0, '2025-01-01', NULL, 0, NULL), -- DAD-SGN, Deluxe
+(19, 4, 4, 3000000.00, 75, 0, '2025-01-01', NULL, 0, NULL), -- DAD-SGN, Business
+(20, 4, 5, 4500000.00, 100, 0, '2025-01-01', NULL, 0, NULL); -- DAD-SGN, FirstClass
 
 -- Bảng chi tiết chuyến bay
-INSERT INTO `chitietchuyenbay` (`machuyenbay`, `matuyenbay`, `mamaybay`, `sohieuchuyenbay`, `ngaydi`, `giodi`, `ngayden`, `gioden`, `trangthai`, `thoigianden_thucte`, `thoigiandi_thucte`, `lydoDelay`) VALUES
+INSERT INTO `chitietchuyenbay` (`machuyenbay`, `matuyenbay`, `mamaybay`, `sohieuchuyenbay`, `ngaydi`, `giodi`, `ngayden`, `gioden`, `trangthai`, `thoigianden_thucte`, `thoigiandi_thucte`, `lydoDelay`, `da_xoa`, `deleted_at`) VALUES
 -- Chuyến bay hiện tại có thể đặt
-(1, 1, 1, 'VN240', '2026-01-15', '08:00:00', '2026-01-15', '10:05:00', 'OPEN', NULL, NULL, NULL),
-(2, 1, 2, 'VJ130', '2026-01-15', '10:30:00', '2026-01-15', '12:35:00', 'OPEN', NULL, NULL, NULL),
-(3, 3, 3, 'VN712', '2026-01-16', '15:00:00', '2026-01-16', '16:15:00', 'OPEN', NULL, NULL, NULL),
-(4, 2, 1, 'VN241', '2026-01-17', '11:00:00', '2026-01-17', '13:05:00', 'OPEN', NULL, NULL, NULL),
+(1, 1, 1, 'VN240', '2026-01-15', '08:00:00', '2026-01-15', '10:05:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(2, 1, 2, 'VJ130', '2026-01-15', '10:30:00', '2026-01-15', '12:35:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(3, 3, 3, 'VN712', '2026-01-16', '15:00:00', '2026-01-16', '16:15:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(4, 2, 1, 'VN241', '2026-01-17', '11:00:00', '2026-01-17', '13:05:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
 -- Chuyến bay trong tháng tới (tháng 1-3/2026)
-(5, 1, 2, 'VN300', '2026-01-18', '09:00:00', '2026-01-18', '11:00:00', 'OPEN', NULL, NULL, NULL),
-(6, 3, 3, 'VN800', '2026-01-19', '14:00:00', '2026-01-19', '15:15:00', 'OPEN', NULL, NULL, NULL),
-(7, 2, 1, 'VN250', '2026-01-20', '06:30:00', '2026-01-20', '08:35:00', 'OPEN', NULL, NULL, NULL),
-(8, 1, 2, 'VN251', '2026-01-20', '09:15:00', '2026-01-20', '11:20:00', 'OPEN', NULL, NULL, NULL),
-(9, 1, 3, 'VN252', '2026-01-21', '14:45:00', '2026-01-21', '16:50:00', 'OPEN', NULL, NULL, NULL),
-(10, 1, 1, 'VN253', '2026-01-22', '07:00:00', '2026-01-22', '09:05:00', 'OPEN', NULL, NULL, NULL),
-(11, 1, 2, 'VN254', '2026-01-23', '11:30:00', '2026-01-23', '13:35:00', 'OPEN', NULL, NULL, NULL),
-(12, 1, 3, 'VN255', '2026-01-24', '16:15:00', '2026-01-24', '18:20:00', 'OPEN', NULL, NULL, NULL),
-(13, 1, 1, 'VN256', '2026-01-25', '08:45:00', '2026-01-25', '10:50:00', 'OPEN', NULL, NULL, NULL),
-(14, 1, 2, 'VN257', '2026-01-26', '13:20:00', '2026-01-26', '15:25:00', 'OPEN', NULL, NULL, NULL),
-(15, 1, 3, 'VN258', '2026-01-27', '06:00:00', '2026-01-27', '08:05:00', 'OPEN', NULL, NULL, NULL),
-(16, 1, 1, 'VN259', '2026-01-28', '09:30:00', '2026-01-28', '11:35:00', 'OPEN', NULL, NULL, NULL),
-(17, 3, 2, 'VN713', '2026-01-29', '14:00:00', '2026-01-29', '15:15:00', 'OPEN', NULL, NULL, NULL),
-(18, 2, 3, 'VN242', '2026-01-30', '10:00:00', '2026-01-30', '12:05:00', 'OPEN', NULL, NULL, NULL),
-(19, 1, 1, 'VN260', '2026-02-01', '07:15:00', '2026-02-01', '09:20:00', 'OPEN', NULL, NULL, NULL),
-(20, 3, 2, 'VN714', '2026-02-02', '15:30:00', '2026-02-02', '16:45:00', 'OPEN', NULL, NULL, NULL),
-(21, 1, 3, 'VN261', '2026-02-03', '08:30:00', '2026-02-03', '10:35:00', 'OPEN', NULL, NULL, NULL),
-(22, 2, 1, 'VN243', '2026-02-04', '11:45:00', '2026-02-04', '13:50:00', 'OPEN', NULL, NULL, NULL),
-(23, 1, 2, 'VN262', '2026-02-05', '06:45:00', '2026-02-05', '08:50:00', 'OPEN', NULL, NULL, NULL),
-(24, 3, 3, 'VN715', '2026-02-06', '13:00:00', '2026-02-06', '14:15:00', 'OPEN', NULL, NULL, NULL),
-(25, 1, 1, 'VN263', '2026-02-07', '09:00:00', '2026-02-07', '11:05:00', 'OPEN', NULL, NULL, NULL),
-(26, 2, 2, 'VN244', '2026-02-08', '10:30:00', '2026-02-08', '12:35:00', 'OPEN', NULL, NULL, NULL),
-(27, 1, 3, 'VN264', '2026-02-09', '07:30:00', '2026-02-09', '09:35:00', 'OPEN', NULL, NULL, NULL),
-(28, 3, 1, 'VN716', '2026-02-10', '14:45:00', '2026-02-10', '16:00:00', 'OPEN', NULL, NULL, NULL),
-(29, 1, 2, 'VN265', '2026-02-11', '08:15:00', '2026-02-11', '10:20:00', 'OPEN', NULL, NULL, NULL),
-(30, 2, 3, 'VN245', '2026-02-12', '11:00:00', '2026-02-12', '13:05:00', 'OPEN', NULL, NULL, NULL),
-(31, 1, 1, 'VN266', '2026-02-13', '06:30:00', '2026-02-13', '08:35:00', 'OPEN', NULL, NULL, NULL),
-(32, 3, 2, 'VN717', '2026-02-14', '15:15:00', '2026-02-14', '16:30:00', 'OPEN', NULL, NULL, NULL),
-(33, 1, 3, 'VN267', '2026-02-15', '09:45:00', '2026-02-15', '11:50:00', 'OPEN', NULL, NULL, NULL),
-(34, 2, 1, 'VN246', '2026-02-16', '10:15:00', '2026-02-16', '12:20:00', 'OPEN', NULL, NULL, NULL),
-(35, 1, 2, 'VN268', '2026-02-17', '07:00:00', '2026-02-17', '09:05:00', 'OPEN', NULL, NULL, NULL),
-(36, 3, 3, 'VN718', '2026-02-18', '14:30:00', '2026-02-18', '15:45:00', 'OPEN', NULL, NULL, NULL),
-(37, 1, 1, 'VN269', '2026-02-19', '08:00:00', '2026-02-19', '10:05:00', 'OPEN', NULL, NULL, NULL),
-(38, 2, 2, 'VN247', '2026-02-20', '11:30:00', '2026-02-20', '13:35:00', 'OPEN', NULL, NULL, NULL),
-(39, 1, 3, 'VN270', '2026-02-21', '06:15:00', '2026-02-21', '08:20:00', 'OPEN', NULL, NULL, NULL),
-(40, 3, 1, 'VN719', '2026-02-22', '13:45:00', '2026-02-22', '15:00:00', 'OPEN', NULL, NULL, NULL),
+(5, 1, 2, 'VN300', '2026-01-18', '09:00:00', '2026-01-18', '11:00:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(6, 3, 3, 'VN800', '2026-01-19', '14:00:00', '2026-01-19', '15:15:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(7, 2, 1, 'VN250', '2026-01-20', '06:30:00', '2026-01-20', '08:35:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(8, 1, 2, 'VN251', '2026-01-20', '09:15:00', '2026-01-20', '11:20:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(9, 1, 3, 'VN252', '2026-01-21', '14:45:00', '2026-01-21', '16:50:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(10, 1, 1, 'VN253', '2026-01-22', '07:00:00', '2026-01-22', '09:05:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(11, 1, 2, 'VN254', '2026-01-23', '11:30:00', '2026-01-23', '13:35:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(12, 1, 3, 'VN255', '2026-01-24', '16:15:00', '2026-01-24', '18:20:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(13, 1, 1, 'VN256', '2026-01-25', '08:45:00', '2026-01-25', '10:50:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(14, 1, 2, 'VN257', '2026-01-26', '13:20:00', '2026-01-26', '15:25:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(15, 1, 3, 'VN258', '2026-01-27', '06:00:00', '2026-01-27', '08:05:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(16, 1, 1, 'VN259', '2026-01-28', '09:30:00', '2026-01-28', '11:35:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(17, 3, 2, 'VN713', '2026-01-29', '14:00:00', '2026-01-29', '15:15:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(18, 2, 3, 'VN242', '2026-01-30', '10:00:00', '2026-01-30', '12:05:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(19, 1, 1, 'VN260', '2026-02-01', '07:15:00', '2026-02-01', '09:20:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(20, 3, 2, 'VN714', '2026-02-02', '15:30:00', '2026-02-02', '16:45:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(21, 1, 3, 'VN261', '2026-02-03', '08:30:00', '2026-02-03', '10:35:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(22, 2, 1, 'VN243', '2026-02-04', '11:45:00', '2026-02-04', '13:50:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(23, 1, 2, 'VN262', '2026-02-05', '06:45:00', '2026-02-05', '08:50:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(24, 3, 3, 'VN715', '2026-02-06', '13:00:00', '2026-02-06', '14:15:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(25, 1, 1, 'VN263', '2026-02-07', '09:00:00', '2026-02-07', '11:05:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(26, 2, 2, 'VN244', '2026-02-08', '10:30:00', '2026-02-08', '12:35:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(27, 1, 3, 'VN264', '2026-02-09', '07:30:00', '2026-02-09', '09:35:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(28, 3, 1, 'VN716', '2026-02-10', '14:45:00', '2026-02-10', '16:00:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(29, 1, 2, 'VN265', '2026-02-11', '08:15:00', '2026-02-11', '10:20:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(30, 2, 3, 'VN245', '2026-02-12', '11:00:00', '2026-02-12', '13:05:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(31, 1, 1, 'VN266', '2026-02-13', '06:30:00', '2026-02-13', '08:35:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(32, 3, 2, 'VN717', '2026-02-14', '15:15:00', '2026-02-14', '16:30:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(33, 1, 3, 'VN267', '2026-02-15', '09:45:00', '2026-02-15', '11:50:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(34, 2, 1, 'VN246', '2026-02-16', '10:15:00', '2026-02-16', '12:20:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(35, 1, 2, 'VN268', '2026-02-17', '07:00:00', '2026-02-17', '09:05:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(36, 3, 3, 'VN718', '2026-02-18', '14:30:00', '2026-02-18', '15:45:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(37, 1, 1, 'VN269', '2026-02-19', '08:00:00', '2026-02-19', '10:05:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(38, 2, 2, 'VN247', '2026-02-20', '11:30:00', '2026-02-20', '13:35:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(39, 1, 3, 'VN270', '2026-02-21', '06:15:00', '2026-02-21', '08:20:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(40, 3, 1, 'VN719', '2026-02-22', '13:45:00', '2026-02-22', '15:00:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
 -- Chuyến bay cho tháng 3/2026
-(41, 1, 2, 'VN271', '2026-03-01', '08:00:00', '2026-03-01', '10:05:00', 'OPEN', NULL, NULL, NULL),
-(42, 2, 3, 'VN272', '2026-03-02', '15:30:00', '2026-03-02', '17:35:00', 'OPEN', NULL, NULL, NULL),
-(43, 1, 1, 'VN273', '2026-03-03', '09:15:00', '2026-03-03', '11:20:00', 'OPEN', NULL, NULL, NULL),
-(44, 3, 2, 'VN274', '2026-03-04', '14:45:00', '2026-03-04', '16:00:00', 'OPEN', NULL, NULL, NULL),
-(45, 1, 3, 'VN275', '2026-03-05', '07:00:00', '2026-03-05', '09:05:00', 'OPEN', NULL, NULL, NULL),
-(46, 2, 1, 'VN276', '2026-03-06', '16:00:00', '2026-03-06', '18:05:00', 'OPEN', NULL, NULL, NULL),
-(47, 1, 2, 'VN277', '2026-03-07', '08:15:00', '2026-03-07', '09:50:00', 'OPEN', NULL, NULL, NULL),
-(48, 3, 3, 'VN278', '2026-03-08', '13:30:00', '2026-03-08', '14:45:00', 'OPEN', NULL, NULL, NULL),
-(49, 1, 1, 'VN279', '2026-03-09', '08:00:00', '2026-03-09', '10:05:00', 'OPEN', NULL, NULL, NULL),
-(50, 2, 2, 'VN280', '2026-03-10', '14:30:00', '2026-03-10', '16:35:00', 'OPEN', NULL, NULL, NULL);
+(41, 1, 2, 'VN271', '2026-03-01', '08:00:00', '2026-03-01', '10:05:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(42, 2, 3, 'VN272', '2026-03-02', '15:30:00', '2026-03-02', '17:35:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(43, 1, 1, 'VN273', '2026-03-03', '09:15:00', '2026-03-03', '11:20:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(44, 3, 2, 'VN274', '2026-03-04', '14:45:00', '2026-03-04', '16:00:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(45, 1, 3, 'VN275', '2026-03-05', '07:00:00', '2026-03-05', '09:05:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(46, 2, 1, 'VN276', '2026-03-06', '16:00:00', '2026-03-06', '18:05:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(47, 1, 2, 'VN277', '2026-03-07', '08:15:00', '2026-03-07', '09:50:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(48, 3, 3, 'VN278', '2026-03-08', '13:30:00', '2026-03-08', '14:45:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(49, 1, 1, 'VN279', '2026-03-09', '08:00:00', '2026-03-09', '10:05:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
+(50, 2, 2, 'VN280', '2026-03-10', '14:30:00', '2026-03-10', '16:35:00', 'OPEN', NULL, NULL, NULL, 0, NULL);
 
 -- =================================================================
 -- 5. BẢNG DỊCH VỤ CHUYẾN BAY

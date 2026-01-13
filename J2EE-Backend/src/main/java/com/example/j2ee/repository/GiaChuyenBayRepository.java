@@ -4,11 +4,13 @@ import com.example.j2ee.model.GiaChuyenBay;
 import com.example.j2ee.model.HangVe;
 import com.example.j2ee.model.TuyenBay;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface GiaChuyenBayRepository extends JpaRepository<GiaChuyenBay, Integer> {
     boolean existsByTuyenBay_MaTuyenBay(int maTuyenBay);
@@ -71,4 +73,37 @@ public interface GiaChuyenBayRepository extends JpaRepository<GiaChuyenBay, Inte
         @Param("machuyenbay") Long machuyenbay,
         @Param("mahangve") Long mahangve
     );
+
+    // ==================== SOFT DELETE METHODS ====================
+    /**
+     * Tìm tất cả giá chuyến bay bao gồm cả đã xóa mềm
+     */
+    @Query(value = "SELECT * FROM giachuyenbay", nativeQuery = true)
+    List<GiaChuyenBay> findAllIncludingDeleted();
+
+    /**
+     * Tìm giá chuyến bay đã xóa mềm theo ID
+     */
+    @Query(value = "SELECT * FROM giachuyenbay WHERE magia = :id AND da_xoa = 1", nativeQuery = true)
+    Optional<GiaChuyenBay> findDeletedById(@Param("id") int id);
+
+    /**
+     * Lấy tất cả bản ghi đã bị xóa mềm
+     */
+    @Query(value = "SELECT * FROM giachuyenbay WHERE da_xoa = 1", nativeQuery = true)
+    List<GiaChuyenBay> findAllDeleted();
+
+    /**
+     * Khôi phục giá chuyến bay đã xóa mềm
+     */
+    @Modifying
+    @Query(value = "UPDATE giachuyenbay SET da_xoa = 0, deleted_at = NULL WHERE magia = :id", nativeQuery = true)
+    void restoreById(@Param("id") int id);
+
+    /**
+     * Xóa cứng (vĩnh viễn) - chỉ dùng khi cần thiết
+     */
+    @Modifying
+    @Query(value = "DELETE FROM giachuyenbay WHERE magia = :id", nativeQuery = true)
+    void hardDeleteById(@Param("id") int id);
 }

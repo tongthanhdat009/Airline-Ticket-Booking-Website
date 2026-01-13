@@ -1,7 +1,23 @@
+-- Tạo database nếu chưa tồn tại
+CREATE DATABASE IF NOT EXISTS `datvemaybay`;
+
+-- Sử dụng database
+USE `datvemaybay`;
+
 -- Vô hiệu hóa kiểm tra khóa ngoại để xóa bảng không bị lỗi
 SET FOREIGN_KEY_CHECKS=0;
 
--- Xóa các bảng nếu chúng đã tồn tại
+-- Xóa các bảng nếu chúng đã tồn tại (theo đúng thứ tự để tránh lỗi khóa ngoại)
+DROP TABLE IF EXISTS `admin_vai_tro`;
+DROP TABLE IF EXISTS `phan_quyen`;
+DROP TABLE IF EXISTS `hanh_dong`;
+DROP TABLE IF EXISTS `chuc_nang`;
+DROP TABLE IF EXISTS `vai_tro`;
+DROP TABLE IF EXISTS `khuyenmai_datcho`;
+DROP TABLE IF EXISTS `hoantien`;
+DROP TABLE IF EXISTS `refreshtoken`;
+DROP TABLE IF EXISTS `khuyenmai`;
+DROP TABLE IF EXISTS `email_verification_token`;
 DROP TABLE IF EXISTS `taikhoanadmin`;
 DROP TABLE IF EXISTS `datchodichvu`;
 DROP TABLE IF EXISTS `dichvuchuyenbay`;
@@ -9,15 +25,18 @@ DROP TABLE IF EXISTS `luachondichvu`;
 DROP TABLE IF EXISTS `dichvucungcap`;
 DROP TABLE IF EXISTS `trangthaithanhtoan`;
 DROP TABLE IF EXISTS `datcho`;
+DROP TABLE IF EXISTS `ghe_da_dat`;
 DROP TABLE IF EXISTS `giachuyenbay`;
 DROP TABLE IF EXISTS `taikhoan`;
+DROP TABLE IF EXISTS `donhang`;
 DROP TABLE IF EXISTS `hanhkhach`;
+DROP TABLE IF EXISTS `audit_log`;
 DROP TABLE IF EXISTS `chitietghe`;
 DROP TABLE IF EXISTS `chitietchuyenbay`;
 DROP TABLE IF EXISTS `tuyenbay`;
+DROP TABLE IF EXISTS `maybay`;
 DROP TABLE IF EXISTS `sanbay`;
 DROP TABLE IF EXISTS `hangve`;
-DROP TABLE IF EXISTS `email_verification_token`;
 
 -- Bật lại kiểm tra khóa ngoại
 SET FOREIGN_KEY_CHECKS=1;
@@ -28,12 +47,16 @@ CREATE TABLE `sanbay` (
   `tensanbay` varchar(255) NOT NULL,
   `thanhphosanbay` varchar(255) DEFAULT null,
   `quocgiasanbay` varchar(255) DEFAULT null,
-  `trangthaihoatdong` varchar(20) DEFAULT null
+  `trangthaihoatdong` varchar(20) DEFAULT null,
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
+  `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
 );
 
 CREATE TABLE `hangve` (
   `mahangve` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `tenhangve` varchar(255) NOT NULL
+  `tenhangve` varchar(255) NOT NULL,
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
+  `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
 );
 
 CREATE TABLE `maybay` (
@@ -44,13 +67,17 @@ CREATE TABLE `maybay` (
   `sohieu` varchar(50) NOT NULL,
   `tongsoghe` int NOT NULL,
   `trangthai` varchar(50) DEFAULT 'Active',
-  `namkhaithac` int DEFAULT null
+  `namkhaithac` int DEFAULT null,
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
+  `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
 );
 
 CREATE TABLE `tuyenbay` (
   `matuyenbay` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `masanbaydi` int NOT NULL,
-  `masanbayden` int NOT NULL
+  `masanbayden` int NOT NULL,
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
+  `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
 );
 
 CREATE TABLE `chitietchuyenbay` (
@@ -65,7 +92,9 @@ CREATE TABLE `chitietchuyenbay` (
   `trangthai` varchar(20) DEFAULT 'OPEN',
   `thoigianden_thucte` timestamp DEFAULT null,
   `thoigiandi_thucte` timestamp DEFAULT null,
-  `lydoDelay` varchar(255) DEFAULT null
+  `lydoDelay` varchar(255) DEFAULT null,
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
+  `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
 );
 
 CREATE TABLE `chitietghe` (
@@ -88,7 +117,9 @@ CREATE TABLE `hanhkhach` (
   `email` varchar(100),
   `madinhdanh` varchar(50) DEFAULT null,
   `diachi` varchar(255) DEFAULT null,
-  `quocgia` varchar(100)
+  `quocgia` varchar(100),
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
+  `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
 );
 
 CREATE TABLE `donhang` (
@@ -102,7 +133,9 @@ CREATE TABLE `donhang` (
   `sodienthoai_nguoidat` varchar(20) NOT NULL,
   `ghichu` varchar(500) DEFAULT null,
   `created_at` datetime NOT NULL DEFAULT (CURRENT_TIMESTAMP),
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
+  `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
 );
 
 CREATE TABLE `taikhoan` (
@@ -113,7 +146,9 @@ CREATE TABLE `taikhoan` (
   `trangthai` varchar(20) NOT NULL,
   `ngaytao` datetime(6) NOT NULL,
   `email_verified` tinyint(1) NOT NULL DEFAULT 0,
-  `oauth2_provider` varchar(20) DEFAULT null COMMENT 'GOOGLE, FACEBOOK, null for normal accounts'
+  `oauth2_provider` varchar(20) DEFAULT null COMMENT 'GOOGLE, FACEBOOK, null for normal accounts',
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
+  `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
 );
 
 CREATE TABLE `datcho` (
@@ -127,14 +162,18 @@ CREATE TABLE `datcho` (
   `ngaydatcho` datetime NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   `trangthai` varchar(50) NOT NULL DEFAULT 'ACTIVE' COMMENT 'ACTIVE, CANCELLED',
   `checkin_status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0: chưa check-in, 1: đã check-in',
-  `checkin_time` datetime DEFAULT null COMMENT 'Thời gian check-in'
+  `checkin_time` datetime DEFAULT null COMMENT 'Thời gian check-in',
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
+  `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
 );
 
 CREATE TABLE `dichvucungcap` (
   `madichvu` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `tendichvu` varchar(100) NOT NULL,
   `mota` varchar(255),
-  `anh` varchar(255)
+  `anh` varchar(255),
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
+  `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
 );
 
 CREATE TABLE `dichvuchuyenbay` (
@@ -151,7 +190,9 @@ CREATE TABLE `giachuyenbay` (
   `soluong_phanbo` int NOT NULL DEFAULT 0 COMMENT 'Số ghế phân bổ cho mức giá này',
   `soluong_daban` int NOT NULL DEFAULT 0 COMMENT 'Số ghế đã bán với mức giá này',
   `ngayapdungtu` date NOT NULL,
-  `ngayapdungden` date DEFAULT null
+  `ngayapdungden` date DEFAULT null,
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
+  `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
 );
 
 CREATE TABLE `luachondichvu` (
@@ -160,7 +201,9 @@ CREATE TABLE `luachondichvu` (
   `tenluachon` varchar(100) NOT NULL,
   `mota` varchar(255) DEFAULT null,
   `gia` decimal(10,2) NOT NULL,
-  `anh` varchar(255) DEFAULT null
+  `anh` varchar(255) DEFAULT null,
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
+  `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
 );
 
 CREATE TABLE `ghe_da_dat` (
@@ -178,7 +221,9 @@ CREATE TABLE `trangthaithanhtoan` (
   `madatcho` int DEFAULT null,
   `sotien` decimal(10,2) NOT NULL,
   `dathanhtoan` char(1) NOT NULL,
-  `ngayhethan` date DEFAULT null
+  `ngayhethan` date DEFAULT null,
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
+  `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
 );
 
 CREATE TABLE `audit_log` (
@@ -213,7 +258,9 @@ CREATE TABLE `taikhoanadmin` (
   `matkhaubam` VARCHAR(255) NOT NULL,
   `email` VARCHAR(100) NOT NULL,
   `hovaten` VARCHAR(100) DEFAULT null,
-  `ngaytao` DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP)
+  `ngaytao` DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
+  `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
 );
 
 CREATE TABLE `email_verification_token` (
@@ -249,7 +296,9 @@ CREATE TABLE `khuyenmai` (
   `ngaybatdau` DATETIME NOT NULL,
   `ngayketthuc` DATETIME NOT NULL,
   `trangthai` VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' COMMENT 'ACTIVE: active, INACTIVE: inactive, EXPIRED: expired',
-  `ngaytao` DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP)
+  `ngaytao` DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
+  `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
 );
 
 CREATE TABLE `hoantien` (
@@ -264,7 +313,9 @@ CREATE TABLE `hoantien` (
   `nguoixuly` VARCHAR(100) COMMENT 'Người xử lý yêu cầu hoàn tiền',
   `ghichu` VARCHAR(500) COMMENT 'Ghi chú thêm',
   `created_at` DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
-  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
+  `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
 );
 
 CREATE TABLE `khuyenmai_datcho` (
@@ -385,7 +436,9 @@ CREATE TABLE `vai_tro` (
   `ma_vai_tro` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `ten_vai_tro` varchar(50) NOT NULL UNIQUE,
   `mo_ta` varchar(255) DEFAULT null,
-  `trang_thai` tinyint(1) DEFAULT 1 COMMENT '1: Active, 0: Inactive'
+  `trang_thai` tinyint(1) DEFAULT 1 COMMENT '1: Active, 0: Inactive',
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
+  `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
 );
 
 -- 2. Bảng Chức năng (Features / Resources)

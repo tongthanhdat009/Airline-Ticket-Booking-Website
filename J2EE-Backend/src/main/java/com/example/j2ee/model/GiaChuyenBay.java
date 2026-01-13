@@ -6,9 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "giachuyenbay")
@@ -17,6 +20,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@SQLDelete(sql = "UPDATE giachuyenbay SET da_xoa = 1, deleted_at = NOW() WHERE magia = ?")
+@SQLRestriction("da_xoa = 0")
 public class GiaChuyenBay {
 
     @Id
@@ -50,4 +55,11 @@ public class GiaChuyenBay {
 
     @Column(name = "ngayapdungden")
     private LocalDate ngayApDungDen; // Có thể là null, nghĩa là áp dụng vô thời hạn
+
+    // ==================== SOFT DELETE FIELDS ====================
+    @Column(name = "da_xoa", nullable = false)
+    private Boolean daXoa = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 }

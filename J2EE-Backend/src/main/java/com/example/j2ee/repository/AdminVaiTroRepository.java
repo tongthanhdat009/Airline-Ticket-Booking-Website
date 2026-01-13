@@ -13,9 +13,9 @@ import java.util.List;
 @Repository
 public interface AdminVaiTroRepository extends JpaRepository<AdminVaiTro, AdminVaiTroId> {
 
-    List<AdminVaiTro> findByMataikhoan(int mataikhoan);
+    List<AdminVaiTro> findById_Mataikhoan(int mataikhoan);
 
-    List<AdminVaiTro> findByMaVaiTro(int maVaiTro);
+    List<AdminVaiTro> findById_MaVaiTro(int maVaiTro);
 
     boolean existsById_MataikhoanAndId_MaVaiTro(int mataikhoan, int maVaiTro);
 

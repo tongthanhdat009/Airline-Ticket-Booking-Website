@@ -2,6 +2,8 @@ package com.example.j2ee.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
@@ -11,6 +13,8 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE taikhoanadmin SET da_xoa = 1, deleted_at = NOW() WHERE mataikhoan = ?")
+@SQLRestriction("da_xoa = 0")
 public class TaiKhoanAdmin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,4 +35,11 @@ public class TaiKhoanAdmin {
 
     @Column(name = "ngaytao", nullable = false)
     private LocalDateTime ngayTao;
+
+    // ==================== SOFT DELETE FIELDS ====================
+    @Column(name = "da_xoa", nullable = false)
+    private Boolean daXoa = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 }

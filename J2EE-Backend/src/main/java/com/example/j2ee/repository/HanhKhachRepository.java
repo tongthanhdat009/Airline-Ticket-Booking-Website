@@ -2,6 +2,7 @@ package com.example.j2ee.repository; // Hoặc package repository của bạn
 
 import com.example.j2ee.model.HanhKhach;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,12 +16,45 @@ public interface HanhKhachRepository extends JpaRepository<HanhKhach, Integer> {
     // - findAll() -> Lấy tất cả
     // - findById(id) -> Lấy theo ID
     // - save(hanhKhach) -> Lưu/Cập nhật
-    // - deleteById(id) -> Xóa
+    // - deleteById(id) -> Xóa (soft delete do @SQLDelete)
 
     // Các phương thức truy vấn tùy chỉnh:
     Optional<HanhKhach> findByEmail(String email);
     Optional<HanhKhach> findBySoDienThoai(String soDienThoai);
     Optional<HanhKhach> findByMaDinhDanh(String maDinhDanh);
+
+    // ==================== SOFT DELETE METHODS ====================
+    /**
+     * Tìm tất cả hành khách bao gồm cả đã xóa mềm
+     */
+    @Query(value = "SELECT * FROM hanhkhach", nativeQuery = true)
+    List<HanhKhach> findAllIncludingDeleted();
+
+    /**
+     * Tìm hành khách đã xóa mềm theo ID
+     */
+    @Query(value = "SELECT * FROM hanhkhach WHERE mahanhkhach = :id AND da_xoa = 1", nativeQuery = true)
+    Optional<HanhKhach> findDeletedById(@Param("id") int id);
+
+    /**
+     * Lấy tất cả bản ghi đã bị xóa mềm
+     */
+    @Query(value = "SELECT * FROM hanhkhach WHERE da_xoa = 1", nativeQuery = true)
+    List<HanhKhach> findAllDeleted();
+
+    /**
+     * Khôi phục hành khách đã xóa mềm
+     */
+    @Modifying
+    @Query(value = "UPDATE hanhkhach SET da_xoa = 0, deleted_at = NULL WHERE mahanhkhach = :id", nativeQuery = true)
+    void restoreById(@Param("id") int id);
+
+    /**
+     * Xóa cứng (vĩnh viễn) - chỉ dùng khi cần thiết
+     */
+    @Modifying
+    @Query(value = "DELETE FROM hanhkhach WHERE mahanhkhach = :id", nativeQuery = true)
+    void hardDeleteById(@Param("id") int id);
 
     @Query(value = """
         SELECT

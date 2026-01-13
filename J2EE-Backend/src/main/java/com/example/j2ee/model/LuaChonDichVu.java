@@ -7,8 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -18,6 +21,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@SQLDelete(sql = "UPDATE luachondichvu SET da_xoa = 1, deleted_at = NOW() WHERE maluachon = ?")
+@SQLRestriction("da_xoa = 0")
 public class LuaChonDichVu {
 
     @Id
@@ -45,4 +50,11 @@ public class LuaChonDichVu {
     @OneToMany(mappedBy = "luaChonDichVu", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private Set<DatChoDichVu> datChoDichVuSet;
+
+    // ==================== SOFT DELETE FIELDS ====================
+    @Column(name = "da_xoa", nullable = false)
+    private Boolean daXoa = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 }
