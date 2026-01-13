@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { FaChartBar, FaUsers, FaRoute, FaPlaneDeparture, FaConciergeBell, FaSignOutAlt, FaBars, FaTimes, FaMoneyBillWave, FaDollarSign, FaTags, FaFighterJet, FaFileInvoice, FaUndo, FaHistory } from 'react-icons/fa';
+import { FaChartBar, FaUsers, FaRoute, FaPlaneDeparture, FaConciergeBell, FaSignOutAlt, FaBars, FaTimes, FaMoneyBillWave, FaDollarSign, FaTags, FaFighterJet, FaFileInvoice, FaUndo, FaHistory, FaUserShield, FaKey } from 'react-icons/fa';
 import { MdLocalAirport } from 'react-icons/md'; 
 import { logout } from '../../services/AuthService';
 import { getUserInfo, isAuthenticated } from '../../utils/cookieUtils';
@@ -42,6 +42,8 @@ function TrangChuAdmin() {
         { path: 'HoanTien', icon: <FaUndo size={20} />, text: 'Hoàn tiền', color: 'from-lime-500 to-green-600' },
         { path: 'LichSuThaoTac', icon: <FaHistory size={20} />, text: 'Lịch sử thao tác', color: 'from-green-500 to-emerald-600' },
         { path: 'QuanLyTKAdmin', icon: <FaUsers size={20} />, text: 'Quản lý TK Admin', color: 'from-purple-500 to-pink-500' },
+        { path: 'VaiTro', icon: <FaUserShield size={20} />, text: 'Quản lý Vai trò', color: 'from-violet-500 to-purple-600' },
+        { path: 'PhanQuyen', icon: <FaKey size={20} />, text: 'Phân quyền', color: 'from-amber-500 to-orange-600' },
     ];
 
     // Lấy chữ cái đầu của username để hiển thị avatar

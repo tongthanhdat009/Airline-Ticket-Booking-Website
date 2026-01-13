@@ -1,7 +1,61 @@
 import React, { useEffect, useState } from 'react';
-import { FaPlus, FaSearch, FaEdit, FaTrash, FaUser, FaTimes } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaEdit, FaTrash, FaUser, FaTimes, FaUserShield } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
 import { getAllTKadmin, updateTKadmin, addTKadmin, deleteTKadmin } from '../../services/QLTaiKhoanAdminServices';
+
+// Hard code danh sách vai trò
+const ROLES_DATA = [
+  { maVaiTro: 1, tenVaiTro: 'Super Admin' },
+  { maVaiTro: 2, tenVaiTro: 'Nhân viên bán vé' },
+  { maVaiTro: 3, tenVaiTro: 'Kế toán' },
+  { maVaiTro: 4, tenVaiTro: 'Quản lý vận hành' },
+  { maVaiTro: 5, tenVaiTro: 'Chăm sóc khách hàng' },
+  { maVaiTro: 6, tenVaiTro: 'Báo cáo viên' }
+];
+
+// Hard code dữ liệu account với vai trò
+const ACCOUNTS_WITH_ROLES = [
+  {
+    maTaiKhoan: 1,
+    tenDangNhap: 'admin',
+    hoVaTen: 'Nguyễn Văn Admin',
+    email: 'admin@airline.com',
+    vaiTro: [1, 2],
+    tenVaiTro: ['Super Admin', 'Nhân viên bán vé']
+  },
+  {
+    maTaiKhoan: 2,
+    tenDangNhap: 'staff01',
+    hoVaTen: 'Trần Thị Staff',
+    email: 'staff01@airline.com',
+    vaiTro: [2],
+    tenVaiTro: ['Nhân viên bán vé']
+  },
+  {
+    maTaiKhoan: 3,
+    tenDangNhap: 'accountant',
+    hoVaTen: 'Lê Văn KeToan',
+    email: 'accountant@airline.com',
+    vaiTro: [3],
+    tenVaiTro: ['Kế toán']
+  },
+  {
+    maTaiKhoan: 4,
+    tenDangNhap: 'ops_manager',
+    hoVaTen: 'Phạm Thị Ops',
+    email: 'ops@airline.com',
+    vaiTro: [4],
+    tenVaiTro: ['Quản lý vận hành']
+  },
+  {
+    maTaiKhoan: 5,
+    tenDangNhap: 'cs_agent',
+    hoVaTen: 'Hoàng Văn CS',
+    email: 'cs@airline.com',
+    vaiTro: [5],
+    tenVaiTro: ['Chăm sóc khách hàng']
+  }
+];
 
 const QuanLyTKAdmin = () => {
   const [accounts, setAccounts] = useState([]);
@@ -19,9 +73,11 @@ const QuanLyTKAdmin = () => {
   const fetchAccounts = async () => {
     try {
       setLoading(true);
-      const res = await getAllTKadmin();
-      setAccounts(Array.isArray(res.data) ? res.data : []);
-      console.log(res.data);
+      // Sử dụng hard code data thay vì API
+      setAccounts(ACCOUNTS_WITH_ROLES);
+      // Nếu muốn dùng API, uncomment dòng dưới:
+      // const res = await getAllTKadmin();
+      // setAccounts(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error('Error fetching accounts:', err);
       setAccounts([]);
@@ -132,6 +188,7 @@ const QuanLyTKAdmin = () => {
                   <th className="px-6 py-4 text-left font-semibold">Họ và tên</th>
                   <th className="px-6 py-4 text-left font-semibold">Tên đăng nhập</th>
                   <th className="px-6 py-4 text-left font-semibold">Email</th>
+                  <th className="px-6 py-4 text-left font-semibold">Vai trò</th>
                   <th className="px-6 py-4 text-center font-semibold">Hành động</th>
                 </tr>
               </thead>
@@ -155,6 +212,25 @@ const QuanLyTKAdmin = () => {
                       </td>
                       <td className="px-6 py-4 text-gray-700">{acc.email}</td>
                       <td className="px-6 py-4">
+                        <div className="flex flex-wrap gap-1">
+                          {acc.tenVaiTro && acc.tenVaiTro.length > 0 ? (
+                            acc.tenVaiTro.map((role, idx) => (
+                              <span
+                                key={idx}
+                                className="px-2 py-1 bg-violet-100 text-violet-700 rounded-full text-xs font-semibold flex items-center gap-1"
+                              >
+                                <FaUserShield size={10} />
+                                {role}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full text-xs">
+                              Chưa gán
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
                         <div className="flex justify-center gap-2">
                           <button
                             onClick={() => handleEdit(acc)}
@@ -176,7 +252,7 @@ const QuanLyTKAdmin = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" className="text-center py-12">
+                    <td colSpan="6" className="text-center py-12">
                       <div className="flex flex-col items-center gap-3">
                         <FaUser className="text-gray-300 text-5xl" />
                         <p className="text-gray-500 font-medium">Không tìm thấy tài khoản nào.</p>
@@ -254,6 +330,7 @@ const AccountForm = ({ account, onClose, onSave }) => {
     hoVaTen: '',
     email: '',
     matKhauBam: '',
+    vaiTro: [], // Mảng chứa các maVaiTro
   });
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -264,9 +341,10 @@ const AccountForm = ({ account, onClose, onSave }) => {
         tenDangNhap: account.tenDangNhap || '',
         email: account.email || '',
         matKhauBam: account.matKhauBam ? account.matKhauBam.substring(0, 6) : '',
+        vaiTro: account.vaiTro || [],
       });
     } else {
-      setFormData({ tenDangNhap: '', hoVaTen: '', email: '', matKhauBam: '' });
+      setFormData({ tenDangNhap: '', hoVaTen: '', email: '', matKhauBam: '', vaiTro: [] });
     }
     setErrorMessage('');
   }, [account]);
@@ -275,6 +353,16 @@ const AccountForm = ({ account, onClose, onSave }) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     setErrorMessage('');
+  };
+
+  // Xử lý chọn/bỏ chọn vai trò
+  const handleRoleToggle = (maVaiTro) => {
+    setFormData(prev => {
+      const newRoles = prev.vaiTro.includes(maVaiTro)
+        ? prev.vaiTro.filter(id => id !== maVaiTro)
+        : [...prev.vaiTro, maVaiTro];
+      return { ...prev, vaiTro: newRoles };
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -346,6 +434,41 @@ const AccountForm = ({ account, onClose, onSave }) => {
                 placeholder="Nhập email"
                 required
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">
+                Vai trò <span className="text-red-500">*</span>
+              </label>
+              <div className="border border-gray-300 rounded-lg p-4 bg-gray-50 max-h-48 overflow-y-auto">
+                <div className="grid grid-cols-1 gap-2">
+                  {ROLES_DATA.map(role => (
+                    <label
+                      key={role.maVaiTro}
+                      className="flex items-center gap-3 p-2 hover:bg-white rounded-lg cursor-pointer transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={formData.vaiTro.includes(role.maVaiTro)}
+                        onChange={() => handleRoleToggle(role.maVaiTro)}
+                        className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                      />
+                      <div className="flex items-center gap-2">
+                        <FaUserShield className="text-violet-600" />
+                        <span className="font-medium text-gray-700">{role.tenVaiTro}</span>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              {formData.vaiTro.length === 0 && (
+                <p className="text-red-500 text-sm mt-1">Vui lòng chọn ít nhất một vai trò!</p>
+              )}
+              {formData.vaiTro.length > 0 && (
+                <p className="text-green-600 text-sm mt-1">
+                  Đã chọn {formData.vaiTro.length} vai trò
+                </p>
+              )}
             </div>
 
             <div>

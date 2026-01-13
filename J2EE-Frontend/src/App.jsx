@@ -20,6 +20,8 @@ import QuanLyMayBay from "./pages/QuanLy/QuanLyMayBay"
 import QuanLyHoaDon from "./pages/QuanLy/QuanLyHoaDon"
 import QuanLyHoanTien from "./pages/QuanLy/QuanLyHoanTien"
 import QuanLyLichSuThaoTac from "./pages/QuanLy/QuanLyLichSuThaoTac"
+import QuanLyVaiTro from "./pages/QuanLy/QuanLyVaiTro"
+import QuanLyPhanQuyen from "./pages/QuanLy/QuanLyPhanQuyen"
 import DichVuChuyenBay from "./pages/KhachHang/DichVuChuyenBay"
 import DichVuKhac from "./pages/KhachHang/DichVuKhac"
 import TraCuuChuyenBay from "./pages/KhachHang/TraCuuChuyenBay"
@@ -125,6 +127,8 @@ function AppContent() {
             <Route path="HoaDon" element={<QuanLyHoaDon />} />
             <Route path="HoanTien" element={<QuanLyHoanTien />} />
             <Route path="LichSuThaoTac" element={<QuanLyLichSuThaoTac />} />
+            <Route path="VaiTro" element={<QuanLyVaiTro />} />
+            <Route path="PhanQuyen" element={<QuanLyPhanQuyen />} />
           </Route>
 
           {/* Backward compatibility - redirect old routes */}
@@ -142,6 +146,8 @@ function AppContent() {
             <Route path="HoaDon" element={<QuanLyHoaDon />} />
             <Route path="HoanTien" element={<QuanLyHoanTien />} />
             <Route path="LichSuThaoTac" element={<QuanLyLichSuThaoTac />} />
+            <Route path="VaiTro" element={<QuanLyVaiTro />} />
+            <Route path="PhanQuyen" element={<QuanLyPhanQuyen />} />
           </Route>
         </Routes>
       </main>
