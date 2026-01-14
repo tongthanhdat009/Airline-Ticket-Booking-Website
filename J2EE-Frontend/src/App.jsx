@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom"
 import Home from "./pages/KhachHang/TrangChu"
-import Admin from "./pages/QuanLy/TrangChuAdmin"
+import Admin, { AdminSidebarProvider } from "./pages/QuanLy/TrangChuAdmin"
 import LoginAdmin from "./pages/QuanLy/DangNhap"
 import LoginClient from "./pages/KhachHang/DangNhap"
 // import SignupClient from "./pages/KhachHang/DangKy"
-import TestAPI from "./testAPI"; 
+import TestAPI from "./testAPI";
 import ProtectedRoute, { AdminProtectedRoute } from "./components/common/ProtectedRoute"
 
 import ThongKeDoanhThu from './pages/QuanLy/ThongKeDoanhThu';
@@ -114,7 +114,11 @@ function AppContent() {
           <Route path="/test-api" element={<TestAPI/>}/>
 
           {/* Admin Routes - Bảo vệ bằng ProtectedRoute */}
-          <Route path="/admin/dashboard" element={<AdminProtectedRoute><Admin /></AdminProtectedRoute>}>
+          <Route path="/admin/dashboard" element={
+            <AdminSidebarProvider>
+              <AdminProtectedRoute><Admin /></AdminProtectedRoute>
+            </AdminSidebarProvider>
+          }>
             <Route path="KhachHang" element={<QuanLyKhachHang />} />
             <Route path="TuyenBay" element={<QuanLyTuyenBay />} />
             <Route path="ChuyenBay" element={<QuanLyChuyenBay />} />
@@ -134,7 +138,11 @@ function AppContent() {
           </Route>
 
           {/* Backward compatibility - redirect old routes */}
-          <Route path="/admin" element={<AdminProtectedRoute><Admin /></AdminProtectedRoute>}>
+          <Route path="/admin" element={
+            <AdminSidebarProvider>
+              <AdminProtectedRoute><Admin /></AdminProtectedRoute>
+            </AdminSidebarProvider>
+          }>
             <Route path="KhachHang" element={<QuanLyKhachHang />} />
             <Route path="TuyenBay" element={<QuanLyTuyenBay />} />
             <Route path="ChuyenBay" element={<QuanLyChuyenBay />} />

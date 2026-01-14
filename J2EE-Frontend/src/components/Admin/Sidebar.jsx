@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -21,27 +21,24 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { hasPermission } from '../../utils/permissionUtils';
+import { useSidebar } from '../../context/SidebarContext';
 
 /**
  * Sidebar Component - Hiển thị menu navigation với permissions
  * Các menu items được ẩn/hiện dựa trên permissions của user
+ * State được quản lý bằng Context để không bị reset khi URL thay đổi
  */
 const Sidebar = ({ collapsed, setCollapsed }) => {
   const location = useLocation();
-
-  // State để theo dõi menu đang mở
-  const [openMenus, setOpenMenus] = useState({});
+  const { toggleMenu, isMenuOpen } = useSidebar();
 
   // Toggle menu con - chỉ thay đổi state, không navigate
-  const toggleMenu = (menuKey, e) => {
+  const handleToggleMenu = (menuKey, e) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
-    setOpenMenus(prev => ({
-      ...prev,
-      [menuKey]: !prev[menuKey]
-    }));
+    toggleMenu(menuKey);
   };
 
   // Kiểm tra menu có đang active không
@@ -167,7 +164,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
 
       const Icon = item.icon;
       const hasChildren = item.children && item.children.length > 0;
-      const isMenuOpen = openMenus[item.title];
+      const isMenuItemOpen = isMenuOpen(item.title);
       const isMenuItemActive = isActive(item.path);
 
       return (
@@ -178,7 +175,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
               // Menu có children: dùng button để toggle, không navigate
               <button
                 type="button"
-                onClick={(e) => toggleMenu(item.title, e)}
+                onClick={(e) => handleToggleMenu(item.title, e)}
                 className={`
                   w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200
                   ${isMenuItemActive
@@ -194,7 +191,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
                 {!collapsed && (
                   <ChevronDown
                     size={16}
-                    className={`transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`}
+                    className={`transition-transform duration-200 ${isMenuItemOpen ? 'rotate-180' : ''}`}
                   />
                 )}
               </button>
@@ -219,7 +216,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
           </div>
 
           {/* Children menu (submenu) */}
-          {hasChildren && !collapsed && isMenuOpen && (
+          {hasChildren && !collapsed && isMenuItemOpen && (
             <div className="ml-12 mt-1 space-y-1">
               {item.children.map((child) => {
                 // Check permission cho child

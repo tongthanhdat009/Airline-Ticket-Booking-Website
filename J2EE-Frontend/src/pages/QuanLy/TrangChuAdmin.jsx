@@ -1,16 +1,48 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { FaSignOutAlt, FaBars, FaTimes, FaUserCircle, FaChevronDown } from 'react-icons/fa';
 import { logout } from '../../services/AuthService';
 import { getUserInfo, isAuthenticated, getAdminUserInfo } from '../../utils/cookieUtils';
 import { getMenuItemsGroupedByPermissions } from '../../data/adminMenuData';
 
+// Context cho expanded groups state
+const AdminSidebarContext = createContext();
+
+const useAdminSidebar = () => {
+  const context = useContext(AdminSidebarContext);
+  if (!context) {
+    throw new Error('useAdminSidebar must be used within AdminSidebarProvider');
+  }
+  return context;
+};
+
+const AdminSidebarProvider = ({ children }) => {
+  const [expandedGroups, setExpandedGroups] = useState({});
+
+  const toggleGroup = (groupName) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [groupName]: !prev[groupName]
+    }));
+  };
+
+  const isGroupExpanded = (groupName) => {
+    return expandedGroups[groupName] || false;
+  };
+
+  return (
+    <AdminSidebarContext.Provider value={{ expandedGroups, toggleGroup, isGroupExpanded }}>
+      {children}
+    </AdminSidebarContext.Provider>
+  );
+};
+
 function TrangChuAdmin() {
     const navigate = useNavigate();
+    const { isGroupExpanded, toggleGroup } = useAdminSidebar();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [userInfo, setUserInfo] = useState(null);
     const [groupedMenuItems, setGroupedMenuItems] = useState({});
-    const [expandedGroups, setExpandedGroups] = useState({});
 
     // Kiểm tra xác thực khi component mount và load menu theo permission
     useEffect(() => {
@@ -26,25 +58,9 @@ function TrangChuAdmin() {
             if (adminUserInfo && adminUserInfo.permissions) {
                 const groupedMenu = getMenuItemsGroupedByPermissions(adminUserInfo.permissions);
                 setGroupedMenuItems(groupedMenu);
-
-                // Đóng tất cả groups mặc định
-                const initialExpanded = {};
-                Object.keys(groupedMenu).forEach(groupName => {
-                    initialExpanded[groupName] = false;
-                });
-                setExpandedGroups(initialExpanded);
             }
         }
     }, [navigate]);
-
-
-    // Toggle collapse/expand group
-    const toggleGroup = (groupName) => {
-        setExpandedGroups(prev => ({
-            ...prev,
-            [groupName]: !prev[groupName]
-        }));
-    };
 
     const handleLogout = async () => {
         if (window.confirm('Bạn có chắc chắn muốn đăng xuất?')) {
@@ -81,7 +97,7 @@ function TrangChuAdmin() {
                     <nav className="flex-1 mt-6 px-4 overflow-y-auto">
                         <div className="space-y-3">
                             {Object.entries(groupedMenuItems).map(([groupName, groupData]) => {
-                                const isExpanded = expandedGroups[groupName];
+                                const isExpanded = isGroupExpanded(groupName);
 
                                 return (
                                     <div key={groupName} className="mb-2">
@@ -198,3 +214,4 @@ function TrangChuAdmin() {
 }
 
 export default TrangChuAdmin;
+export { AdminSidebarProvider };
