@@ -1,124 +1,142 @@
 import React, { useState, useEffect } from 'react';
-import { FaKey, FaSave, FaCheckSquare, FaSquare, FaSearch, FaChevronDown, FaChevronRight } from 'react-icons/fa';
+import { FaKey, FaSave, FaCheckSquare, FaSquare, FaSearch, FaChevronRight, FaCopy, FaLock, FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
+import Toast from '../../components/common/Toast';
+import {
+    getAllChucNang,
+    getAllHanhDong,
+    getAllVaiTroWithSuperAdminFlag,
+    getPermissionMatrix,
+    updatePhanQuyen,
+    copyPermissions
+} from '../../services/PhanQuyenService';
 
 const QuanLyPhanQuyen = () => {
-    // Hard code danh sách Vai trò
-    const [roles] = useState([
-        { maVaiTro: 1, tenVaiTro: 'Super Admin' },
-        { maVaiTro: 2, tenVaiTro: 'Nhân viên bán vé' },
-        { maVaiTro: 3, tenVaiTro: 'Kế toán' },
-        { maVaiTro: 4, tenVaiTro: 'Quản lý vận hành' },
-        { maVaiTro: 5, tenVaiTro: 'Chăm sóc khách hàng' },
-        { maVaiTro: 6, tenVaiTro: 'Báo cáo viên' }
-    ]);
-
-    // Hard code danh sách Chức năng theo schema
-    const [features] = useState([
-        { maChucNang: 1, maCode: 'DASHBOARD', tenChucNang: 'Thống kê & Báo cáo', nhom: 'Báo cáo' },
-        { maChucNang: 2, maCode: 'KHACHHANG', tenChucNang: 'Quản lý Khách hàng', nhom: 'Quản lý' },
-        { maChucNang: 3, maCode: 'TUYENBAY', tenChucNang: 'Quản lý Tuyến bay', nhom: 'Vận hành' },
-        { maChucNang: 4, maCode: 'CHUYENBAY', tenChucNang: 'Quản lý Chuyến bay', nhom: 'Vận hành' },
-        { maChucNang: 5, maCode: 'GIABAY', tenChucNang: 'Quản lý Giá vé', nhom: 'Vận hành' },
-        { maChucNang: 6, maCode: 'SANBAY', tenChucNang: 'Quản lý Sân bay', nhom: 'Vận hành' },
-        { maChucNang: 7, maCode: 'MAYBAY', tenChucNang: 'Quản lý Máy bay', nhom: 'Vận hành' },
-        { maChucNang: 8, maCode: 'DICHVU', tenChucNang: 'Quản lý Dịch vụ', nhom: 'Vận hành' },
-        { maChucNang: 9, maCode: 'KHUYENMAI', tenChucNang: 'Quản lý Khuyến mãi', nhom: 'Marketing' },
-        { maChucNang: 10, maCode: 'HOADON', tenChucNang: 'Quản lý Hóa đơn', nhom: 'Tài chính' },
-        { maChucNang: 11, maCode: 'HOANTIEN', tenChucNang: 'Quản lý Hoàn tiền', nhom: 'Tài chính' },
-        { maChucNang: 12, maCode: 'DONHANG', tenChucNang: 'Quản lý Đơn hàng', nhom: 'Quản lý' },
-        { maChucNang: 13, maCode: 'LICHSU', tenChucNang: 'Lịch sử thao tác', nhom: 'Báo cáo' },
-        { maChucNang: 14, maCode: 'ADMIN', tenChucNang: 'Quản lý Tài khoản Admin', nhom: 'Hệ thống' },
-        { maChucNang: 15, maCode: 'VAITRO', tenChucNang: 'Quản lý Vai trò', nhom: 'Hệ thống' },
-        { maChucNang: 16, maCode: 'PHANQUYEN', tenChucNang: 'Phân quyền', nhom: 'Hệ thống' }
-    ]);
-
-    // Hard code danh sách Hành động theo schema
-    const [actions] = useState([
-        { maHanhDong: 'VIEW', moTa: 'Xem' },
-        { maHanhDong: 'CREATE', moTa: 'Thêm mới' },
-        { maHanhDong: 'UPDATE', moTa: 'Cập nhật' },
-        { maHanhDong: 'DELETE', moTa: 'Xóa' },
-        { maHanhDong: 'APPROVE', moTa: 'Duyệt' },
-        { maHanhDong: 'EXPORT', moTa: 'Xuất báo cáo' },
-        { maHanhDong: 'IMPORT', moTa: 'Nhập dữ liệu' }
-    ]);
-
-    // Ma trận quyền - key format: "maVaiTro-maChucNang-maHanhDong"
+    // State cho dữ liệu từ API
+    const [roles, setRoles] = useState([]);
+    const [features, setFeatures] = useState([]);
+    const [actions, setActions] = useState([]);
+    
+    // Ma trận quyền - key format: "maChucNang-maHanhDong"
     const [permissions, setPermissions] = useState({});
+    const [originalPermissions, setOriginalPermissions] = useState({});
 
-    const [selectedRole, setSelectedRole] = useState(1);
+    const [selectedRole, setSelectedRole] = useState(null);
+    const [selectedRoleInfo, setSelectedRoleInfo] = useState(null);
     const [filterGroup, setFilterGroup] = useState('ALL');
     const [searchTerm, setSearchTerm] = useState('');
     const [saveStatus, setSaveStatus] = useState('');
-    const [expandedFeature, setExpandedFeature] = useState(null); // ID của chức năng đang mở
+    const [expandedFeature, setExpandedFeature] = useState(null);
+    
+    // Loading states
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    
+    // Toast
+    const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
+    
+    // Copy permissions modal
+    const [showCopyModal, setShowCopyModal] = useState(false);
+    const [copyFromRole, setCopyFromRole] = useState(null);
 
-    // Khởi tạo permissions cho Super Admin (full quyền)
+    // Toast functions
+    const showToast = (message, type = 'success') => {
+        setToast({ isVisible: true, message, type });
+    };
+
+    const hideToast = () => {
+        setToast({ ...toast, isVisible: false });
+    };
+
+    // Fetch data từ API
     useEffect(() => {
-        const initialPermissions = {};
-
-        // Super Admin có full quyền
-        features.forEach(feature => {
-            actions.forEach(action => {
-                initialPermissions[`1-${feature.maChucNang}-${action.maHanhDong}`] = true;
-            });
-        });
-
-        // Nhân viên bán vé
-        const staffPermissions = [
-            '2-1-VIEW', '2-2-VIEW', '2-2-CREATE', '2-12-VIEW', '2-12-CREATE', '2-12-UPDATE',
-            '2-4-VIEW', '2-10-VIEW', '2-13-VIEW'
-        ];
-        staffPermissions.forEach(key => initialPermissions[key] = true);
-
-        // Kế toán
-        const accountingPermissions = [
-            '3-1-VIEW', '3-10-VIEW', '3-10-CREATE', '3-10-UPDATE', '3-10-APPROVE', '3-10-EXPORT',
-            '3-11-VIEW', '3-11-CREATE', '3-11-UPDATE', '3-11-APPROVE', '3-13-VIEW'
-        ];
-        accountingPermissions.forEach(key => initialPermissions[key] = true);
-
-        // Quản lý vận hành
-        const opsPermissions = [
-            '4-1-VIEW', '4-3-VIEW', '4-3-CREATE', '4-3-UPDATE', '4-3-DELETE',
-            '4-4-VIEW', '4-4-CREATE', '4-4-UPDATE', '4-4-DELETE',
-            '4-5-VIEW', '4-5-CREATE', '4-5-UPDATE',
-            '4-6-VIEW', '4-6-CREATE', '4-6-UPDATE', '4-6-DELETE',
-            '4-7-VIEW', '4-7-CREATE', '4-7-UPDATE', '4-7-DELETE',
-            '4-8-VIEW', '4-8-CREATE', '4-8-UPDATE', '4-8-DELETE',
-            '4-13-VIEW', '4-13-EXPORT'
-        ];
-        opsPermissions.forEach(key => initialPermissions[key] = true);
-
-        // Chăm sóc khách hàng
-        const csPermissions = [
-            '5-1-VIEW', '5-2-VIEW', '5-2-CREATE', '5-2-UPDATE', '5-12-VIEW', '5-12-CREATE', '5-12-UPDATE',
-            '5-11-VIEW', '5-11-CREATE', '5-11-UPDATE', '5-13-VIEW', '5-13-EXPORT'
-        ];
-        csPermissions.forEach(key => initialPermissions[key] = true);
-
-        // Báo cáo viên (chỉ xem)
-        const reportPermissions = [
-            '6-1-VIEW', '6-1-EXPORT', '6-13-VIEW', '6-13-EXPORT'
-        ];
-        reportPermissions.forEach(key => initialPermissions[key] = true);
-
-        setPermissions(initialPermissions);
+        fetchInitialData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const fetchInitialData = async () => {
+        try {
+            setLoading(true);
+            
+            // Fetch song song các dữ liệu cần thiết
+            const [rolesRes, featuresRes, actionsRes] = await Promise.all([
+                getAllVaiTroWithSuperAdminFlag(),
+                getAllChucNang(),
+                getAllHanhDong()
+            ]);
+
+            if (rolesRes.success && rolesRes.data) {
+                setRoles(rolesRes.data);
+                // Chọn vai trò đầu tiên (ưu tiên không phải SUPER_ADMIN)
+                const nonSuperAdmin = rolesRes.data.find(r => !r.isSuperAdmin);
+                const firstRole = nonSuperAdmin || rolesRes.data[0];
+                if (firstRole) {
+                    setSelectedRole(firstRole.maVaiTro);
+                    setSelectedRoleInfo(firstRole);
+                }
+            }
+
+            if (featuresRes.success && featuresRes.data) {
+                setFeatures(featuresRes.data);
+            }
+
+            if (actionsRes.success && actionsRes.data) {
+                setActions(actionsRes.data);
+            }
+
+        } catch (error) {
+            console.error('Error fetching initial data:', error);
+            showToast('Lỗi khi tải dữ liệu. Vui lòng thử lại!', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch permissions khi đổi vai trò
+    useEffect(() => {
+        if (selectedRole) {
+            fetchPermissionMatrix(selectedRole);
+            // Cập nhật thông tin vai trò đang chọn
+            const roleInfo = roles.find(r => r.maVaiTro === selectedRole);
+            setSelectedRoleInfo(roleInfo);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedRole, roles]);
+
+    const fetchPermissionMatrix = async (maVaiTro) => {
+        try {
+            const response = await getPermissionMatrix(maVaiTro);
+            if (response.success && response.data) {
+                setPermissions(response.data);
+                setOriginalPermissions(response.data);
+            }
+        } catch (error) {
+            console.error('Error fetching permission matrix:', error);
+            showToast('Lỗi khi tải phân quyền', 'error');
+        }
+    };
+
     // Lấy danh sách nhóm
-    const groups = ['ALL', ...new Set(features.map(f => f.nhom))];
+    const groups = ['ALL', ...new Set(features.map(f => f.nhom).filter(Boolean))];
 
     // Filter features
     const filteredFeatures = features.filter(feature => {
-        const matchSearch = feature.tenChucNang.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           feature.maCode.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchSearch = feature.tenChucNang?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           feature.maCode?.toLowerCase().includes(searchTerm.toLowerCase());
         const matchGroup = filterGroup === 'ALL' || feature.nhom === filterGroup;
         return matchSearch && matchGroup;
     });
 
+    // Kiểm tra vai trò hiện tại có phải SUPER_ADMIN không
+    const isSuperAdmin = selectedRoleInfo?.isSuperAdmin || false;
+
     // Toggle permission
-    const togglePermission = (featureCode, actionCode) => {
-        const key = `${selectedRole}-${featureCode}-${actionCode}`;
+    const togglePermission = (featureId, actionCode) => {
+        if (isSuperAdmin) {
+            showToast('Không được phép chỉnh sửa phân quyền của vai trò SUPER_ADMIN', 'error');
+            return;
+        }
+
+        const key = `${featureId}-${actionCode}`;
         setPermissions(prev => ({
             ...prev,
             [key]: !prev[key]
@@ -126,61 +144,137 @@ const QuanLyPhanQuyen = () => {
     };
 
     // Check all actions for a feature
-    const checkAllFeature = (featureCode) => {
-        const newChecked = !actions.every(action =>
-            permissions[`${selectedRole}-${featureCode}-${action.maHanhDong}`]
+    const checkAllFeature = (featureId) => {
+        if (isSuperAdmin) {
+            showToast('Không được phép chỉnh sửa phân quyền của vai trò SUPER_ADMIN', 'error');
+            return;
+        }
+
+        const allChecked = actions.every(action =>
+            permissions[`${featureId}-${action.maHanhDong}`]
         );
 
+        const newPermissions = { ...permissions };
         actions.forEach(action => {
-            const key = `${selectedRole}-${featureCode}-${action.maHanhDong}`;
-            setPermissions(prev => ({
-                ...prev,
-                [key]: newChecked
-            }));
+            const key = `${featureId}-${action.maHanhDong}`;
+            newPermissions[key] = !allChecked;
         });
+        setPermissions(newPermissions);
     };
 
     // Check if all actions are checked for a feature
-    const isFeatureAllChecked = (featureCode) => {
+    const isFeatureAllChecked = (featureId) => {
         return actions.every(action =>
-            permissions[`${selectedRole}-${featureCode}-${action.maHanhDong}`]
+            permissions[`${featureId}-${action.maHanhDong}`]
         );
     };
 
+    // Kiểm tra có thay đổi không
+    const hasChanges = () => {
+        return JSON.stringify(permissions) !== JSON.stringify(originalPermissions);
+    };
+
     // Save permissions
-    const handleSave = () => {
-        setSaveStatus('saving');
+    const handleSave = async () => {
+        if (isSuperAdmin) {
+            showToast('Không được phép chỉnh sửa phân quyền của vai trò SUPER_ADMIN', 'error');
+            return;
+        }
 
-        // Simulate API call
-        setTimeout(() => {
-            setSaveStatus('saved');
+        if (!hasChanges()) {
+            showToast('Không có thay đổi nào để lưu', 'info');
+            return;
+        }
 
-            // Collect all permissions for selected role
-            const rolePermissions = [];
+        try {
+            setSaving(true);
+            setSaveStatus('saving');
+
+            // Chuyển đổi permissions object thành array
+            const permissionList = [];
             Object.entries(permissions).forEach(([key, value]) => {
-                const [maVaiTro, maChucNang, maHanhDong] = key.split('-');
-                if (parseInt(maVaiTro) === selectedRole && value) {
-                    rolePermissions.push({
-                        maVaiTro: parseInt(maVaiTro),
+                if (value) {
+                    const [maChucNang, maHanhDong] = key.split('-');
+                    permissionList.push({
                         maChucNang: parseInt(maChucNang),
                         maHanhDong: maHanhDong
                     });
                 }
             });
 
-            console.log('Saving permissions for role:', selectedRole, rolePermissions);
+            const response = await updatePhanQuyen({
+                maVaiTro: selectedRole,
+                permissions: permissionList
+            });
 
-            setTimeout(() => setSaveStatus(''), 3000);
-        }, 1000);
+            if (response.success) {
+                showToast('Lưu phân quyền thành công!', 'success');
+                setSaveStatus('saved');
+                setOriginalPermissions({ ...permissions });
+                
+                setTimeout(() => setSaveStatus(''), 3000);
+            } else {
+                showToast(response.message || 'Lỗi khi lưu phân quyền', 'error');
+                setSaveStatus('');
+            }
+
+        } catch (error) {
+            console.error('Error saving permissions:', error);
+            const errorMessage = error.response?.data?.message || 'Lỗi khi lưu phân quyền';
+            showToast(errorMessage, 'error');
+            setSaveStatus('');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    // Handle copy permissions
+    const handleCopyPermissions = async () => {
+        if (isSuperAdmin) {
+            showToast('Không được phép chỉnh sửa phân quyền của vai trò SUPER_ADMIN', 'error');
+            return;
+        }
+
+        if (!copyFromRole) {
+            showToast('Vui lòng chọn vai trò nguồn', 'error');
+            return;
+        }
+
+        try {
+            setSaving(true);
+            const response = await copyPermissions(copyFromRole, selectedRole);
+            
+            if (response.success) {
+                showToast('Sao chép phân quyền thành công!', 'success');
+                setShowCopyModal(false);
+                setCopyFromRole(null);
+                // Refresh permission matrix
+                await fetchPermissionMatrix(selectedRole);
+            } else {
+                showToast(response.message || 'Lỗi khi sao chép phân quyền', 'error');
+            }
+        } catch (error) {
+            console.error('Error copying permissions:', error);
+            const errorMessage = error.response?.data?.message || 'Lỗi khi sao chép phân quyền';
+            showToast(errorMessage, 'error');
+        } finally {
+            setSaving(false);
+        }
     };
 
     // Count permissions for selected role
-    const permissionCount = Object.entries(permissions)
-        .filter(([key, value]) => {
-            const [maVaiTro] = key.split('-');
-            return parseInt(maVaiTro) === selectedRole && value;
-        })
-        .length;
+    const permissionCount = Object.values(permissions).filter(v => v).length;
+
+    if (loading) {
+        return (
+            <div className="p-6 bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <FaSpinner className="text-4xl text-amber-600 animate-spin" />
+                    <p className="text-slate-600">Đang tải dữ liệu...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="p-6 bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
@@ -195,6 +289,21 @@ const QuanLyPhanQuyen = () => {
                     <p className="text-slate-600 mt-2">Cấu hình quyền cho từng vai trò trong hệ thống</p>
                 </div>
 
+                {/* Warning for SUPER_ADMIN */}
+                {isSuperAdmin && (
+                    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r-lg">
+                        <div className="flex items-center gap-3">
+                            <FaLock className="text-yellow-600 text-xl" />
+                            <div>
+                                <h3 className="font-bold text-yellow-800">Vai trò SUPER_ADMIN được bảo vệ</h3>
+                                <p className="text-yellow-700 text-sm">
+                                    Không thể chỉnh sửa phân quyền của vai trò SUPER_ADMIN. Vai trò này có toàn quyền trong hệ thống.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Control Panel */}
                 <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -204,13 +313,13 @@ const QuanLyPhanQuyen = () => {
                                 Chọn vai trò <span className="text-red-500">*</span>
                             </label>
                             <select
-                                value={selectedRole}
+                                value={selectedRole || ''}
                                 onChange={(e) => setSelectedRole(parseInt(e.target.value))}
                                 className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-amber-500 focus:outline-none transition-colors font-semibold"
                             >
                                 {roles.map(role => (
                                     <option key={role.maVaiTro} value={role.maVaiTro}>
-                                        {role.tenVaiTro}
+                                        {role.tenVaiTro} {role.isSuperAdmin ? '🔒' : ''}
                                     </option>
                                 ))}
                             </select>
@@ -253,23 +362,50 @@ const QuanLyPhanQuyen = () => {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center justify-between mt-6">
-                        <div className="text-slate-600">
-                            <span className="font-semibold">{permissionCount}</span> quyền đã được cấp cho vai trò này
-                        </div>
-                        <button
-                            onClick={handleSave}
-                            disabled={saveStatus === 'saving'}
-                            className="px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all shadow-lg shadow-amber-500/50 flex items-center gap-2 font-bold disabled:opacity-50"
-                        >
-                            {saveStatus === 'saving' ? (
-                                <>Đang lưu...</>
-                            ) : saveStatus === 'saved' ? (
-                                <><FaCheckSquare /> Đã lưu!</>
-                            ) : (
-                                <><FaSave /> Lưu cấu hình</>
+                    <div className="flex items-center justify-between mt-6 flex-wrap gap-4">
+                        <div className="flex items-center gap-4">
+                            <div className="text-slate-600">
+                                <span className="font-semibold">{permissionCount}</span> quyền đã được cấp cho vai trò này
+                            </div>
+                            {hasChanges() && !isSuperAdmin && (
+                                <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">
+                                    Có thay đổi chưa lưu
+                                </span>
                             )}
-                        </button>
+                        </div>
+                        
+                        <div className="flex items-center gap-3">
+                            {/* Copy Button */}
+                            {!isSuperAdmin && (
+                                <button
+                                    onClick={() => setShowCopyModal(true)}
+                                    className="px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-all shadow-lg flex items-center gap-2 font-bold"
+                                >
+                                    <FaCopy /> Sao chép từ vai trò khác
+                                </button>
+                            )}
+                            
+                            {/* Save Button */}
+                            <button
+                                onClick={handleSave}
+                                disabled={saving || isSuperAdmin || !hasChanges()}
+                                className={`px-8 py-3 rounded-xl transition-all shadow-lg flex items-center gap-2 font-bold
+                                    ${isSuperAdmin 
+                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                                        : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 shadow-amber-500/50 disabled:opacity-50'
+                                    }`}
+                            >
+                                {saving ? (
+                                    <><FaSpinner className="animate-spin" /> Đang lưu...</>
+                                ) : saveStatus === 'saved' ? (
+                                    <><FaCheckSquare /> Đã lưu!</>
+                                ) : isSuperAdmin ? (
+                                    <><FaLock /> Không thể chỉnh sửa</>
+                                ) : (
+                                    <><FaSave /> Lưu cấu hình</>
+                                )}
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -278,7 +414,7 @@ const QuanLyPhanQuyen = () => {
                     {filteredFeatures.map((feature) => {
                         const isExpanded = expandedFeature === feature.maChucNang;
                         const grantedCount = actions.filter(action =>
-                            permissions[`${selectedRole}-${feature.maChucNang}-${action.maHanhDong}`]
+                            permissions[`${feature.maChucNang}-${action.maHanhDong}`]
                         ).length;
 
                         return (
@@ -299,9 +435,11 @@ const QuanLyPhanQuyen = () => {
                                                     <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs font-mono">
                                                         {feature.maCode}
                                                     </span>
-                                                    <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
-                                                        {feature.nhom}
-                                                    </span>
+                                                    {feature.nhom && (
+                                                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
+                                                            {feature.nhom}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </div>
                                             <div className="text-sm text-slate-500 mt-1">
@@ -316,28 +454,35 @@ const QuanLyPhanQuyen = () => {
                                     <div className="border-t border-slate-200 bg-slate-50 p-6">
                                         <div className="flex items-center justify-between mb-4">
                                             <h4 className="font-bold text-slate-700">Danh sách hành động</h4>
-                                            <button
-                                                onClick={() => checkAllFeature(feature.maChucNang)}
-                                                className="px-4 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors font-semibold text-sm flex items-center gap-2"
-                                            >
-                                                {isFeatureAllChecked(feature.maChucNang) ? (
-                                                    <><FaCheckSquare /> Bỏ chọn tất cả</>
-                                                ) : (
-                                                    <><FaSquare /> Chọn tất cả</>
-                                                )}
-                                            </button>
+                                            {!isSuperAdmin && (
+                                                <button
+                                                    onClick={() => checkAllFeature(feature.maChucNang)}
+                                                    className="px-4 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors font-semibold text-sm flex items-center gap-2"
+                                                >
+                                                    {isFeatureAllChecked(feature.maChucNang) ? (
+                                                        <><FaCheckSquare /> Bỏ chọn tất cả</>
+                                                    ) : (
+                                                        <><FaSquare /> Chọn tất cả</>
+                                                    )}
+                                                </button>
+                                            )}
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                             {actions.map(action => {
-                                                const key = `${selectedRole}-${feature.maChucNang}-${action.maHanhDong}`;
+                                                const key = `${feature.maChucNang}-${action.maHanhDong}`;
                                                 const checked = permissions[key] || false;
 
                                                 return (
                                                     <button
                                                         key={action.maHanhDong}
                                                         onClick={() => togglePermission(feature.maChucNang, action.maHanhDong)}
+                                                        disabled={isSuperAdmin}
                                                         className={`p-4 rounded-xl border-2 transition-all flex items-center gap-3 ${
+                                                            isSuperAdmin
+                                                                ? 'cursor-not-allowed opacity-75'
+                                                                : ''
+                                                        } ${
                                                             checked
                                                                 ? 'border-amber-500 bg-amber-50 hover:bg-amber-100'
                                                                 : 'border-slate-200 bg-white hover:bg-slate-50'
@@ -365,6 +510,15 @@ const QuanLyPhanQuyen = () => {
                     })}
                 </div>
 
+                {/* Empty State */}
+                {filteredFeatures.length === 0 && (
+                    <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
+                        <FaExclamationTriangle className="text-5xl text-amber-400 mx-auto mb-4" />
+                        <h3 className="text-xl font-bold text-slate-700 mb-2">Không tìm thấy chức năng</h3>
+                        <p className="text-slate-500">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
+                    </div>
+                )}
+
                 {/* Legend */}
                 <div className="bg-white rounded-2xl shadow-lg p-6 mt-6">
                     <h3 className="font-bold text-slate-800 mb-4">Hướng dẫn sử dụng:</h3>
@@ -384,15 +538,80 @@ const QuanLyPhanQuyen = () => {
                             </div>
                         </div>
                         <div className="flex items-start gap-3">
-                            <FaKey className="text-amber-600 text-xl mt-0.5" />
+                            <FaLock className="text-amber-600 text-xl mt-0.5" />
                             <div>
-                                <strong className="text-slate-800">Lưu cấu hình:</strong>
-                                <p>Nhấn nút "Lưu cấu hình" để áp dụng thay đổi</p>
+                                <strong className="text-slate-800">SUPER_ADMIN:</strong>
+                                <p>Không thể chỉnh sửa phân quyền của vai trò này</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Copy Permissions Modal */}
+            {showCopyModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
+                        <h2 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-3">
+                            <FaCopy className="text-blue-500" />
+                            Sao chép phân quyền
+                        </h2>
+                        <p className="text-slate-600 mb-6">
+                            Sao chép tất cả phân quyền từ vai trò nguồn sang vai trò <strong>{selectedRoleInfo?.tenVaiTro}</strong>.
+                            Các phân quyền hiện tại sẽ bị ghi đè.
+                        </p>
+
+                        <div className="mb-6">
+                            <label className="block text-slate-700 font-bold mb-2">
+                                Chọn vai trò nguồn
+                            </label>
+                            <select
+                                value={copyFromRole || ''}
+                                onChange={(e) => setCopyFromRole(parseInt(e.target.value))}
+                                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none"
+                            >
+                                <option value="">-- Chọn vai trò --</option>
+                                {roles.filter(r => r.maVaiTro !== selectedRole).map(role => (
+                                    <option key={role.maVaiTro} value={role.maVaiTro}>
+                                        {role.tenVaiTro}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => {
+                                    setShowCopyModal(false);
+                                    setCopyFromRole(null);
+                                }}
+                                className="flex-1 px-6 py-3 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-colors font-semibold"
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                onClick={handleCopyPermissions}
+                                disabled={!copyFromRole || saving}
+                                className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors font-semibold disabled:opacity-50 flex items-center justify-center gap-2"
+                            >
+                                {saving ? (
+                                    <><FaSpinner className="animate-spin" /> Đang sao chép...</>
+                                ) : (
+                                    <><FaCopy /> Sao chép</>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Toast */}
+            <Toast
+                isVisible={toast.isVisible}
+                message={toast.message}
+                type={toast.type}
+                onClose={hideToast}
+            />
         </div>
     );
 };

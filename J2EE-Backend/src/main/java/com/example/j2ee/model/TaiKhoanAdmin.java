@@ -15,7 +15,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE taikhoanadmin SET da_xoa = 1, deleted_at = NOW() WHERE mataikhoan = ?")
+@SQLDelete(sql = "UPDATE taikhoanadmin SET da_xoa = 1, deleted_at = NOW(), tendangnhap = CONCAT(tendangnhap, '_deleted_', mataikhoan), email = CONCAT(email, '_deleted_', mataikhoan) WHERE mataikhoan = ?")
 @SQLRestriction("da_xoa = 0")
 public class TaiKhoanAdmin {
     @Id
@@ -39,7 +39,7 @@ public class TaiKhoanAdmin {
     private LocalDateTime ngayTao;
 
     // ==================== SOFT DELETE FIELDS ====================
-    @Column(name = "da_xoa", nullable = false)
+    @Column(name = "da_xoa", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean daXoa = false;
 
     @Column(name = "deleted_at")

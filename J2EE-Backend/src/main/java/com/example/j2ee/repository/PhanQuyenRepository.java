@@ -3,6 +3,7 @@ package com.example.j2ee.repository;
 import com.example.j2ee.model.PhanQuyen;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -20,8 +21,10 @@ public interface PhanQuyenRepository extends JpaRepository<PhanQuyen, Integer> {
 
     boolean existsByMaVaiTroAndMaChucNangAndMaHanhDong(int maVaiTro, int maChucNang, String maHanhDong);
 
+    @Modifying
     void deleteByMaVaiTro(int maVaiTro);
 
+    @Modifying
     void deleteByMaChucNang(int maChucNang);
 
     @Query("SELECT DISTINCT pq.maHanhDong FROM PhanQuyen pq WHERE pq.maVaiTro = :maVaiTro")

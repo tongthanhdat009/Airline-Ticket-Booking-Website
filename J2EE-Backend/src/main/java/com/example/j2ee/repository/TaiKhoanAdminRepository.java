@@ -22,6 +22,53 @@ public interface TaiKhoanAdminRepository extends JpaRepository<TaiKhoanAdmin, In
 
     // ==================== SOFT DELETE METHODS ====================
     /**
+     * Đếm số tài khoản active có tên đăng nhập
+     * Lưu ý: Soft deleted accounts đã có suffix _deleted_<id> nên không cần kiểm tra
+     */
+    @Query(value = "SELECT COUNT(*) FROM taikhoanadmin WHERE tendangnhap = :tenDangNhap AND da_xoa = 0", nativeQuery = true)
+    Long countActiveByTenDangNhap(@Param("tenDangNhap") String tenDangNhap);
+
+    /**
+     * Kiểm tra tên đăng nhập có tồn tại trong các tài khoản active
+     * Soft deleted accounts đã được đổi tên với suffix _deleted_<id>
+     */
+    default boolean existsByTenDangNhapIncludingDeleted(String tenDangNhap) {
+        Long count = countActiveByTenDangNhap(tenDangNhap);
+        return count != null && count > 0;
+    }
+
+    /**
+     * Đếm số tài khoản active có email
+     * Lưu ý: Soft deleted accounts đã có suffix _deleted_<id> nên không cần kiểm tra
+     */
+    @Query(value = "SELECT COUNT(*) FROM taikhoanadmin WHERE email = :email AND da_xoa = 0", nativeQuery = true)
+    Long countActiveByEmail(@Param("email") String email);
+
+    /**
+     * Kiểm tra email có tồn tại trong các tài khoản active
+     * Soft deleted accounts đã được đổi email với suffix _deleted_<id>
+     */
+    default boolean existsByEmailIncludingDeleted(String email) {
+        Long count = countActiveByEmail(email);
+        return count != null && count > 0;
+    }
+
+    /**
+     * Đếm số tài khoản active có email, loại trừ ID hiện tại
+     * Dùng cho việc update email
+     */
+    @Query(value = "SELECT COUNT(*) FROM taikhoanadmin WHERE email = :email AND da_xoa = 0 AND mataikhoan != :id", nativeQuery = true)
+    Long countActiveByEmailExcludingId(@Param("email") String email, @Param("id") int id);
+
+    /**
+     * Kiểm tra email có tồn tại trong tài khoản active khác (loại trừ ID hiện tại)
+     */
+    default boolean existsByEmailExcludingId(String email, int id) {
+        Long count = countActiveByEmailExcludingId(email, id);
+        return count != null && count > 0;
+    }
+
+    /**
      * Tìm tất cả tài khoản admin bao gồm cả đã xóa mềm
      */
     @Query(value = "SELECT * FROM taikhoanadmin", nativeQuery = true)
