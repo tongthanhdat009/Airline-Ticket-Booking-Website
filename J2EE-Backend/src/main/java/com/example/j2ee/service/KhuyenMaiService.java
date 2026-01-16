@@ -2,6 +2,9 @@ package com.example.j2ee.service;
 
 import com.example.j2ee.dto.khuyenmai.ApplyCouponRequest;
 import com.example.j2ee.dto.khuyenmai.ApplyCouponResponse;
+import com.example.j2ee.dto.khuyenmai.CreateKhuyenMaiRequest;
+import com.example.j2ee.dto.khuyenmai.KhuyenMaiResponse;
+import com.example.j2ee.dto.khuyenmai.UpdateKhuyenMaiRequest;
 import com.example.j2ee.model.DatCho;
 import com.example.j2ee.model.KhuyenMai;
 import com.example.j2ee.model.KhuyenMaiDatCho;
@@ -19,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Service xử lý khuyến mãi với:
@@ -262,5 +266,254 @@ public class KhuyenMaiService {
         return datCho.getDanhSachKhuyenMai().stream()
                 .map(KhuyenMaiDatCho::getSoTienGiam)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    // ==================== CRUD METHODS ====================
+
+    /**
+     * Lấy tất cả khuyến mãi (chỉ những cái chưa bị xóa mềm)
+     */
+    public List<KhuyenMaiResponse> findAll() {
+        return khuyenMaiRepository.findAll().stream()
+                .map(KhuyenMaiResponse::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Lấy khuyến mãi theo ID
+     */
+    public KhuyenMaiResponse findById(Integer id) {
+        KhuyenMai khuyenMai = khuyenMaiRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Khuyến mãi không tồn tại"));
+        return KhuyenMaiResponse.fromEntity(khuyenMai);
+    }
+
+    /**
+     * Tạo khuyến mãi mới
+     */
+    @Transactional
+    public KhuyenMaiResponse create(CreateKhuyenMaiRequest request) {
+        // Validate uniqueness của maKM và tenKhuyenMai
+        validateUniquenessForCreate(request.getMaKM(), request.getTenKhuyenMai());
+
+        // Validate số lượng > 0 nếu có cung cấp
+        if (request.getSoLuong() != null && request.getSoLuong() <= 0) {
+            throw new IllegalArgumentException("Số lượng phải lớn hơn 0");
+        }
+
+        // Validate các giá trị >= 0
+        if (request.getGiaTriGiam().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Giá trị giảm phải lớn hơn 0");
+        }
+
+        if (request.getGiaTriToiThieu() != null && request.getGiaTriToiThieu().compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Giá trị tối thiểu không được âm");
+        }
+
+        if (request.getGiaTriToiDa() != null && request.getGiaTriToiDa().compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Giá trị tối đa không được âm");
+        }
+
+        // Validate date range
+        if (request.getNgayKetThuc().isBefore(request.getNgayBatDau()) ||
+            request.getNgayKetThuc().isEqual(request.getNgayBatDau())) {
+            throw new IllegalArgumentException("Ngày kết thúc phải sau ngày bắt đầu");
+        }
+
+        // Tạo entity
+        KhuyenMai khuyenMai = new KhuyenMai();
+        khuyenMai.setMaKM(request.getMaKM());
+        khuyenMai.setTenKhuyenMai(request.getTenKhuyenMai());
+        khuyenMai.setMoTa(request.getMoTa());
+        khuyenMai.setLoaiKhuyenMai(request.getLoaiKhuyenMai());
+        khuyenMai.setGiaTriGiam(request.getGiaTriGiam());
+        khuyenMai.setGiaTriToiThieu(request.getGiaTriToiThieu());
+        khuyenMai.setGiaTriToiDa(request.getGiaTriToiDa());
+        khuyenMai.setSoLuong(request.getSoLuong());
+        khuyenMai.setSoLuongDaDuocDung(0);
+        khuyenMai.setNgayBatDau(request.getNgayBatDau());
+        khuyenMai.setNgayKetThuc(request.getNgayKetThuc());
+        khuyenMai.setTrangThai(request.getTrangThai());
+        khuyenMai.setNgayTao(LocalDateTime.now());
+        khuyenMai.setDaXoa(false);
+
+        KhuyenMai saved = khuyenMaiRepository.save(khuyenMai);
+        log.info("Đã tạo khuyến mãi mới: {}", saved.getMaKM());
+
+        return KhuyenMaiResponse.fromEntity(saved);
+    }
+
+    /**
+     * Cập nhật khuyến mãi
+     * Chỉ cho phép cập nhật khi trangThai = INACTIVE
+     */
+    @Transactional
+    public KhuyenMaiResponse update(Integer id, UpdateKhuyenMaiRequest request) {
+        KhuyenMai existing = khuyenMaiRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Khuyến mãi không tồn tại"));
+
+        // Chỉ cho phép cập nhật khi trạng thái là INACTIVE
+        if (!"INACTIVE".equals(existing.getTrangThai())) {
+            throw new IllegalArgumentException("Chỉ có thể cập nhật khuyến mãi khi trạng thái là INACTIVE");
+        }
+
+        // Validate uniqueness của maKM và tenKhuyenMai (loại trừ bản thân)
+        validateUniquenessForUpdate(id, request.getMaKM(), request.getTenKhuyenMai());
+
+        // Validate số lượng > 0 nếu có cung cấp
+        if (request.getSoLuong() != null && request.getSoLuong() <= 0) {
+            throw new IllegalArgumentException("Số lượng phải lớn hơn 0");
+        }
+
+        // Validate các giá trị >= 0
+        if (request.getGiaTriGiam().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Giá trị giảm phải lớn hơn 0");
+        }
+
+        if (request.getGiaTriToiThieu() != null && request.getGiaTriToiThieu().compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Giá trị tối thiểu không được âm");
+        }
+
+        if (request.getGiaTriToiDa() != null && request.getGiaTriToiDa().compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Giá trị tối đa không được âm");
+        }
+
+        // Validate date range
+        if (request.getNgayKetThuc().isBefore(request.getNgayBatDau()) ||
+            request.getNgayKetThuc().isEqual(request.getNgayBatDau())) {
+            throw new IllegalArgumentException("Ngày kết thúc phải sau ngày bắt đầu");
+        }
+
+        // Cập nhật thông tin
+        existing.setMaKM(request.getMaKM());
+        existing.setTenKhuyenMai(request.getTenKhuyenMai());
+        existing.setMoTa(request.getMoTa());
+        existing.setLoaiKhuyenMai(request.getLoaiKhuyenMai());
+        existing.setGiaTriGiam(request.getGiaTriGiam());
+        existing.setGiaTriToiThieu(request.getGiaTriToiThieu());
+        existing.setGiaTriToiDa(request.getGiaTriToiDa());
+        existing.setSoLuong(request.getSoLuong());
+        existing.setNgayBatDau(request.getNgayBatDau());
+        existing.setNgayKetThuc(request.getNgayKetThuc());
+        existing.setTrangThai(request.getTrangThai());
+
+        KhuyenMai updated = khuyenMaiRepository.save(existing);
+        log.info("Đã cập nhật khuyến mãi: {}", updated.getMaKM());
+
+        return KhuyenMaiResponse.fromEntity(updated);
+    }
+
+    /**
+     * Xóa mềm khuyến mãi
+     */
+    @Transactional
+    public void delete(Integer id) {
+        KhuyenMai khuyenMai = khuyenMaiRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Khuyến mãi không tồn tại"));
+
+        // Không cho phép xóa nếu khuyến mãi đang được sử dụng
+        if ("ACTIVE".equals(khuyenMai.getTrangThai()) &&
+            khuyenMai.getSoLuongDaDuocDung() != null &&
+            khuyenMai.getSoLuongDaDuocDung() > 0) {
+            throw new IllegalArgumentException("Không thể xóa khuyến mãi đang được sử dụng");
+        }
+
+        khuyenMaiRepository.delete(khuyenMai); // Sẽ trigger @SQLDelete
+        log.info("Đã xóa mềm khuyến mãi: {}", khuyenMai.getMaKM());
+    }
+
+    /**
+     * Khôi phục khuyến mãi đã xóa mềm
+     */
+    @Transactional
+    public KhuyenMaiResponse restore(Integer id) {
+        // Tìm trong các bản ghi đã xóa
+        KhuyenMai deleted = khuyenMaiRepository.findDeletedById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Khuyến mãi đã xóa không tồn tại"));
+
+        // Khôi phục tên gốc (loại bỏ suffix _deleted_)
+        String originalMaKM = deleted.getMaKM().replaceFirst("_deleted_\\d+$", "");
+        String originalTen = deleted.getTenKhuyenMai().replaceFirst("_deleted_\\d+$", "");
+
+        // Kiểm tra uniqueness sau khi khôi phục
+        if (khuyenMaiRepository.findByMaKM(originalMaKM).isPresent()) {
+            throw new IllegalArgumentException("Mã khuyến mãi " + originalMaKM + " đã tồn tại. Không thể khôi phục.");
+        }
+
+        // Restore trực tiếp bằng native query
+        khuyenMaiRepository.restoreById(id);
+
+        // Load lại entity sau khi restore
+        KhuyenMai restored = khuyenMaiRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Lỗi khi khôi phục khuyến mãi"));
+
+        // Cập nhật lại tên gốc
+        restored.setMaKM(originalMaKM);
+        restored.setTenKhuyenMai(originalTen);
+        khuyenMaiRepository.save(restored);
+
+        log.info("Đã khôi phục khuyến mãi: {}", restored.getMaKM());
+
+        return KhuyenMaiResponse.fromEntity(restored);
+    }
+
+    /**
+     * Cập nhật trạng thái khuyến mãi (ACTIVE/INACTIVE)
+     */
+    @Transactional
+    public KhuyenMaiResponse updateStatus(Integer id, String newStatus) {
+        KhuyenMai khuyenMai = khuyenMaiRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Khuyến mãi không tồn tại"));
+
+        // Validate status
+        if (!"ACTIVE".equals(newStatus) && !"INACTIVE".equals(newStatus) && !"EXPIRED".equals(newStatus)) {
+            throw new IllegalArgumentException("Trạng thái không hợp lệ. Phải là ACTIVE, INACTIVE hoặc EXPIRED");
+        }
+
+        khuyenMai.setTrangThai(newStatus);
+        KhuyenMai updated = khuyenMaiRepository.save(khuyenMai);
+
+        log.info("Đã cập nhật trạng thái khuyến mãi {} thành {}", updated.getMaKM(), newStatus);
+
+        return KhuyenMaiResponse.fromEntity(updated);
+    }
+
+    // ==================== VALIDATION HELPER METHODS ====================
+
+    /**
+     * Validate uniqueness khi tạo mới
+     */
+    private void validateUniquenessForCreate(String maKM, String tenKhuyenMai) {
+        if (khuyenMaiRepository.findByMaKMIncludingDeleted(maKM).isPresent()) {
+            throw new IllegalArgumentException("Mã khuyến mãi '" + maKM + "' đã tồn tại");
+        }
+
+        // Kiểm tra tên khuyến mãi (có thể trùng tên nhưng nên cảnh báo)
+        khuyenMaiRepository.findAllIncludingDeleted().stream()
+                .filter(km -> km.getTenKhuyenMai().equals(tenKhuyenMai))
+                .findFirst()
+                .ifPresent(km -> {
+                    throw new IllegalArgumentException("Tên khuyến mãi '" + tenKhuyenMai + "' đã tồn tại");
+                });
+    }
+
+    /**
+     * Validate uniqueness khi cập nhật (loại trừ chính bản thân)
+     */
+    private void validateUniquenessForUpdate(Integer id, String maKM, String tenKhuyenMai) {
+        khuyenMaiRepository.findByMaKMIncludingDeleted(maKM).ifPresent(km -> {
+            if (km.getMaKhuyenMai() != id.intValue()) {
+                throw new IllegalArgumentException("Mã khuyến mãi '" + maKM + "' đã tồn tại");
+            }
+        });
+
+        // Kiểm tra tên khuyến mãi
+        khuyenMaiRepository.findAllIncludingDeleted().stream()
+                .filter(km -> km.getTenKhuyenMai().equals(tenKhuyenMai))
+                .filter(km -> km.getMaKhuyenMai() != id.intValue())
+                .findFirst()
+                .ifPresent(km -> {
+                    throw new IllegalArgumentException("Tên khuyến mãi '" + tenKhuyenMai + "' đã tồn tại");
+                });
     }
 }

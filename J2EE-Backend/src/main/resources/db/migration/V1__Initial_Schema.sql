@@ -269,7 +269,7 @@ CREATE TABLE `refreshtoken` (
 -- Bảng khuyến mãi
 CREATE TABLE `khuyenmai` (
   `makhuyenmai` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `makm` VARCHAR(20) UNIQUE NOT NULL,
+  `makm` VARCHAR(50) UNIQUE NOT NULL,
   `tenkhuyenmai` VARCHAR(255) NOT NULL,
   `mota` VARCHAR(500),
   `loaikhuyenmai` VARCHAR(50) NOT NULL COMMENT 'PERCENT: phần trăm, FIXED: số tiền cố định',

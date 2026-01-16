@@ -1,87 +1,56 @@
-import React, { useState } from 'react';
-import { FaPlus, FaSearch, FaEdit, FaTrash, FaToggleOn, FaToggleOff, FaTags, FaTimes } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaPlus, FaSearch, FaEdit, FaTrash, FaToggleOn, FaToggleOff, FaTags } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
+import Toast from '../../components/common/Toast';
+import ConfirmDialog from '../../components/common/ConfirmDialog';
+import KhuyenMaiModal from '../../components/QuanLy/QuanLyKhuyenMai/KhuyenMaiModal';
+import QLKhuyenMaiService from '../../services/QLKhuyenMaiService';
 
 const QuanLyKhuyenMai = () => {
     const [search, setSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedPromotion, setSelectedPromotion] = useState(null);
+    const [promotions, setPromotions] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [promotionToDelete, setPromotionToDelete] = useState(null);
     const itemsPerPage = 5;
 
-    // Dữ liệu mẫu hard code
-    const [promotions, setPromotions] = useState([
-        {
-            maKhuyenMai: 'KM001',
-            tenKhuyenMai: 'Giảm giá 20% mùa hè',
-            maGiamGia: 'SUMMER20',
-            loaiKhuyenMai: 'PHAN_TRAM',
-            giaTriGiam: 20,
-            giaTriDonHangToiThieu: 2000000,
-            soLuong: 100,
-            soLuongDaSuDung: 35,
-            ngayBatDau: '2025-06-01',
-            ngayKetThuc: '2025-08-31',
-            trangThai: 'ACTIVE'
-        },
-        {
-            maKhuyenMai: 'KM002',
-            tenKhuyenMai: 'Giảm 500k cho vé quốc tế',
-            maGiamGia: 'INTL500',
-            loaiKhuyenMai: 'TIEN_MAT',
-            giaTriGiam: 500000,
-            giaTriDonHangToiThieu: 5000000,
-            soLuong: 50,
-            soLuongDaSuDung: 12,
-            ngayBatDau: '2025-07-01',
-            ngayKetThuc: '2025-12-31',
-            trangThai: 'ACTIVE'
-        },
-        {
-            maKhuyenMai: 'KM003',
-            tenKhuyenMai: 'Vé đi tặng vé về',
-            maGiamGia: 'BUY1GET1',
-            loaiKhuyenMai: 'KHAC',
-            giaTriGiam: 100,
-            giaTriDonHangToiThieu: 3000000,
-            soLuong: 20,
-            soLuongDaSuDung: 8,
-            ngayBatDau: '2025-01-01',
-            ngayKetThuc: '2025-03-31',
-            trangThai: 'INACTIVE'
-        },
-        {
-            maKhuyenMai: 'KM004',
-            tenKhuyenMai: 'Giảm 15% hạng thương gia',
-            maGiamGai: 'BUSINESS15',
-            loaiKhuyenMai: 'PHAN_TRAM',
-            giaTriGiam: 15,
-            giaTriDonHangToiThieu: 10000000,
-            soLuong: 30,
-            soLuongDaSuDung: 5,
-            ngayBatDau: '2025-07-15',
-            ngayKetThuc: '2025-09-15',
-            trangThai: 'ACTIVE'
-        },
-        {
-            maKhuyenMai: 'KM005',
-            tenKhuyenMai: 'Khuyến mãi thành viên mới',
-            maGiamGia: 'NEWUSER',
-            loaiKhuyenMai: 'PHAN_TRAM',
-            giaTriGiam: 10,
-            giaTriDonHangToiThieu: 500000,
-            soLuong: 200,
-            soLuongDaSuDung: 150,
-            ngayBatDau: '2025-01-01',
-            ngayKetThuc: '2025-12-31',
-            trangThai: 'ACTIVE'
+    // Toast functions
+    const showToast = (message, type = 'success') => {
+        setToast({ isVisible: true, message, type });
+    };
+
+    const hideToast = () => {
+        setToast({ ...toast, isVisible: false });
+    };
+
+    // Load promotions from API
+    const loadPromotions = async () => {
+        try {
+            setLoading(true);
+            const data = await QLKhuyenMaiService.getAll();
+            setPromotions(data);
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách khuyến mãi:', error);
+            showToast('Không thể tải danh sách khuyến mãi', 'error');
+        } finally {
+            setLoading(false);
         }
-    ]);
+    };
+
+    // Load promotions from API
+    useEffect(() => {
+        loadPromotions();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const filteredPromotions = promotions.filter(km =>
         km.tenKhuyenMai?.toLowerCase().includes(search.toLowerCase()) ||
-        km.maGiamGia?.toLowerCase().includes(search.toLowerCase()) ||
-        km.maKhuyenMai?.toLowerCase().includes(search.toLowerCase())
+        km.maKM?.toLowerCase().includes(search.toLowerCase()) ||
+        km.maKhuyenMai?.toString().includes(search.toLowerCase())
     );
 
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -106,17 +75,42 @@ const QuanLyKhuyenMai = () => {
         setSelectedPromotion(null);
     };
 
-    const handleDelete = (maKhuyenMai) => {
-        if (window.confirm('Bạn có chắc chắn muốn xóa khuyến mãi này?')) {
-            setPromotions(promotions.filter(km => km.maKhuyenMai !== maKhuyenMai));
+    const handleDelete = async (maKhuyenMai) => {
+        setPromotionToDelete(maKhuyenMai);
+        setShowDeleteConfirm(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!promotionToDelete) return;
+
+        try {
+            await QLKhuyenMaiService.delete(promotionToDelete);
+            showToast('Xóa khuyến mãi thành công');
+            loadPromotions();
+        } catch (error) {
+            console.error('Lỗi khi xóa khuyến mãi:', error);
+            showToast(error.response?.data?.message || 'Không thể xóa khuyến mãi', 'error');
+        } finally {
+            setShowDeleteConfirm(false);
+            setPromotionToDelete(null);
         }
     };
 
-    const handleToggleStatus = (maKhuyenMai, currentStatus) => {
+    const cancelDelete = () => {
+        setShowDeleteConfirm(false);
+        setPromotionToDelete(null);
+    };
+
+    const handleToggleStatus = async (maKhuyenMai, currentStatus) => {
         const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
-        setPromotions(promotions.map(km =>
-            km.maKhuyenMai === maKhuyenMai ? { ...km, trangThai: newStatus } : km
-        ));
+        try {
+            await QLKhuyenMaiService.updateStatus(maKhuyenMai, newStatus);
+            showToast(`Đã ${newStatus === 'ACTIVE' ? 'kích hoạt' : 'vô hiệu hóa'} khuyến mãi`);
+            loadPromotions();
+        } catch (error) {
+            console.error('Lỗi khi cập nhật trạng thái:', error);
+            showToast(error.response?.data?.message || 'Không thể cập nhật trạng thái', 'error');
+        }
     };
 
     const formatCurrency = (value) => {
@@ -125,17 +119,27 @@ const QuanLyKhuyenMai = () => {
     };
 
     const formatDate = (dateString) => {
+        if (!dateString) return '';
         return new Date(dateString).toLocaleDateString('vi-VN');
     };
 
     const getLoaiKhuyenMaiText = (loai) => {
         switch (loai) {
-            case 'PHAN_TRAM': return 'Phần trăm';
-            case 'TIEN_MAT': return 'Tiền mặt';
-            case 'KHAC': return 'Khác';
+            case 'PERCENT': return 'Phần trăm';
+            case 'FIXED': return 'Tiền mặt';
             default: return loai;
         }
     };
+
+    if (loading) {
+        return (
+            <Card title="Quản lý khuyến mãi">
+                <div className="flex justify-center items-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
+                </div>
+            </Card>
+        );
+    }
 
     return (
         <Card title="Quản lý khuyến mãi">
@@ -166,9 +170,9 @@ const QuanLyKhuyenMai = () => {
                     <table className="w-full text-sm">
                         <thead className="bg-gradient-to-r from-pink-600 to-rose-600 text-white">
                             <tr>
-                                <th className="px-6 py-4 text-left font-semibold">Mã KM</th>
+                                <th className="px-6 py-4 text-left font-semibold">ID</th>
                                 <th className="px-6 py-4 text-left font-semibold">Tên khuyến mãi</th>
-                                <th className="px-6 py-4 text-left font-semibold">Mã giảm giá</th>
+                                <th className="px-6 py-4 text-left font-semibold">Mã KM</th>
                                 <th className="px-6 py-4 text-left font-semibold">Loại</th>
                                 <th className="px-6 py-4 text-left font-semibold">Giá trị giảm</th>
                                 <th className="px-6 py-4 text-center font-semibold">Số lượng</th>
@@ -193,15 +197,15 @@ const QuanLyKhuyenMai = () => {
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-semibold">
-                                                {km.maGiamGia || km.maGiamGai}
+                                                {km.maKM}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-gray-700">{getLoaiKhuyenMaiText(km.loaiKhuyenMai)}</td>
                                         <td className="px-6 py-4 font-semibold text-gray-900">
-                                            {km.loaiKhuyenMai === 'PHAN_TRAM' ? `${km.giaTriGiam}%` : formatCurrency(km.giaTriGiam)}
+                                            {km.loaiKhuyenMai === 'PERCENT' ? `${km.giaTriGiam}%` : formatCurrency(km.giaTriGiam)}
                                         </td>
                                         <td className="px-6 py-4 text-center">
-                                            <span className="text-gray-700">{km.soLuongDaSuDung}/{km.soLuong}</span>
+                                            <span className="text-gray-700">{km.soLuongDaDuocDung || 0}/{km.soLuong || '∞'}</span>
                                         </td>
                                         <td className="px-6 py-4 text-center text-gray-700">{formatDate(km.ngayBatDau)}</td>
                                         <td className="px-6 py-4 text-center text-gray-700">{formatDate(km.ngayKetThuc)}</td>
@@ -234,8 +238,13 @@ const QuanLyKhuyenMai = () => {
                                             <div className="flex justify-center items-center gap-2">
                                                 <button
                                                     onClick={() => handleOpenModalForEdit(km)}
-                                                    className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
-                                                    title="Chỉnh sửa"
+                                                    disabled={km.trangThai !== 'INACTIVE'}
+                                                    className={`p-2 rounded-lg transition-colors ${
+                                                        km.trangThai === 'INACTIVE'
+                                                            ? 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                                                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                    }`}
+                                                    title={km.trangThai === 'INACTIVE' ? 'Chỉnh sửa' : 'Chỉ sửa khi INACTIVE'}
                                                 >
                                                     <FaEdit />
                                                 </button>
@@ -316,229 +325,30 @@ const QuanLyKhuyenMai = () => {
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
                     promotion={selectedPromotion}
-                    onSave={(data) => {
-                        if (selectedPromotion) {
-                            setPromotions(promotions.map(km => km.maKhuyenMai === selectedPromotion.maKhuyenMai ? data : km));
-                        } else {
-                            setPromotions([...promotions, { ...data, maKhuyenMai: `KM00${promotions.length + 1}` }]);
-                        }
+                    onSave={() => {
+                        loadPromotions();
                         handleCloseModal();
                     }}
+                    showToast={showToast}
                 />
             )}
+            <Toast
+                isVisible={toast.isVisible}
+                message={toast.message}
+                type={toast.type}
+                onClose={hideToast}
+            />
+            <ConfirmDialog
+                isVisible={showDeleteConfirm}
+                title="Xác nhận xóa"
+                message="Bạn có chắc chắn muốn xóa khuyến mãi này? Hành động này không thể hoàn tác."
+                type="danger"
+                confirmText="Xóa"
+                cancelText="Hủy"
+                onConfirm={confirmDelete}
+                onCancel={cancelDelete}
+            />
         </Card>
-    );
-};
-
-// Modal Component
-const KhuyenMaiModal = ({ isOpen, onClose, onSave, promotion }) => {
-    const [formData, setFormData] = useState({
-        tenKhuyenMai: '',
-        maGiamGia: '',
-        loaiKhuyenMai: 'PHAN_TRAM',
-        giaTriGiam: '',
-        giaTriDonHangToiThieu: '',
-        soLuong: '',
-        ngayBatDau: '',
-        ngayKetThuc: '',
-        trangThai: 'ACTIVE'
-    });
-
-    React.useEffect(() => {
-        if (isOpen && promotion) {
-            setFormData(promotion);
-        } else if (isOpen) {
-            setFormData({
-                tenKhuyenMai: '',
-                maGiamGia: '',
-                loaiKhuyenMai: 'PHAN_TRAM',
-                giaTriGiam: '',
-                giaTriDonHangToiThieu: '',
-                soLuong: '',
-                ngayBatDau: '',
-                ngayKetThuc: '',
-                trangThai: 'ACTIVE'
-            });
-        }
-    }, [isOpen, promotion]);
-
-    if (!isOpen) return null;
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        onSave(formData);
-    };
-
-    return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                <div className="bg-gradient-to-r from-pink-600 to-rose-600 text-white p-6 rounded-t-xl sticky top-0">
-                    <div className="flex justify-between items-center">
-                        <h2 className="text-2xl font-bold">{promotion ? 'Cập nhật khuyến mãi' : 'Thêm khuyến mãi mới'}</h2>
-                        <button onClick={onClose} className="text-white hover:text-gray-200 transition-colors">
-                            <FaTimes size={24} />
-                        </button>
-                    </div>
-                </div>
-
-                <form onSubmit={handleSubmit} className="p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">
-                                Tên khuyến mãi <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                name="tenKhuyenMai"
-                                value={formData.tenKhuyenMai}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent shadow-sm"
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">
-                                Mã giảm giá <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                name="maGiamGia"
-                                value={formData.maGiamGia}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent shadow-sm"
-                                placeholder="VD: SUMMER20"
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">
-                                Loại khuyến mãi <span className="text-red-500">*</span>
-                            </label>
-                            <select
-                                name="loaiKhuyenMai"
-                                value={formData.loaiKhuyenMai}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent shadow-sm"
-                                required
-                            >
-                                <option value="PHAN_TRAM">Phần trăm</option>
-                                <option value="TIEN_MAT">Tiền mặt</option>
-                                <option value="KHAC">Khác</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">
-                                Giá trị giảm <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="number"
-                                name="giaTriGiam"
-                                value={formData.giaTriGiam}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent shadow-sm"
-                                placeholder={formData.loaiKhuyenMai === 'PHAN_TRAM' ? 'VD: 20' : 'VD: 500000'}
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">
-                                Giá trị đơn hàng tối thiểu
-                            </label>
-                            <input
-                                type="number"
-                                name="giaTriDonHangToiThieu"
-                                value={formData.giaTriDonHangToiThieu}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent shadow-sm"
-                                placeholder="VD: 2000000"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">
-                                Số lượng <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="number"
-                                name="soLuong"
-                                value={formData.soLuong}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent shadow-sm"
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">
-                                Ngày bắt đầu <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="date"
-                                name="ngayBatDau"
-                                value={formData.ngayBatDau}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent shadow-sm"
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">
-                                Ngày kết thúc <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="date"
-                                name="ngayKetThuc"
-                                value={formData.ngayKetThuc}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent shadow-sm"
-                                required
-                            />
-                        </div>
-
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-bold text-gray-700 mb-2">
-                                Trạng thái
-                            </label>
-                            <select
-                                name="trangThai"
-                                value={formData.trangThai}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent shadow-sm"
-                            >
-                                <option value="ACTIVE">Hoạt động</option>
-                                <option value="INACTIVE">Vô hiệu</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold transition-colors"
-                        >
-                            Hủy
-                        </button>
-                        <button
-                            type="submit"
-                            className="px-6 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-lg hover:from-pink-600 hover:to-rose-600 font-semibold transition-all shadow-lg"
-                        >
-                            {promotion ? 'Cập nhật' : 'Thêm mới'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
     );
 };
 
