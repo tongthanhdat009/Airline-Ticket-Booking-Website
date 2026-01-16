@@ -167,17 +167,24 @@ public class ChiTietGheService {
 
     /**
      * Tạo sơ đồ ghế tự động cho máy bay
-     * Tạo ghế dựa trên cấu hình hàng và cột
+     * Chỉ thêm ghế mới vào vị trí trống, không ghi đè ghế đã có
      */
     @Transactional
     public List<ChiTietGhe> autoGenerateSeatLayout(int maMayBay, List<SeatConfig> seatConfigs) {
         MayBay mayBay = mayBayRepository.findById(maMayBay)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy máy bay với mã: " + maMayBay));
 
-        // Xóa tất cả ghế cũ
-        deleteAllSeatsByAircraft(maMayBay);
+        // Lấy danh sách ghế hiện tại
+        List<ChiTietGhe> existingSeats = chiTietGheRepository.findByMayBay_MaMayBay(maMayBay);
+
+        // Tạo set chứa các vị trí đã có (row-col)
+        java.util.Set<String> existingPositions = existingSeats.stream()
+                .map(seat -> seat.getHang() + "-" + seat.getCot())
+                .collect(java.util.stream.Collectors.toSet());
 
         List<ChiTietGhe> createdSeats = new java.util.ArrayList<>();
+        int duplicateCount = 0;
+        int skippedCount = 0;
 
         for (SeatConfig config : seatConfigs) {
             HangVe hangVe = hangVeRepository.findById(config.getMaHangVe())
@@ -190,6 +197,15 @@ public class ChiTietGheService {
 
             for (int row = startRow; row <= endRow; row++) {
                 for (String col : columns) {
+                    String positionKey = row + "-" + col;
+
+                    // Kiểm tra xem vị trí này đã có ghế chưa
+                    if (existingPositions.contains(positionKey)) {
+                        duplicateCount++;
+                        continue; // Bỏ qua vị trí đã có ghế
+                    }
+
+                    // Chỉ tạo ghế mới cho vị trí trống
                     ChiTietGhe ghe = new ChiTietGhe();
                     ghe.setMayBay(mayBay);
                     ghe.setHangVe(hangVe);
@@ -198,7 +214,10 @@ public class ChiTietGheService {
                     ghe.setHang(row);
                     ghe.setCot(col);
 
-                    createdSeats.add(chiTietGheRepository.save(ghe));
+                    ChiTietGhe saved = chiTietGheRepository.save(ghe);
+                    createdSeats.add(saved);
+                    existingPositions.add(positionKey); // Thêm vào set để tránh trùng lặp trong cùng batch
+                    skippedCount++;
                 }
             }
         }

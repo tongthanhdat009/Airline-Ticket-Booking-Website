@@ -57,6 +57,11 @@ public interface GiaChuyenBayRepository extends JpaRepository<GiaChuyenBay, Inte
      */
     GiaChuyenBay findByTuyenBay_MaTuyenBayAndHangVe_MaHangVe(int maTuyenBay, int maHangVe);
 
+    /**
+     * Tìm tất cả giá chuyến bay theo hạng vé
+     */
+    List<GiaChuyenBay> findByHangVe_MaHangVe(int maHangVe);
+
     @Query(value = """
         SELECT gcb.*
         FROM hangve hv

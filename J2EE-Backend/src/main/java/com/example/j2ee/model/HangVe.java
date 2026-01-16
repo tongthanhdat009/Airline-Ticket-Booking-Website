@@ -16,7 +16,7 @@ import java.util.Set;
 @Getter
 @Setter
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-@SQLDelete(sql = "UPDATE hangve SET da_xoa = 1, deleted_at = NOW() WHERE mahangve = ?")
+@SQLDelete(sql = "UPDATE hangve SET da_xoa = 1, deleted_at = NOW(), tenhangve = CONCAT(tenhangve, '_deleted_', mahangve) WHERE mahangve = ?")
 @SQLRestriction("da_xoa = 0")
 public class HangVe {
 

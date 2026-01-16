@@ -29,7 +29,7 @@ const SeatLayoutEditor = ({ maMayBay, onClose, onSave }) => {
             setLoading(true);
             const [seatsRes, hangVeRes] = await Promise.all([
                 SoDoGheService.getSeatsByAircraft(maMayBay),
-                QLHangVeService.getAll()
+                QLHangVeService.getAllHangVeAdmin()
             ]);
             setSeats(seatsRes.data || []);
             setHangVeList(hangVeRes.data || []);
@@ -91,13 +91,25 @@ const SeatLayoutEditor = ({ maMayBay, onClose, onSave }) => {
 
     const handleAutoGenerate = async () => {
         try {
-            await SoDoGheService.autoGenerateSeats(maMayBay, [autoGenConfig]);
+            const response = await SoDoGheService.autoGenerateSeats(maMayBay, [autoGenConfig]);
+
+            // Kiểm tra xem có ghế nào bị bỏ qua không
+            const createdCount = response.data?.length || 0;
+            const totalRequested = (autoGenConfig.endRow - autoGenConfig.startRow + 1) * autoGenConfig.columns.length;
+
+            if (createdCount < totalRequested) {
+                const skipped = totalRequested - createdCount;
+                alert(`Đã tạo ${createdCount} ghế thành công!\n⚠️ ${skipped} vị trí đã có ghế nên bị bỏ qua.`);
+            } else {
+                alert(`Tạo ${createdCount} ghế thành công!`);
+            }
+
             await loadData();
             setShowAutoGenerate(false);
-            alert('Tự động tạo sơ đồ ghế thành công!');
         } catch (error) {
             console.error('Lỗi khi tự động tạo sơ đồ ghế:', error);
-            alert(error.response?.data?.message || 'Không thể tạo sơ đồ ghế');
+            const errorMsg = error.response?.data?.message || error.response?.data?.error || 'Không thể tạo sơ đồ ghế';
+            alert(errorMsg);
         }
     };
 
@@ -325,6 +337,25 @@ const SeatGridView = ({ seats, hangVeList, onSeatClick, onDeleteSeat, getHangVeN
     const sortedRows = Object.keys(seatMap).sort((a, b) => a - b);
     const sortedColumns = Array.from(columns).sort();
 
+    // Tạo màu sắc cho từng hạng vé
+    const getHangVeColor = (maHangVe) => {
+        const colors = [
+            'bg-purple-100 border-purple-300',
+            'bg-pink-100 border-pink-300',
+            'bg-indigo-100 border-indigo-300',
+            'bg-teal-100 border-teal-300',
+            'bg-orange-100 border-orange-300',
+            'bg-cyan-100 border-cyan-300',
+            'bg-rose-100 border-rose-300',
+            'bg-amber-100 border-amber-300'
+        ];
+        const index = hangVeList.findIndex(h => h.maHangVe === maHangVe);
+        return colors[index % colors.length] || 'bg-gray-100 border-gray-300';
+    };
+
+    // Lấy danh sách các hạng vé đang được sử dụng
+    const usedHangVe = [...new Set(seats.map(s => s.maHangVe))];
+
     return (
         <div className="bg-white rounded-lg shadow p-6">
             {seats.length === 0 ? (
@@ -334,49 +365,74 @@ const SeatGridView = ({ seats, hangVeList, onSeatClick, onDeleteSeat, getHangVeN
                     <p className="text-gray-400 text-sm mt-2">Nhấn "Tự động tạo" để tạo sơ đồ ghế nhanh chóng</p>
                 </div>
             ) : (
-                <div className="overflow-x-auto">
-                    <div className="min-w-max">
-                        {sortedRows.map(row => (
-                            <div key={row} className="flex items-center gap-2 mb-2">
-                                <div className="w-20 flex-shrink-0 text-sm font-semibold text-gray-600">Hàng {row}</div>
-                                {sortedColumns.map(col => {
-                                    const seat = seatMap[row]?.[col];
+                <>
+                    {/* Legend cho hạng vé */}
+                    {usedHangVe.length > 0 && (
+                        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                            <p className="text-xs font-bold text-gray-700 mb-2">Phân loại theo hạng vé:</p>
+                            <div className="flex flex-wrap gap-2">
+                                {usedHangVe.map(maHangVe => {
+                                    const hangVe = hangVeList.find(h => h.maHangVe === maHangVe);
+                                    if (!hangVe) return null;
                                     return (
-                                        <div key={`${row}-${col}`} className="w-16 flex-shrink-0">
-                                            {seat ? (
-                                                <div
-                                                    className={`relative group cursor-pointer border-2 rounded-lg p-2 transition-all ${
-                                                        seat.viTriGhe === 'CỬA SỜ' ? 'bg-blue-100 border-blue-300' :
-                                                        seat.viTriGhe === 'LỐI ĐI' ? 'bg-green-100 border-green-300' :
-                                                        'bg-gray-100 border-gray-300'
-                                                    } hover:shadow-md`}
-                                                    onClick={() => onSeatClick(seat)}
-                                                >
-                                                    <div className="flex flex-col items-center">
-                                                        <FaChair className="text-lg" />
-                                                        <span className="text-xs font-bold mt-1">{seat.soGhe}</span>
-                                                        <span className="text-xs text-gray-600">{getHangVeName(seat.maHangVe)}</span>
-                                                    </div>
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            onDeleteSeat(seat.maGhe);
-                                                        }}
-                                                        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-600"
-                                                    >
-                                                        <FaTimes size={12} />
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                <div className="w-16 h-16 border-2 border-dashed border-gray-200 rounded-lg"></div>
-                                            )}
+                                        <div key={maHangVe} className={`px-3 py-1 rounded-full text-xs font-semibold border-2 ${getHangVeColor(maHangVe)}`}>
+                                            {hangVe.tenHangVe}
                                         </div>
                                     );
                                 })}
                             </div>
-                        ))}
+                        </div>
+                    )}
+
+                    <div className="overflow-x-auto">
+                        <div className="min-w-max">
+                            {sortedRows.map(row => (
+                                <div key={row} className="flex items-center gap-2 mb-2">
+                                    <div className="w-20 flex-shrink-0 text-sm font-semibold text-gray-600">Hàng {row}</div>
+                                    {sortedColumns.map(col => {
+                                        const seat = seatMap[row]?.[col];
+                                        return (
+                                            <div key={`${row}-${col}`} className="w-16 flex-shrink-0">
+                                                {seat ? (
+                                                    <div
+                                                        className={`relative group cursor-pointer border-2 rounded-lg p-2 transition-all ${getHangVeColor(seat.maHangVe)} hover:shadow-md`}
+                                                        onClick={() => onSeatClick(seat)}
+                                                        title={`${seat.soGhe} - ${getHangVeName(seat.maHangVe)} - ${seat.viTriGhe}`}
+                                                    >
+                                                        <div className="flex flex-col items-center">
+                                                            <FaChair className="text-lg" />
+                                                            <span className="text-xs font-bold mt-1">{seat.soGhe}</span>
+                                                            <span className={`text-xs font-medium ${seat.viTriGhe === 'CỬA SỜ' ? 'text-blue-600' : seat.viTriGhe === 'LỐI ĐI' ? 'text-green-600' : 'text-gray-600'}`}>
+                                                                {getHangVeName(seat.maHangVe)}
+                                                            </span>
+                                                        </div>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                onDeleteSeat(seat.maGhe);
+                                                            }}
+                                                            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-600"
+                                                        >
+                                                            <FaTimes size={12} />
+                                                        </button>
+                                                        {/* Vị trí ghế indicator */}
+                                                        <div className={`absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 rounded-full ${
+                                                            seat.viTriGhe === 'CỬA SỜ' ? 'bg-blue-500' :
+                                                            seat.viTriGhe === 'LỐI ĐI' ? 'bg-green-500' :
+                                                            'bg-gray-400'
+                                                        }`}></div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="w-16 h-16 border-2 border-dashed border-gray-200 rounded-lg"></div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                </>
             )}
         </div>
     );

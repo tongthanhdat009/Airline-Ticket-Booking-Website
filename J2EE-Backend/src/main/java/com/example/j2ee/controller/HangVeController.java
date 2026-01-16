@@ -8,6 +8,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Public API cho hạng vé - chỉ cho phép đọc (read-only)
+ * API này không cần authentication và chỉ trả về các hạng vé đang hoạt động
+ */
 @RestController
 @RequestMapping("/api/hangve")
 public class HangVeController {
@@ -18,12 +22,20 @@ public class HangVeController {
         this.hangVeService = hangVeService;
     }
 
+    /**
+     * Lấy danh sách tất cả hạng vé đang hoạt động
+     * Public API - không cần authentication
+     */
     @GetMapping
     public ResponseEntity<ApiResponse<List<HangVe>>> getAllHangVe() {
         List<HangVe> hangVeList = hangVeService.findAll();
         return ResponseEntity.ok(ApiResponse.success(hangVeList));
     }
 
+    /**
+     * Lấy thông tin hạng vé theo ID
+     * Public API - không cần authentication
+     */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<HangVe>> getHangVeById(@PathVariable int id) {
         try {
@@ -31,41 +43,6 @@ public class HangVeController {
             return ResponseEntity.ok(ApiResponse.success(hangVe));
         } catch (Exception e) {
             return ResponseEntity.status(404)
-                    .body(new ApiResponse<>(false, e.getMessage(), null));
-        }
-    }
-
-    @PostMapping
-    public ResponseEntity<ApiResponse<HangVe>> createHangVe(@RequestBody HangVe hangVe) {
-        try {
-            HangVe createdHangVe = hangVeService.createHangVe(hangVe);
-            return ResponseEntity.ok(ApiResponse.success(createdHangVe));
-        } catch (Exception e) {
-            return ResponseEntity.status(400)
-                    .body(new ApiResponse<>(false, e.getMessage(), null));
-        }
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<HangVe>> updateHangVe(
-            @PathVariable int id,
-            @RequestBody HangVe hangVe) {
-        try {
-            HangVe updatedHangVe = hangVeService.updateHangVe(id, hangVe);
-            return ResponseEntity.ok(ApiResponse.success(updatedHangVe));
-        } catch (Exception e) {
-            return ResponseEntity.status(400)
-                    .body(new ApiResponse<>(false, e.getMessage(), null));
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteHangVe(@PathVariable int id) {
-        try {
-            hangVeService.deleteHangVe(id);
-            return ResponseEntity.ok(ApiResponse.success(null));
-        } catch (Exception e) {
-            return ResponseEntity.status(400)
                     .body(new ApiResponse<>(false, e.getMessage(), null));
         }
     }

@@ -33,10 +33,15 @@ public interface ChiTietGheRepository extends JpaRepository<ChiTietGhe, Integer>
      * Thống kê ghế theo hạng vé cho máy bay
      */
     @Query(value = """
-        SELECT mahangve, COUNT(*) as so_luong 
-        FROM chitietghe 
-        WHERE mamaybay = :maMayBay 
+        SELECT mahangve, COUNT(*) as so_luong
+        FROM chitietghe
+        WHERE mamaybay = :maMayBay
         GROUP BY mahangve
     """, nativeQuery = true)
     List<Object[]> thongKeGheTheoHangVe(@Param("maMayBay") int maMayBay);
+
+    /**
+     * Tìm tất cả ghế theo hạng vé
+     */
+    List<ChiTietGhe> findByHangVe_MaHangVe(int maHangVe);
 }
