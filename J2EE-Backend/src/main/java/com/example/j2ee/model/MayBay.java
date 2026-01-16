@@ -20,7 +20,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-@SQLDelete(sql = "UPDATE maybay SET da_xoa = 1, deleted_at = NOW() WHERE mamaybay = ?")
+@SQLDelete(sql = "UPDATE maybay SET da_xoa = 1, deleted_at = NOW(), sohieu = CONCAT(sohieu, '_deleted_', mamaybay) WHERE mamaybay = ?")
 @SQLRestriction("da_xoa = 0")
 public class MayBay {
 

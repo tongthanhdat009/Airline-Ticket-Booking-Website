@@ -78,6 +78,16 @@ public interface ChiTietChuyenBayRepository extends JpaRepository<ChiTietChuyenB
     @Query("SELECT COUNT(gdd) FROM GheDaDat gdd WHERE gdd.chuyenBay.maChuyenBay = :maChuyenBay")
     long countBookedSeats(@Param("maChuyenBay") int maChuyenBay);
 
+    /**
+     * Kiểm tra xem máy bay có chuyến bay trong tương lai không
+     * Sử dụng cho việc xóa hoặc thay đổi trạng thái máy bay
+     */
+    @Query("SELECT COUNT(c) > 0 FROM ChiTietChuyenBay c " +
+           "WHERE c.mayBay.maMayBay = :maMayBay " +
+           "AND c.ngayDi >= :currentDate")
+    boolean existsByAircraftInFutureFlights(@Param("maMayBay") int maMayBay,
+                                           @Param("currentDate") LocalDate currentDate);
+
     // ==================== SOFT DELETE METHODS ====================
     /**
      * Tìm tất cả chuyến bay bao gồm cả đã xóa mềm

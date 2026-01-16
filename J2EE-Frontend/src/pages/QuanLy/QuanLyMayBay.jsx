@@ -1,88 +1,59 @@
-import React, { useState } from 'react';
-import { FaPlus, FaSearch, FaEdit, FaTrash, FaFighterJet, FaTimes } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaPlus, FaSearch, FaEdit, FaTrash, FaFighterJet, FaTimes, FaChair, FaWrench } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
+import Toast from '../../components/common/Toast';
+import SeatLayoutViewer from '../../components/QuanLy/QuanLyMayBay/SeatLayoutViewer';
+import SeatLayoutEditor from '../../components/QuanLy/QuanLyMayBay/SeatLayoutEditor';
+import * as QLMayBayService from '../../services/QLMayBayService';
 
 const QuanLyMayBay = () => {
     const [search, setSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedAircraft, setSelectedAircraft] = useState(null);
+    const [aircrafts, setAircrafts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [aircraftToDelete, setAircraftToDelete] = useState(null);
+    const [seatViewerAircraft, setSeatViewerAircraft] = useState(null);
+    const [seatEditorAircraft, setSeatEditorAircraft] = useState(null);
     const itemsPerPage = 5;
 
-    // Dữ liệu mẫu hard code
-    const [aircrafts, setAircrafts] = useState([
-        {
-            maMayBay: 'MB001',
-            tenMayBay: 'Boeing 787-9 Dreamliner',
-            loaiMayBay: 'Commercial',
-            hangSanXuat: 'Boeing',
-            namSanXuat: 2019,
-            soGheHangNhat: 24,
-            soGheHangHai: 48,
-            soGhePhoThong: 210,
-            tongSoGhe: 282,
-            trangThai: 'ACTIVE',
-            anhMayBay: '/images/boeing787.jpg'
-        },
-        {
-            maMayBay: 'MB002',
-            tenMayBay: 'Airbus A350-900',
-            loaiMayBay: 'Commercial',
-            hangSanXuat: 'Airbus',
-            namSanXuat: 2020,
-            soGheHangNhat: 32,
-            soGheHangHai: 64,
-            soGhePhoThong: 235,
-            tongSoGhe: 331,
-            trangThai: 'ACTIVE',
-            anhMayBay: '/images/airbus350.jpg'
-        },
-        {
-            maMayBay: 'MB003',
-            tenMayBay: 'Boeing 777-300ER',
-            loaiMayBay: 'Commercial',
-            hangSanXuat: 'Boeing',
-            namSanXuat: 2018,
-            soGheHangNhat: 8,
-            soGheHangHai: 42,
-            soGhePhoThong: 306,
-            tongSoGhe: 356,
-            trangThai: 'ACTIVE',
-            anhMayBay: '/images/boeing777.jpg'
-        },
-        {
-            maMayBay: 'MB004',
-            tenMayBay: 'Airbus A321neo',
-            loaiMayBay: 'Commercial',
-            hangSanXuat: 'Airbus',
-            namSanXuat: 2021,
-            soGheHangNhat: 0,
-            soGheHangHai: 16,
-            soGhePhoThong: 180,
-            tongSoGhe: 196,
-            trangThai: 'ACTIVE',
-            anhMayBay: '/images/airbus321.jpg'
-        },
-        {
-            maMayBay: 'MB005',
-            tenMayBay: 'Boeing 737 MAX 8',
-            loaiMayBay: 'Commercial',
-            hangSanXuat: 'Boeing',
-            namSanXuat: 2022,
-            soGheHangNhat: 0,
-            soGheHangHai: 12,
-            soGhePhoThong: 162,
-            tongSoGhe: 174,
-            trangThai: 'MAINTENANCE',
-            anhMayBay: '/images/boeing737.jpg'
+    // Toast functions
+    const showToast = (message, type = 'success') => {
+        setToast({ isVisible: true, message, type });
+    };
+
+    const hideToast = () => {
+        setToast({ ...toast, isVisible: false });
+    };
+
+    // Load aircrafts from API
+    const loadAircrafts = async () => {
+        try {
+            setLoading(true);
+            const response = await QLMayBayService.getAllMayBay();
+            setAircrafts(response.data || []);
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách máy bay:', error);
+            showToast('Không thể tải danh sách máy bay', 'error');
+        } finally {
+            setLoading(false);
         }
-    ]);
+    };
+
+    useEffect(() => {
+        loadAircrafts();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const filteredAircrafts = aircrafts.filter(mb =>
         mb.tenMayBay?.toLowerCase().includes(search.toLowerCase()) ||
-        mb.hangSanXuat?.toLowerCase().includes(search.toLowerCase()) ||
-        mb.maMayBay?.toLowerCase().includes(search.toLowerCase()) ||
-        mb.loaiMayBay?.toLowerCase().includes(search.toLowerCase())
+        mb.hangMayBay?.toLowerCase().includes(search.toLowerCase()) ||
+        mb.maMayBay?.toString().includes(search.toLowerCase()) ||
+        mb.loaiMayBay?.toLowerCase().includes(search.toLowerCase()) ||
+        mb.soHieu?.toLowerCase().includes(search.toLowerCase())
     );
 
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -107,29 +78,129 @@ const QuanLyMayBay = () => {
         setSelectedAircraft(null);
     };
 
-    const handleDelete = (maMayBay) => {
-        if (window.confirm('Bạn có chắc chắn muốn xóa máy bay này?')) {
-            setAircrafts(aircrafts.filter(mb => mb.maMayBay !== maMayBay));
+    const handleDelete = async (maMayBay) => {
+        setAircraftToDelete(maMayBay);
+        setShowDeleteConfirm(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!aircraftToDelete) return;
+
+        try {
+            await QLMayBayService.deleteMayBay(aircraftToDelete);
+            showToast('Xóa máy bay thành công');
+            loadAircrafts();
+        } catch (error) {
+            console.error('Lỗi khi xóa máy bay:', error);
+            const errorMsg = error.response?.data?.message || error.response?.data?.error || 'Không thể xóa máy bay';
+            showToast(errorMsg, 'error');
+        } finally {
+            setShowDeleteConfirm(false);
+            setAircraftToDelete(null);
+        }
+    };
+
+    const cancelDelete = () => {
+        setShowDeleteConfirm(false);
+        setAircraftToDelete(null);
+    };
+
+    const handleSave = async (data) => {
+        try {
+            if (selectedAircraft) {
+                // Update existing aircraft
+                await QLMayBayService.updateMayBay(selectedAircraft.maMayBay, data);
+                showToast('Cập nhật máy bay thành công');
+            } else {
+                // Create new aircraft
+                await QLMayBayService.addMayBay(data);
+                showToast('Thêm máy bay thành công');
+            }
+            loadAircrafts();
+            handleCloseModal();
+        } catch (error) {
+            console.error('Lỗi khi lưu máy bay:', error);
+            const errorMsg = error.response?.data?.message || error.response?.data?.error || 'Không thể lưu máy bay';
+            showToast(errorMsg, 'error');
+            throw error; // Re-throw to prevent modal from closing
+        }
+    };
+
+    const handleToggleStatus = async (maMayBay, currentStatus) => {
+        const newStatus = currentStatus === 'Hoạt động' ? 'Bảo trì' :
+                         currentStatus === 'Bảo trì' ? 'Vô hiệu' : 'Hoạt động';
+        try {
+            await QLMayBayService.updateTrangThaiMayBay(maMayBay, newStatus);
+            showToast(`Đã chuyển sang trạng thái ${newStatus}`);
+            loadAircrafts();
+        } catch (error) {
+            console.error('Lỗi khi cập nhật trạng thái:', error);
+            const errorMsg = error.response?.data?.message || error.response?.data?.error || 'Không thể cập nhật trạng thái';
+            showToast(errorMsg, 'error');
         }
     };
 
     const getTrangThaiText = (trangThai) => {
         switch (trangThai) {
-            case 'ACTIVE': return { text: 'Hoạt động', color: 'bg-green-100 text-green-700' };
-            case 'MAINTENANCE': return { text: 'Bảo trì', color: 'bg-yellow-100 text-yellow-700' };
-            case 'INACTIVE': return { text: 'Vô hiệu', color: 'bg-red-100 text-red-700' };
+            case 'Hoạt động': return { text: 'Hoạt động', color: 'bg-green-100 text-green-700' };
+            case 'Bảo trì': return { text: 'Bảo trì', color: 'bg-yellow-100 text-yellow-700' };
+            case 'Vô hiệu': return { text: 'Vô hiệu', color: 'bg-red-100 text-red-700' };
             default: return { text: trangThai, color: 'bg-gray-100 text-gray-700' };
         }
     };
 
+    if (loading) {
+        return (
+            <Card title="Quản lý máy bay">
+                <div className="flex justify-center items-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600"></div>
+                </div>
+            </Card>
+        );
+    }
+
     return (
         <Card title="Quản lý máy bay">
+            {/* Toast notification */}
+            <Toast
+                message={toast.message}
+                type={toast.type}
+                isVisible={toast.isVisible}
+                onClose={hideToast}
+            />
+
+            {/* Delete confirmation dialog */}
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
+                        <h3 className="text-xl font-bold text-gray-800 mb-4">Xác nhận xóa</h3>
+                        <p className="text-gray-600 mb-6">
+                            Bạn có chắc chắn muốn xóa máy bay này không? Hành động này không thể hoàn tác.
+                        </p>
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={cancelDelete}
+                                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold transition-colors"
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                onClick={confirmDelete}
+                                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold transition-colors"
+                            >
+                                Xóa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Thanh công cụ */}
             <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-3">
                 <div className="relative w-full md:w-96">
                     <input
                         type="text"
-                        placeholder="Tìm kiếm máy bay theo tên, hãng sản xuất..."
+                        placeholder="Tìm kiếm máy bay theo tên, hãng, số hiệu..."
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent shadow-sm"
@@ -160,7 +231,7 @@ const QuanLyMayBay = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Đang hoạt động</p>
-                            <p className="text-3xl font-bold mt-2">{aircrafts.filter(a => a.trangThai === 'ACTIVE').length}</p>
+                            <p className="text-3xl font-bold mt-2">{aircrafts.filter(a => a.trangThai === 'Hoạt động').length}</p>
                         </div>
                         <FaFighterJet size={40} className="opacity-80" />
                     </div>
@@ -169,7 +240,7 @@ const QuanLyMayBay = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Đang bảo trì</p>
-                            <p className="text-3xl font-bold mt-2">{aircrafts.filter(a => a.trangThai === 'MAINTENANCE').length}</p>
+                            <p className="text-3xl font-bold mt-2">{aircrafts.filter(a => a.trangThai === 'Bảo trì').length}</p>
                         </div>
                         <FaFighterJet size={40} className="opacity-80" />
                     </div>
@@ -178,7 +249,7 @@ const QuanLyMayBay = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Tổng số ghế</p>
-                            <p className="text-3xl font-bold mt-2">{aircrafts.reduce((sum, a) => sum + a.tongSoGhe, 0).toLocaleString()}</p>
+                            <p className="text-3xl font-bold mt-2">{aircrafts.reduce((sum, a) => sum + (a.tongSoGhe || 0), 0).toLocaleString()}</p>
                         </div>
                         <FaFighterJet size={40} className="opacity-80" />
                     </div>
@@ -194,11 +265,9 @@ const QuanLyMayBay = () => {
                                 <th className="px-6 py-4 text-left font-semibold">Mã máy bay</th>
                                 <th className="px-6 py-4 text-left font-semibold">Tên máy bay</th>
                                 <th className="px-6 py-4 text-left font-semibold">Hãng SX</th>
-                                <th className="px-6 py-4 text-left font-semibold">Năm SX</th>
-                                <th className="px-6 py-4 text-center font-semibold">Hạng nhất</th>
-                                <th className="px-6 py-4 text-center font-semibold">Hạng hai</th>
-                                <th className="px-6 py-4 text-center font-semibold">Phổ thông</th>
-                                <th className="px-6 py-4 text-center font-semibold">Tổng</th>
+                                <th className="px-6 py-4 text-left font-semibold">Số hiệu</th>
+                                <th className="px-6 py-4 text-center font-semibold">Năm KH</th>
+                                <th className="px-6 py-4 text-center font-semibold">Tổng ghế</th>
                                 <th className="px-6 py-4 text-center font-semibold">Trạng thái</th>
                                 <th className="px-6 py-4 text-center font-semibold">Thao tác</th>
                             </tr>
@@ -221,14 +290,14 @@ const QuanLyMayBay = () => {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-gray-700">{mb.hangSanXuat}</td>
-                                            <td className="px-6 py-4 text-gray-700">{mb.namSanXuat}</td>
-                                            <td className="px-6 py-4 text-center font-semibold text-yellow-600">{mb.soGheHangNhat}</td>
-                                            <td className="px-6 py-4 text-center font-semibold text-orange-600">{mb.soGheHangHai}</td>
-                                            <td className="px-6 py-4 text-center font-semibold text-blue-600">{mb.soGhePhoThong}</td>
+                                            <td className="px-6 py-4 text-gray-700">{mb.hangMayBay}</td>
+                                            <td className="px-6 py-4 text-gray-700">{mb.soHieu}</td>
+                                            <td className="px-6 py-4 text-gray-700">{mb.namKhaiThac || '-'}</td>
                                             <td className="px-6 py-4 text-center font-bold text-sky-600">{mb.tongSoGhe}</td>
                                             <td className="px-6 py-4">
-                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status.color}`}>
+                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status.color} cursor-pointer hover:opacity-80`}
+                                                      onClick={() => handleToggleStatus(mb.maMayBay, mb.trangThai)}
+                                                      title="Click để đổi trạng thái">
                                                     {status.text}
                                                 </span>
                                             </td>
@@ -237,9 +306,23 @@ const QuanLyMayBay = () => {
                                                     <button
                                                         onClick={() => handleOpenModalForEdit(mb)}
                                                         className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
-                                                        title="Chỉnh sửa"
+                                                        title="Chỉnh sửa thông tin"
                                                     >
                                                         <FaEdit />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setSeatViewerAircraft(mb.maMayBay)}
+                                                        className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors"
+                                                        title="Xem sơ đồ ghế"
+                                                    >
+                                                        <FaChair />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setSeatEditorAircraft(mb.maMayBay)}
+                                                        className="p-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors"
+                                                        title="Chỉnh sửa sơ đồ ghế"
+                                                    >
+                                                        <FaWrench />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(mb.maMayBay)}
@@ -255,7 +338,7 @@ const QuanLyMayBay = () => {
                                 })
                             ) : (
                                 <tr>
-                                    <td colSpan="10" className="text-center py-12">
+                                    <td colSpan="8" className="text-center py-12">
                                         <div className="flex flex-col items-center gap-3">
                                             <FaFighterJet className="text-gray-300 text-5xl" />
                                             <p className="text-gray-500 font-medium">Không tìm thấy máy bay nào.</p>
@@ -319,15 +402,26 @@ const QuanLyMayBay = () => {
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
                     aircraft={selectedAircraft}
-                    onSave={(data) => {
-                        const tongSoGhe = (parseInt(data.soGheHangNhat) || 0) + (parseInt(data.soGheHangHai) || 0) + (parseInt(data.soGhePhoThong) || 0);
-                        const aircraftWithTotal = { ...data, tongSoGhe };
-                        if (selectedAircraft) {
-                            setAircrafts(aircrafts.map(mb => mb.maMayBay === selectedAircraft.maMayBay ? aircraftWithTotal : mb));
-                        } else {
-                            setAircrafts([...aircrafts, { ...aircraftWithTotal, maMayBay: `MB00${aircrafts.length + 1}` }]);
-                        }
-                        handleCloseModal();
+                    onSave={handleSave}
+                />
+            )}
+
+            {/* Seat Layout Viewer Modal */}
+            {seatViewerAircraft && (
+                <SeatLayoutViewer
+                    maMayBay={seatViewerAircraft}
+                    onClose={() => setSeatViewerAircraft(null)}
+                />
+            )}
+
+            {/* Seat Layout Editor Modal */}
+            {seatEditorAircraft && (
+                <SeatLayoutEditor
+                    maMayBay={seatEditorAircraft}
+                    onClose={() => setSeatEditorAircraft(null)}
+                    onSave={() => {
+                        setSeatEditorAircraft(null);
+                        loadAircrafts();
                     }}
                 />
             )}
@@ -340,31 +434,38 @@ const MayBayModal = ({ isOpen, onClose, onSave, aircraft }) => {
     const [formData, setFormData] = useState({
         tenMayBay: '',
         loaiMayBay: 'Commercial',
-        hangSanXuat: '',
-        namSanXuat: '',
-        soGheHangNhat: 0,
-        soGheHangHai: 0,
-        soGhePhoThong: 0,
-        trangThai: 'ACTIVE',
-        anhMayBay: ''
+        hangMayBay: '',
+        namKhaiThac: '',
+        tongSoGhe: '',
+        trangThai: 'Hoạt động',
+        soHieu: ''
     });
+
+    const [errors, setErrors] = useState({});
 
     React.useEffect(() => {
         if (isOpen && aircraft) {
-            setFormData(aircraft);
+            setFormData({
+                tenMayBay: aircraft.tenMayBay || '',
+                loaiMayBay: aircraft.loaiMayBay || 'Commercial',
+                hangMayBay: aircraft.hangMayBay || '',
+                namKhaiThac: aircraft.namKhaiThac || '',
+                tongSoGhe: aircraft.tongSoGhe || '',
+                trangThai: aircraft.trangThai || 'Hoạt động',
+                soHieu: aircraft.soHieu || ''
+            });
         } else if (isOpen) {
             setFormData({
                 tenMayBay: '',
                 loaiMayBay: 'Commercial',
-                hangSanXuat: '',
-                namSanXuat: '',
-                soGheHangNhat: 0,
-                soGheHangHai: 0,
-                soGhePhoThong: 0,
-                trangThai: 'ACTIVE',
-                anhMayBay: ''
+                hangMayBay: '',
+                namKhaiThac: '',
+                tongSoGhe: '',
+                trangThai: 'Hoạt động',
+                soHieu: ''
             });
         }
+        setErrors({});
     }, [isOpen, aircraft]);
 
     if (!isOpen) return null;
@@ -372,11 +473,44 @@ const MayBayModal = ({ isOpen, onClose, onSave, aircraft }) => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+        // Clear error for this field when user starts typing
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: '' }));
+        }
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+
+        if (!formData.tenMayBay?.trim()) newErrors.tenMayBay = 'Tên máy bay là bắt buộc';
+        if (!formData.hangMayBay?.trim()) newErrors.hangMayBay = 'Hãng máy bay là bắt buộc';
+        if (!formData.loaiMayBay?.trim()) newErrors.loaiMayBay = 'Loại máy bay là bắt buộc';
+        if (!formData.soHieu?.trim()) {
+            newErrors.soHieu = 'Số hiệu là bắt buộc';
+        } else if (!/^[A-Z0-9-]+$/.test(formData.soHieu)) {
+            newErrors.soHieu = 'Số hiệu chỉ được chứa chữ hoa, số và dấu gạch ngang';
+        }
+        if (!formData.tongSoGhe || formData.tongSoGhe <= 0) {
+            newErrors.tongSoGhe = 'Tổng số ghế phải lớn hơn 0';
+        }
+        if (formData.namKhaiThac && formData.namKhaiThac < 1900) {
+            newErrors.namKhaiThac = 'Năm khai thác phải từ năm 1900';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSave(formData);
+        if (validateForm()) {
+            const submitData = {
+                ...formData,
+                tongSoGhe: parseInt(formData.tongSoGhe),
+                namKhaiThac: formData.namKhaiThac ? parseInt(formData.namKhaiThac) : null
+            };
+            onSave(submitData);
+        }
     };
 
     return (
@@ -402,21 +536,26 @@ const MayBayModal = ({ isOpen, onClose, onSave, aircraft }) => {
                                 name="tenMayBay"
                                 value={formData.tenMayBay}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent shadow-sm"
+                                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm ${
+                                    errors.tenMayBay ? 'border-red-500' : 'border-gray-300'
+                                }`}
                                 placeholder="VD: Boeing 787-9 Dreamliner"
                                 required
                             />
+                            {errors.tenMayBay && <p className="text-red-500 text-xs mt-1">{errors.tenMayBay}</p>}
                         </div>
 
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-2">
-                                Hãng sản xuất <span className="text-red-500">*</span>
+                                Hãng máy bay <span className="text-red-500">*</span>
                             </label>
                             <select
-                                name="hangSanXuat"
-                                value={formData.hangSanXuat}
+                                name="hangMayBay"
+                                value={formData.hangMayBay}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent shadow-sm"
+                                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm ${
+                                    errors.hangMayBay ? 'border-red-500' : 'border-gray-300'
+                                }`}
                                 required
                             >
                                 <option value="">Chọn hãng</option>
@@ -425,6 +564,7 @@ const MayBayModal = ({ isOpen, onClose, onSave, aircraft }) => {
                                 <option value="Embraer">Embraer</option>
                                 <option value="Bombardier">Bombardier</option>
                             </select>
+                            {errors.hangMayBay && <p className="text-red-500 text-xs mt-1">{errors.hangMayBay}</p>}
                         </div>
 
                         <div>
@@ -435,30 +575,71 @@ const MayBayModal = ({ isOpen, onClose, onSave, aircraft }) => {
                                 name="loaiMayBay"
                                 value={formData.loaiMayBay}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent shadow-sm"
+                                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm ${
+                                    errors.loaiMayBay ? 'border-red-500' : 'border-gray-300'
+                                }`}
                                 required
                             >
                                 <option value="Commercial">Commercial</option>
                                 <option value="Private">Private</option>
                                 <option value="Cargo">Cargo</option>
                             </select>
+                            {errors.loaiMayBay && <p className="text-red-500 text-xs mt-1">{errors.loaiMayBay}</p>}
                         </div>
 
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-2">
-                                Năm sản xuất <span className="text-red-500">*</span>
+                                Số hiệu <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                name="soHieu"
+                                value={formData.soHieu}
+                                onChange={handleChange}
+                                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm ${
+                                    errors.soHieu ? 'border-red-500' : 'border-gray-300'
+                                }`}
+                                placeholder="VD: VN-A12345"
+                                required
+                            />
+                            {errors.soHieu && <p className="text-red-500 text-xs mt-1">{errors.soHieu}</p>}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">
+                                Tổng số ghế <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="number"
-                                name="namSanXuat"
-                                value={formData.namSanXuat}
+                                name="tongSoGhe"
+                                value={formData.tongSoGhe}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent shadow-sm"
-                                placeholder="VD: 2020"
-                                min="1970"
-                                max="2030"
+                                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm ${
+                                    errors.tongSoGhe ? 'border-red-500' : 'border-gray-300'
+                                }`}
+                                placeholder="VD: 180"
+                                min="1"
                                 required
                             />
+                            {errors.tongSoGhe && <p className="text-red-500 text-xs mt-1">{errors.tongSoGhe}</p>}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">
+                                Năm khai thác
+                            </label>
+                            <input
+                                type="number"
+                                name="namKhaiThac"
+                                value={formData.namKhaiThac}
+                                onChange={handleChange}
+                                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm ${
+                                    errors.namKhaiThac ? 'border-red-500' : 'border-gray-300'
+                                }`}
+                                placeholder="VD: 2020"
+                                min="1900"
+                            />
+                            {errors.namKhaiThac && <p className="text-red-500 text-xs mt-1">{errors.namKhaiThac}</p>}
                         </div>
 
                         <div>
@@ -469,69 +650,12 @@ const MayBayModal = ({ isOpen, onClose, onSave, aircraft }) => {
                                 name="trangThai"
                                 value={formData.trangThai}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent shadow-sm"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm"
                             >
-                                <option value="ACTIVE">Hoạt động</option>
-                                <option value="MAINTENANCE">Bảo trì</option>
-                                <option value="INACTIVE">Vô hiệu</option>
+                                <option value="Hoạt động">Hoạt động</option>
+                                <option value="Bảo trì">Bảo trì</option>
+                                <option value="Vô hiệu">Vô hiệu</option>
                             </select>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">
-                                Số ghế hạng nhất
-                            </label>
-                            <input
-                                type="number"
-                                name="soGheHangNhat"
-                                value={formData.soGheHangNhat}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent shadow-sm"
-                                min="0"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">
-                                Số ghế hạng hai
-                            </label>
-                            <input
-                                type="number"
-                                name="soGheHangHai"
-                                value={formData.soGheHangHai}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent shadow-sm"
-                                min="0"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">
-                                Số ghế phổ thông <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="number"
-                                name="soGhePhoThong"
-                                value={formData.soGhePhoThong}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent shadow-sm"
-                                min="0"
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">
-                                URL ảnh máy bay
-                            </label>
-                            <input
-                                type="text"
-                                name="anhMayBay"
-                                value={formData.anhMayBay}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent shadow-sm"
-                                placeholder="/images/aircraft.jpg"
-                            />
                         </div>
                     </div>
 
