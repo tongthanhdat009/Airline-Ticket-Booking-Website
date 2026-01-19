@@ -1,14 +1,27 @@
-import React from 'react';
-import { FaPlus, FaTrash, FaTimes } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { FaPlus, FaTrash, FaTimes, FaCog } from 'react-icons/fa';
 import { AIRCRAFT_TEMPLATES } from '../../../../constants/aircraftConfig';
 
-const AutoGenerateModal = ({ 
-    cabinConfigs, 
-    setCabinConfigs, 
-    hangVeList, 
-    onGenerate, 
-    onClose 
+const AutoGenerateModal = ({
+    cabinConfigs,
+    setCabinConfigs,
+    hangVeList,
+    onGenerate,
+    onClose
 }) => {
+    const [showCustomMode, setShowCustomMode] = useState(false);
+    const [columnInputs, setColumnInputs] = useState({}); // Store raw input values
+
+    // Preset layouts for quick configuration
+    const PRESET_LAYOUTS = [
+        { name: '3-3 (Narrow Body)', columnsLeft: ['A', 'B', 'C'], columnsMiddle: [], columnsRight: ['D', 'E', 'F'], total: 6 },
+        { name: '3-4-3 (Wide Body)', columnsLeft: ['A', 'B', 'C'], columnsMiddle: ['D', 'E', 'F', 'G'], columnsRight: ['H', 'J', 'K'], total: 10 },
+        { name: '2-4-2 (Wide Body)', columnsLeft: ['A', 'B'], columnsMiddle: ['C', 'D', 'E', 'F'], columnsRight: ['G', 'H'], total: 8 },
+        { name: '2-5-2 (A380)', columnsLeft: ['A', 'B'], columnsMiddle: ['C', 'D', 'E', 'F', 'G'], columnsRight: ['H', 'J'], total: 9 },
+        { name: '3-3-3 (B777)', columnsLeft: ['A', 'B', 'C'], columnsMiddle: ['D', 'E', 'F'], columnsRight: ['G', 'H', 'J'], total: 9 },
+        { name: '2-2 (Regional)', columnsLeft: ['A', 'B'], columnsMiddle: [], columnsRight: ['C', 'D'], total: 4 }
+    ];
+
     const addCabinConfig = () => {
         const newId = Math.max(...cabinConfigs.map(c => c.id), 0) + 1;
         setCabinConfigs([...cabinConfigs, {
@@ -18,6 +31,7 @@ const AutoGenerateModal = ({
             startRow: cabinConfigs[cabinConfigs.length - 1].endRow + 1,
             endRow: cabinConfigs[cabinConfigs.length - 1].endRow + 10,
             columnsLeft: ['A', 'B', 'C'],
+            columnsMiddle: [],
             columnsRight: ['D', 'E', 'F'],
             exitRows: [],
             backgroundColor: '#FAFAFA'
@@ -36,6 +50,47 @@ const AutoGenerateModal = ({
         setCabinConfigs(cabinConfigs.map(c =>
             c.id === id ? { ...c, [field]: value } : c
         ));
+    };
+
+    // Update raw input value immediately for smooth typing
+    const handleColumnInputChange = (id, side, value) => {
+        setColumnInputs(prev => ({
+            ...prev,
+            [`${id}-${side}`]: value
+        }));
+    };
+
+    // Process and update cabin config when input loses focus
+    const handleColumnInputBlur = (id, side, value) => {
+        if (!value || value.trim() === '') {
+            setCabinConfigs(cabinConfigs.map(c =>
+                c.id === id ? { ...c, [side]: [] } : c
+            ));
+            return;
+        }
+
+        const columns = value
+            .split(',')
+            .map(col => col.trim().toUpperCase())
+            .filter(col => col && col.match(/^[A-Z]+$/));
+
+        setCabinConfigs(cabinConfigs.map(c =>
+            c.id === id ? { ...c, [side]: columns } : c
+        ));
+
+        // Update the input with processed value
+        setColumnInputs(prev => ({
+            ...prev,
+            [`${id}-${side}`]: columns.join(', ')
+        }));
+    };
+
+    // Get the display value for column input
+    const getColumnInputValue = (id, side, configValue) => {
+        const key = `${id}-${side}`;
+        return columnInputs[key] !== undefined
+            ? columnInputs[key]
+            : configValue?.join(', ') || '';
     };
 
     const applyTemplate = (templateKey) => {
@@ -58,8 +113,60 @@ const AutoGenerateModal = ({
         setCabinConfigs(newConfigs);
     };
 
+    // Apply preset layout to a cabin configuration
+    const applyPresetLayout = (configId, preset) => {
+        const updatedConfigs = cabinConfigs.map(config => {
+            if (config.id === configId) {
+                return {
+                    ...config,
+                    columnsLeft: preset.columnsLeft,
+                    columnsMiddle: preset.columnsMiddle,
+                    columnsRight: preset.columnsRight
+                };
+            }
+            return config;
+        });
+        setCabinConfigs(updatedConfigs);
+        
+        // Update column inputs state
+        setColumnInputs(prev => ({
+            ...prev,
+            [configId]: {
+                columnsLeft: preset.columnsLeft.join(', '),
+                columnsMiddle: preset.columnsMiddle.join(', '),
+                columnsRight: preset.columnsRight.join(', ')
+            }
+        }));
+    };
+
+    const switchToCustomMode = () => {
+        setShowCustomMode(true);
+        // Initialize with a 3-3-3 wide-body config (Boeing 777 style)
+        setCabinConfigs([{
+            id: 1,
+            cabinName: 'Cabin Tùy Chỉnh',
+            maHangVe: '',
+            startRow: 1,
+            endRow: 10,
+            columnsLeft: ['A', 'B', 'C'],
+            columnsMiddle: ['D', 'E', 'F'],
+            columnsRight: ['G', 'H', 'K'],
+            exitRows: [],
+            backgroundColor: '#FAFAFA'
+        }]);
+        
+        // Initialize column inputs
+        setColumnInputs({
+            1: {
+                columnsLeft: 'A, B, C',
+                columnsMiddle: 'D, E, F',
+                columnsRight: 'G, H, K'
+            }
+        });
+    };
+
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+        <div className="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
                 <div className="bg-gradient-to-r from-purple-600 to-indigo-700 text-white p-6 rounded-t-xl sticky top-0">
                     <div className="flex justify-between items-start">
@@ -74,21 +181,61 @@ const AutoGenerateModal = ({
                 </div>
 
                 <div className="p-6 space-y-4">
-                    {/* Template quick select */}
-                    <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                        <p className="font-bold text-gray-700 mb-2">Mẫu máy bay có sẵn:</p>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                            {Object.keys(AIRCRAFT_TEMPLATES).map(key => (
-                                <button
-                                    key={key}
-                                    onClick={() => applyTemplate(key)}
-                                    className="px-4 py-2 bg-white border border-purple-300 rounded-lg hover:bg-purple-100 text-sm font-medium"
-                                >
-                                    {AIRCRAFT_TEMPLATES[key].name}
-                                </button>
-                            ))}
-                        </div>
+                    {/* Mode Selector */}
+                    <div className="flex gap-2 mb-4">
+                        <button
+                            onClick={() => setShowCustomMode(false)}
+                            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
+                                !showCustomMode
+                                    ? 'bg-purple-600 text-white shadow-md'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
+                        >
+                            📋 Mẫu có sẵn
+                        </button>
+                        <button
+                            onClick={switchToCustomMode}
+                            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
+                                showCustomMode
+                                    ? 'bg-purple-600 text-white shadow-md'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
+                        >
+                            <FaCog />
+                            Tùy biến
+                        </button>
                     </div>
+
+                    {/* Template quick select - Only show in template mode */}
+                    {!showCustomMode && (
+                        <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                            <p className="font-bold text-gray-700 mb-2">Mẫu máy bay có sẵn:</p>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                {Object.keys(AIRCRAFT_TEMPLATES).map(key => (
+                                    <button
+                                        key={key}
+                                        onClick={() => applyTemplate(key)}
+                                        className="px-4 py-2 bg-white border border-purple-300 rounded-lg hover:bg-purple-100 text-sm font-medium"
+                                    >
+                                        {AIRCRAFT_TEMPLATES[key].name}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Custom mode instructions */}
+                    {showCustomMode && (
+                        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                            <p className="font-bold text-blue-900 mb-2">💡 Hướng dẫn tùy biến:</p>
+                            <ul className="text-sm text-blue-800 space-y-1">
+                                <li>• Nhập số hàng bắt đầu và kết thúc cho mỗi cabin</li>
+                                <li>• Nhập các cột phân cách bằng dấu phẩy (ví dụ: A, B, C hoặc A,B,C)</li>
+                                <li>• Cột trái và cột phải sẽ tạo lối đi ở giữa</li>
+                                <li>• Chọn hạng vé tương ứng cho mỗi cabin</li>
+                            </ul>
+                        </div>
+                    )}
 
                     {/* Cabin configurations */}
                     {cabinConfigs.map((config, index) => (
@@ -153,16 +300,166 @@ const AutoGenerateModal = ({
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Custom column configuration - Only show in custom mode */}
+                            {showCustomMode && (
+                                <div className="mt-3 pt-3 border-t border-gray-200 space-y-3">
+                                    {/* Preset layout selector */}
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-600 mb-2">
+                                            🎯 Mẫu cấu hình nhanh:
+                                        </label>
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                            {PRESET_LAYOUTS.map((preset, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    type="button"
+                                                    onClick={() => applyPresetLayout(config.id, preset)}
+                                                    className="px-3 py-2 text-xs bg-white border-2 border-purple-200 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-all text-left"
+                                                >
+                                                    <div className="font-bold text-purple-700">{preset.name}</div>
+                                                    <div className="text-gray-500 mt-0.5">Tổng: {preset.total} cột</div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Manual column configuration */}
+                                    <div>
+                                        <p className="text-xs font-bold text-gray-600 mb-2">✏️ Hoặc tùy chỉnh thủ công:</p>
+                                        <div className="grid grid-cols-3 gap-3">
+                                            <div>
+                                                <label className="block text-xs font-medium text-gray-600 mb-1">
+                                                    Cột trái
+                                                    <span className="text-gray-400 ml-1">(A,B,C)</span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={getColumnInputValue(config.id, 'columnsLeft', config.columnsLeft)}
+                                                    onChange={(e) => handleColumnInputChange(config.id, 'columnsLeft', e.target.value)}
+                                                    onBlur={(e) => handleColumnInputBlur(config.id, 'columnsLeft', e.target.value)}
+                                                    placeholder="A, B, C"
+                                                    className="w-full px-3 py-2 border rounded-lg text-sm font-mono"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-medium text-gray-600 mb-1">
+                                                    Cột giữa
+                                                    <span className="text-gray-400 ml-1">(D,E,F)</span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={getColumnInputValue(config.id, 'columnsMiddle', config.columnsMiddle)}
+                                                    onChange={(e) => handleColumnInputChange(config.id, 'columnsMiddle', e.target.value)}
+                                                    onBlur={(e) => handleColumnInputBlur(config.id, 'columnsMiddle', e.target.value)}
+                                                    placeholder="D, E, F (tùy chọn)"
+                                                    className="w-full px-3 py-2 border rounded-lg text-sm font-mono"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-medium text-gray-600 mb-1">
+                                                    Cột phải
+                                                    <span className="text-gray-400 ml-1">(G,H,K)</span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={getColumnInputValue(config.id, 'columnsRight', config.columnsRight)}
+                                                    onChange={(e) => handleColumnInputChange(config.id, 'columnsRight', e.target.value)}
+                                                    onBlur={(e) => handleColumnInputBlur(config.id, 'columnsRight', e.target.value)}
+                                                    placeholder="G, H, K"
+                                                    className="w-full px-3 py-2 border rounded-lg text-sm font-mono"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Preview */}
+                                    <div className="mt-2 space-y-2">
+                                        <div className="flex items-center gap-2 text-xs text-gray-500 bg-purple-50 p-2 rounded-lg">
+                                            <span>📊 Preview:</span>
+                                            <div className="flex items-center gap-1 flex-wrap">
+                                                {config.columnsLeft?.map((col, idx) => (
+                                                    <span 
+                                                        key={`left-${idx}`} 
+                                                        className="px-2 py-1 bg-blue-100 text-blue-700 rounded font-mono text-xs"
+                                                        title={idx === 0 ? "Cửa sổ" : idx === config.columnsLeft.length - 1 ? "Lối đi" : "Giữa"}
+                                                    >
+                                                        {col}
+                                                    </span>
+                                                ))}
+                                                {config.columnsMiddle && config.columnsMiddle.length > 0 ? (
+                                                    <>
+                                                        <span className="px-2 py-1 bg-gray-200 text-gray-600 rounded text-xs">🚶 Lối đi 1</span>
+                                                        {config.columnsMiddle?.map((col, idx) => (
+                                                            <span 
+                                                                key={`mid-${idx}`} 
+                                                                className="px-2 py-1 bg-green-100 text-green-700 rounded font-mono text-xs"
+                                                                title={idx === 0 || idx === config.columnsMiddle.length - 1 ? "Lối đi" : "Giữa"}
+                                                            >
+                                                                {col}
+                                                            </span>
+                                                        ))}
+                                                        <span className="px-2 py-1 bg-gray-200 text-gray-600 rounded text-xs">🚶 Lối đi 2</span>
+                                                    </>
+                                                ) : (
+                                                    <span className="px-2 py-1 bg-gray-200 text-gray-600 rounded text-xs">🚶 Lối đi</span>
+                                                )}
+                                                {config.columnsRight?.map((col, idx) => (
+                                                    <span 
+                                                        key={`right-${idx}`} 
+                                                        className="px-2 py-1 bg-blue-100 text-blue-700 rounded font-mono text-xs"
+                                                        title={idx === 0 ? "Lối đi" : idx === config.columnsRight.length - 1 ? "Cửa sổ" : "Giữa"}
+                                                    >
+                                                        {col}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Position legend */}
+                                        <div className="flex items-center gap-3 text-xs bg-indigo-50 p-2 rounded-lg border border-indigo-200">
+                                            <span className="font-semibold text-indigo-700">🎯 Vị trí ghế:</span>
+                                            <div className="flex items-center gap-1">
+                                                <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                                                <span>Đầu/Cuối = Cửa sổ</span>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                                                <span>Cạnh lối đi = Lối đi</span>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <span className="w-2 h-2 rounded-full bg-gray-400"></span>
+                                                <span>Ở giữa = Giữa</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Tips */}
+                                    <div className="text-xs text-gray-500 bg-amber-50 p-2 rounded-lg border border-amber-200">
+                                        <p className="font-semibold text-amber-700 mb-1">💡 Mẹo cấu hình:</p>
+                                        <ul className="space-y-1">
+                                            <li>• <strong>Máy bay nhỏ (2-2):</strong> Trái: A,B | Phải: C,D</li>
+                                            <li>• <strong>Máy bay vừa (3-3):</strong> Trái: A,B,C | Phải: D,E,F</li>
+                                            <li>• <strong>Máy bay lớn (3-3-3):</strong> Trái: A,B,C | Giữa: D,E,F | Phải: G,H,K</li>
+                                            <li>• <strong>Máy bay rất lớn (3-4-3):</strong> Trái: A,B,C | Giữa: D,E,F,G | Phải: H,J,K</li>
+                                            <li className="text-indigo-600 font-semibold">• Ghế đầu mỗi phần = CỬA SỔ, ghế cạnh lối đi = LỐI ĐI, ghế ở giữa = GIỮA</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     ))}
 
-                    <button
-                        onClick={addCabinConfig}
-                        className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-purple-500 hover:text-purple-600 font-medium flex items-center justify-center gap-2"
-                    >
-                        <FaPlus />
-                        Thêm cabin
-                    </button>
+                    {/* Add cabin button - only show in custom mode */}
+                    {showCustomMode && (
+                        <button
+                            onClick={addCabinConfig}
+                            className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-purple-500 hover:text-purple-600 font-medium flex items-center justify-center gap-2"
+                        >
+                            <FaPlus />
+                            Thêm cabin
+                        </button>
+                    )}
                 </div>
 
                 <div className="border-t border-gray-200 p-4 flex justify-end gap-3 bg-gray-50 rounded-b-xl">
@@ -176,7 +473,10 @@ const AutoGenerateModal = ({
                         onClick={onGenerate}
                         className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium"
                     >
-                        Tạo {cabinConfigs.reduce((sum, c) => sum + (c.endRow - c.startRow + 1) * 6, 0)} ghế
+                        Tạo {cabinConfigs.reduce((sum, c) => {
+                            const totalCols = (c.columnsLeft?.length || 0) + (c.columnsMiddle?.length || 0) + (c.columnsRight?.length || 0);
+                            return sum + (c.endRow - c.startRow + 1) * totalCols;
+                        }, 0)} ghế
                     </button>
                 </div>
             </div>

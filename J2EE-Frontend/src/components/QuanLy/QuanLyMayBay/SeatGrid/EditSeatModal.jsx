@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
-import { FaEdit, FaSave } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaEdit, FaSave, FaWindowMaximize, FaArrowsAltH, FaDotCircle } from 'react-icons/fa';
 import { SEAT_POSITIONS } from '../../../../constants/aircraftConfig';
+import * as QLHangVeService from '../../../../services/QLHangVeService';
+import Toast from '../../../common/Toast';
 
-const EditSeatModal = ({ seat, hangVeList, onSave, onClose }) => {
+const EditSeatModal = ({ seat, seats, onSave, onClose }) => {
+    const [toast, setToast] = useState({ isVisible: false, message: '', type: 'error' });
+    const [hangVeList, setHangVeList] = useState([]);
+    const [loadingHangVe, setLoadingHangVe] = useState(true);
+
     const [formData, setFormData] = useState({
         soGhe: seat.soGhe || '',
         maHangVe: seat.maHangVe || '',
@@ -11,27 +17,71 @@ const EditSeatModal = ({ seat, hangVeList, onSave, onClose }) => {
         cot: seat.cot || 'A'
     });
 
+    // Load all ticket classes when modal opens
+    useEffect(() => {
+        const loadHangVe = async () => {
+            try {
+                setLoadingHangVe(true);
+                const response = await QLHangVeService.getAllHangVeAdmin();
+                setHangVeList(response.data || []);
+            } catch (error) {
+                console.error('Lỗi khi tải danh sách hạng vé:', error);
+            } finally {
+                setLoadingHangVe(false);
+            }
+        };
+
+        loadHangVe();
+    }, []);
+
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        // Check for duplicate seat number in current aircraft (database constraint: UK_maybay_soghe)
+        // In the same aircraft, seat number must be unique regardless of ticket class
+        // Exclude current seat from check (editing same seat is allowed)
+        if (seats && seats.some(s =>
+            s.soGhe === formData.soGhe &&
+            s.maGhe !== seat.maGhe // Different seat
+        )) {
+            setToast({
+                isVisible: true,
+                message: `Ghế ${formData.soGhe} đã tồn tại trong máy bay này! Mỗi số ghế chỉ được sử dụng một lần.`,
+                type: 'error'
+            });
+            return;
+        }
+
         onSave(seat.maGhe, formData);
     };
 
+    const hideToast = () => {
+        setToast({ ...toast, isVisible: false });
+    };
+
     const positionButtons = [
-        { value: SEAT_POSITIONS.WINDOW, icon: '🪟', label: 'Cửa sổ' },
-        { value: SEAT_POSITIONS.AISLE, icon: '🚶', label: 'Lối đi' },
-        { value: SEAT_POSITIONS.MIDDLE, icon: '📍', label: 'Giữa' }
+        { value: SEAT_POSITIONS.WINDOW, icon: <FaWindowMaximize />, label: 'Cửa sổ' },
+        { value: SEAT_POSITIONS.AISLE, icon: <FaArrowsAltH />, label: 'Lối đi' },
+        { value: SEAT_POSITIONS.MIDDLE, icon: <FaDotCircle />, label: 'Giữa' }
     ];
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4" onClick={onClose}>
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
-                <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-6 rounded-t-xl">
-                    <h3 className="text-xl font-bold flex items-center gap-2">
-                        <FaEdit />
-                        Chỉnh sửa ghế {seat.soGhe}
-                    </h3>
-                    <p className="text-blue-100 text-sm mt-1">Cập nhật thông tin chi tiết ghế</p>
-                </div>
+        <>
+            <Toast
+                message={toast.message}
+                type={toast.type}
+                isVisible={toast.isVisible}
+                onClose={hideToast}
+            />
+            <div className="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50 p-4" onClick={onClose}>
+                <div className="bg-white rounded-xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+                    <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-6 rounded-t-xl">
+                        <h3 className="text-xl font-bold flex items-center gap-2">
+                            <FaEdit />
+                            Chỉnh sửa ghế {seat.soGhe}
+                        </h3>
+                        <p className="text-blue-100 text-sm mt-1">Cập nhật thông tin chi tiết ghế</p>
+                    </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     <div className="grid grid-cols-2 gap-4">
@@ -53,17 +103,23 @@ const EditSeatModal = ({ seat, hangVeList, onSave, onClose }) => {
                             <label className="block text-sm font-bold text-gray-700 mb-2">
                                 Hạng vé <span className="text-red-500">*</span>
                             </label>
-                            <select
-                                value={formData.maHangVe}
-                                onChange={(e) => setFormData({ ...formData, maHangVe: parseInt(e.target.value) })}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                required
-                            >
-                                <option value="">Chọn hạng vé</option>
-                                {hangVeList.map(hv => (
-                                    <option key={hv.maHangVe} value={hv.maHangVe}>{hv.tenHangVe}</option>
-                                ))}
-                            </select>
+                            {loadingHangVe ? (
+                                <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm">
+                                    Đang tải danh sách hạng vé...
+                                </div>
+                            ) : (
+                                <select
+                                    value={formData.maHangVe}
+                                    onChange={(e) => setFormData({ ...formData, maHangVe: parseInt(e.target.value) })}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                    required
+                                >
+                                    <option value="">Chọn hạng vé</option>
+                                    {hangVeList.map(hv => (
+                                        <option key={hv.maHangVe} value={hv.maHangVe}>{hv.tenHangVe}</option>
+                                    ))}
+                                </select>
+                            )}
                         </div>
                     </div>
 
@@ -145,6 +201,7 @@ const EditSeatModal = ({ seat, hangVeList, onSave, onClose }) => {
                 </form>
             </div>
         </div>
+        </>
     );
 };
 

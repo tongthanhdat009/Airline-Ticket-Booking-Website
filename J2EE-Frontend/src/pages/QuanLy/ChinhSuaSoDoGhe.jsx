@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { FaPlane, FaChevronLeft, FaMagic, FaTrash, FaPlus, FaExpand, FaCompress } from 'react-icons/fa';
+import { FaPlane, FaChevronLeft, FaMagic, FaTrash, FaPlus, FaExpand, FaCompress, FaEdit, FaTimes, FaChevronRight } from 'react-icons/fa';
 import * as SoDoGheService from '../../services/SoDoGheService';
 import * as QLHangVeService from '../../services/QLHangVeService';
 import * as QLMayBayService from '../../services/QLMayBayService';
@@ -17,7 +17,7 @@ import ContextMenu from '../../components/QuanLy/QuanLyMayBay/SeatGrid/ContextMe
 import SeatStatistics from '../../components/QuanLy/QuanLyMayBay/SeatGrid/SeatStatistics';
 
 // Import constants
-import { CABIN_COLORS, DEFAULT_CABIN_CONFIG } from '../../constants/aircraftConfig';
+import { DEFAULT_CABIN_CONFIG } from '../../constants/aircraftConfig';
 
 const ChinhSuaSoDoGhe = () => {
     const { maMayBay } = useParams();
@@ -64,8 +64,8 @@ const ChinhSuaSoDoGhe = () => {
             setHangVeList(hangVeRes.data || []);
             setAircraft(aircraftRes.data || null);
         } catch (error) {
-            console.error('Lá»—i khi táº£i dá»¯ liá»‡u:', error);
-            showToast('KhÃ´ng thá»ƒ táº£i dá»¯ liá»‡u', 'error');
+            console.error('Lỗi khi tải dữ liệu:', error);
+            showToast('Không thể tải dữ liệu', 'error');
         } finally {
             setLoading(false);
         }
@@ -150,7 +150,7 @@ const ChinhSuaSoDoGhe = () => {
             case 'delete':
                 handleDeleteSeat(seat.maGhe);
                 break;
-            case 'duplicate':
+            case 'duplicate': {
                 // Open add modal with pre-filled data
                 const newSeatData = {
                     ...seat,
@@ -161,6 +161,7 @@ const ChinhSuaSoDoGhe = () => {
                 setEditingSeat(newSeatData);
                 setShowAddSeat(true);
                 break;
+            }
             default:
                 break;
         }
@@ -183,10 +184,10 @@ const ChinhSuaSoDoGhe = () => {
             await SoDoGheService.addSeatToAircraft(maMayBay, seatData);
             await loadData();
             setShowAddSeat(false);
-            showToast('ÄÃ£ thÃªm gháº¿ thÃ nh cÃ´ng');
+            showToast('Đã thêm ghế thành công');
         } catch (error) {
-            console.error('Lá»—i khi thÃªm gháº¿:', error);
-            showToast(error.response?.data?.message || 'KhÃ´ng thá»ƒ thÃªm gháº¿', 'error');
+            console.error('Lỗi khi thêm ghế:', error);
+            showToast(error.response?.data?.message || 'Không thể thêm ghế', 'error');
         }
     };
 
@@ -197,10 +198,10 @@ const ChinhSuaSoDoGhe = () => {
             setShowEditSeat(false);
             setEditingSeat(null);
             setSelectedSeats([]);
-            showToast('ÄÃ£ cáº­p nháº­t gháº¿ thÃ nh cÃ´ng');
+            showToast('Đã cập nhật ghế thành công');
         } catch (error) {
-            console.error('Lá»—i khi cáº­p nháº­t gháº¿:', error);
-            showToast(error.response?.data?.message || 'KhÃ´ng thá»ƒ cáº­p nháº­t gháº¿', 'error');
+            console.error('Lỗi khi cập nhật ghế:', error);
+            showToast(error.response?.data?.message || 'Không thể cập nhật ghế', 'error');
         }
     };
     const handleDeleteSeat = async (maGhe) => {
@@ -208,16 +209,16 @@ const ChinhSuaSoDoGhe = () => {
             await SoDoGheService.deleteSeat(maGhe);
             await loadData();
             setSelectedSeats(prev => prev.filter(s => s.maGhe !== maGhe));
-            showToast('ÄÃ£ xÃ³a gháº¿ thÃ nh cÃ´ng');
+            showToast('Đã xóa ghế thành công');
         } catch (error) {
-            console.error('Lá»—i khi xÃ³a gháº¿:', error);
-            showToast(error.response?.data?.message || 'KhÃ´ng thá»ƒ xÃ³a gháº¿', 'error');
+            console.error('Lỗi khi xóa ghế:', error);
+            showToast(error.response?.data?.message || 'Không thể xóa ghế', 'error');
         }
     };
 
     const handleDeleteSelectedSeats = async () => {
         if (selectedSeats.length === 0) return;
-        if (!window.confirm(`Báº¡n cÃ³ cháº¯c cháº¯n muá»‘n xÃ³a ${selectedSeats.length} gháº¿ Ä‘Ã£ chá»n?`)) return;
+        if (!window.confirm(`Bạn có chắc chắn muốn xóa ${selectedSeats.length} ghế đã chọn?`)) return;
 
         try {
             for (const seat of selectedSeats) {
@@ -225,24 +226,24 @@ const ChinhSuaSoDoGhe = () => {
             }
             await loadData();
             setSelectedSeats([]);
-            showToast(`ÄÃ£ xÃ³a ${selectedSeats.length} gháº¿ thÃ nh cÃ´ng`);
+            showToast(`Đã xóa ${selectedSeats.length} ghế thành công`);
         } catch (error) {
-            console.error('Lá»—i khi xÃ³a gháº¿:', error);
-            showToast('CÃ³ lá»—i xáº£y ra khi xÃ³a gháº¿', 'error');
+            console.error('Lỗi khi xóa ghế:', error);
+            showToast('Có lỗi xảy ra khi xóa ghế', 'error');
         }
     };
 
     const handleDeleteAllSeats = async () => {
-        if (!window.confirm('Báº¡n cÃ³ cháº¯c cháº¯n muá»‘n xÃ³a Táº¤T Cáº¢ gháº¿? HÃ nh Ä‘á»™ng nÃ y khÃ´ng thá»ƒ hoÃ n tÃ¡c!')) return;
+        if (!window.confirm('Bạn có chắc chắn muốn xóa TẤT CẢ ghế? Hành động này không thể hoàn tác!')) return;
 
         try {
             await SoDoGheService.deleteAllSeatsByAircraft(maMayBay);
             await loadData();
             setSelectedSeats([]);
-            showToast('ÄÃ£ xÃ³a táº¥t cáº£ gháº¿ thÃ nh cÃ´ng');
+            showToast('Đã xóa tất cả ghế thành công');
         } catch (error) {
-            console.error('Lá»—i khi xÃ³a táº¥t cáº£ gháº¿:', error);
-            showToast(error.response?.data?.message || 'KhÃ´ng thá»ƒ xÃ³a táº¥t cáº£ gháº¿', 'error');
+            console.error('Lỗi khi xóa tất cả ghế:', error);
+            showToast(error.response?.data?.message || 'Không thể xóa tất cả ghế', 'error');
         }
     };
 
@@ -259,10 +260,10 @@ const ChinhSuaSoDoGhe = () => {
             await loadData();
             setSelectedSeats([]);
             setShowBulkEdit(false);
-            showToast(`ÄÃ£ cáº­p nháº­t ${selectedSeats.length} gháº¿ thÃ nh cÃ´ng`);
+            showToast(`Đã cập nhật ${selectedSeats.length} ghế thành công`);
         } catch (error) {
-            console.error('Lá»—i khi cáº­p nháº­t gháº¿:', error);
-            showToast('CÃ³ lá»—i xáº£y ra khi cáº­p nháº­t gháº¿', 'error');
+            console.error('Lỗi khi cập nhật ghế:', error);
+            showToast('Có lỗi xảy ra khi cập nhật ghế', 'error');
         }
     };
 
@@ -271,77 +272,78 @@ const ChinhSuaSoDoGhe = () => {
         try {
             const validConfigs = cabinConfigs.filter(c => c.maHangVe);
             if (validConfigs.length === 0) {
-                showToast('Vui lÃ²ng chá»n háº¡ng vÃ© cho Ã­t nháº¥t má»™t cabin', 'error');
+                showToast('Vui lòng chọn hạng vé cho ít nhất một cabin', 'error');
                 return;
             }
 
-            // Transform configs to API format
+            // Transform configs to API format with proper seat position detection
             const apiConfigs = validConfigs.flatMap(config => {
-                const allColumns = [...config.columnsLeft, ...config.columnsRight];
-                return [{
-                    maHangVe: config.maHangVe,
-                    startRow: config.startRow,
-                    endRow: config.endRow,
-                    columns: allColumns,
-                    viTriGhe: 'GIá»®A' // Auto-detect based on column position
-                }];
+                const seats = [];
+                
+                // Helper function to determine seat position
+                const getSeatPosition = (colIndex, totalCols, section) => {
+                    if (section === 'left') {
+                        if (colIndex === 0) return 'WINDOW'; // First column on left = window
+                        if (colIndex === config.columnsLeft.length - 1) return 'AISLE'; // Last column on left = aisle
+                        return 'MIDDLE';
+                    } else if (section === 'middle') {
+                        // All middle section seats are aisle or middle (no window)
+                        if (colIndex === 0 || colIndex === config.columnsMiddle.length - 1) return 'AISLE';
+                        return 'MIDDLE';
+                    } else if (section === 'right') {
+                        if (colIndex === 0) return 'AISLE'; // First column on right = aisle
+                        if (colIndex === config.columnsRight.length - 1) return 'WINDOW'; // Last column on right = window
+                        return 'MIDDLE';
+                    }
+                    return 'MIDDLE';
+                };
+                
+                // Process left columns - send each column as separate config
+                config.columnsLeft.forEach((col, idx) => {
+                    seats.push({
+                        maHangVe: config.maHangVe,
+                        startRow: config.startRow,
+                        endRow: config.endRow,
+                        columns: [col], // Backend expects array
+                        viTriGhe: getSeatPosition(idx, config.columnsLeft.length, 'left')
+                    });
+                });
+                
+                // Process middle columns (if any)
+                if (config.columnsMiddle && config.columnsMiddle.length > 0) {
+                    config.columnsMiddle.forEach((col, idx) => {
+                        seats.push({
+                            maHangVe: config.maHangVe,
+                            startRow: config.startRow,
+                            endRow: config.endRow,
+                            columns: [col], // Backend expects array
+                            viTriGhe: getSeatPosition(idx, config.columnsMiddle.length, 'middle')
+                        });
+                    });
+                }
+                
+                // Process right columns
+                config.columnsRight.forEach((col, idx) => {
+                    seats.push({
+                        maHangVe: config.maHangVe,
+                        startRow: config.startRow,
+                        endRow: config.endRow,
+                        columns: [col], // Backend expects array
+                        viTriGhe: getSeatPosition(idx, config.columnsRight.length, 'right')
+                    });
+                });
+                
+                return seats;
             });
 
             const response = await SoDoGheService.autoGenerateSeats(maMayBay, apiConfigs);
             await loadData();
             setShowAutoGenerate(false);
-            showToast(`ÄÃ£ táº¡o ${response.data?.length || 0} gháº¿ thÃ nh cÃ´ng!`);
+            showToast(`Đã tạo ${response.data?.length || 0} ghế thành công!`);
         } catch (error) {
-            console.error('Lá»—i khi tá»± Ä‘á»™ng táº¡o gháº¿:', error);
-            showToast(error.response?.data?.message || 'KhÃ´ng thá»ƒ táº¡o sÆ¡ Ä‘á»“ gháº¿', 'error');
+            console.error('Lỗi khi tự động tạo ghế:', error);
+            showToast(error.response?.data?.message || 'Không thể tạo sơ đồ ghế', 'error');
         }
-    };
-
-    const applyTemplate = (templateKey) => {
-        const template = AIRCRAFT_TEMPLATES[templateKey];
-        if (!template) return;
-
-        const newConfigs = template.cabins.map((cabin, idx) => ({
-            id: idx + 1,
-            cabinName: cabin.name,
-            maHangVe: hangVeList.find(hv =>
-                hv.tenHangVe?.toLowerCase().includes(cabin.name.toLowerCase().split(' ')[0])
-            )?.maHangVe || '',
-            startRow: cabin.startRow,
-            endRow: cabin.endRow,
-            columnsLeft: cabin.columnsLeft,
-            columnsRight: cabin.columnsRight,
-            columnsMiddle: cabin.columnsMiddle || [],
-            exitRows: template.exitRows?.filter(r => r >= cabin.startRow && r <= cabin.endRow) || [],
-            backgroundColor: cabin.backgroundColor
-        }));
-
-        setCabinConfigs(newConfigs);
-    };
-
-    const addCabinConfig = () => {
-        const lastConfig = cabinConfigs[cabinConfigs.length - 1];
-        setCabinConfigs([...cabinConfigs, {
-            id: Date.now(),
-            cabinName: 'New Cabin',
-            maHangVe: '',
-            startRow: lastConfig ? lastConfig.endRow + 1 : 1,
-            endRow: lastConfig ? lastConfig.endRow + 5 : 5,
-            columnsLeft: ['A', 'B', 'C'],
-            columnsRight: ['D', 'E', 'F'],
-            exitRows: [],
-            backgroundColor: '#FAFAFA'
-        }]);
-    };
-
-    const removeCabinConfig = (id) => {
-        setCabinConfigs(cabinConfigs.filter(c => c.id !== id));
-    };
-
-    const updateCabinConfig = (id, field, value) => {
-        setCabinConfigs(cabinConfigs.map(c =>
-            c.id === id ? { ...c, [field]: value } : c
-        ));
     };
 
     // Helper functions
@@ -360,18 +362,12 @@ const ChinhSuaSoDoGhe = () => {
         return Array.from(columns).sort();
     }, [seats]);
 
-    const getAllRows = useCallback(() => {
-        const rows = new Set();
-        seats.forEach(seat => rows.add(seat.hang));
-        return Array.from(rows).sort((a, b) => a - b);
-    }, [seats]);
-
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-100 flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600"></div>
-                    <p className="text-gray-600">Äang táº£i sÆ¡ Ä‘á»“ gháº¿...</p>
+                    <p className="text-gray-600">Đang tải sơ đồ ghế...</p>
                 </div>
             </div>
         );
@@ -394,14 +390,14 @@ const ChinhSuaSoDoGhe = () => {
                         {/* Breadcrumb */}
                         <div className="flex items-center gap-2 text-sm">
                             <Link to="/admin/dashboard/MayBay" className="text-gray-500 hover:text-sky-600 transition-colors">
-                                Quáº£n lÃ½ MÃ¡y Bay
+                                Quản lý Máy Bay
                             </Link>
                             <FaChevronRight className="text-gray-400 text-xs" />
                             <span className="text-gray-700 font-medium">
-                                {aircraft?.tenMayBay || `MÃ¡y bay #${maMayBay}`}
+                                {aircraft?.tenMayBay || `Máy bay #${maMayBay}`}
                             </span>
                             <FaChevronRight className="text-gray-400 text-xs" />
-                            <span className="text-sky-600 font-semibold">SÆ¡ Ä‘á»“ gháº¿</span>
+                            <span className="text-sky-600 font-semibold">Sơ đồ ghế</span>
                         </div>
 
                         {/* Actions */}
@@ -414,14 +410,14 @@ const ChinhSuaSoDoGhe = () => {
                                 className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors shadow-md"
                             >
                                 <FaPlus />
-                                ThÃªm gháº¿
+                                Thêm ghế
                             </button>
                             
                             <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-1">
                                 <button
                                     onClick={() => setZoomLevel(Math.max(50, zoomLevel - 10))}
                                     className="p-2 text-gray-600 hover:bg-gray-200 rounded-lg"
-                                    title="Thu nhá»"
+                                    title="Thu nhỏ"
                                 >
                                     <FaCompress />
                                 </button>
@@ -429,7 +425,7 @@ const ChinhSuaSoDoGhe = () => {
                                 <button
                                     onClick={() => setZoomLevel(Math.min(150, zoomLevel + 10))}
                                     className="p-2 text-gray-600 hover:bg-gray-200 rounded-lg"
-                                    title="PhÃ³ng to"
+                                    title="Phóng to"
                                 >
                                     <FaExpand />
                                 </button>
@@ -438,7 +434,7 @@ const ChinhSuaSoDoGhe = () => {
                             <button
                                 onClick={() => setIsFullscreen(!isFullscreen)}
                                 className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
-                                title={isFullscreen ? 'ThoÃ¡t toÃ n mÃ n hÃ¬nh' : 'ToÃ n mÃ n hÃ¬nh'}
+                                title={isFullscreen ? 'Thoát toàn màn hình' : 'Toàn màn hình'}
                             >
                                 {isFullscreen ? <FaCompress /> : <FaExpand />}
                             </button>
@@ -448,7 +444,7 @@ const ChinhSuaSoDoGhe = () => {
                                 className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
                             >
                                 <FaChevronLeft />
-                                Quay láº¡i
+                                Quay lại
                             </button>
                         </div>
                     </div>
@@ -458,123 +454,155 @@ const ChinhSuaSoDoGhe = () => {
             {/* Main Content */}
             <div className="flex h-[calc(100vh-64px)]">
                 {/* Seat Grid Area */}
-                <div className="flex-1 overflow-auto bg-gray-50 p-6">
-                    {/* Toolbar */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
-                        <div className="flex flex-wrap items-center justify-between gap-4">
-                            <div className="flex items-center gap-3">
+                <div className="flex-1 overflow-auto bg-gray-50">
+                    {/* Toolbar Container - Modern Layout */}
+                    <div className="sticky top-0 z-10 bg-gray-50 pt-4 px-6 pb-2 space-y-3">
+                        {/* Primary Actions Bar */}
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                            <div className="flex items-center justify-center gap-3">
                                 <button
                                     onClick={() => setShowAutoGenerate(true)}
-                                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 font-medium transition-all shadow-md"
+                                    className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 font-medium transition-all shadow-md hover:shadow-lg"
                                 >
                                     <FaMagic />
-                                    Tá»± Ä‘á»™ng táº¡o
+                                    Tự động tạo
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setEditingSeat(null);
+                                        setShowAddSeat(true);
+                                    }}
+                                    className="flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors shadow-md hover:shadow-lg"
+                                >
+                                    <FaPlus />
+                                    Thêm ghế
                                 </button>
                                 <button
                                     onClick={handleDeleteAllSeats}
-                                    className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 font-medium transition-colors"
+                                    className="flex items-center gap-2 px-5 py-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 font-medium transition-colors border border-red-200 shadow-sm hover:shadow-md"
                                 >
                                     <FaTrash />
-                                    XÃ³a táº¥t cáº£
+                                    Xóa tất cả
                                 </button>
                             </div>
+                        </div>
 
-                            {/* Selection actions */}
-                            {selectedSeats.length > 0 && (
-                                <div className="flex items-center gap-3 bg-sky-50 px-4 py-2 rounded-lg border border-sky-200">
-                                    <span className="text-sky-700 font-medium">
-                                        ÄÃ£ chá»n: {selectedSeats.length} gháº¿
-                                    </span>
-                                    <button
-                                        onClick={() => setShowBulkEdit(true)}
-                                        className="flex items-center gap-1 px-3 py-1 bg-sky-600 text-white rounded-lg hover:bg-sky-700 text-sm font-medium"
-                                    >
-                                        <FaEdit size={12} />
-                                        Sá»­a hÃ ng loáº¡t
-                                    </button>
-                                    <button
-                                        onClick={handleDeleteSelectedSeats}
-                                        className="flex items-center gap-1 px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium"
-                                    >
-                                        <FaTrash size={12} />
-                                        XÃ³a
-                                    </button>
+                        {/* Selection Actions Bar - Only shown when seats are selected */}
+                        {selectedSeats.length > 0 && (
+                            <div className="bg-sky-50 rounded-xl border border-sky-200 p-3 animate-slideDown">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                                                {selectedSeats.length}
+                                            </div>
+                                            <span className="text-sky-700 font-semibold">ghế đã chọn</span>
+                                        </div>
+                                        <div className="h-6 w-px bg-sky-200"></div>
+                                        <button
+                                            onClick={() => setShowBulkEdit(true)}
+                                            className="flex items-center gap-1.5 px-4 py-1.5 bg-sky-600 text-white rounded-lg hover:bg-sky-700 text-sm font-medium transition-colors"
+                                        >
+                                            <FaEdit size={12} />
+                                            Sửa hàng loạt
+                                        </button>
+                                        <button
+                                            onClick={handleDeleteSelectedSeats}
+                                            className="flex items-center gap-1.5 px-4 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium transition-colors"
+                                        >
+                                            <FaTrash size={12} />
+                                            Xóa đã chọn
+                                        </button>
+                                    </div>
                                     <button
                                         onClick={clearSelection}
-                                        className="p-1 text-gray-500 hover:text-gray-700"
+                                        className="p-2 text-sky-600 hover:bg-sky-100 rounded-lg transition-colors"
+                                        title="Bỏ chọn tất cả"
                                     >
                                         <FaTimes />
                                     </button>
                                 </div>
-                            )}
+                            </div>
+                        )}
 
-                            <div className="flex items-center gap-2 text-sm text-gray-500">
-                                <span>ðŸ’¡ Click Ä‘á»ƒ chá»n</span>
-                                <span>|</span>
-                                <span>Click 2 láº§n Ä‘á»ƒ sá»­a</span>
-                                <span>|</span>
-                                <span>Chuá»™t pháº£i Ä‘á»ƒ menu</span>
-                                <span>|</span>
-                                <span>Ctrl+Click: chá»n nhiá»u</span>
+                        {/* Help/Tips Bar */}
+                        <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg px-4 py-2 border border-amber-200">
+                            <div className="flex items-center justify-center gap-4 text-xs text-amber-900">
+                                <span className="flex items-center gap-1">
+                                    <span className="font-semibold">💡 Click</span> để chọn
+                                </span>
+                                <span className="text-amber-300">•</span>
+                                <span className="flex items-center gap-1">
+                                    <span className="font-semibold">Double-click</span> để sửa
+                                </span>
+                                <span className="text-amber-300">•</span>
+                                <span className="flex items-center gap-1">
+                                    <span className="font-semibold">Right-click</span> menu tùy chọn
+                                </span>
+                                <span className="text-amber-300">•</span>
+                                <span className="flex items-center gap-1">
+                                    <span className="font-semibold">Ctrl+Click</span> chọn nhiều
+                                </span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Legend */}
-                    <SeatLegend />
+                    {/* Main Content Area */}
+                    <div className="px-6 pb-6 pt-4">
+                        {/* Legend */}
+                        <SeatLegend />
 
-                    {/* Aircraft Seat Map */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        {/* Aircraft Seat Map */}
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mt-4">
                         {/* Cockpit Header */}
                         <div className="bg-gradient-to-r from-sky-600 to-blue-700 text-white p-4 text-center">
                             <div className="flex items-center justify-center gap-3">
                                 <FaPlane className="text-2xl" />
-                                <span className="text-lg font-bold">Äáº¦U MÃY BAY / COCKPIT</span>
+                                <span className="text-lg font-bold">ĐẦU MÁY BAY / COCKPIT</span>
                             </div>
                             {aircraft && (
                                 <p className="text-sky-100 text-sm mt-1">
-                                    {aircraft.tenMayBay} - {aircraft.hangMayBay} | Sá»‘ hiá»‡u: {aircraft.soHieu}
+                                    {aircraft.tenMayBay} - {aircraft.hangMayBay} | Số hiệu: {aircraft.soHieu}
                                 </p>
                             )}
                         </div>
 
-                        {/* Seat Grid */}
-                        <div
-                            className="p-6 overflow-auto"
-                            style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top center' }}
-                        >
-                            {seats.length === 0 ? (
-                                <div className="text-center py-16">
-                                    <FaPlane className="text-gray-300 text-6xl mx-auto mb-4" />
-                                    <p className="text-gray-500 font-medium text-lg">ChÆ°a cÃ³ sÆ¡ Ä‘á»“ gháº¿</p>
-                                    <p className="text-gray-400 text-sm mt-2 mb-6">Nháº¥n "Tá»± Ä‘á»™ng táº¡o" Ä‘á»ƒ báº¯t Ä‘áº§u</p>
-                                    <button
-                                        onClick={() => setShowAutoGenerate(true)}
-                                        className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
-                                    >
-                                        <FaMagic className="inline mr-2" />
-                                        Tá»± Ä‘á»™ng táº¡o sÆ¡ Ä‘á»“ gháº¿
-                                    </button>
+                            {/* Seat Grid */}
+                            <div
+                                className="p-6 overflow-auto"
+                                style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top center' }}
+                            >
+                                {seats.length === 0 ? (
+                                    <div className="text-center py-16">
+                                        <FaPlane className="text-gray-300 text-6xl mx-auto mb-4" />
+                                        <p className="text-gray-500 font-medium text-lg">Chưa có sơ đồ ghế</p>
+                                        <p className="text-gray-400 text-sm mt-2 mb-6">Nhấn "Tự động tạo" để bắt đầu</p>
+                                        <button
+                                            onClick={() => setShowAutoGenerate(true)}
+                                            className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
+                                        >
+                                            <FaMagic className="inline mr-2" />
+                                            Tự động tạo sơ đồ ghế
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <SeatGridDisplay
+                                        seats={seats}
+                                        maxRow={seats.length > 0 ? Math.max(...seats.map(s => s.hang)) : 0}
+                                        selectedSeats={selectedSeats}
+                                        onSeatClick={handleSeatClick}
+                                        onSeatRightClick={handleSeatRightClick}
+                                    />
+                                )}
+                            </div>
+
+                            {/* Tail */}
+                            {seats.length > 0 && (
+                                <div className="bg-gradient-to-r from-gray-400 to-gray-500 text-white p-3 text-center">
+                                    <span className="text-sm font-medium">🚻 PHÍA SAU MÁY BAY / TAIL</span>
                                 </div>
-                            ) : (
-                                <SeatGridDisplay
-                                    seats={seats}
-                                    maxRow={seats.length > 0 ? Math.max(...seats.map(s => s.hang)) : 0}
-                                    allColumns={getAllColumns()}
-                                    selectedSeats={selectedSeats}
-                                    onSeatClick={handleSeatClick}
-                                    onSeatRightClick={handleSeatRightClick}
-                                    zoomLevel={zoomLevel}
-                                />
                             )}
                         </div>
-
-                        {/* Tail */}
-                        {seats.length > 0 && (
-                            <div className="bg-gradient-to-r from-gray-400 to-gray-500 text-white p-3 text-center">
-                                <span className="text-sm font-medium">ðŸš» PHÃA SAU MÃY BAY / TAIL</span>
-                            </div>
-                        )}
                     </div>
                 </div>
 
@@ -601,7 +629,7 @@ const ChinhSuaSoDoGhe = () => {
             {showEditSeat && editingSeat && (
                 <EditSeatModal
                     seat={editingSeat}
-                    hangVeList={hangVeList}
+                    seats={seats}
                     onSave={handleUpdateSeat}
                     onClose={() => {
                         setShowEditSeat(false);
@@ -614,7 +642,7 @@ const ChinhSuaSoDoGhe = () => {
             {showAddSeat && (
                 <AddSeatModal
                     initialData={editingSeat}
-                    hangVeList={hangVeList}
+                    seats={seats}
                     onSave={handleAddSeat}
                     onClose={() => {
                         setShowAddSeat(false);
