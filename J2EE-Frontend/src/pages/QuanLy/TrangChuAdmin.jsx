@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { FaSignOutAlt, FaBars, FaTimes, FaUserCircle, FaChevronDown } from 'react-icons/fa';
+import { NavLink, Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
+import { FaSignOutAlt, FaBars, FaTimes, FaUserCircle, FaChevronDown, FaChevronRight } from 'react-icons/fa';
 import { logout } from '../../services/AuthService';
 import { getUserInfo, isAuthenticated, getAdminUserInfo } from '../../utils/cookieUtils';
 import { getMenuItemsGroupedByPermissions } from '../../data/adminMenuData';
@@ -39,6 +39,7 @@ const AdminSidebarProvider = ({ children }) => {
 
 function TrangChuAdmin() {
     const navigate = useNavigate();
+    const location = useLocation();
     const { isGroupExpanded, toggleGroup } = useAdminSidebar();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [userInfo, setUserInfo] = useState(null);
@@ -75,6 +76,54 @@ function TrangChuAdmin() {
             return userInfo.username.charAt(0).toUpperCase();
         }
         return 'A';
+    };
+
+    // Tạo breadcrumb động từ URL
+    const getBreadcrumbs = () => {
+        const path = location.pathname;
+        const segments = path.split('/').filter(Boolean);
+        
+        const breadcrumbMap = {
+            'admin': 'Quản trị',
+            'dashboard': 'Dashboard',
+            'MayBay': 'Quản lý Máy Bay',
+            'TuyenBay': 'Quản lý Tuyến Bay',
+            'ChuyenBay': 'Quản lý Chuyến Bay',
+            'SanBay': 'Quản lý Sân Bay',
+            'DichVu': 'Quản lý Dịch Vụ',
+            'KhachHang': 'Quản lý Khách Hàng',
+            'TKAdmin': 'Quản lý Tài Khoản',
+            'GiaBay': 'Quản lý Giá Bay',
+            'KhuyenMai': 'Quản lý Khuyến Mãi',
+            'HoaDon': 'Quản lý Hóa Đơn',
+            'HoanTien': 'Quản lý Hoàn Tiền',
+            'LichSuThaoTac': 'Lịch Sử Thao Tác',
+            'VaiTro': 'Quản lý Vai Trò',
+            'PhanQuyen': 'Quản lý Phân Quyền',
+            'HangVe': 'Quản lý Hạng Vé',
+            'ThongKe': 'Thống Kê Doanh Thu',
+        };
+        
+        const breadcrumbs = [];
+        let currentPath = '';
+        
+        segments.forEach((segment, index) => {
+            currentPath += `/${segment}`;
+            const label = breadcrumbMap[segment] || segment;
+            
+            // Nếu là segment cuối cùng và có dạng số hoặc ID, bỏ qua
+            if (index === segments.length - 1 && /^[0-9]+$/.test(segment)) {
+                return;
+            }
+            
+            breadcrumbs.push({
+                label,
+                path: currentPath,
+                isLast: index === segments.length - 1
+            });
+        });
+        
+        return breadcrumbs;
     };
 
     return (
@@ -184,25 +233,41 @@ function TrangChuAdmin() {
 
             {/* Main Content */}
             <main className="flex-1 flex flex-col overflow-hidden">
-                {/* Toggle Button */}
-                <div className="bg-white shadow-md p-4 flex items-center gap-4">
-                    <button
-                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
-                    >
-                        {isSidebarOpen ? (
-                            <>
-                                <FaTimes size={20} />
-                                <span className="font-semibold text-sm">Đóng Menu</span>
-                            </>
-                        ) : (
-                            <>
-                                <FaBars size={20} />
-                                <span className="font-semibold text-sm">Mở Menu</span>
-                            </>
-                        )}
-                    </button>
-                </div>
+                {/* Header with Breadcrumb */}
+                <header className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 shadow-lg">
+                    <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex items-center justify-between h-16">
+                            {/* Left side - Menu toggle + Breadcrumb */}
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-all border border-white/20"
+                                >
+                                    {isSidebarOpen ? <FaTimes size={18} /> : <FaBars size={18} />}
+                                </button>
+                                
+                                {/* Dynamic Breadcrumb */}
+                                <div className="flex items-center gap-2 text-sm">
+                                    {getBreadcrumbs().map((crumb, index) => (
+                                        <React.Fragment key={crumb.path}>
+                                            {index > 0 && <FaChevronRight className="text-blue-300 text-xs" />}
+                                            {crumb.isLast ? (
+                                                <span className="text-white font-bold">{crumb.label}</span>
+                                            ) : (
+                                                <Link 
+                                                    to={crumb.path} 
+                                                    className="text-blue-100 hover:text-white transition-colors font-medium"
+                                                >
+                                                    {crumb.label}
+                                                </Link>
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
 
                 {/* Page Content */}
                 <div className="flex-1 p-8 overflow-y-auto">
