@@ -35,6 +35,13 @@ public class MayBayService {
     }
 
     /**
+     * Lấy danh sách máy bay đang hoạt động (Active)
+     */
+    public List<MayBay> getActiveMayBay() {
+        return mayBayRepository.findByTrangThai("Active");
+    }
+
+    /**
      * Lấy thông tin máy bay theo ID
      */
     public MayBay getMayBayById(Integer maMayBay) {
@@ -63,7 +70,7 @@ public class MayBayService {
         mayBay.setLoaiMayBay(request.getLoaiMayBay());
         mayBay.setSoHieu(request.getSoHieu());
         mayBay.setTongSoGhe(request.getTongSoGhe());
-        mayBay.setTrangThai(request.getTrangThai() != null ? request.getTrangThai() : "Hoạt động");
+        mayBay.setTrangThai(request.getTrangThai() != null ? request.getTrangThai() : "Active");
         mayBay.setNamKhaiThac(request.getNamKhaiThac());
         mayBay.setDaXoa(false);
 

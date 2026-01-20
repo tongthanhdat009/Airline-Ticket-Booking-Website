@@ -58,7 +58,17 @@ const ChinhSuaSoDoGhe = () => {
             ]);
             setSeats(seatsRes.data || []);
             setHangVeList(hangVeRes.data || []);
-            setAircraft(aircraftRes.data || null);
+            const aircraftData = aircraftRes.data || null;
+
+            // Kiểm tra trạng thái máy bay
+            if (aircraftData && aircraftData.trangThai === 'Active') {
+                showToast('Không thể chỉnh sửa sơ đồ ghế khi máy bay đang hoạt động. Vui lòng chuyển sang trạng thái Inactive hoặc Maintenance.', 'error');
+                // Redirect back to aircraft management page
+                window.history.back();
+                return;
+            }
+
+            setAircraft(aircraftData);
         } catch (error) {
             console.error('Lỗi khi tải dữ liệu:', error);
             showToast('Không thể tải dữ liệu', 'error');

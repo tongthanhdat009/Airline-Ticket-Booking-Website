@@ -28,12 +28,15 @@ INSERT INTO `tuyenbay` (`matuyenbay`, `masanbaydi`, `masanbayden`, `da_xoa`, `de
 (3, 1, 3, 0, NULL),
 (4, 3, 1, 0, NULL);
 
--- Bảng máy bay
+-- Bảng máy bay với 4 trạng thái: Active, Inactive, Maintenance, Retired
 INSERT INTO `maybay` (`mamaybay`, `tenmaybay`, `hangmaybay`, `loaimaybay`, `sohieu`, `tongsoghe`, `trangthai`, `namkhaithac`, `da_xoa`, `deleted_at`) VALUES
 (1, 'Airbus A320', 'Vietnam Airlines', 'Airbus A320', 'VN-A320', 180, 'Active', 2015, 0, NULL),
 (2, 'Boeing 737', 'Vietnam Airlines', 'Boeing 737-800', 'VN-B737', 180, 'Active', 2016, 0, NULL),
 (3, 'Airbus A321', 'Vietjet Air', 'Airbus A321', 'VJ-A321', 180, 'Active', 2017, 0, NULL),
-(4, 'Boeing 787', 'Vietnam Airlines', 'Boeing 787-9', 'VN-B789', 280, 'Active', 2018, 0, NULL);
+(4, 'Boeing 787', 'Vietnam Airlines', 'Boeing 787-9', 'VN-B789', 280, 'Active', 2018, 0, NULL),
+(5, 'Airbus A350', 'Vietnam Airlines', 'Airbus A350-900', 'VN-A350', 300, 'Inactive', 2019, 0, NULL),
+(6, 'Boeing 777', 'Vietnam Airlines', 'Boeing 777-300ER', 'VN-B777', 350, 'Maintenance', 2014, 0, NULL),
+(7, 'Airbus A330', 'Vietnam Airlines', 'Airbus A330-200', 'VN-A330', 250, 'Retired', 2012, 0, NULL);
 
 -- Bảng chi tiết ghế (sơ đồ ghế cho mỗi máy bay)
 -- Máy bay 1 (VN-A320) - 180 ghế
@@ -186,28 +189,29 @@ INSERT INTO `giachuyenbay` (`magia`, `matuyenbay`, `mahangve`, `giave`, `soluong
 (19, 4, 4, 3000000.00, 75, 0, '2025-01-01', NULL, 0, NULL),
 (20, 4, 5, 4500000.00, 100, 0, '2025-01-01', NULL, 0, NULL);
 
--- Bảng chi tiết chuyến bay
+-- Bảng chi tiết chuyến bay với các trạng thái:
+-- 'Đang mở bán', 'Đã bay', 'Delay', 'Hủy', 'Hoãn', 'Đang check-in', 'Đang bay', 'Đã hạ cánh'
 INSERT INTO `chitietchuyenbay` (`machuyenbay`, `matuyenbay`, `mamaybay`, `sohieuchuyenbay`, `ngaydi`, `giodi`, `ngayden`, `gioden`, `trangthai`, `thoigianden_thucte`, `thoigiandi_thucte`, `lydoDelay`, `da_xoa`, `deleted_at`) VALUES
-(1, 1, 1, 'VN240', '2026-01-15', '08:00:00', '2026-01-15', '10:05:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
-(2, 1, 2, 'VJ130', '2026-01-15', '10:30:00', '2026-01-15', '12:35:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
-(3, 3, 3, 'VN712', '2026-01-16', '15:00:00', '2026-01-16', '16:15:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
-(4, 2, 1, 'VN241', '2026-01-17', '11:00:00', '2026-01-17', '13:05:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
-(5, 1, 2, 'VN300', '2026-01-18', '09:00:00', '2026-01-18', '11:00:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
-(6, 3, 3, 'VN800', '2026-01-19', '14:00:00', '2026-01-19', '15:15:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
-(7, 2, 1, 'VN250', '2026-01-20', '06:30:00', '2026-01-20', '08:35:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
-(8, 1, 2, 'VN251', '2026-01-20', '09:15:00', '2026-01-20', '11:20:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
-(9, 1, 3, 'VN252', '2026-01-21', '14:45:00', '2026-01-21', '16:50:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
-(10, 1, 1, 'VN253', '2026-01-22', '07:00:00', '2026-01-22', '09:05:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
-(11, 1, 2, 'VN254', '2026-01-23', '11:30:00', '2026-01-23', '13:35:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
-(12, 1, 3, 'VN255', '2026-01-24', '16:15:00', '2026-01-24', '18:20:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
-(13, 1, 1, 'VN256', '2026-01-25', '08:45:00', '2026-01-25', '10:50:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
-(14, 1, 2, 'VN257', '2026-01-26', '13:20:00', '2026-01-26', '15:25:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
-(15, 1, 3, 'VN258', '2026-01-27', '06:00:00', '2026-01-27', '08:05:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
-(16, 1, 1, 'VN259', '2026-01-28', '09:30:00', '2026-01-28', '11:35:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
-(17, 3, 2, 'VN713', '2026-01-29', '14:00:00', '2026-01-29', '15:15:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
-(18, 2, 3, 'VN242', '2026-01-30', '10:00:00', '2026-01-30', '12:05:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
-(19, 1, 1, 'VN260', '2026-02-01', '07:15:00', '2026-02-01', '09:20:00', 'OPEN', NULL, NULL, NULL, 0, NULL),
-(20, 3, 2, 'VN714', '2026-02-02', '15:30:00', '2026-02-02', '16:45:00', 'OPEN', NULL, NULL, NULL, 0, NULL);
+(1, 1, 1, 'VN240', '2026-01-15', '08:00:00', '2026-01-15', '10:05:00', 'Đang mở bán', NULL, NULL, NULL, 0, NULL),
+(2, 1, 2, 'VJ130', '2026-01-15', '10:30:00', '2026-01-15', '12:35:00', 'Đang mở bán', NULL, NULL, NULL, 0, NULL),
+(3, 3, 3, 'VN712', '2026-01-16', '15:00:00', '2026-01-16', '16:15:00', 'Đang mở bán', NULL, NULL, NULL, 0, NULL),
+(4, 2, 1, 'VN241', '2026-01-17', '11:00:00', '2026-01-17', '13:05:00', 'Đang mở bán', NULL, NULL, NULL, 0, NULL),
+(5, 1, 2, 'VN300', '2026-01-18', '09:00:00', '2026-01-18', '11:00:00', 'Đang mở bán', NULL, NULL, NULL, 0, NULL),
+(6, 3, 3, 'VN800', '2026-01-19', '14:00:00', '2026-01-19', '15:15:00', 'Đang mở bán', NULL, NULL, NULL, 0, NULL),
+(7, 2, 1, 'VN250', '2026-01-20', '06:30:00', '2026-01-20', '08:35:00', 'Đang mở bán', NULL, NULL, NULL, 0, NULL),
+(8, 1, 2, 'VN251', '2026-01-20', '09:15:00', '2026-01-20', '11:20:00', 'Delay', '2026-01-20 09:45:00', NULL, 'Thời tiết xấu', 0, NULL),
+(9, 1, 3, 'VN252', '2026-01-21', '14:45:00', '2026-01-21', '16:50:00', 'Đã bay', '2026-01-21 14:50:00', '2026-01-21 17:00:00', NULL, 0, NULL),
+(10, 1, 1, 'VN253', '2026-01-22', '07:00:00', '2026-01-22', '09:05:00', 'Đang mở bán', NULL, NULL, NULL, 0, NULL),
+(11, 1, 2, 'VN254', '2026-01-23', '11:30:00', '2026-01-23', '13:35:00', 'Đang mở bán', NULL, NULL, NULL, 0, NULL),
+(12, 1, 3, 'VN255', '2026-01-24', '16:15:00', '2026-01-24', '18:20:00', 'Hủy', NULL, NULL, 'Bảo dưỡng máy bay khẩn cấp', 0, NULL),
+(13, 1, 1, 'VN256', '2026-01-25', '08:45:00', '2026-01-25', '10:50:00', 'Đang mở bán', NULL, NULL, NULL, 0, NULL),
+(14, 1, 2, 'VN257', '2026-01-26', '13:20:00', '2026-01-26', '15:25:00', 'Đang mở bán', NULL, NULL, NULL, 0, NULL),
+(15, 1, 3, 'VN258', '2026-01-27', '06:00:00', '2026-01-27', '08:05:00', 'Đang mở bán', NULL, NULL, NULL, 0, NULL),
+(16, 1, 1, 'VN259', '2026-01-28', '09:30:00', '2026-01-28', '11:35:00', 'Đang check-in', NULL, NULL, NULL, 0, NULL),
+(17, 3, 2, 'VN713', '2026-01-29', '14:00:00', '2026-01-29', '15:15:00', 'Đang bay', NULL, NULL, NULL, 0, NULL),
+(18, 2, 3, 'VN242', '2026-01-30', '10:00:00', '2026-01-30', '12:05:00', 'Đã hạ cánh', '2026-01-30 12:10:00', '2026-01-30 12:10:00', NULL, 0, NULL),
+(19, 1, 1, 'VN260', '2026-02-01', '07:15:00', '2026-02-01', '09:20:00', 'Đang mở bán', NULL, NULL, NULL, 0, NULL),
+(20, 3, 2, 'VN714', '2026-02-02', '15:30:00', '2026-02-02', '16:45:00', 'Đang mở bán', NULL, NULL, NULL, 0, NULL);
 
 -- =================================================================
 -- 5. BẢNG DỊCH VỤ CHUYẾN BAY

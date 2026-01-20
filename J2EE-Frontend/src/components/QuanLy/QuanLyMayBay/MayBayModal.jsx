@@ -8,7 +8,7 @@ const MayBayModal = ({ isOpen, onClose, onSave, aircraft }) => {
         hangMayBay: '',
         namKhaiThac: '',
         tongSoGhe: '',
-        trangThai: 'Hoạt động',
+        trangThai: 'Active',
         soHieu: ''
     });
 
@@ -22,7 +22,7 @@ const MayBayModal = ({ isOpen, onClose, onSave, aircraft }) => {
                 hangMayBay: aircraft.hangMayBay || '',
                 namKhaiThac: aircraft.namKhaiThac || '',
                 tongSoGhe: aircraft.tongSoGhe || '',
-                trangThai: aircraft.trangThai || 'Hoạt động',
+                trangThai: aircraft.trangThai || 'Active',
                 soHieu: aircraft.soHieu || ''
             });
         } else if (isOpen) {
@@ -32,7 +32,7 @@ const MayBayModal = ({ isOpen, onClose, onSave, aircraft }) => {
                 hangMayBay: '',
                 namKhaiThac: '',
                 tongSoGhe: '',
-                trangThai: 'Hoạt động',
+                trangThai: 'Active',
                 soHieu: ''
             });
         }
@@ -223,10 +223,15 @@ const MayBayModal = ({ isOpen, onClose, onSave, aircraft }) => {
                                 onChange={handleChange}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm"
                             >
-                                <option value="Hoạt động">Hoạt động</option>
-                                <option value="Bảo trì">Bảo trì</option>
-                                <option value="Vô hiệu">Vô hiệu</option>
+                                <option value="Active">Active (Hoạt động)</option>
+                                <option value="Inactive">Inactive (Vô hiệu)</option>
+                                <option value="Maintenance">Maintenance (Bảo trì)</option>
                             </select>
+                            <p className="text-xs text-gray-500 mt-1">
+                                {formData.trangThai === 'Active' ? 'Máy bay đang hoạt động bình thường' :
+                                 formData.trangThai === 'Inactive' ? 'Máy bay không hoạt động - có thể chỉnh sửa sơ đồ ghế' :
+                                 'Máy bay đang bảo trì - có thể chỉnh sửa sơ đồ ghế'}
+                            </p>
                         </div>
                     </div>
 

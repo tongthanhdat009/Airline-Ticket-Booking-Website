@@ -11,6 +11,8 @@ import ThongKeDoanhThu from './pages/QuanLy/ThongKeDoanhThu';
 import QuanLyKhachHang from './pages/QuanLy/QuanLyKhachHang';
 import QuanLyTuyenBay from './pages/QuanLy/QuanLyTuyenBay';
 import QuanLyChuyenBay from './pages/QuanLy/QuanLyChuyenBay';
+import ThemChuyenBay from './pages/QuanLy/ChuyenBay/ThemChuyenBay';
+import SuaChuyenBay from './pages/QuanLy/ChuyenBay/SuaChuyenBay';
 import QuanLyDichVu from './pages/QuanLy/QuanLyDichVu';
 import QuanLySanBay from "./pages/QuanLy/QuanLySanBay"
 import QuanLyTKAdmin from "./pages/QuanLy/QuanLyTKAdmin"
@@ -123,6 +125,8 @@ function AppContent() {
             <Route path="KhachHang" element={<QuanLyKhachHang />} />
             <Route path="TuyenBay" element={<QuanLyTuyenBay />} />
             <Route path="ChuyenBay" element={<QuanLyChuyenBay />} />
+            <Route path="ChuyenBay/them" element={<ThemChuyenBay />} />
+            <Route path="ChuyenBay/:id/sua" element={<SuaChuyenBay />} />
             <Route path="DichVu" element={<QuanLyDichVu />} />
             <Route path="ThongKe" element={<ThongKeDoanhThu />} />
             <Route path="SanBay" element={<QuanLySanBay />} />
@@ -148,6 +152,8 @@ function AppContent() {
             <Route path="KhachHang" element={<QuanLyKhachHang />} />
             <Route path="TuyenBay" element={<QuanLyTuyenBay />} />
             <Route path="ChuyenBay" element={<QuanLyChuyenBay />} />
+            <Route path="ChuyenBay/them" element={<ThemChuyenBay />} />
+            <Route path="ChuyenBay/:id/sua" element={<SuaChuyenBay />} />
             <Route path="DichVu" element={<QuanLyDichVu />} />
             <Route path="ThongKe" element={<ThongKeDoanhThu />} />
             <Route path="SanBay" element={<QuanLySanBay />} />

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaPlane, FaConciergeBell } from 'react-icons/fa';
 
-const EditFlightModal = ({ isOpen, onClose, onSubmit, formData, onFormChange, routes, getRouteInfo, currentFlight, services = [], selectedServices = [], onServiceChange }) => {
+const EditFlightModal = ({ isOpen, onClose, onSubmit, formData, onFormChange, routes, getRouteInfo, currentFlight, services = [], selectedServices = [], onServiceChange, aircraft = [] }) => {
     const [loaiChuyenBay, setLoaiChuyenBay] = useState('1-chieu'); // '1-chieu' hoặc 'khu-hoi'
     const [errors, setErrors] = useState({});
 
@@ -149,15 +149,32 @@ const EditFlightModal = ({ isOpen, onClose, onSubmit, formData, onFormChange, ro
                         </div>
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-2">Số hiệu chuyến bay</label>
-                            <input 
-                                type="text" 
-                                name="soHieuChuyenBay" 
-                                value={formData.soHieuChuyenBay} 
-                                onChange={onFormChange} 
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                                required 
+                            <input
+                                type="text"
+                                name="soHieuChuyenBay"
+                                value={formData.soHieuChuyenBay}
+                                onChange={onFormChange}
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                required
                                 placeholder="VD: VN214"
                             />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Máy bay</label>
+                            <select
+                                name="maMayBay"
+                                value={formData.maMayBay || ''}
+                                onChange={onFormChange}
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                required
+                            >
+                                <option value="" disabled>-- Chọn máy bay --</option>
+                                {aircraft.map(mb => (
+                                    <option key={mb.maMayBay} value={mb.maMayBay}>
+                                        {mb.tenMayBay} - {mb.sohieu} ({mb.tongSoGhe} ghế)
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-2">Ngày đi</label>
@@ -208,86 +225,6 @@ const EditFlightModal = ({ isOpen, onClose, onSubmit, formData, onFormChange, ro
                         </div>
                     </div>
                     </div>
-
-                    {/* Số lượng ghế cho từng hạng vé - chỉ hiển thị khi thêm mới */}
-                    {!currentFlight && (
-                        <div className="mt-6 pt-6 border-t border-gray-200">
-                            <h3 className="text-lg font-bold text-gray-800 mb-4 pb-2 border-b border-gray-200 flex items-center gap-2">
-                                <FaPlane className="text-blue-600" />
-                                Số lượng ghế theo hạng vé
-                            </h3>
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                <p className="text-sm text-gray-700 mb-4">
-                                    Nhập số lượng ghế cho từng hạng vé trên chuyến bay:
-                                </p>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-bold text-gray-700 mb-2">
-                                            Economy (Hạng 1)
-                                        </label>
-                                        <input 
-                                            type="number" 
-                                            name="soGheEconomy" 
-                                            value={formData.soGheEconomy || 0} 
-                                            onChange={onFormChange} 
-                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" 
-                                            min="0"
-                                            placeholder="0"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-bold text-gray-700 mb-2">
-                                            Deluxe (Hạng 2)
-                                        </label>
-                                        <input 
-                                            type="number" 
-                                            name="soGheDeluxe" 
-                                            value={formData.soGheDeluxe || 0} 
-                                            onChange={onFormChange} 
-                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent" 
-                                            min="0"
-                                            placeholder="0"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-bold text-gray-700 mb-2">
-                                            Business (Hạng 3)
-                                        </label>
-                                        <input 
-                                            type="number" 
-                                            name="soGheBusiness" 
-                                            value={formData.soGheBusiness || 0} 
-                                            onChange={onFormChange} 
-                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" 
-                                            min="0"
-                                            placeholder="0"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-bold text-gray-700 mb-2">
-                                            FirstClass (Hạng 4)
-                                        </label>
-                                        <input 
-                                            type="number" 
-                                            name="soGheFirstClass" 
-                                            value={formData.soGheFirstClass || 0} 
-                                            onChange={onFormChange} 
-                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" 
-                                            min="0"
-                                            placeholder="0"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="mt-3 p-3 bg-blue-100 rounded text-sm text-blue-800">
-                                    <span className="font-semibold">Tổng số ghế: </span>
-                                    {(parseInt(formData.soGheEconomy || 0) + 
-                                      parseInt(formData.soGheDeluxe || 0) + 
-                                      parseInt(formData.soGheBusiness || 0) + 
-                                      parseInt(formData.soGheFirstClass || 0))} ghế
-                                </div>
-                            </div>
-                        </div>
-                    )}
 
                     {/* Chuyến bay về - chỉ hiển thị khi chọn khứ hồi */}
                     {!currentFlight && loaiChuyenBay === 'khu-hoi' && (
@@ -363,7 +300,7 @@ const EditFlightModal = ({ isOpen, onClose, onSubmit, formData, onFormChange, ro
                                 </p>
                             </div>
                         </div>
-                    )})
+                    )}
 
                     {/* Phần gán dịch vụ cho chuyến bay */}
                     <div className="mt-6 pt-6 border-t border-gray-200">

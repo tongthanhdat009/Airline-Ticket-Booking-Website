@@ -5,6 +5,7 @@ import { getAllServices, fetchImageByName, getServiceOptions, createServiceOptio
 import ServiceModal from '../../components/QuanLy/QuanLyDichVu/ServiceModal';
 import DeleteConfirmationModal from '../../components/QuanLy/QuanLyDichVu/DeleteConfirmationModal';
 import ServiceDetailModal from '../../components/QuanLy/QuanLyDichVu/ServiceDetailModal';
+import Toast from '../../components/common/Toast';
 
 const QuanLyDichVu = () => {
   const [services, setServices] = useState([]);
@@ -17,6 +18,7 @@ const QuanLyDichVu = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [imageCache, setImageCache] = useState({}); // Cache để lưu ảnh đã tải
   const [currentPage, setCurrentPage] = useState(1);
+  const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
   const itemsPerPage = 5;
 
   useEffect(() => {
@@ -169,16 +171,28 @@ const QuanLyDichVu = () => {
       // Remove from local state only after successful deletion
       const updatedServices = services.filter(s => s.maDichVu !== currentService.maDichVu);
       setServices(updatedServices);
-      
+
+      showToast('Xóa dịch vụ thành công', 'success');
+
       // Reset về trang đầu tiên sau khi xóa
       setCurrentPage(1);
-      
+
       setIsDeleteConfirmOpen(false);
       setCurrentService(null);
     } catch (error) {
       console.error('Lỗi khi xóa dịch vụ:', error);
-      alert('Không thể xóa dịch vụ. Vui lòng thử lại.');
+      const errorMsg = error.response?.data?.message || error.response?.data?.error || 'Không thể xóa dịch vụ. Vui lòng thử lại.';
+      showToast(errorMsg, 'error');
     }
+  };
+
+  // Toast functions
+  const showToast = (message, type = 'success') => {
+    setToast({ isVisible: true, message, type });
+  };
+
+  const hideToast = () => {
+    setToast({ ...toast, isVisible: false });
   };
 
   const handleViewDetail = async (service) => {
@@ -287,6 +301,14 @@ const QuanLyDichVu = () => {
 
   return (
     <Card title="Quản lý Dịch vụ Chuyến bay">
+      {/* Toast notification */}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+      />
+
       {/* Header Actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div className="relative w-full sm:w-96">
@@ -348,22 +370,22 @@ const QuanLyDichVu = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex justify-center gap-2">
-                        <button 
-                          onClick={() => handleViewDetail(service)} 
+                        <button
+                          onClick={() => handleViewDetail(service)}
                           className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
                           title="Xem chi tiết"
                         >
                           <FaEye size={16} />
                         </button>
-                        <button 
-                          onClick={() => handleEdit(service)} 
+                        <button
+                          onClick={() => handleEdit(service)}
                           className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
                           title="Chỉnh sửa"
                         >
                           <FaEdit size={16} />
                         </button>
-                        <button 
-                          onClick={() => handleDelete(service)} 
+                        <button
+                          onClick={() => handleDelete(service)}
                           className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
                           title="Xóa"
                         >

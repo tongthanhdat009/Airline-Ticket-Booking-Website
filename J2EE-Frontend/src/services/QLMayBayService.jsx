@@ -14,6 +14,19 @@ export const getAllMayBay = async () => {
 };
 
 /**
+ * Lấy danh sách máy bay đang hoạt động (Active)
+ */
+export const getActiveMayBay = async () => {
+  try {
+    const response = await apiClient.get("/admin/dashboard/maybay/active");
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi khi lấy danh sách máy bay active", error);
+    throw error;
+  }
+};
+
+/**
  * Lấy thông tin máy bay theo ID
  */
 export const getMayBayById = async (maMayBay) => {

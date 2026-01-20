@@ -4,10 +4,12 @@ import com.example.j2ee.model.ChiTietChuyenBay;
 import com.example.j2ee.model.DichVuChuyenBay;
 import com.example.j2ee.model.DichVuChuyenBayId;
 import com.example.j2ee.model.DichVuCungCap;
+import com.example.j2ee.model.MayBay;
 import com.example.j2ee.model.TuyenBay;
 import com.example.j2ee.repository.ChiTietChuyenBayRepository;
 import com.example.j2ee.repository.DichVuChuyenBayRepository;
 import com.example.j2ee.repository.DichVuCungCapRepository;
+import com.example.j2ee.repository.MayBayRepository;
 import com.example.j2ee.repository.TuyenBayRepository;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -23,17 +25,20 @@ import java.util.Set;
 public class ChiTietChuyenBayService {
     private final ChiTietChuyenBayRepository chiTietChuyenBayRepository;
     private final TuyenBayRepository tuyenBayRepository;
+    private final MayBayRepository mayBayRepository;
     private final DichVuChuyenBayRepository dichVuChuyenBayRepository;
     private final DichVuCungCapRepository dichVuCungCapRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
     public ChiTietChuyenBayService(ChiTietChuyenBayRepository chiTietChuyenBayRepository,
                                    TuyenBayRepository tuyenBayRepository,
+                                   MayBayRepository mayBayRepository,
                                    DichVuChuyenBayRepository dichVuChuyenBayRepository,
                                    DichVuCungCapRepository dichVuCungCapRepository,
                                    SimpMessagingTemplate messagingTemplate) {
         this.chiTietChuyenBayRepository = chiTietChuyenBayRepository;
         this.tuyenBayRepository = tuyenBayRepository;
+        this.mayBayRepository = mayBayRepository;
         this.dichVuChuyenBayRepository = dichVuChuyenBayRepository;
         this.dichVuCungCapRepository = dichVuCungCapRepository;
         this.messagingTemplate = messagingTemplate;
@@ -90,6 +95,37 @@ public class ChiTietChuyenBayService {
         }
         ct.setTuyenBay(tuyenBay);
 
+        // Kiểm tra máy bay phải đang ở trạng thái Active
+        if (ct.getMayBay() != null && ct.getMayBay().getMaMayBay() != 0) {
+            int maMayBay = ct.getMayBay().getMaMayBay();
+            MayBay mayBay = mayBayRepository.findById(maMayBay).orElse(null);
+            if (mayBay == null) {
+                return "Máy bay không tồn tại: " + maMayBay;
+            }
+            if (!"Active".equals(mayBay.getTrangThai())) {
+                if ("Maintenance".equals(mayBay.getTrangThai())) {
+                    return "Máy bay đang bảo trì không thể sử dụng. Hiện tại: " + mayBay.getTrangThai();
+                }
+                return "Máy bay phải ở trạng thái Active mới có thể tạo chuyến bay. Hiện tại: " + mayBay.getTrangThai();
+            }
+
+            // Kiểm tra trùng lịch máy bay (với buffer 30 phút)
+            long conflictCount = chiTietChuyenBayRepository.existsAircraftScheduleConflict(
+                maMayBay,
+                ct.getNgayDi(),
+                ct.getGioDi(),
+                ct.getNgayDen(),
+                ct.getGioDen(),
+                null // excludeMaChuyenBay = null khi tạo mới
+            );
+
+            if (conflictCount > 0) {
+                return "Máy bay này đã được lịch bay trong khung thời gian này (cần buffer 30 phút giữa các chuyến). Vui lòng chọn khung giờ khác.";
+            }
+
+            ct.setMayBay(mayBay);
+        }
+
         // Kiểm tra trùng theo số hiệu + lịch (ngày đi/giờ đi/ngày đến/giờ đến)
         boolean duplicate = chiTietChuyenBayRepository
                 .existsBySoHieuChuyenBayAndNgayDiAndGioDiAndNgayDenAndGioDen(
@@ -118,7 +154,6 @@ public class ChiTietChuyenBayService {
         }
 
         boolean hasSeats = ct.getDanhSachGheDaDat() != null && !ct.getDanhSachGheDaDat().isEmpty();
-        boolean hasServices = ct.getDichVuCungCap() != null && !ct.getDichVuCungCap().isEmpty();
         boolean changingRoute = ctUpdate.getTuyenBay() != null
                 && ctUpdate.getTuyenBay().getMaTuyenBay() != 0
                 && (ct.getTuyenBay() == null
@@ -129,8 +164,8 @@ public class ChiTietChuyenBayService {
                         (ctUpdate.getNgayDen()!= null && !ctUpdate.getNgayDen().equals(ct.getNgayDen()))||
                         (ctUpdate.getGioDen() != null && !ctUpdate.getGioDen().equals(ct.getGioDen()));
 
-        if ((hasSeats || hasServices) && (changingRoute || changingTime)) {
-            return "Không thể sửa tuyến/ thời gian vì chuyến bay đã có dữ liệu liên quan (ghế hoặc dịch vụ).";
+        if (hasSeats && (changingRoute || changingTime)) {
+            return "Không thể sửa tuyến/ thời gian vì chuyến bay đã có dữ liệu liên quan (ghế).";
         }
 
         // Cập nhật tuyến bay nếu gửi lên
@@ -141,6 +176,49 @@ public class ChiTietChuyenBayService {
                 return "Tuyến bay không tồn tại: " + maTuyenBay;
             }
             ct.setTuyenBay(tuyenBay);
+        }
+
+        // Cập nhật máy bay nếu gửi lên và kiểm tra trạng thái Active
+        if (ctUpdate.getMayBay() != null && ctUpdate.getMayBay().getMaMayBay() != 0) {
+            int maMayBay = ctUpdate.getMayBay().getMaMayBay();
+            MayBay mayBay = mayBayRepository.findById(maMayBay).orElse(null);
+            if (mayBay == null) {
+                return "Máy bay không tồn tại: " + maMayBay;
+            }
+            if (!"Active".equals(mayBay.getTrangThai())) {
+                if ("Maintenance".equals(mayBay.getTrangThai())) {
+                    return "Máy bay đang bảo trì không thể sử dụng. Hiện tại: " + mayBay.getTrangThai();
+                }
+                return "Máy bay phải ở trạng thái Active mới có thể gán cho chuyến bay. Hiện tại: " + mayBay.getTrangThai();
+            }
+
+            // Kiểm tra trùng lịch máy bay khi thay đổi thời gian (loại trừ chuyến bay đang sửa)
+            boolean isChangingTime = (ctUpdate.getNgayDi() != null && !ctUpdate.getNgayDi().equals(ct.getNgayDi())) ||
+                    (ctUpdate.getGioDi() != null && !ctUpdate.getGioDi().equals(ct.getGioDi())) ||
+                    (ctUpdate.getNgayDen() != null && !ctUpdate.getNgayDen().equals(ct.getNgayDen())) ||
+                    (ctUpdate.getGioDen() != null && !ctUpdate.getGioDen().equals(ct.getGioDen()));
+
+            LocalDate ngayDiToCheck = ctUpdate.getNgayDi() != null ? ctUpdate.getNgayDi() : ct.getNgayDi();
+            LocalTime gioDiToCheck = ctUpdate.getGioDi() != null ? ctUpdate.getGioDi() : ct.getGioDi();
+            LocalDate ngayDenToCheck = ctUpdate.getNgayDen() != null ? ctUpdate.getNgayDen() : ct.getNgayDen();
+            LocalTime gioDenToCheck = ctUpdate.getGioDen() != null ? ctUpdate.getGioDen() : ct.getGioDen();
+
+            if (isChangingTime) {
+                long conflictCount = chiTietChuyenBayRepository.existsAircraftScheduleConflict(
+                    maMayBay,
+                    ngayDiToCheck,
+                    gioDiToCheck,
+                    ngayDenToCheck,
+                    gioDenToCheck,
+                    ct.getMaChuyenBay() // exclude chuyến bay hiện tại
+                );
+
+                if (conflictCount > 0) {
+                    return "Máy bay này đã được lịch bay trong khung thời gian này (cần buffer 30 phút giữa các chuyến). Vui lòng chọn khung giờ khác.";
+                }
+            }
+
+            ct.setMayBay(mayBay);
         }
 
         // Cập nhật trường khác nếu có
@@ -189,7 +267,7 @@ public class ChiTietChuyenBayService {
         }
     }
 
-    // Xóa chi tiết chuyến bay theo model và trả thông báo
+    // Xóa chi tiết chuyến bay theo model và trả thông báo (soft delete)
     public String deleteChiTietChuyenBay(ChiTietChuyenBay ct) {
         if (ct == null || ct.getMaChuyenBay() == 0) {
             return "Chi tiết chuyến bay không hợp lệ";
@@ -200,19 +278,24 @@ public class ChiTietChuyenBayService {
             return "Chi tiết chuyến bay không tồn tại: " + maChuyenBay;
         }
 
-        // Kiểm tra dữ liệu liên quan: ghế đã đặt, đặt chỗ, dịch vụ chuyến bay
+        // Chỉ cho phép xóa chuyến bay khi trạng thái là "Hủy"
+        if (!"Hủy".equals(existing.getTrangThai())) {
+            return "Chỉ được xóa chuyến bay khi có trạng thái 'Hủy'. Hiện tại: " + existing.getTrangThai();
+        }
+
+        // Kiểm tra dữ liệu liên quan: ghế đã đặt, đặt chỗ
         boolean hasSeats = existing.getDanhSachGheDaDat() != null && !existing.getDanhSachGheDaDat().isEmpty();
-        boolean hasServices = existing.getDichVuCungCap() != null && !existing.getDichVuCungCap().isEmpty();
         // Nếu có bảng đặt chỗ tham chiếu ghế, nên kiểm tra thông qua quan hệ ghế -> đặt chỗ (tùy model).
         if (hasSeats) {
             return "Không thể xóa vì chuyến bay đã phát sinh ghế/đặt chỗ đang được sử dụng.";
         }
-        if (hasServices) {
-            return "Không thể xóa vì chuyến bay đang gắn dịch vụ đang được sử dụng.";
-        }
 
         try {
-            chiTietChuyenBayRepository.deleteById(maChuyenBay);
+            // Sử dụng soft delete - chỉ set flag và thời gian
+            existing.setDaXoa(true);
+            existing.setDeletedAt(LocalDateTime.now());
+
+            chiTietChuyenBayRepository.save(existing);
             return "Xóa chi tiết chuyến bay thành công";
         } catch (Exception e) {
             return "Lỗi khi xóa chi tiết chuyến bay: " + e.getMessage();
@@ -358,7 +441,7 @@ public class ChiTietChuyenBayService {
     // Xóa dịch vụ khỏi chuyến bay
     public String removeDichVuFromChuyenBay(int maChuyenBay, int maDichVu) {
         DichVuChuyenBayId id = new DichVuChuyenBayId(maChuyenBay, maDichVu);
-        
+
         if (!dichVuChuyenBayRepository.existsById(id)) {
             return "Dịch vụ không tồn tại trong chuyến bay này";
         }
@@ -368,6 +451,45 @@ public class ChiTietChuyenBayService {
             return "Xóa dịch vụ khỏi chuyến bay thành công";
         } catch (Exception e) {
             return "Lỗi khi xóa dịch vụ: " + e.getMessage();
+        }
+    }
+
+    // === SOFT DELETE METHODS ===
+
+    /**
+     * Lấy danh sách tất cả các chuyến bay đã bị xóa (soft delete)
+     */
+    public List<ChiTietChuyenBay> getAllDeletedChiTietChuyenBay() {
+        return chiTietChuyenBayRepository.findByDaXoaTrue();
+    }
+
+    /**
+     * Khôi phục một chuyến bay đã bị xóa
+     * @param maChuyenBay Mã chuyến bay cần khôi phục
+     * @return Thông báo kết quả
+     */
+    public String restoreChiTietChuyenBay(int maChuyenBay) {
+        if (!chiTietChuyenBayRepository.existsById(maChuyenBay)) {
+            return "Chuyến bay không tồn tại: " + maChuyenBay;
+        }
+
+        ChiTietChuyenBay chuyenBay = chiTietChuyenBayRepository.findById(maChuyenBay).orElse(null);
+        if (chuyenBay == null) {
+            return "Không tìm thấy chuyến bay";
+        }
+
+        if (!chuyenBay.isDaXoa()) {
+            return "Chuyến bay này chưa bị xóa nên không cần khôi phục";
+        }
+
+        try {
+            chuyenBay.setDaXoa(false);
+            chuyenBay.setDeletedAt(null);
+
+            chiTietChuyenBayRepository.save(chuyenBay);
+            return "Khôi phục chuyến bay thành công";
+        } catch (Exception e) {
+            return "Lỗi khi khôi phục chuyến bay: " + e.getMessage();
         }
     }
 

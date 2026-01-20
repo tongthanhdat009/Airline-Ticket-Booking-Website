@@ -199,4 +199,44 @@ public class QuanLyChuyenBayController {
                     .body(ApiResponse.error("Lỗi khi xóa dịch vụ: " + e.getMessage()));
         }
     }
+
+    // ==================== SOFT DELETE ENDPOINTS ====================
+
+    /**
+     * Lấy danh sách tất cả các chuyến bay đã bị xóa (soft delete)
+     */
+    @GetMapping("/deleted")
+    public ResponseEntity<ApiResponse<Iterable<ChiTietChuyenBay>>> getAllDeletedChuyenBay() {
+        try {
+            Iterable<ChiTietChuyenBay> deletedChuyenBayList = chiTietChuyenBayService.getAllDeletedChiTietChuyenBay();
+            return ResponseEntity.ok(ApiResponse.success(deletedChuyenBayList));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Lỗi khi lấy danh sách chuyến bay đã xóa: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Khôi phục một chuyến bay đã bị xóa
+     * @param maChuyenBay Mã chuyến bay cần khôi phục
+     * @return Thông báo kết quả
+     */
+    @PutMapping("/{maChuyenBay}/restore")
+    public ResponseEntity<ApiResponse<ChiTietChuyenBay>> restoreChuyenBay(@PathVariable int maChuyenBay) {
+        try {
+            String msg = chiTietChuyenBayService.restoreChiTietChuyenBay(maChuyenBay);
+            if ("Khôi phục chuyến bay thành công".equals(msg)) {
+                var chuyenBayOpt = chiTietChuyenBayService.getChiTietChuyenBayById(maChuyenBay);
+                if (chuyenBayOpt.isPresent()) {
+                    return ResponseEntity.ok(ApiResponse.success(chuyenBayOpt.get(), msg));
+                }
+                return ResponseEntity.ok(ApiResponse.successMessage(msg));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(msg));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Lỗi khi khôi phục chuyến bay: " + e.getMessage()));
+        }
+    }
 }

@@ -45,7 +45,7 @@ public class MayBay {
     private int tongSoGhe;
 
     @Column(name = "trangthai", length = 50)
-    private String trangThai = "Hoạt động";
+    private String trangThai = "Active";
 
     @Column(name = "namkhaithac")
     private Integer namKhaiThac;

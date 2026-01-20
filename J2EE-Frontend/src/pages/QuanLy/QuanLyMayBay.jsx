@@ -127,27 +127,21 @@ const QuanLyMayBay = () => {
         }
     };
 
-    const handleToggleStatus = async (maMayBay, currentStatus) => {
-        const newStatus = currentStatus === 'Hoạt động' ? 'Bảo trì' :
-                         currentStatus === 'Bảo trì' ? 'Vô hiệu' : 'Hoạt động';
-        try {
-            await QLMayBayService.updateTrangThaiMayBay(maMayBay, newStatus);
-            showToast(`Đã chuyển sang trạng thái ${newStatus}`);
-            loadAircrafts();
-        } catch (error) {
-            console.error('Lỗi khi cập nhật trạng thái:', error);
-            const errorMsg = error.response?.data?.message || error.response?.data?.error || 'Không thể cập nhật trạng thái';
-            showToast(errorMsg, 'error');
+    const getTrangThaiText = (trangThai) => {
+        switch (trangThai) {
+            case 'Active': return { text: 'Active', color: 'bg-green-100 text-green-700' };
+            case 'Maintenance': return { text: 'Maintenance', color: 'bg-yellow-100 text-yellow-700' };
+            case 'Inactive': return { text: 'Inactive', color: 'bg-red-100 text-red-700' };
+            default: return { text: trangThai, color: 'bg-gray-100 text-gray-700' };
         }
     };
 
-    const getTrangThaiText = (trangThai) => {
-        switch (trangThai) {
-            case 'Hoạt động': return { text: 'Hoạt động', color: 'bg-green-100 text-green-700' };
-            case 'Bảo trì': return { text: 'Bảo trì', color: 'bg-yellow-100 text-yellow-700' };
-            case 'Vô hiệu': return { text: 'Vô hiệu', color: 'bg-red-100 text-red-700' };
-            default: return { text: trangThai, color: 'bg-gray-100 text-gray-700' };
+    const handleEditSeatLayout = (aircraft) => {
+        if (aircraft.trangThai === 'Active') {
+            showToast('Không thể chỉnh sửa sơ đồ ghế khi máy bay đang hoạt động. Vui lòng chuyển sang trạng thái Inactive hoặc Maintenance.', 'error');
+            return;
         }
+        navigate(`/admin/dashboard/MayBay/${aircraft.maMayBay}/ghe`);
     };
 
     if (loading) {
@@ -232,7 +226,7 @@ const QuanLyMayBay = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Đang hoạt động</p>
-                            <p className="text-3xl font-bold mt-2">{aircrafts.filter(a => a.trangThai === 'Hoạt động').length}</p>
+                            <p className="text-3xl font-bold mt-2">{aircrafts.filter(a => a.trangThai === 'Active').length}</p>
                         </div>
                         <FaFighterJet size={40} className="opacity-80" />
                     </div>
@@ -241,7 +235,7 @@ const QuanLyMayBay = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Đang bảo trì</p>
-                            <p className="text-3xl font-bold mt-2">{aircrafts.filter(a => a.trangThai === 'Bảo trì').length}</p>
+                            <p className="text-3xl font-bold mt-2">{aircrafts.filter(a => a.trangThai === 'Maintenance').length}</p>
                         </div>
                         <FaFighterJet size={40} className="opacity-80" />
                     </div>
@@ -296,9 +290,7 @@ const QuanLyMayBay = () => {
                                             <td className="px-6 py-4 text-gray-700">{mb.namKhaiThac || '-'}</td>
                                             <td className="px-6 py-4 text-center font-bold text-sky-600">{mb.tongSoGhe}</td>
                                             <td className="px-6 py-4">
-                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status.color} cursor-pointer hover:opacity-80`}
-                                                      onClick={() => handleToggleStatus(mb.maMayBay, mb.trangThai)}
-                                                      title="Click để đổi trạng thái">
+                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status.color}`}>
                                                     {status.text}
                                                 </span>
                                             </td>
@@ -319,7 +311,7 @@ const QuanLyMayBay = () => {
                                                         <FaChair />
                                                     </button>
                                                     <button
-                                                        onClick={() => navigate(`/admin/dashboard/MayBay/${mb.maMayBay}/ghe`)}
+                                                        onClick={() => handleEditSeatLayout(mb)}
                                                         className="p-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors"
                                                         title="Chỉnh sửa sơ đồ ghế"
                                                     >

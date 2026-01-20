@@ -90,3 +90,23 @@ export const addGheToChuyenBay = async (maChuyenBay, soGheTheoHangVe) => {
         throw error;
     }
 };
+
+export const getAllDeletedChuyenBay = async () => {
+    try {
+        const response = await apiClient.get('/admin/dashboard/chuyenbay/deleted');
+        return response;
+    } catch (error) {
+        console.error('Error fetching deleted flights:', error);
+        throw error;
+    }
+};
+
+export const restoreChuyenBay = async (maChuyenBay) => {
+    try {
+        const response = await apiClient.put(`/admin/dashboard/chuyenbay/${maChuyenBay}/restore`);
+        return response;
+    } catch (error) {
+        console.error('Error restoring flight:', error);
+        throw error;
+    }
+};

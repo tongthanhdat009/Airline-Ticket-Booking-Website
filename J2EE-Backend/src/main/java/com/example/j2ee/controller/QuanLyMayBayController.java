@@ -38,6 +38,16 @@ public class QuanLyMayBayController {
     }
 
     /**
+     * Lấy danh sách máy bay đang hoạt động (Active)
+     */
+    @GetMapping("/active")
+    @PreAuthorize("hasAuthority('AIRCRAFT_VIEW')")
+    public ResponseEntity<ApiResponse<List<MayBay>>> getActiveMayBay() {
+        List<MayBay> activeMayBayList = mayBayService.getActiveMayBay();
+        return ResponseEntity.ok(ApiResponse.success(activeMayBayList));
+    }
+
+    /**
      * Lấy thông tin máy bay theo ID
      */
     @GetMapping("/{id}")

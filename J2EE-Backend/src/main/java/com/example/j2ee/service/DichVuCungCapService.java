@@ -263,4 +263,52 @@ public class DichVuCungCapService {
     private boolean isTenDichVuExists(String tenDichVu) {
         return dichVuCungCapRepository.existsByTenDichVu(tenDichVu);
     }
+
+    // ==================== SOFT DELETE METHODS ====================
+
+    /**
+     * Lấy danh sách tất cả dịch vụ bao gồm cả đã xóa mềm
+     */
+    public List<DichVuCungCap> getAllDichVuIncludingDeleted() {
+        return dichVuCungCapRepository.findAllIncludingDeleted();
+    }
+
+    /**
+     * Lấy danh sách dịch vụ đã xóa mềm
+     */
+    public List<DichVuCungCap> getAllDeletedDichVu() {
+        return dichVuCungCapRepository.findAllDeleted();
+    }
+
+    /**
+     * Khôi phục dịch vụ đã xóa mềm
+     */
+    public DichVuCungCap restoreDichVu(int id) {
+        Optional<DichVuCungCap> deletedDichVu = dichVuCungCapRepository.findDeletedById(id);
+        if (!deletedDichVu.isPresent()) {
+            throw new IllegalArgumentException("Không tìm thấy dịch vụ đã xóa với ID: " + id);
+        }
+
+        dichVuCungCapRepository.restoreById(id);
+
+        // Trả về dịch vụ đã khôi phục
+        return dichVuCungCapRepository.findById(id).orElse(null);
+    }
+
+    /**
+     * Xóa cứng (vĩnh viễn) dịch vụ - CHỈ DÙNG KHI CẦN THIẾT
+     */
+    public boolean hardDeleteDichVu(int id) {
+        if (!dichVuCungCapRepository.findDeletedById(id).isPresent()) {
+            throw new IllegalArgumentException("Chỉ có thể xóa cứng các dịch vụ đã bị xóa mềm");
+        }
+
+        // Kiểm tra xem có đang được sử dụng không
+        if (dichVuChuyenBayRepository.existsByDichVuCungCap_MaDichVu(id)) {
+            throw new IllegalArgumentException("Không thể xóa cứng dịch vụ đang được sử dụng trong chuyến bay");
+        }
+
+        dichVuCungCapRepository.hardDeleteById(id);
+        return true;
+    }
 }

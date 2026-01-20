@@ -17,11 +17,16 @@ public interface MayBayRepository extends JpaRepository<MayBay, Integer> {
      * Tìm máy bay theo số hiệu
      */
     Optional<MayBay> findBySoHieu(String soHieu);
-    
+
     /**
      * Kiểm tra máy bay tồn tại theo số hiệu
      */
     boolean existsBySoHieu(String soHieu);
+
+    /**
+     * Tìm máy bay theo trạng thái
+     */
+    List<MayBay> findByTrangThai(String trangThai);
 
     // ==================== SOFT DELETE METHODS ====================
     /**

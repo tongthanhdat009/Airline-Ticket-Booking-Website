@@ -216,4 +216,43 @@ public class DichVuCungCapController {
             return ResponseEntity.status(500).build();
         }
     }
+
+    // ==================== SOFT DELETE ENDPOINTS ====================
+
+    /**
+     * Lấy danh sách dịch vụ đã xóa mềm
+     */
+    @GetMapping("/deleted")
+    public ResponseEntity<ApiResponse<List<DichVuCungCap>>> getDeletedDichVu() {
+        return ResponseEntity.ok(ApiResponse.success(dichVuCungCapService.getAllDeletedDichVu()));
+    }
+
+    /**
+     * Khôi phục dịch vụ đã xóa mềm
+     */
+    @PostMapping("/{id}/restore")
+    public ResponseEntity<ApiResponse<DichVuCungCap>> restoreDichVu(@PathVariable int id) {
+        try {
+            DichVuCungCap restored = dichVuCungCapService.restoreDichVu(id);
+            return ResponseEntity.ok(ApiResponse.success("Khôi phục dịch vụ thành công", restored));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    /**
+     * Xóa cứng (vĩnh viễn) dịch vụ - CHỈ DÙNG KHI CẦN THIẾT
+     */
+    @DeleteMapping("/{id}/hard")
+    public ResponseEntity<ApiResponse<Void>> hardDeleteDichVu(@PathVariable int id) {
+        try {
+            boolean deleted = dichVuCungCapService.hardDeleteDichVu(id);
+            if (!deleted) {
+                return ResponseEntity.status(404).body(ApiResponse.error("Không tìm thấy dịch vụ"));
+            }
+            return ResponseEntity.ok(ApiResponse.successMessage("Xóa vĩnh viễn dịch vụ thành công"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
 }

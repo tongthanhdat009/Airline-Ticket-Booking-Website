@@ -34,7 +34,7 @@ public class UpdateMayBayRequest {
     @Min(value = 1, message = "Tổng số ghế phải lớn hơn 0")
     private Integer tongSoGhe;
 
-    @Pattern(regexp = "Hoạt động|Bảo trì|Vô hiệu", message = "Trạng thái phải là: Hoạt động, Bảo trì, Vô hiệu")
+    @Pattern(regexp = "Active|Inactive|Maintenance", message = "Trạng thái phải là: Active, Inactive, Maintenance")
     private String trangThai;
 
     @Min(value = 1900, message = "Năm khai thác phải từ năm 1900")

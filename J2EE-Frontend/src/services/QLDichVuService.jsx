@@ -2,7 +2,7 @@ import apiClient from "./apiClient";
 export const getAllServices = async () => {
     try{
         const response = await apiClient.get('/admin/dashboard/dichvu');
-        return response;
+        return response.data;
     }catch(error){
         console.error("Error fetching services:", error);
         throw error;
@@ -181,6 +181,44 @@ export const fetchServiceImageByName = async (imageName) => {
     }
     catch(error){
         console.error("Error fetching service image:", error);
+        throw error;
+    }
+}
+
+// ==================== SOFT DELETE METHODS ====================
+
+// Lấy danh sách dịch vụ đã xóa mềm
+export const getDeletedServices = async () => {
+    try{
+        const response = await apiClient.get('/admin/dashboard/dichvu/deleted');
+        return response.data;
+    }
+    catch(error){
+        console.error("Error fetching deleted services:", error);
+        throw error;
+    }
+}
+
+// Khôi phục dịch vụ đã xóa mềm
+export const restoreService = async (maDichVu) => {
+    try{
+        const response = await apiClient.post(`/admin/dashboard/dichvu/${maDichVu}/restore`);
+        return response.data;
+    }
+    catch(error){
+        console.error("Error restoring service:", error);
+        throw error;
+    }
+}
+
+// Xóa cứng (vĩnh viễn) dịch vụ
+export const hardDeleteService = async (maDichVu) => {
+    try{
+        const response = await apiClient.delete(`/admin/dashboard/dichvu/${maDichVu}/hard`);
+        return response.data;
+    }
+    catch(error){
+        console.error("Error hard deleting service:", error);
         throw error;
     }
 }
