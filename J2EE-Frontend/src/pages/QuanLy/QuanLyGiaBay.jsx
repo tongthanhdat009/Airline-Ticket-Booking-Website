@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { FaSearch, FaPlus, FaEdit, FaTrash, FaMoneyBillWave, FaCalendarAlt, FaEye, FaPlane, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { useState, useMemo, useEffect } from 'react';
+import { FaSearch, FaMoneyBillWave, FaEye, FaPlane } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
 import ViewPriceDetailModal from '../../components/QuanLy/QuanLyGiaBay/ViewPriceDetailModal';
@@ -20,7 +20,6 @@ const QuanLyGiaBay = () => {
     const [currentPrice, setCurrentPrice] = useState(null);
     const [formData, setFormData] = useState({});
     const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
-    const [expandedClassId, setExpandedClassId] = useState(null);
     const [priceFilter, setPriceFilter] = useState('all'); // Bộ lọc giá: all, low, medium, high
     const itemsPerPage = 10;
 
@@ -198,7 +197,6 @@ const QuanLyGiaBay = () => {
         console.log('handleViewDetail - routeData:', routeData);
         console.log('handleViewDetail - routeData.prices:', routeData.prices);
         setSelectedRoute(routeData);
-        setExpandedClassId(null);
         setIsDetailModalOpen(true);
     };
 
@@ -330,41 +328,6 @@ const QuanLyGiaBay = () => {
         return new Date(dateString).toLocaleDateString('vi-VN');
     };
 
-    const toggleClassExpansion = (classId) => {
-        // Chỉ mở 1 accordion tại một thời điểm
-        setExpandedClassId(prev => prev === classId ? null : classId);
-    };
-
-    // Nhóm giá theo hạng vé trong modal chi tiết
-    const groupPricesByClass = (prices) => {
-        const grouped = {};
-        
-        prices.forEach(price => {
-            const classId = price.hangVe?.maHangVe;
-            if (!classId) return;
-            
-            if (!grouped[classId]) {
-                grouped[classId] = {
-                    maHangVe: classId,
-                    tenHangVe: price.hangVe?.tenHangVe,
-                    prices: [],
-                    totalPrice: 0,
-                    count: 0
-                };
-            }
-            
-            grouped[classId].prices.push(price);
-            grouped[classId].totalPrice += parseFloat(price.giaVe);
-            grouped[classId].count += 1;
-        });
-        
-        Object.keys(grouped).forEach(classId => {
-            grouped[classId].avgPrice = grouped[classId].totalPrice / grouped[classId].count;
-        });
-        
-        return Object.values(grouped);
-    };
-
     const handleEditFromDetail = (price) => {
         setIsDetailModalOpen(false);
         handleOpenModal(price);
@@ -432,7 +395,7 @@ const QuanLyGiaBay = () => {
                             <tr>
                                 <th scope="col" className="px-6 py-4 text-left font-semibold">STT</th>
                                 <th scope="col" className="px-6 py-4 text-left font-semibold">Tuyến bay</th>
-                                <th scope="col" className="px-6 py-4 text-left font-semibold">Giá vé trung bình</th>
+                                <th scope="col" className="px-6 py-4 text-left font-semibold">Số hạng vé đang áp dụng</th>
                                 <th scope="col" className="px-6 py-4 text-center font-semibold">Hành động</th>
                             </tr>
                         </thead>
@@ -457,8 +420,12 @@ const QuanLyGiaBay = () => {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="font-bold text-green-600 text-lg">{formatCurrency(item.avgPrice)}</div>
-                                            <div className="text-xs text-gray-500">{item.count} mức giá</div>
+                                            <div className="font-bold text-blue-600 text-lg">{item.prices.length > 0 ? new Set(item.prices.map(p => p.hangVe?.tenHangVe)).size : 0} hạng vé</div>
+                                            <div className="text-xs text-gray-500 mt-1">
+                                                {item.prices.length > 0
+                                                    ? Array.from(new Set(item.prices.map(p => p.hangVe?.tenHangVe))).join(', ')
+                                                    : 'Chưa có hạng vé'}
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex justify-center gap-2">

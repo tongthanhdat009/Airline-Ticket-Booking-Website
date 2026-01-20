@@ -168,7 +168,7 @@ const QuanLyKhuyenMai = () => {
             <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="bg-gradient-to-r from-pink-600 to-rose-600 text-white">
+                        <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
                             <tr>
                                 <th className="px-6 py-4 text-left font-semibold">ID</th>
                                 <th className="px-6 py-4 text-left font-semibold">Tên khuyến mãi</th>

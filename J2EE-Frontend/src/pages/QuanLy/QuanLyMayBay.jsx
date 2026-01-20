@@ -261,7 +261,7 @@ const QuanLyMayBay = () => {
             <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="bg-gradient-to-r from-sky-600 to-blue-700 text-white">
+                        <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
                             <tr>
                                 <th className="px-6 py-4 text-left font-semibold">Mã máy bay</th>
                                 <th className="px-6 py-4 text-left font-semibold">Tên máy bay</th>

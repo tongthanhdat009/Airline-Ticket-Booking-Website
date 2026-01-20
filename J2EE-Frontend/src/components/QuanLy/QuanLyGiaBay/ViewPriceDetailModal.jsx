@@ -124,9 +124,16 @@ const ViewPriceDetailModal = ({
                                 </div>
                                 
                                 <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
-                                    <div className="text-sm text-gray-600 mb-2">Giá vé trung bình</div>
-                                    <div className="text-2xl font-bold text-green-600">{formatCurrency(selectedRoute.avgPrice)}</div>
-                                    <div className="text-xs text-gray-500 mt-1">{selectedRoute.count} mức giá khác nhau</div>
+                                    <div className="text-sm text-gray-600 mb-2">Tổng quan giá vé</div>
+                                    <div className="space-y-2">
+                                        {groupPricesByClass(selectedRoute.prices).map((ticketClass) => (
+                                            <div key={ticketClass.maHangVe} className="flex justify-between items-center bg-white rounded px-3 py-2">
+                                                <span className="text-sm font-medium text-gray-700">{ticketClass.tenHangVe}</span>
+                                                <span className="text-lg font-bold text-green-600">{formatCurrency(ticketClass.avgPrice)}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="text-xs text-gray-500 mt-2">{selectedRoute.count} mức giá khác nhau</div>
                                 </div>
                             </div>
                         </div>

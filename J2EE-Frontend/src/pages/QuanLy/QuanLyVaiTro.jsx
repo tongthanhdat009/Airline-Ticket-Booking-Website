@@ -298,7 +298,7 @@ const QuanLyVaiTro = () => {
                     <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-gradient-to-r from-violet-600 to-purple-600">
+                                <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
                                     <tr>
                                         <th className="px-6 py-4 text-left text-white font-bold">Mã vai trò</th>
                                         <th className="px-6 py-4 text-left text-white font-bold">Tên vai trò</th>

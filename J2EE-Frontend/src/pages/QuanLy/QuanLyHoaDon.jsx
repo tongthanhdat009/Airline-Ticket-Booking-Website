@@ -229,7 +229,7 @@ const QuanLyHoaDon = () => {
             <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="bg-gradient-to-r from-violet-600 to-purple-700 text-white">
+                        <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
                             <tr>
                                 <th className="px-6 py-4 text-left font-semibold">Mã HD</th>
                                 <th className="px-6 py-4 text-left font-semibold">Mã đặt vé</th>
@@ -401,7 +401,7 @@ const QuanLyHoaDon = () => {
                                 </h3>
                                 <div className="bg-gray-50 rounded-lg overflow-hidden">
                                     <table className="w-full text-sm">
-                                        <thead className="bg-violet-100 text-violet-800">
+                                        <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
                                             <tr>
                                                 <th className="px-4 py-3 text-left font-semibold">Dịch vụ</th>
                                                 <th className="px-4 py-3 text-center font-semibold">Số lượng</th>

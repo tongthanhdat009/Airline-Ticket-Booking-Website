@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { FaPlane, FaMagic, FaTrash, FaPlus, FaExpand, FaCompress, FaEdit, FaTimes } from 'react-icons/fa';
 import * as SoDoGheService from '../../services/SoDoGheService';
 import * as QLHangVeService from '../../services/QLHangVeService';
@@ -20,7 +20,6 @@ import { DEFAULT_CABIN_CONFIG } from '../../constants/aircraftConfig';
 
 const ChinhSuaSoDoGhe = () => {
     const { maMayBay } = useParams();
-    const navigate = useNavigate();
 
     // Data states
     const [aircraft, setAircraft] = useState(null);
