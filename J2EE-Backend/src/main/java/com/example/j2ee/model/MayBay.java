@@ -19,7 +19,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 @SQLDelete(sql = "UPDATE maybay SET da_xoa = 1, deleted_at = NOW(), sohieu = CONCAT(sohieu, '_deleted_', mamaybay) WHERE mamaybay = ?")
 @SQLRestriction("da_xoa = 0")
 public class MayBay {
@@ -63,6 +63,14 @@ public class MayBay {
     @OneToMany(mappedBy = "mayBay", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<ChiTietGhe> danhSachGhe;
+
+    /**
+     * Sân bay hiện tại mà máy bay đang đỗ
+     * Dùng để xác định tuyến bay khả dụng khi tạo chuyến bay
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "ma_sanbay_hientai")
+    private SanBay sanBayHienTai;
 
     // ==================== SOFT DELETE FIELDS ====================
     @Column(name = "da_xoa", nullable = false)

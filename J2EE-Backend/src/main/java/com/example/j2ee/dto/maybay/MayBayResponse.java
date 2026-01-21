@@ -26,6 +26,11 @@ public class MayBayResponse {
     private String trangThai;
     private Integer namKhaiThac;
 
+    /**
+     * Thông tin sân bay hiện tại mà máy bay đang đỗ
+     */
+    private CurrentAirportDTO currentAirport;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
@@ -34,4 +39,18 @@ public class MayBayResponse {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime deletedAt;
+
+    /**
+     * DTO cho thông tin sân bay hiện tại
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CurrentAirportDTO {
+        private Integer maSanBay;
+        private String maIATA;
+        private String tenSanBay;
+        private String thanhPho;
+    }
 }

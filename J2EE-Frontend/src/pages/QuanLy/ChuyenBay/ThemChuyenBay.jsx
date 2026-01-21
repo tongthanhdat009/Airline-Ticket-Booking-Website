@@ -31,6 +31,7 @@ const ThemChuyenBay = () => {
     });
     const [selectedServices, setSelectedServices] = useState([]);
     const [routes, setRoutes] = useState([]);
+    const [filteredRoutes, setFilteredRoutes] = useState([]); // Tuyến bay được lọc theo vị trí máy bay
     const [aircraft, setAircraft] = useState([]);
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -71,15 +72,33 @@ const ThemChuyenBay = () => {
         fetchData();
     }, []);
 
-    // Khi chọn máy bay, cập nhật selectedAircraft
+    // Khi chọn máy bay, cập nhật selectedAircraft và lọc tuyến bay phù hợp
     useEffect(() => {
         if (formData.maMayBay) {
             const selectedCraft = aircraft.find(mb => mb.maMayBay === parseInt(formData.maMayBay));
             setSelectedAircraft(selectedCraft || null);
+
+            // Lọc tuyến bay theo vị trí sân bay hiện tại của máy bay
+            if (selectedCraft?.sanBayHienTai) {
+                const filtered = routes.filter(r =>
+                    r.sanBayDi?.maSanBay === selectedCraft.sanBayHienTai.maSanBay
+                );
+                setFilteredRoutes(filtered);
+
+                // Reset tuyến bay đã chọn nếu không còn trong danh sách lọc
+                if (formData.maTuyenBay && !filtered.some(r => r.maTuyenBay === parseInt(formData.maTuyenBay))) {
+                    setFormData(prev => ({ ...prev, maTuyenBay: '' }));
+                    setSelectedRoute(null);
+                }
+            } else {
+                // Máy bay chưa có vị trí - không có tuyến bay khả dụng
+                setFilteredRoutes([]);
+            }
         } else {
             setSelectedAircraft(null);
+            setFilteredRoutes(routes); // Khi chưa chọn máy bay, hiển thị tất cả tuyến bay
         }
-    }, [formData.maMayBay, aircraft]);
+    }, [formData.maMayBay, aircraft, routes]);
 
     // Khi chọn tuyến bay, cập nhật selectedRoute
     useEffect(() => {
@@ -353,27 +372,6 @@ const ThemChuyenBay = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-2">
-                                Tuyến bay <span className="text-red-500">*</span>
-                            </label>
-                            <select
-                                name="maTuyenBay"
-                                value={formData.maTuyenBay}
-                                onChange={handleFormChange}
-                                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.maTuyenBay ? 'border-red-500' : 'border-gray-300'}`}
-                                required
-                            >
-                                <option value="">-- Chọn tuyến bay --</option>
-                                {routes.map(r => (
-                                    <option key={r.maTuyenBay} value={r.maTuyenBay}>
-                                        {r.sanBayDi?.maIATA || '?'} → {r.sanBayDen?.maIATA || '?'}
-                                    </option>
-                                ))}
-                            </select>
-                            {errors.maTuyenBay && <p className="text-red-500 text-xs mt-1">{errors.maTuyenBay}</p>}
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">
                                 Máy bay <span className="text-red-500">*</span>
                             </label>
                             <select
@@ -386,11 +384,49 @@ const ThemChuyenBay = () => {
                                 <option value="">-- Chọn máy bay --</option>
                                 {aircraft.map(mb => (
                                     <option key={mb.maMayBay} value={mb.maMayBay}>
-                                        {mb.tenMayBay} - {mb.sohieu} ({mb.tongSoGhe} ghế)
+                                        {mb.tenMayBay} - {mb.soHieu || mb.sohieu} ({mb.tongSoGhe} ghế)
+                                        {mb.sanBayHienTai ? ` - Đang ở ${mb.sanBayHienTai.maIATA}` : ' - Chưa có vị trí'}
                                     </option>
                                 ))}
                             </select>
                             {errors.maMayBay && <p className="text-red-500 text-xs mt-1">{errors.maMayBay}</p>}
+                            {selectedAircraft?.sanBayHienTai && (
+                                <p className="text-sm text-blue-600 mt-1">
+                                    📍 Vị trí hiện tại: {selectedAircraft.sanBayHienTai.tenSanBay} ({selectedAircraft.sanBayHienTai.maIATA})
+                                </p>
+                            )}
+                            {selectedAircraft && !selectedAircraft.sanBayHienTai && (
+                                <p className="text-sm text-orange-600 mt-1">
+                                    ⚠️ Máy bay chưa được gán vị trí sân bay. Vui lòng cập nhật trong Quản lý máy bay.
+                                </p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">
+                                Tuyến bay <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                name="maTuyenBay"
+                                value={formData.maTuyenBay}
+                                onChange={handleFormChange}
+                                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.maTuyenBay ? 'border-red-500' : 'border-gray-300'}`}
+                                required
+                                disabled={!selectedAircraft || filteredRoutes.length === 0}
+                            >
+                                <option value="">-- Chọn tuyến bay --</option>
+                                {filteredRoutes.map(r => (
+                                    <option key={r.maTuyenBay} value={r.maTuyenBay}>
+                                        {r.sanBayDi?.maIATA || '?'} → {r.sanBayDen?.maIATA || '?'}
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.maTuyenBay && <p className="text-red-500 text-xs mt-1">{errors.maTuyenBay}</p>}
+                            {selectedAircraft && filteredRoutes.length === 0 && (
+                                <p className="text-sm text-orange-600 mt-1">
+                                    ⚠️ Không có tuyến bay khả dụng từ sân bay hiện tại của máy bay
+                                </p>
+                            )}
                         </div>
 
                         <div>
@@ -500,92 +536,94 @@ const ThemChuyenBay = () => {
                 </div>
 
                 {/* Chuyến bay về */}
-                {loaiChuyenBay === 'khu-hoi' && (
-                    <div>
-                        <h3 className="text-xl font-bold text-gray-800 mb-4 pb-2 border-b border-gray-200">Chuyến bay về</h3>
-                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                            <p className="text-sm text-yellow-800">
-                                <span className="font-semibold">📌 Lưu ý:</span> Chuyến bay về sẽ đi ngược lại tuyến bay (điểm đến → điểm đi)
-                            </p>
+                {
+                    loaiChuyenBay === 'khu-hoi' && (
+                        <div>
+                            <h3 className="text-xl font-bold text-gray-800 mb-4 pb-2 border-b border-gray-200">Chuyến bay về</h3>
+                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                                <p className="text-sm text-yellow-800">
+                                    <span className="font-semibold">📌 Lưu ý:</span> Chuyến bay về sẽ đi ngược lại tuyến bay (điểm đến → điểm đi)
+                                </p>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                                        Số hiệu chuyến bay về <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="soHieuChuyenBayVe"
+                                        value={formData.soHieuChuyenBayVe}
+                                        onChange={handleFormChange}
+                                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.soHieuChuyenBayVe ? 'border-red-500' : 'border-gray-300'}`}
+                                        placeholder="VD: VN215"
+                                        required
+                                    />
+                                    {errors.soHieuChuyenBayVe && <p className="text-red-500 text-xs mt-1">{errors.soHieuChuyenBayVe}</p>}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                                        Ngày đi về <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="date"
+                                        name="ngayDiVe"
+                                        value={formData.ngayDiVe}
+                                        onChange={handleFormChange}
+                                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.ngayDiVe ? 'border-red-500' : 'border-gray-300'}`}
+                                        required
+                                    />
+                                    {errors.ngayDiVe && <p className="text-red-500 text-xs mt-1">{errors.ngayDiVe}</p>}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                                        Giờ đi về <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="time"
+                                        name="gioDiVe"
+                                        value={formData.gioDiVe}
+                                        onChange={handleFormChange}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                                        Ngày đến về <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="date"
+                                        name="ngayDenVe"
+                                        value={formData.ngayDenVe}
+                                        onChange={handleFormChange}
+                                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.ngayDenVe ? 'border-red-500' : 'border-gray-300'}`}
+                                        required
+                                    />
+                                    {errors.ngayDenVe && <p className="text-red-500 text-xs mt-1">{errors.ngayDenVe}</p>}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                                        Giờ đến về <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="time"
+                                        name="gioDenVe"
+                                        value={formData.gioDenVe}
+                                        onChange={handleFormChange}
+                                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.gioDenVe ? 'border-red-500' : 'border-gray-300'}`}
+                                        required
+                                    />
+                                    {errors.gioDenVe && <p className="text-red-500 text-xs mt-1">{errors.gioDenVe}</p>}
+                                </div>
+                            </div>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">
-                                    Số hiệu chuyến bay về <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    name="soHieuChuyenBayVe"
-                                    value={formData.soHieuChuyenBayVe}
-                                    onChange={handleFormChange}
-                                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.soHieuChuyenBayVe ? 'border-red-500' : 'border-gray-300'}`}
-                                    placeholder="VD: VN215"
-                                    required
-                                />
-                                {errors.soHieuChuyenBayVe && <p className="text-red-500 text-xs mt-1">{errors.soHieuChuyenBayVe}</p>}
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">
-                                    Ngày đi về <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="date"
-                                    name="ngayDiVe"
-                                    value={formData.ngayDiVe}
-                                    onChange={handleFormChange}
-                                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.ngayDiVe ? 'border-red-500' : 'border-gray-300'}`}
-                                    required
-                                />
-                                {errors.ngayDiVe && <p className="text-red-500 text-xs mt-1">{errors.ngayDiVe}</p>}
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">
-                                    Giờ đi về <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="time"
-                                    name="gioDiVe"
-                                    value={formData.gioDiVe}
-                                    onChange={handleFormChange}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                    required
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">
-                                    Ngày đến về <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="date"
-                                    name="ngayDenVe"
-                                    value={formData.ngayDenVe}
-                                    onChange={handleFormChange}
-                                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.ngayDenVe ? 'border-red-500' : 'border-gray-300'}`}
-                                    required
-                                />
-                                {errors.ngayDenVe && <p className="text-red-500 text-xs mt-1">{errors.ngayDenVe}</p>}
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">
-                                    Giờ đến về <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="time"
-                                    name="gioDenVe"
-                                    value={formData.gioDenVe}
-                                    onChange={handleFormChange}
-                                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.gioDenVe ? 'border-red-500' : 'border-gray-300'}`}
-                                    required
-                                />
-                                {errors.gioDenVe && <p className="text-red-500 text-xs mt-1">{errors.gioDenVe}</p>}
-                            </div>
-                        </div>
-                    </div>
-                )}
+                    )
+                }
 
                 {/* Dịch vụ */}
                 <div>
@@ -646,16 +684,18 @@ const ThemChuyenBay = () => {
                         <span>{isSubmitting ? 'Đang lưu...' : 'Lưu chuyến bay'}</span>
                     </button>
                 </div>
-            </form>
+            </form >
 
             {/* Seat Layout Modal */}
-            {showSeatModal && selectedAircraft && (
-                <SeatLayoutViewer
-                    maMayBay={selectedAircraft.maMayBay}
-                    onClose={() => setShowSeatModal(false)}
-                />
-            )}
-        </Card>
+            {
+                showSeatModal && selectedAircraft && (
+                    <SeatLayoutViewer
+                        maMayBay={selectedAircraft.maMayBay}
+                        onClose={() => setShowSeatModal(false)}
+                    />
+                )
+            }
+        </Card >
     );
 };
 

@@ -29,14 +29,15 @@ INSERT INTO `tuyenbay` (`matuyenbay`, `masanbaydi`, `masanbayden`, `da_xoa`, `de
 (4, 3, 1, 0, NULL);
 
 -- Bảng máy bay với 4 trạng thái: Active, Inactive, Maintenance, Retired
-INSERT INTO `maybay` (`mamaybay`, `tenmaybay`, `hangmaybay`, `loaimaybay`, `sohieu`, `tongsoghe`, `trangthai`, `namkhaithac`, `da_xoa`, `deleted_at`) VALUES
-(1, 'Airbus A320', 'Vietnam Airlines', 'Airbus A320', 'VN-A320', 180, 'Active', 2015, 0, NULL),
-(2, 'Boeing 737', 'Vietnam Airlines', 'Boeing 737-800', 'VN-B737', 180, 'Active', 2016, 0, NULL),
-(3, 'Airbus A321', 'Vietjet Air', 'Airbus A321', 'VJ-A321', 180, 'Active', 2017, 0, NULL),
-(4, 'Boeing 787', 'Vietnam Airlines', 'Boeing 787-9', 'VN-B789', 280, 'Active', 2018, 0, NULL),
-(5, 'Airbus A350', 'Vietnam Airlines', 'Airbus A350-900', 'VN-A350', 300, 'Inactive', 2019, 0, NULL),
-(6, 'Boeing 777', 'Vietnam Airlines', 'Boeing 777-300ER', 'VN-B777', 350, 'Maintenance', 2014, 0, NULL),
-(7, 'Airbus A330', 'Vietnam Airlines', 'Airbus A330-200', 'VN-A330', 250, 'Retired', 2012, 0, NULL);
+-- Tất cả máy bay được gán vị trí hiện tại là SGN (ma_sanbay_hientai = 1)
+INSERT INTO `maybay` (`mamaybay`, `tenmaybay`, `hangmaybay`, `loaimaybay`, `sohieu`, `tongsoghe`, `trangthai`, `namkhaithac`, `ma_sanbay_hientai`, `da_xoa`, `deleted_at`) VALUES
+(1, 'Airbus A320', 'Vietnam Airlines', 'Airbus A320', 'VN-A320', 180, 'Active', 2015, 1, 0, NULL),
+(2, 'Boeing 737', 'Vietnam Airlines', 'Boeing 737-800', 'VN-B737', 180, 'Active', 2016, 1, 0, NULL),
+(3, 'Airbus A321', 'Vietjet Air', 'Airbus A321', 'VJ-A321', 180, 'Active', 2017, 1, 0, NULL),
+(4, 'Boeing 787', 'Vietnam Airlines', 'Boeing 787-9', 'VN-B789', 280, 'Active', 2018, 1, 0, NULL),
+(5, 'Airbus A350', 'Vietnam Airlines', 'Airbus A350-900', 'VN-A350', 300, 'Inactive', 2019, 1, 0, NULL),
+(6, 'Boeing 777', 'Vietnam Airlines', 'Boeing 777-300ER', 'VN-B777', 350, 'Maintenance', 2014, 1, 0, NULL),
+(7, 'Airbus A330', 'Vietnam Airlines', 'Airbus A330-200', 'VN-A330', 250, 'Retired', 2012, 1, 0, NULL);
 
 -- Bảng chi tiết ghế (sơ đồ ghế cho mỗi máy bay)
 -- Máy bay 1 (VN-A320) - 180 ghế

@@ -13,11 +13,17 @@ public interface TuyenBayRepository extends JpaRepository<TuyenBay, Integer> {
     boolean existsBySanBayDi_MaSanBayOrSanBayDen_MaSanBay(int maSanBayDi, int maSanBayDen);
 
     boolean existsBySanBayDi_MaSanBayAndSanBayDen_MaSanBayAndMaTuyenBayNot(int maSanBayDi,
-                                                                           int maSanBayDen,
-                                                                           int maTuyenBay);
+            int maSanBayDen,
+            int maTuyenBay);
 
     // Kiểm tra trùng tuyến bay khi tạo mới (cả sân bay đi và đến giống nhau)
     boolean existsBySanBayDi_MaSanBayAndSanBayDen_MaSanBay(int maSanBayDi, int maSanBayDen);
+
+    /**
+     * Tìm các tuyến bay khởi hành từ sân bay có mã maSanBay
+     * Dùng để lọc tuyến bay phù hợp với vị trí hiện tại của máy bay
+     */
+    List<TuyenBay> findBySanBayDi_MaSanBay(int maSanBay);
 
     // ==================== SOFT DELETE METHODS ====================
     /**

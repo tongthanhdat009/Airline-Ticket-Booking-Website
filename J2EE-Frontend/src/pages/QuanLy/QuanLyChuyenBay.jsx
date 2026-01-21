@@ -102,7 +102,7 @@ const QuanLyChuyenBay = () => {
                         thoiGianDenThucTe: latestUpdate.thoiGianDenThucTe,
                         lyDoDelay: latestUpdate.lyDoDelay,
                         lyDoHuy: latestUpdate.lyDoHuy
-                      }
+                    }
                     : flight
             )
         );
@@ -171,7 +171,7 @@ const QuanLyChuyenBay = () => {
         } : {
             maTuyenBay: '', maMayBay: '', soHieuChuyenBay: '', ngayDi: '', gioDi: '', ngayDen: '', gioDen: ''
         });
-        
+
         // Nếu là sửa chuyến bay, load dịch vụ đã gán
         if (flight) {
             try {
@@ -185,7 +185,7 @@ const QuanLyChuyenBay = () => {
         } else {
             setSelectedServices([]);
         }
-        
+
         setIsModalOpen(true);
     };
 
@@ -200,8 +200,8 @@ const QuanLyChuyenBay = () => {
     };
 
     const handleServiceChange = (maDichVu) => {
-        setSelectedServices(prev => 
-            prev.includes(maDichVu) 
+        setSelectedServices(prev =>
+            prev.includes(maDichVu)
                 ? prev.filter(id => id !== maDichVu)
                 : [...prev, maDichVu]
         );
@@ -320,14 +320,14 @@ const QuanLyChuyenBay = () => {
             const servicesRes = await getDichVuByChuyenBay(maChuyenBay);
             const currentServices = servicesRes.data?.data || servicesRes.data || [];
             const currentServiceIds = currentServices.map(s => s.maDichVu);
-            
+
             // Xóa các dịch vụ không còn được chọn
             for (const maDichVu of currentServiceIds) {
                 if (!newServiceIds.includes(maDichVu)) {
                     await removeDichVuFromChuyenBay(maChuyenBay, maDichVu);
                 }
             }
-            
+
             // Thêm các dịch vụ mới
             for (const maDichVu of newServiceIds) {
                 if (!currentServiceIds.includes(maDichVu)) {
@@ -511,7 +511,7 @@ const QuanLyChuyenBay = () => {
     return (
         <Card title="Quản lý chuyến bay">
             {/* Toast Notification */}
-            <Toast 
+            <Toast
                 message={toast.message}
                 type={toast.type}
                 isVisible={toast.isVisible}
@@ -526,7 +526,7 @@ const QuanLyChuyenBay = () => {
                         <FaPlane className="text-blue-600 text-xl animate-bounce" />
                         <span className="text-blue-800 font-semibold">{updateMessage}</span>
                     </div>
-                    <button 
+                    <button
                         onClick={() => setShowUpdateNotification(false)}
                         className="text-blue-600 hover:text-blue-800 font-bold text-lg"
                     >
@@ -577,11 +577,10 @@ const QuanLyChuyenBay = () => {
                             setShowDeleted(!showDeleted);
                             setCurrentPage(1);
                         }}
-                        className={`flex items-center gap-2 px-5 py-3 rounded-lg font-semibold transition-all shadow-lg w-full sm:w-auto ${
-                            showDeleted
-                                ? 'bg-orange-500 text-white hover:bg-orange-600'
-                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        }`}
+                        className={`flex items-center gap-2 px-5 py-3 rounded-lg font-semibold transition-all shadow-lg w-full sm:w-auto ${showDeleted
+                            ? 'bg-orange-500 text-white hover:bg-orange-600'
+                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            }`}
                         title={showDeleted ? 'Hiển thị chuyến bay đang hoạt động' : 'Hiển thị chuyến bay đã xóa'}
                     >
                         {showDeleted ? <FaEye /> : <FaEyeSlash />}
@@ -657,23 +656,73 @@ const QuanLyChuyenBay = () => {
                                                     <select
                                                         value={flight.trangThai}
                                                         onChange={(e) => handleStatusChange(flight.maChuyenBay, e.target.value)}
-                                                        disabled={['Đã hủy', 'Đã bay'].includes(flight.trangThai)}
-                                                        className={`px-3 py-1.5 text-xs font-semibold rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 ${['Đã hủy', 'Đã bay'].includes(flight.trangThai) ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                                                        disabled={['Đã hủy', 'Đã bay', 'Hủy'].includes(flight.trangThai)}
+                                                        className={`px-3 py-1.5 text-xs font-semibold rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 ${['Đã hủy', 'Đã bay', 'Hủy'].includes(flight.trangThai) ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                                                     >
-                                                        {flight.trangThai === 'Delay' ? (
-                                                            <>
-                                                                <option value="Delay">Delay</option>
-                                                                <option value="Đã bay">Đã bay</option>
-                                                                <option value="Đã hủy">Đã hủy</option>
-                                                            </>
-                                                        ) : flight.trangThai === 'Đã hủy' ? (
-                                                            <>
-                                                                <option value="Đã hủy">Đã hủy</option>
-                                                                <option value="Đã bay">Đã bay</option>
-                                                            </>
-                                                        ) : (
+                                                        {/* Đang mở bán: có thể chuyển sang Đang check-in, Đang bay, Delay, Đã hủy */}
+                                                        {flight.trangThai === 'Đang mở bán' && (
                                                             <>
                                                                 <option value="Đang mở bán">Đang mở bán</option>
+                                                                <option value="Đang check-in">Đang check-in</option>
+                                                                <option value="Đang bay">Đang bay</option>
+                                                                <option value="Delay">Delay</option>
+                                                                <option value="Đã hủy">Đã hủy</option>
+                                                            </>
+                                                        )}
+
+                                                        {/* Đang check-in: có thể chuyển sang Đang bay, Delay, Đã hủy */}
+                                                        {flight.trangThai === 'Đang check-in' && (
+                                                            <>
+                                                                <option value="Đang check-in">Đang check-in</option>
+                                                                <option value="Đang bay">Đang bay</option>
+                                                                <option value="Delay">Delay</option>
+                                                                <option value="Đã hủy">Đã hủy</option>
+                                                            </>
+                                                        )}
+
+                                                        {/* Đang bay: chỉ có thể chuyển sang Đã bay */}
+                                                        {flight.trangThai === 'Đang bay' && (
+                                                            <>
+                                                                <option value="Đang bay">Đang bay</option>
+                                                                <option value="Đã bay">Đã bay</option>
+                                                            </>
+                                                        )}
+
+                                                        {/* Delay: có thể chuyển sang Đang bay, Đã bay, Đã hủy */}
+                                                        {flight.trangThai === 'Delay' && (
+                                                            <>
+                                                                <option value="Delay">Delay</option>
+                                                                <option value="Đang bay">Đang bay</option>
+                                                                <option value="Đã bay">Đã bay</option>
+                                                                <option value="Đã hủy">Đã hủy</option>
+                                                            </>
+                                                        )}
+
+                                                        {/* Đã hủy: không thể thay đổi */}
+                                                        {(flight.trangThai === 'Đã hủy' || flight.trangThai === 'Hủy') && (
+                                                            <option value={flight.trangThai}>{flight.trangThai}</option>
+                                                        )}
+
+                                                        {/* Đã bay: không thể thay đổi */}
+                                                        {flight.trangThai === 'Đã bay' && (
+                                                            <option value="Đã bay">Đã bay</option>
+                                                        )}
+
+                                                        {/* Legacy: Đã hạ cánh */}
+                                                        {flight.trangThai === 'Đã hạ cánh' && (
+                                                            <>
+                                                                <option value="Đã hạ cánh">Đã hạ cánh</option>
+                                                                <option value="Đã bay">Đã bay</option>
+                                                            </>
+                                                        )}
+
+                                                        {/* Default case: nếu không match với trường hợp nào */}
+                                                        {!['Đang mở bán', 'Đang check-in', 'Đang bay', 'Delay', 'Đã hủy', 'Hủy', 'Đã bay', 'Đã hạ cánh'].includes(flight.trangThai) && (
+                                                            <>
+                                                                <option value={flight.trangThai}>{flight.trangThai || 'Chưa xác định'}</option>
+                                                                <option value="Đang mở bán">Đang mở bán</option>
+                                                                <option value="Đang check-in">Đang check-in</option>
+                                                                <option value="Đang bay">Đang bay</option>
                                                                 <option value="Đã bay">Đã bay</option>
                                                                 <option value="Delay">Delay</option>
                                                                 <option value="Đã hủy">Đã hủy</option>
@@ -720,9 +769,9 @@ const QuanLyChuyenBay = () => {
                                                         </button>
                                                         <button
                                                             onClick={() => navigate(`/admin/dashboard/ChuyenBay/${flight.maChuyenBay}/sua`)}
-                                                            disabled={['Đã hủy', 'Đã bay'].includes(flight.trangThai)}
-                                                            className={`p-2 rounded-lg transition-colors ${['Đã hủy', 'Đã bay'].includes(flight.trangThai) ? 'text-gray-400 cursor-not-allowed' : 'text-orange-600 hover:bg-orange-100'}`}
-                                                            title="Chỉnh sửa"
+                                                            disabled={['Đã hủy', 'Đã bay', 'Đang bay'].includes(flight.trangThai)}
+                                                            className={`p-2 rounded-lg transition-colors ${['Đã hủy', 'Đã bay', 'Đang bay'].includes(flight.trangThai) ? 'text-gray-400 cursor-not-allowed' : 'text-orange-600 hover:bg-orange-100'}`}
+                                                            title={['Đang bay'].includes(flight.trangThai) ? 'Không thể sửa khi đang bay' : 'Chỉnh sửa'}
                                                         >
                                                             <FaEdit size={16} />
                                                         </button>
@@ -774,7 +823,7 @@ const QuanLyChuyenBay = () => {
                                     Trước
                                 </button>
                             </li>
-                            
+
                             {/* Trang đầu */}
                             {currentPage > 3 && (
                                 <>
@@ -808,11 +857,10 @@ const QuanLyChuyenBay = () => {
                                         <li key={index}>
                                             <button
                                                 onClick={() => paginate(pageNum)}
-                                                className={`px-3 py-2 rounded-lg font-medium transition-all text-sm ${
-                                                    currentPage === pageNum
-                                                        ? 'bg-blue-600 text-white shadow-lg'
-                                                        : 'bg-white border border-gray-300 hover:bg-gray-100'
-                                                }`}
+                                                className={`px-3 py-2 rounded-lg font-medium transition-all text-sm ${currentPage === pageNum
+                                                    ? 'bg-blue-600 text-white shadow-lg'
+                                                    : 'bg-white border border-gray-300 hover:bg-gray-100'
+                                                    }`}
                                             >
                                                 {pageNum}
                                             </button>

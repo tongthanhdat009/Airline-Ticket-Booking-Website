@@ -34,6 +34,7 @@ CREATE TABLE `maybay` (
   `tongsoghe` int NOT NULL,
   `trangthai` varchar(50) DEFAULT 'Active',
   `namkhaithac` int DEFAULT null,
+  `ma_sanbay_hientai` int DEFAULT null COMMENT 'Sân bay hiện tại mà máy bay đang đỗ',
   `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
   `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
 );
@@ -402,6 +403,7 @@ ALTER TABLE `tuyenbay` ADD CONSTRAINT `FK_tuyenbay_sanbaydi` FOREIGN KEY (`masan
 ALTER TABLE `tuyenbay` ADD CONSTRAINT `FK_tuyenbay_sanbayden` FOREIGN KEY (`masanbayden`) REFERENCES `sanbay` (`masanbay`);
 ALTER TABLE `chitietchuyenbay` ADD CONSTRAINT `FK_chitiet_tuyenbay` FOREIGN KEY (`matuyenbay`) REFERENCES `tuyenbay` (`matuyenbay`);
 ALTER TABLE `chitietchuyenbay` ADD CONSTRAINT `FK_chitiet_maybay` FOREIGN KEY (`mamaybay`) REFERENCES `maybay` (`mamaybay`);
+ALTER TABLE `maybay` ADD CONSTRAINT `FK_maybay_sanbay_hientai` FOREIGN KEY (`ma_sanbay_hientai`) REFERENCES `sanbay` (`masanbay`) ON DELETE SET NULL;
 ALTER TABLE `chitietghe` ADD CONSTRAINT `FK_ghe_maybay` FOREIGN KEY (`mamaybay`) REFERENCES `maybay` (`mamaybay`);
 ALTER TABLE `chitietghe` ADD CONSTRAINT `FK_ghe_hangve` FOREIGN KEY (`mahangve`) REFERENCES `hangve` (`mahangve`);
 ALTER TABLE `taikhoan` ADD CONSTRAINT `FK_taikhoan_hanhkhach` FOREIGN KEY (`mahanhkhach`) REFERENCES `hanhkhach` (`mahanhkhach`);

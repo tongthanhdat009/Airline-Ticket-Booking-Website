@@ -13,6 +13,7 @@ import com.example.j2ee.repository.MayBayRepository;
 import com.example.j2ee.repository.TuyenBayRepository;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,11 +32,11 @@ public class ChiTietChuyenBayService {
     private final SimpMessagingTemplate messagingTemplate;
 
     public ChiTietChuyenBayService(ChiTietChuyenBayRepository chiTietChuyenBayRepository,
-                                   TuyenBayRepository tuyenBayRepository,
-                                   MayBayRepository mayBayRepository,
-                                   DichVuChuyenBayRepository dichVuChuyenBayRepository,
-                                   DichVuCungCapRepository dichVuCungCapRepository,
-                                   SimpMessagingTemplate messagingTemplate) {
+            TuyenBayRepository tuyenBayRepository,
+            MayBayRepository mayBayRepository,
+            DichVuChuyenBayRepository dichVuChuyenBayRepository,
+            DichVuCungCapRepository dichVuCungCapRepository,
+            SimpMessagingTemplate messagingTemplate) {
         this.chiTietChuyenBayRepository = chiTietChuyenBayRepository;
         this.tuyenBayRepository = tuyenBayRepository;
         this.mayBayRepository = mayBayRepository;
@@ -109,14 +110,26 @@ public class ChiTietChuyenBayService {
                 return "Máy bay phải ở trạng thái Active mới có thể tạo chuyến bay. Hiện tại: " + mayBay.getTrangThai();
             }
 
+            // Kiểm tra máy bay phải có vị trí sân bay hiện tại
+            if (mayBay.getSanBayHienTai() == null) {
+                return "Máy bay chưa được gán vị trí sân bay hiện tại. Vui lòng cập nhật vị trí máy bay trước khi tạo chuyến bay.";
+            }
+
+            // Kiểm tra tuyến bay phải khởi hành từ sân bay hiện tại của máy bay
+            if (tuyenBay.getSanBayDi().getMaSanBay() != mayBay.getSanBayHienTai().getMaSanBay()) {
+                return "Tuyến bay không phù hợp. Máy bay đang ở " + mayBay.getSanBayHienTai().getTenSanBay()
+                        + " (" + mayBay.getSanBayHienTai().getMaIATA() + ") nhưng tuyến bay khởi hành từ "
+                        + tuyenBay.getSanBayDi().getTenSanBay() + " (" + tuyenBay.getSanBayDi().getMaIATA() + ").";
+            }
+
             // Kiểm tra trùng lịch máy bay (với buffer 30 phút)
             long conflictCount = chiTietChuyenBayRepository.existsAircraftScheduleConflict(
-                maMayBay,
-                ct.getNgayDi(),
-                ct.getGioDi(),
-                ct.getNgayDen(),
-                ct.getGioDen(),
-                null // excludeMaChuyenBay = null khi tạo mới
+                    maMayBay,
+                    ct.getNgayDi(),
+                    ct.getGioDi(),
+                    ct.getNgayDen(),
+                    ct.getGioDen(),
+                    null // excludeMaChuyenBay = null khi tạo mới
             );
 
             if (conflictCount > 0) {
@@ -153,16 +166,20 @@ public class ChiTietChuyenBayService {
             return "Chi tiết chuyến bay không tồn tại: " + ctUpdate.getMaChuyenBay();
         }
 
+        // Không cho sửa thông tin chuyến bay khi đang bay
+        if ("Đang bay".equals(ct.getTrangThai())) {
+            return "Không thể sửa thông tin chuyến bay khi đang bay. Chỉ có thể cập nhật trạng thái.";
+        }
+
         boolean hasSeats = ct.getDanhSachGheDaDat() != null && !ct.getDanhSachGheDaDat().isEmpty();
         boolean changingRoute = ctUpdate.getTuyenBay() != null
                 && ctUpdate.getTuyenBay().getMaTuyenBay() != 0
                 && (ct.getTuyenBay() == null
-                || ct.getTuyenBay().getMaTuyenBay() != ctUpdate.getTuyenBay().getMaTuyenBay());
-        boolean changingTime =
-                (ctUpdate.getNgayDi() != null && !ctUpdate.getNgayDi().equals(ct.getNgayDi())) ||
-                        (ctUpdate.getGioDi()  != null && !ctUpdate.getGioDi().equals(ct.getGioDi()))   ||
-                        (ctUpdate.getNgayDen()!= null && !ctUpdate.getNgayDen().equals(ct.getNgayDen()))||
-                        (ctUpdate.getGioDen() != null && !ctUpdate.getGioDen().equals(ct.getGioDen()));
+                        || ct.getTuyenBay().getMaTuyenBay() != ctUpdate.getTuyenBay().getMaTuyenBay());
+        boolean changingTime = (ctUpdate.getNgayDi() != null && !ctUpdate.getNgayDi().equals(ct.getNgayDi())) ||
+                (ctUpdate.getGioDi() != null && !ctUpdate.getGioDi().equals(ct.getGioDi())) ||
+                (ctUpdate.getNgayDen() != null && !ctUpdate.getNgayDen().equals(ct.getNgayDen())) ||
+                (ctUpdate.getGioDen() != null && !ctUpdate.getGioDen().equals(ct.getGioDen()));
 
         if (hasSeats && (changingRoute || changingTime)) {
             return "Không thể sửa tuyến/ thời gian vì chuyến bay đã có dữ liệu liên quan (ghế).";
@@ -189,10 +206,26 @@ public class ChiTietChuyenBayService {
                 if ("Maintenance".equals(mayBay.getTrangThai())) {
                     return "Máy bay đang bảo trì không thể sử dụng. Hiện tại: " + mayBay.getTrangThai();
                 }
-                return "Máy bay phải ở trạng thái Active mới có thể gán cho chuyến bay. Hiện tại: " + mayBay.getTrangThai();
+                return "Máy bay phải ở trạng thái Active mới có thể gán cho chuyến bay. Hiện tại: "
+                        + mayBay.getTrangThai();
             }
 
-            // Kiểm tra trùng lịch máy bay khi thay đổi thời gian (loại trừ chuyến bay đang sửa)
+            // Kiểm tra máy bay phải có vị trí sân bay hiện tại
+            if (mayBay.getSanBayHienTai() == null) {
+                return "Máy bay chưa được gán vị trí sân bay hiện tại. Vui lòng cập nhật vị trí máy bay trước khi gán cho chuyến bay.";
+            }
+
+            // Kiểm tra tuyến bay phải khởi hành từ sân bay hiện tại của máy bay
+            TuyenBay tuyenBayToCheck = ct.getTuyenBay(); // dùng tuyến bay hiện tại hoặc đã được cập nhật ở trên
+            if (tuyenBayToCheck.getSanBayDi().getMaSanBay() != mayBay.getSanBayHienTai().getMaSanBay()) {
+                return "Tuyến bay không phù hợp. Máy bay đang ở " + mayBay.getSanBayHienTai().getTenSanBay()
+                        + " (" + mayBay.getSanBayHienTai().getMaIATA() + ") nhưng tuyến bay khởi hành từ "
+                        + tuyenBayToCheck.getSanBayDi().getTenSanBay() + " ("
+                        + tuyenBayToCheck.getSanBayDi().getMaIATA() + ").";
+            }
+
+            // Kiểm tra trùng lịch máy bay khi thay đổi thời gian (loại trừ chuyến bay đang
+            // sửa)
             boolean isChangingTime = (ctUpdate.getNgayDi() != null && !ctUpdate.getNgayDi().equals(ct.getNgayDi())) ||
                     (ctUpdate.getGioDi() != null && !ctUpdate.getGioDi().equals(ct.getGioDi())) ||
                     (ctUpdate.getNgayDen() != null && !ctUpdate.getNgayDen().equals(ct.getNgayDen())) ||
@@ -205,12 +238,12 @@ public class ChiTietChuyenBayService {
 
             if (isChangingTime) {
                 long conflictCount = chiTietChuyenBayRepository.existsAircraftScheduleConflict(
-                    maMayBay,
-                    ngayDiToCheck,
-                    gioDiToCheck,
-                    ngayDenToCheck,
-                    gioDenToCheck,
-                    ct.getMaChuyenBay() // exclude chuyến bay hiện tại
+                        maMayBay,
+                        ngayDiToCheck,
+                        gioDiToCheck,
+                        ngayDenToCheck,
+                        gioDenToCheck,
+                        ct.getMaChuyenBay() // exclude chuyến bay hiện tại
                 );
 
                 if (conflictCount > 0) {
@@ -222,11 +255,16 @@ public class ChiTietChuyenBayService {
         }
 
         // Cập nhật trường khác nếu có
-        if (ctUpdate.getSoHieuChuyenBay() != null) ct.setSoHieuChuyenBay(ctUpdate.getSoHieuChuyenBay());
-        if (ctUpdate.getNgayDi() != null) ct.setNgayDi(ctUpdate.getNgayDi());
-        if (ctUpdate.getGioDi() != null) ct.setGioDi(ctUpdate.getGioDi());
-        if (ctUpdate.getNgayDen() != null) ct.setNgayDen(ctUpdate.getNgayDen());
-        if (ctUpdate.getGioDen() != null) ct.setGioDen(ctUpdate.getGioDen());
+        if (ctUpdate.getSoHieuChuyenBay() != null)
+            ct.setSoHieuChuyenBay(ctUpdate.getSoHieuChuyenBay());
+        if (ctUpdate.getNgayDi() != null)
+            ct.setNgayDi(ctUpdate.getNgayDi());
+        if (ctUpdate.getGioDi() != null)
+            ct.setGioDi(ctUpdate.getGioDi());
+        if (ctUpdate.getNgayDen() != null)
+            ct.setNgayDen(ctUpdate.getNgayDen());
+        if (ctUpdate.getGioDen() != null)
+            ct.setGioDen(ctUpdate.getGioDen());
 
         // Kiểm tra ngày giờ đi không được sau ngày giờ đến sau khi áp dụng cập nhật
         try {
@@ -254,7 +292,8 @@ public class ChiTietChuyenBayService {
         // Kiểm tra trùng lịch (loại trừ chính bản ghi đang sửa)
         boolean duplicate = chiTietChuyenBayRepository
                 .existsBySoHieuChuyenBayAndNgayDiAndGioDiAndNgayDenAndGioDenAndMaChuyenBayNot(
-                        ct.getSoHieuChuyenBay(), ct.getNgayDi(), ct.getGioDi(), ct.getNgayDen(), ct.getGioDen(), ct.getMaChuyenBay());
+                        ct.getSoHieuChuyenBay(), ct.getNgayDi(), ct.getGioDi(), ct.getNgayDen(), ct.getGioDen(),
+                        ct.getMaChuyenBay());
         if (duplicate) {
             return "Bị trùng lịch: đã có chuyến với số hiệu và lịch này";
         }
@@ -278,14 +317,15 @@ public class ChiTietChuyenBayService {
             return "Chi tiết chuyến bay không tồn tại: " + maChuyenBay;
         }
 
-        // Chỉ cho phép xóa chuyến bay khi trạng thái là "Hủy"
-        if (!"Hủy".equals(existing.getTrangThai())) {
-            return "Chỉ được xóa chuyến bay khi có trạng thái 'Hủy'. Hiện tại: " + existing.getTrangThai();
+        // Chỉ cho phép xóa chuyến bay khi trạng thái là "Đã Huỷ"
+        if (!"Đã Huỷ".equals(existing.getTrangThai())) {
+            return "Chỉ được xóa chuyến bay khi có trạng thái 'Đã Huỷ'. Hiện tại: " + existing.getTrangThai();
         }
 
         // Kiểm tra dữ liệu liên quan: ghế đã đặt, đặt chỗ
         boolean hasSeats = existing.getDanhSachGheDaDat() != null && !existing.getDanhSachGheDaDat().isEmpty();
-        // Nếu có bảng đặt chỗ tham chiếu ghế, nên kiểm tra thông qua quan hệ ghế -> đặt chỗ (tùy model).
+        // Nếu có bảng đặt chỗ tham chiếu ghế, nên kiểm tra thông qua quan hệ ghế -> đặt
+        // chỗ (tùy model).
         if (hasSeats) {
             return "Không thể xóa vì chuyến bay đã phát sinh ghế/đặt chỗ đang được sử dụng.";
         }
@@ -317,42 +357,77 @@ public class ChiTietChuyenBayService {
         }
     }
 
+    @Transactional
     public String updateTrangThaiChuyenBay(int maChuyenBay, String trangThai) {
         ChiTietChuyenBay ct = chiTietChuyenBayRepository.findById(maChuyenBay).orElse(null);
         if (ct == null) {
             return "Chi tiết chuyến bay không tồn tại: " + maChuyenBay;
         }
-        
+
         String oldStatus = ct.getTrangThai();
+
+        // Validation: Không cho hủy chuyến bay đã cất cánh
+        if ("Đã Huỷ".equals(trangThai)) {
+            if ("Đang bay".equals(oldStatus) || "Đã hạ cánh".equals(oldStatus) || "Đã bay".equals(oldStatus)) {
+                return "Không thể hủy chuyến bay đã cất cánh. Trạng thái hiện tại: " + oldStatus;
+            }
+        }
+
+        // Validation: Kiểm tra luồng chuyển trạng thái hợp lệ
+        // Đang mở bán -> Đang check-in -> Đang bay -> Đã bay
+        // Delay có thể chuyển sang Đang bay hoặc Đã bay
+        if ("Đang check-in".equals(trangThai)) {
+            if (!"Đang mở bán".equals(oldStatus) && oldStatus != null && !oldStatus.trim().isEmpty()) {
+                return "Chỉ có thể chuyển sang 'Đang check-in' từ 'Đang mở bán'. Trạng thái hiện tại: " + oldStatus;
+            }
+        }
+
+        if ("Đang bay".equals(trangThai)) {
+            if (!"Đang check-in".equals(oldStatus) && !"Đang mở bán".equals(oldStatus) && !"Delay".equals(oldStatus)) {
+                return "Chỉ có thể chuyển sang 'Đang bay' từ 'Đang check-in', 'Đang mở bán' hoặc 'Delay'. Trạng thái hiện tại: "
+                        + oldStatus;
+            }
+            // Set thời gian khởi hành thực tế khi chuyển sang Đang bay
+            if (ct.getThoiGianDiThucTe() == null) {
+                ct.setThoiGianDiThucTe(LocalDateTime.now());
+            }
+        }
+
         ct.setTrangThai(trangThai);
-        
-        // Khi chuyển từ "Đang mở bán" sang "Đã bay", tự động cập nhật thời gian thực tế = thời gian dự kiến
-        if ("Đang mở bán".equals(oldStatus) && "Đã bay".equals(trangThai)) {
-            // Nếu chưa có thời gian thực tế, set bằng thời gian dự kiến
+
+        // Khi chuyển sang "Đã bay", tự động cập nhật thời gian thực tế nếu chưa có
+        if ("Đã bay".equals(trangThai)) {
             if (ct.getThoiGianDiThucTe() == null) {
                 LocalDateTime thoiGianDiDuKien = LocalDateTime.of(ct.getNgayDi(), ct.getGioDi());
                 ct.setThoiGianDiThucTe(thoiGianDiDuKien);
             }
-            
             if (ct.getThoiGianDenThucTe() == null) {
                 LocalDateTime thoiGianDenDuKien = LocalDateTime.of(ct.getNgayDen(), ct.getGioDen());
                 ct.setThoiGianDenThucTe(thoiGianDenDuKien);
             }
+
+            // Cập nhật vị trí máy bay khi chuyến bay hoàn thành
+            if (ct.getMayBay() != null && ct.getTuyenBay() != null) {
+                MayBay mayBay = ct.getMayBay();
+                mayBay.setSanBayHienTai(ct.getTuyenBay().getSanBayDen());
+                mayBayRepository.save(mayBay);
+            }
         }
-        
+
         try {
             chiTietChuyenBayRepository.save(ct);
-            
+
             // Gửi thông báo WebSocket sau khi cập nhật thành công
             sendFlightUpdate(ct, oldStatus);
-            
+
             return "Cập nhật trạng thái chuyến bay thành công";
         } catch (Exception e) {
             return "Lỗi khi cập nhật trạng thái chuyến bay: " + e.getMessage();
         }
     }
 
-    public String updateDelay(int maChuyenBay, String lyDoDelay, LocalDateTime thoiGianDiThucTe, LocalDateTime thoiGianDenThucTe) {
+    public String updateDelay(int maChuyenBay, String lyDoDelay, LocalDateTime thoiGianDiThucTe,
+            LocalDateTime thoiGianDenThucTe) {
         ChiTietChuyenBay ct = chiTietChuyenBayRepository.findById(maChuyenBay).orElse(null);
         if (ct == null) {
             return "Chi tiết chuyến bay không tồn tại: " + maChuyenBay;
@@ -368,13 +443,13 @@ public class ChiTietChuyenBayService {
         ct.setLyDoDelay(lyDoDelay);
         ct.setThoiGianDiThucTe(thoiGianDiThucTe);
         ct.setThoiGianDenThucTe(thoiGianDenThucTe);
-        
+
         try {
             chiTietChuyenBayRepository.save(ct);
-            
+
             // Gửi thông báo WebSocket sau khi cập nhật thành công
             sendFlightUpdate(ct, oldStatus);
-            
+
             return "Cập nhật delay thành công";
         } catch (Exception e) {
             return "Lỗi khi cập nhật delay: " + e.getMessage();
@@ -388,15 +463,21 @@ public class ChiTietChuyenBayService {
         }
 
         String oldStatus = ct.getTrangThai();
-        ct.setTrangThai("Hủy");
+
+        // Validation: Không cho hủy chuyến bay đã cất cánh
+        if ("Đang bay".equals(oldStatus) || "Đã hạ cánh".equals(oldStatus) || "Đã bay".equals(oldStatus)) {
+            return "Không thể hủy chuyến bay đã cất cánh. Trạng thái hiện tại: " + oldStatus;
+        }
+
+        ct.setTrangThai("Đã Huỷ");
         ct.setLyDoDelay(lyDoHuy);
-        
+
         try {
             chiTietChuyenBayRepository.save(ct);
-            
+
             // Gửi thông báo WebSocket sau khi cập nhật thành công
             sendFlightUpdate(ct, oldStatus);
-            
+
             return "Cập nhật hủy chuyến thành công";
         } catch (Exception e) {
             return "Lỗi khi cập nhật hủy chuyến: " + e.getMessage();
@@ -414,7 +495,7 @@ public class ChiTietChuyenBayService {
     public String addDichVuToChuyenBay(int maChuyenBay, int maDichVu) {
         ChiTietChuyenBay chuyenBay = chiTietChuyenBayRepository.findById(maChuyenBay)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy chuyến bay với mã: " + maChuyenBay));
-        
+
         DichVuCungCap dichVu = dichVuCungCapRepository.findById(maDichVu)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy dịch vụ với mã: " + maDichVu));
 
@@ -465,6 +546,7 @@ public class ChiTietChuyenBayService {
 
     /**
      * Khôi phục một chuyến bay đã bị xóa
+     * 
      * @param maChuyenBay Mã chuyến bay cần khôi phục
      * @return Thông báo kết quả
      */
@@ -494,20 +576,20 @@ public class ChiTietChuyenBayService {
     }
 
     // === WEBSOCKET HELPER METHODS ===
-    
+
     /**
      * Gửi thông báo cập nhật chuyến bay tới tất cả các client WebSocket
      */
     private void sendFlightUpdate(ChiTietChuyenBay flight, String oldStatus) {
         FlightStatusUpdate update = new FlightStatusUpdate(
-            (long) flight.getMaChuyenBay(),
-            oldStatus,
-            flight.getTrangThai(),
-            LocalDateTime.now(),
-            flight.getThoiGianDiThucTe(),
-            flight.getThoiGianDenThucTe(),
-            flight.getLyDoDelay(),
-            flight.getLyDoDelay() // lyDoHuy - có thể cần thêm field riêng nếu cần
+                (long) flight.getMaChuyenBay(),
+                oldStatus,
+                flight.getTrangThai(),
+                LocalDateTime.now(),
+                flight.getThoiGianDiThucTe(),
+                flight.getThoiGianDenThucTe(),
+                flight.getLyDoDelay(),
+                flight.getLyDoDelay() // lyDoHuy - có thể cần thêm field riêng nếu cần
         );
 
         // Gửi message tới tất cả client đang subscribe /topic/flight-updates
@@ -526,8 +608,8 @@ public class ChiTietChuyenBayService {
         private String lyDoHuy;
 
         public FlightStatusUpdate(Long maChuyenBay, String oldStatus, String newStatus, LocalDateTime timestamp,
-                                LocalDateTime thoiGianDiThucTe, LocalDateTime thoiGianDenThucTe,
-                                String lyDoDelay, String lyDoHuy) {
+                LocalDateTime thoiGianDiThucTe, LocalDateTime thoiGianDenThucTe,
+                String lyDoDelay, String lyDoHuy) {
             this.maChuyenBay = maChuyenBay;
             this.oldStatus = oldStatus;
             this.newStatus = newStatus;
@@ -539,13 +621,36 @@ public class ChiTietChuyenBayService {
         }
 
         // Getters
-        public Long getMaChuyenBay() { return maChuyenBay; }
-        public String getOldStatus() { return oldStatus; }
-        public String getNewStatus() { return newStatus; }
-        public LocalDateTime getTimestamp() { return timestamp; }
-        public LocalDateTime getThoiGianDiThucTe() { return thoiGianDiThucTe; }
-        public LocalDateTime getThoiGianDenThucTe() { return thoiGianDenThucTe; }
-        public String getLyDoDelay() { return lyDoDelay; }
-        public String getLyDoHuy() { return lyDoHuy; }
+        public Long getMaChuyenBay() {
+            return maChuyenBay;
+        }
+
+        public String getOldStatus() {
+            return oldStatus;
+        }
+
+        public String getNewStatus() {
+            return newStatus;
+        }
+
+        public LocalDateTime getTimestamp() {
+            return timestamp;
+        }
+
+        public LocalDateTime getThoiGianDiThucTe() {
+            return thoiGianDiThucTe;
+        }
+
+        public LocalDateTime getThoiGianDenThucTe() {
+            return thoiGianDenThucTe;
+        }
+
+        public String getLyDoDelay() {
+            return lyDoDelay;
+        }
+
+        public String getLyDoHuy() {
+            return lyDoHuy;
+        }
     }
 }
