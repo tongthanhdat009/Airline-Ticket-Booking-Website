@@ -173,8 +173,74 @@ public class DonHangService {
      */
     @Transactional
     public DonHangResponse updateTrangThai(int id, UpdateTrangThaiDonHangRequest request) {
-        // Implementation will be added in subtask-2-4
-        throw new UnsupportedOperationException("Method to be implemented in subtask-2-4");
+        // Tìm đơn hàng theo ID
+        DonHang donHang = donHangRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng với ID: " + id));
+
+        String currentStatus = donHang.getTrangThai();
+        String newStatus = request.getTrangThai();
+
+        // Validate trạng thái mới
+        if (!isValidStatus(newStatus)) {
+            throw new IllegalArgumentException(
+                "Trạng thái không hợp lệ. Giá trị hợp lệ: CHỜ THANH TOÁN, ĐÃ THANH TOÁN, ĐÃ HỦY"
+            );
+        }
+
+        // Validate chuyển đổi trạng thái
+        if (!isValidStateTransition(currentStatus, newStatus)) {
+            throw new IllegalArgumentException(
+                "Không thể chuyển từ trạng thái '" + currentStatus + "' sang '" + newStatus + "'"
+            );
+        }
+
+        // Cập nhật trạng thái
+        donHang.setTrangThai(newStatus);
+        donHangRepository.save(donHang);
+
+        // Map và trả về response
+        return mapToResponse(donHang);
+    }
+
+    /**
+     * Kiểm tra trạng thái có hợp lệ không
+     */
+    private boolean isValidStatus(String status) {
+        return "CHỜ THANH TOÁN".equals(status)
+            || "ĐÃ THANH TOÁN".equals(status)
+            || "ĐÃ HỦY".equals(status);
+    }
+
+    /**
+     * Kiểm tra chuyển đổi trạng thái có hợp lệ không
+     * Các chuyển đổi hợp lệ:
+     * - CHỜ THANH TOÁN → ĐÃ THANH TOÁN
+     * - CHỜ THANH TOÁN → ĐÃ HỦY
+     * - ĐÃ THANH TOÁN → ĐÃ HỦY (hoàn tiền)
+     * - ĐÃ HỦY → CHỜ THANH TOÁN (khôi phục)
+     */
+    private boolean isValidStateTransition(String currentStatus, String newStatus) {
+        // Nếu trạng thái mới giống trạng thái hiện tại, không làm gì
+        if (currentStatus.equals(newStatus)) {
+            return false;
+        }
+
+        // CHỜ THANH TOÁN có thể chuyển thành ĐÃ THANH TOÁN hoặc ĐÃ HỦY
+        if ("CHỜ THANH TOÁN".equals(currentStatus)) {
+            return "ĐÃ THANH TOÁN".equals(newStatus) || "ĐÃ HỦY".equals(newStatus);
+        }
+
+        // ĐÃ THANH TOÁN chỉ có thể chuyển thành ĐÃ HỦY (hoàn tiền)
+        if ("ĐÃ THANH TOÁN".equals(currentStatus)) {
+            return "ĐÃ HỦY".equals(newStatus);
+        }
+
+        // ĐÃ HỦY chỉ có thể chuyển thành CHỜ THANH TOÁN (khôi phục)
+        if ("ĐÃ HỦY".equals(currentStatus)) {
+            return "CHỜ THANH TOÁN".equals(newStatus);
+        }
+
+        return false;
     }
 
     /**
