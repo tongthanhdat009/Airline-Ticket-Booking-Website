@@ -4,6 +4,7 @@ import com.example.j2ee.dto.donhang.DonHangDetailResponse;
 import com.example.j2ee.dto.donhang.DonHangResponse;
 import com.example.j2ee.dto.donhang.HuyDonHangRequest;
 import com.example.j2ee.dto.donhang.UpdateTrangThaiDonHangRequest;
+import com.example.j2ee.model.ChiTietChuyenBay;
 import com.example.j2ee.model.DatCho;
 import com.example.j2ee.model.DonHang;
 import com.example.j2ee.repository.DatChoRepository;
@@ -245,11 +246,77 @@ public class DonHangService {
 
     /**
      * Hủy đơn hàng với các quy tắc kinh doanh
+     * Quy tắc:
+     * - Không thể hủy đơn hàng đã có hành khách check-in
+     * - Không thể hủy đơn hàng sau khi chuyến bay đã khởi hành
+     * - Không thể hủy đơn hàng đã ở trạng thái ĐÃ HỦY
+     * - Cập nhật tất cả DatCho sang trạng thái CANCELLED
      */
     @Transactional
-    public void huyDonHang(int id, HuyDonHangRequest request) {
-        // Implementation will be added in subtask-2-5
-        throw new UnsupportedOperationException("Method to be implemented in subtask-2-5");
+    public DonHangResponse huyDonHang(int id, HuyDonHangRequest request) {
+        // Bước 1: Tìm đơn hàng theo ID
+        DonHang donHang = donHangRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng với ID: " + id));
+
+        // Bước 2: Kiểm tra đơn hàng đã bị hủy chưa
+        if ("ĐÃ HỦY".equals(donHang.getTrangThai())) {
+            throw new IllegalArgumentException("Đơn hàng đã ở trạng thái ĐÃ HỦY");
+        }
+
+        // Bước 3: Kiểm tra trạng thái check-in của tất cả hành khách
+        Set<DatCho> danhSachDatCho = donHang.getDanhSachDatCho();
+        if (danhSachDatCho != null && !danhSachDatCho.isEmpty()) {
+            for (DatCho datCho : danhSachDatCho) {
+                if (datCho.isCheckInStatus()) {
+                    throw new IllegalArgumentException("Không thể hủy đơn hàng đã có hành khách check-in");
+                }
+            }
+        }
+
+        // Bước 4: Kiểm tra thời gian khởi hành của chuyến bay
+        if (danhSachDatCho != null && !danhSachDatCho.isEmpty()) {
+            // Lấy chuyến bay đầu tiên (giả sử tất cả DatCho trong cùng một đơn hàng là cùng một chuyến bay)
+            DatCho firstDatCho = danhSachDatCho.iterator().next();
+            ChiTietChuyenBay chuyenBay = firstDatCho.getChuyenBay();
+
+            if (chuyenBay != null) {
+                // Tính toán thời gian khởi hành dự kiến
+                LocalDateTime thoiGianKhoiHanh = LocalDateTime.of(
+                    chuyenBay.getNgayDi(),
+                    chuyenBay.getGioDi()
+                );
+
+                // Kiểm tra nếu chuyến bay đã khởi hành
+                LocalDateTime thoiGianHienTai = LocalDateTime.now();
+                if (thoiGianHienTai.isAfter(thoiGianKhoiHanh)) {
+                    throw new IllegalArgumentException("Không thể hủy đơn hàng sau khi chuyến bay đã khởi hành");
+                }
+            }
+        }
+
+        // Bước 5: Cập nhật ghiChu với lý do hủy
+        String ghiChuHienTai = donHang.getGhiChu();
+        String lyDoHuy = request.getLyDoHuy();
+        if (ghiChuHienTai != null && !ghiChuHienTai.isEmpty()) {
+            donHang.setGhiChu(ghiChuHienTai + "\n[Lý do hủy: " + lyDoHuy + "]");
+        } else {
+            donHang.setGhiChu("[Lý do hủy: " + lyDoHuy + "]");
+        }
+
+        // Bước 6: Cập nhật trạng thái đơn hàng sang ĐÃ HỦY
+        donHang.setTrangThai("ĐÃ HỦY");
+        donHangRepository.save(donHang);
+
+        // Bước 7: Cập nhật tất cả DatCho sang trạng thái CANCELLED
+        if (danhSachDatCho != null && !danhSachDatCho.isEmpty()) {
+            for (DatCho datCho : danhSachDatCho) {
+                datCho.setTrangThai("CANCELLED");
+                datChoRepository.save(datCho);
+            }
+        }
+
+        // Map và trả về response
+        return mapToResponse(donHang);
     }
 
     /**
