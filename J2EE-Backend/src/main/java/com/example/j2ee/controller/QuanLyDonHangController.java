@@ -143,8 +143,40 @@ public class QuanLyDonHangController {
         }
     }
 
+    // ==================== ORDER STATUS ENDPOINTS ====================
+
+    /**
+     * PUT /donhang/{id}/trangthai - Update order status
+     *
+     * Updates the status of an order with business validation:
+     * - CHỜ THANH TOÁN → ĐÃ THANH TOÁN
+     * - CHỜ THANH TOÁN → ĐÃ HỦY
+     * - ĐÃ THANH TOÁN → ĐÃ HỦY (refund)
+     * - ĐÃ HỦY → CHỜ THANH TOÁN (restore)
+     *
+     * Invalid transitions will be rejected with 400 Bad Request
+     *
+     * @param id Order ID (madonhang)
+     * @param request Request body containing new status
+     * @return Updated order information
+     */
+    @PutMapping("/{id}/trangthai")
+    public ResponseEntity<ApiResponse<DonHangResponse>> updateTrangThaiDonHang(
+            @PathVariable int id,
+            @RequestBody UpdateTrangThaiDonHangRequest request) {
+        try {
+            DonHangResponse donHang = donHangService.updateTrangThai(id, request);
+            return ResponseEntity.ok(ApiResponse.success(donHang));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Lỗi khi cập nhật trạng thái đơn hàng: " + e.getMessage()));
+        }
+    }
+
     // Endpoints will be added in subsequent subtasks:
-    // - subtask-3-5: PUT /donhang/{id}/trangthai - Update status
     // - subtask-3-6: PUT /donhang/{id}/huy - Cancel order
     // - subtask-3-7: GET /donhang/deleted - View deleted orders
     // - subtask-3-8: PUT /donhang/{id}/restore - Restore deleted order
