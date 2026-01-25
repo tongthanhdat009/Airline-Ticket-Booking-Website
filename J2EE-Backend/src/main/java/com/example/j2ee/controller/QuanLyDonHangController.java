@@ -93,8 +93,34 @@ public class QuanLyDonHangController {
         }
     }
 
+    // ==================== SINGLE ORDER ENDPOINTS ====================
+
+    /**
+     * GET /donhang/{id} - Get order details by ID
+     *
+     * Retrieves complete order details including:
+     * - Basic order information (PNR, dates, prices, status)
+     * - Customer information (HanhKhach who placed the order)
+     * - All bookings (DatCho) with flight details
+     *
+     * @param id Order ID (madonhang)
+     * @return Complete order details with nested data
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<DonHangDetailResponse>> getDonHangById(@PathVariable int id) {
+        try {
+            DonHangDetailResponse donHang = donHangService.getDonHangById(id);
+            return ResponseEntity.ok(ApiResponse.success(donHang));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Lỗi khi lấy thông tin đơn hàng: " + e.getMessage()));
+        }
+    }
+
     // Endpoints will be added in subsequent subtasks:
-    // - subtask-3-3: GET /donhang/{id} - Get order details
     // - subtask-3-4: GET /donhang/pnr/{pnr} - Find by PNR
     // - subtask-3-5: PUT /donhang/{id}/trangthai - Update status
     // - subtask-3-6: PUT /donhang/{id}/huy - Cancel order
