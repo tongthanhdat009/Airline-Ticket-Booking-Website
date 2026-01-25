@@ -207,8 +207,29 @@ public class QuanLyDonHangController {
         }
     }
 
+    // ==================== SOFT DELETE ENDPOINTS ====================
+
+    /**
+     * GET /donhang/deleted - Get list of soft-deleted orders
+     *
+     * Retrieves all orders that have been soft-deleted (da_xoa = true).
+     * Includes the deletedAt timestamp for each order.
+     * Supports the same filtering and sorting capabilities as the main list endpoint.
+     *
+     * @return List of soft-deleted orders
+     */
+    @GetMapping("/deleted")
+    public ResponseEntity<ApiResponse<List<DonHangResponse>>> getDeletedDonHang() {
+        try {
+            List<DonHangResponse> deletedDonHangList = donHangService.getDeletedDonHang();
+            return ResponseEntity.ok(ApiResponse.success(deletedDonHangList));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Lỗi khi lấy danh sách đơn hàng đã xóa: " + e.getMessage()));
+        }
+    }
+
     // Endpoints will be added in subsequent subtasks:
-    // - subtask-3-7: GET /donhang/deleted - View deleted orders
     // - subtask-3-8: PUT /donhang/{id}/restore - Restore deleted order
     // - subtask-3-9: DELETE /donhang/{id} - Soft delete order
 }
