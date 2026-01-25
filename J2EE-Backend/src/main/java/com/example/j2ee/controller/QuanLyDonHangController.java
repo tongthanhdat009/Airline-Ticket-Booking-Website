@@ -255,6 +255,29 @@ public class QuanLyDonHangController {
         }
     }
 
-    // Endpoints will be added in subsequent subtasks:
-    // - subtask-3-9: DELETE /donhang/{id} - Soft delete order
+    /**
+     * DELETE /donhang/{id} - Soft delete order
+     *
+     * Soft deletes an order (sets da_xoa = true, deleted_at = now).
+     * The order will no longer appear in the main order list but can be restored.
+     * Validation rules:
+     * - Order must exist
+     * - Cannot delete paid orders (status = ĐÃ THANH TOÁN)
+     *
+     * @param id Order ID (madonhang)
+     * @return Success message confirming soft deletion
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> softDeleteDonHang(@PathVariable int id) {
+        try {
+            donHangService.softDeleteDonHang(id);
+            return ResponseEntity.ok(ApiResponse.successMessage("Xóa đơn hàng thành công"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Lỗi khi xóa đơn hàng: " + e.getMessage()));
+        }
+    }
 }
