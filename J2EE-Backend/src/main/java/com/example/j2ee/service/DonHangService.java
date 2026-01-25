@@ -152,8 +152,10 @@ public class DonHangService {
      * Lấy chi tiết đơn hàng theo ID
      */
     public DonHangDetailResponse getDonHangById(int id) {
-        // Implementation will be added in subtask-2-3
-        throw new UnsupportedOperationException("Method to be implemented in subtask-2-3");
+        DonHang donHang = donHangRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng với ID: " + id));
+
+        return mapToDetailResponse(donHang);
     }
 
     /**
