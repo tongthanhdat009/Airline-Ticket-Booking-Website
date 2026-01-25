@@ -229,7 +229,32 @@ public class QuanLyDonHangController {
         }
     }
 
+    /**
+     * PUT /donhang/{id}/restore - Restore soft-deleted order
+     *
+     * Restores an order that has been soft-deleted (da_xoa = true).
+     * The order will be visible again in the main order list.
+     * Validation rules:
+     * - Order must be currently soft-deleted (da_xoa = true)
+     * - Clears the da_xoa and deleted_at fields
+     *
+     * @param id Order ID (madonhang)
+     * @return Success message confirming restoration
+     */
+    @PutMapping("/{id}/restore")
+    public ResponseEntity<ApiResponse<Void>> restoreDonHang(@PathVariable int id) {
+        try {
+            donHangService.restoreDonHang(id);
+            return ResponseEntity.ok(ApiResponse.successMessage("Khôi phục đơn hàng thành công"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Lỗi khi khôi phục đơn hàng: " + e.getMessage()));
+        }
+    }
+
     // Endpoints will be added in subsequent subtasks:
-    // - subtask-3-8: PUT /donhang/{id}/restore - Restore deleted order
     // - subtask-3-9: DELETE /donhang/{id} - Soft delete order
 }
