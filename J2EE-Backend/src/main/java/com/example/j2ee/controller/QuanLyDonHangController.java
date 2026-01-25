@@ -176,8 +176,38 @@ public class QuanLyDonHangController {
         }
     }
 
+    /**
+     * PUT /donhang/{id}/huy - Cancel order
+     *
+     * Cancels an order with comprehensive business validation:
+     * - Cannot cancel if order is already cancelled (ĐÃ HỦY)
+     * - Cannot cancel if any passenger has checked-in
+     * - Cannot cancel after flight has departed
+     * - Updates order status to ĐÃ HỦY
+     * - Updates all related DatCho to CANCELLED
+     * - Records cancellation reason in ghiChu
+     *
+     * @param id Order ID (madonhang)
+     * @param request Request body containing cancellation reason
+     * @return Updated order information
+     */
+    @PutMapping("/{id}/huy")
+    public ResponseEntity<ApiResponse<DonHangResponse>> huyDonHang(
+            @PathVariable int id,
+            @RequestBody HuyDonHangRequest request) {
+        try {
+            DonHangResponse donHang = donHangService.huyDonHang(id, request);
+            return ResponseEntity.ok(ApiResponse.success(donHang));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Lỗi khi hủy đơn hàng: " + e.getMessage()));
+        }
+    }
+
     // Endpoints will be added in subsequent subtasks:
-    // - subtask-3-6: PUT /donhang/{id}/huy - Cancel order
     // - subtask-3-7: GET /donhang/deleted - View deleted orders
     // - subtask-3-8: PUT /donhang/{id}/restore - Restore deleted order
     // - subtask-3-9: DELETE /donhang/{id} - Soft delete order
