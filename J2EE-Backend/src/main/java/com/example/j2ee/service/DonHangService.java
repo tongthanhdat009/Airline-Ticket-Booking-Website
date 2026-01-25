@@ -331,11 +331,23 @@ public class DonHangService {
 
     /**
      * Khôi phục đơn hàng đã xóa mềm
+     * Quy tắc:
+     * - Chỉ khôi phục được đơn hàng đã bị xóa (da_xoa = true)
+     * - Xóa các cờ da_xoa và deleted_at
      */
     @Transactional
     public void restoreDonHang(int id) {
-        // Implementation will be added in subtask-2-6
-        throw new UnsupportedOperationException("Method to be implemented in subtask-2-6");
+        // Bước 1: Kiểm tra đơn hàng có bị xóa không
+        DonHang donHang = donHangRepository.findDeletedById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Đơn hàng chưa bị xóa hoặc không tồn tại"));
+
+        // Bước 2: Kiểm tra đơn hàng đã bị xóa chưa
+        if (donHang.getDaXoa() == null || !donHang.getDaXoa()) {
+            throw new IllegalArgumentException("Đơn hàng chưa bị xóa");
+        }
+
+        // Bước 3: Khôi phục đơn hàng bằng cách xóa cờ soft delete
+        donHangRepository.restoreById(id);
     }
 
     /**
