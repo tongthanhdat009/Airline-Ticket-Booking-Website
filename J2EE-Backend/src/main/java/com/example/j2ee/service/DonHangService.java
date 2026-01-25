@@ -9,11 +9,14 @@ import com.example.j2ee.model.DonHang;
 import com.example.j2ee.repository.DatChoRepository;
 import com.example.j2ee.repository.DonHangRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.Predicate;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,8 +41,111 @@ public class DonHangService {
             BigDecimal denGia,
             String sort
     ) {
-        // Implementation will be added in subtask-2-2
-        throw new UnsupportedOperationException("Method to be implemented in subtask-2-2");
+        Specification<DonHang> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // Filter by status (trạng thái)
+            if (trangThai != null && !trangThai.isEmpty()) {
+                predicates.add(cb.equal(root.get("trangThai"), trangThai));
+            }
+
+            // Filter by email
+            if (email != null && !email.isEmpty()) {
+                predicates.add(cb.like(
+                    cb.lower(root.get("emailNguoiDat")),
+                    "%" + email.toLowerCase() + "%"
+                ));
+            }
+
+            // Filter by phone number
+            if (soDienThoai != null && !soDienThoai.isEmpty()) {
+                predicates.add(cb.like(
+                    root.get("soDienThoaiNguoiDat"),
+                    "%" + soDienThoai + "%"
+                ));
+            }
+
+            // Filter by PNR
+            if (pnr != null && !pnr.isEmpty()) {
+                predicates.add(cb.like(
+                    cb.upper(root.get("pnr")),
+                    "%" + pnr.toUpperCase() + "%"
+                ));
+            }
+
+            // Filter by date range (ngày đặt)
+            if (tuNgay != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("ngayDat"), tuNgay));
+            }
+            if (denNgay != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("ngayDat"), denNgay));
+            }
+
+            // Filter by price range (tổng giá)
+            if (tuGia != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("tongGia"), tuGia));
+            }
+            if (denGia != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("tongGia"), denGia));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        // Apply sorting
+        List<DonHang> donHangList;
+        if (sort != null && !sort.isEmpty()) {
+            org.springframework.data.domain.Sort sortOption = createSortOption(sort);
+            donHangList = donHangRepository.findAll(spec, sortOption);
+        } else {
+            // Default sort by order date descending
+            donHangList = donHangRepository.findAll(
+                spec,
+                org.springframework.data.domain.Sort.by(
+                    org.springframework.data.domain.Sort.Direction.DESC,
+                    "ngayDat"
+                )
+            );
+        }
+
+        return donHangList.stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    /**
+     * Tạo tùy chọn sắp xếp dựa trên tham số sort
+     * Format: "field" hoặc "field:asc" hoặc "field:desc"
+     */
+    private org.springframework.data.domain.Sort createSortOption(String sort) {
+        String[] parts = sort.split(":");
+        String field = parts[0];
+        org.springframework.data.domain.Sort.Direction direction =
+            org.springframework.data.domain.Sort.Direction.DESC;
+
+        if (parts.length > 1) {
+            String dir = parts[1].toLowerCase();
+            if ("asc".equals(dir)) {
+                direction = org.springframework.data.domain.Sort.Direction.ASC;
+            }
+        }
+
+        // Map field names to entity fields
+        String entityField = mapSortField(field);
+        return org.springframework.data.domain.Sort.by(direction, entityField);
+    }
+
+    /**
+     * Mapping tham số sort sang field thực tế trong entity
+     */
+    private String mapSortField(String field) {
+        return switch (field.toLowerCase()) {
+            case "ngaydat" -> "ngayDat";
+            case "tonggia" -> "tongGia";
+            case "trangthai" -> "trangThai";
+            case "pnr" -> "pnr";
+            default -> "ngayDat"; // Default sort field
+        };
     }
 
     /**
