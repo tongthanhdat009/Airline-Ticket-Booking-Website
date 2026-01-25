@@ -120,8 +120,30 @@ public class QuanLyDonHangController {
         }
     }
 
+    /**
+     * GET /donhang/pnr/{pnr} - Find order by PNR code
+     *
+     * Retrieves complete order details using the unique PNR (Passenger Name Record) code.
+     * PNR is a unique identifier for each booking in the airline system.
+     *
+     * @param pnr PNR code (6-character alphanumeric code)
+     * @return Complete order details with nested data
+     */
+    @GetMapping("/pnr/{pnr}")
+    public ResponseEntity<ApiResponse<DonHangDetailResponse>> getDonHangByPnr(@PathVariable String pnr) {
+        try {
+            DonHangDetailResponse donHang = donHangService.getDonHangByPnr(pnr);
+            return ResponseEntity.ok(ApiResponse.success(donHang));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Lỗi khi tìm đơn hàng theo PNR: " + e.getMessage()));
+        }
+    }
+
     // Endpoints will be added in subsequent subtasks:
-    // - subtask-3-4: GET /donhang/pnr/{pnr} - Find by PNR
     // - subtask-3-5: PUT /donhang/{id}/trangthai - Update status
     // - subtask-3-6: PUT /donhang/{id}/huy - Cancel order
     // - subtask-3-7: GET /donhang/deleted - View deleted orders
