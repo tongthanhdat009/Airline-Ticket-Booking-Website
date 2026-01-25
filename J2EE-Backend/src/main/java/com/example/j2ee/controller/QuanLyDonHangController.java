@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -163,7 +164,7 @@ public class QuanLyDonHangController {
     @PutMapping("/{id}/trangthai")
     public ResponseEntity<ApiResponse<DonHangResponse>> updateTrangThaiDonHang(
             @PathVariable int id,
-            @RequestBody UpdateTrangThaiDonHangRequest request) {
+            @Valid @RequestBody UpdateTrangThaiDonHangRequest request) {
         try {
             DonHangResponse donHang = donHangService.updateTrangThai(id, request);
             return ResponseEntity.ok(ApiResponse.success(donHang));
@@ -194,7 +195,7 @@ public class QuanLyDonHangController {
     @PutMapping("/{id}/huy")
     public ResponseEntity<ApiResponse<DonHangResponse>> huyDonHang(
             @PathVariable int id,
-            @RequestBody HuyDonHangRequest request) {
+            @Valid @RequestBody HuyDonHangRequest request) {
         try {
             DonHangResponse donHang = donHangService.huyDonHang(id, request);
             return ResponseEntity.ok(ApiResponse.success(donHang));
@@ -216,13 +217,48 @@ public class QuanLyDonHangController {
      * Includes the deletedAt timestamp for each order.
      * Supports the same filtering and sorting capabilities as the main list endpoint.
      *
-     * @return List of soft-deleted orders
+     * Query Parameters (all optional):
+     * - trangThai: Filter by order status (CHỜ THANH TOÁN, ĐÃ THANH TOÁN, ĐÃ HỦY)
+     * - email: Filter by customer email (case-insensitive partial match)
+     * - soDienThoai: Filter by customer phone number (partial match)
+     * - pnr: Filter by PNR code (case-insensitive partial match)
+     * - tuNgay: Filter by order date from (ISO-8601 format: yyyy-MM-dd'T'HH:mm:ss)
+     * - denNgay: Filter by order date to (ISO-8601 format: yyyy-MM-dd'T'HH:mm:ss)
+     * - tuGia: Filter by total price from (BigDecimal)
+     * - denGia: Filter by total price to (BigDecimal)
+     * - sort: Sort by field (ngayDat, tongGia, trangThai, pnr) with optional direction (field:asc or field:desc)
+     *          Default sort: ngayDat:desc
+     *
+     * @return List of soft-deleted orders matching the filter criteria
      */
     @GetMapping("/deleted")
-    public ResponseEntity<ApiResponse<List<DonHangResponse>>> getDeletedDonHang() {
+    public ResponseEntity<ApiResponse<List<DonHangResponse>>> getDeletedDonHang(
+            @RequestParam(required = false) String trangThai,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String soDienThoai,
+            @RequestParam(required = false) String pnr,
+            @RequestParam(required = false) LocalDateTime tuNgay,
+            @RequestParam(required = false) LocalDateTime denNgay,
+            @RequestParam(required = false) String tuGia,
+            @RequestParam(required = false) String denGia,
+            @RequestParam(required = false) String sort
+    ) {
         try {
-            List<DonHangResponse> deletedDonHangList = donHangService.getDeletedDonHang();
+            List<DonHangResponse> deletedDonHangList = donHangService.getDeletedDonHang(
+                    trangThai,
+                    email,
+                    soDienThoai,
+                    pnr,
+                    tuNgay,
+                    denNgay,
+                    tuGia != null ? new BigDecimal(tuGia) : null,
+                    denGia != null ? new BigDecimal(denGia) : null,
+                    sort
+            );
             return ResponseEntity.ok(ApiResponse.success(deletedDonHangList));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.error("Lỗi khi lấy danh sách đơn hàng đã xóa: " + e.getMessage()));

@@ -14,7 +14,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Predicate;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -320,10 +320,72 @@ public class DonHangService {
     }
 
     /**
-     * Lấy danh sách đơn hàng đã xóa mềm
+     * Lấy danh sách đơn hàng đã xóa mềm với bộ lọc và sắp xếp
      */
-    public List<DonHangResponse> getDeletedDonHang() {
-        List<DonHang> deletedOrders = donHangRepository.findAllDeleted();
+    public List<DonHangResponse> getDeletedDonHang(
+            String trangThai,
+            String email,
+            String soDienThoai,
+            String pnr,
+            LocalDateTime tuNgay,
+            LocalDateTime denNgay,
+            BigDecimal tuGia,
+            BigDecimal denGia,
+            String sort
+    ) {
+        // Create specification for filtering
+        Specification<DonHang> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // Only get deleted records (da_xoa = true)
+            predicates.add(cb.equal(root.get("daXoa"), true));
+
+            // Filter by status (trạng thái)
+            if (trangThai != null && !trangThai.isEmpty()) {
+                predicates.add(cb.equal(root.get("trangThai"), trangThai));
+            }
+
+            // Filter by email (case-insensitive)
+            if (email != null && !email.isEmpty()) {
+                predicates.add(cb.like(cb.lower(root.get("emailNguoiDat")), "%" + email.toLowerCase() + "%"));
+            }
+
+            // Filter by phone number
+            if (soDienThoai != null && !soDienThoai.isEmpty()) {
+                predicates.add(cb.like(root.get("soDienThoaiNguoiDat"), "%" + soDienThoai + "%"));
+            }
+
+            // Filter by PNR (case-insensitive)
+            if (pnr != null && !pnr.isEmpty()) {
+                predicates.add(cb.like(cb.lower(root.get("pnr")), "%" + pnr.toLowerCase() + "%"));
+            }
+
+            // Filter by date range
+            if (tuNgay != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("ngayDat"), tuNgay));
+            }
+            if (denNgay != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("ngayDat"), denNgay));
+            }
+
+            // Filter by price range
+            if (tuGia != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("tongGia"), tuGia));
+            }
+            if (denGia != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("tongGia"), denGia));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        // Apply sorting
+        Specification<DonHang> finalSpec = spec;
+        if (sort != null && !sort.isEmpty()) {
+            finalSpec = addSorting(spec, sort);
+        }
+
+        List<DonHang> deletedOrders = donHangRepository.findAll(finalSpec);
         return deletedOrders.stream()
                 .map(this::mapToResponse)
                 .toList();
