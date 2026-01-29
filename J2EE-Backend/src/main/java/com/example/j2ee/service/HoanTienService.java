@@ -1,14 +1,21 @@
 package com.example.j2ee.service;
 
 import com.example.j2ee.dto.ApiResponse;
+import com.example.j2ee.dto.hoantien.*;
 import com.example.j2ee.model.*;
 import com.example.j2ee.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.Predicate;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Service xử lý hoàn tiền với:
@@ -33,7 +40,7 @@ public class HoanTienService {
      * Kiểm tra điều kiện hạng vé và tính toán tiền hoàn
      */
     @Transactional(rollbackFor = Exception.class)
-    public ApiResponse<HoanTienResponse> requestRefund(int maDatCho, String lyDo) {
+    public ApiResponse<RefundResponse> requestRefund(int maDatCho, String lyDo) {
         // Lấy thông tin đặt chỗ
         DatCho datCho = datChoRepository.findById(maDatCho)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đặt chỗ"));
@@ -54,7 +61,7 @@ public class HoanTienService {
         HoanTienCalculation calculation = calculateRefundAmount(datCho, policy);
 
         // Tạo response
-        HoanTienResponse response = new HoanTienResponse();
+        RefundResponse response = new RefundResponse();
         response.setMaDatCho(maDatCho);
         response.setTenHanhKhach(datCho.getHanhKhach().getHoVaTen());
         response.setGiaVe(datCho.getGiaVe());
@@ -262,9 +269,9 @@ public class HoanTienService {
     }
 
     /**
-     * Response cho hoàn tiền
+     * Response cho yêu cầu hoàn tiền (inner class - dùng cho nội bộ service)
      */
-    public static class HoanTienResponse {
+    public static class RefundResponse {
         private int maDatCho;
         private String tenHanhKhach;
         private BigDecimal giaVe;
@@ -287,5 +294,228 @@ public class HoanTienService {
         public void setSoTienHoan(BigDecimal soTienHoan) { this.soTienHoan = soTienHoan; }
         public String getLyDo() { return lyDo; }
         public void setLyDo(String lyDo) { this.lyDo = lyDo; }
+    }
+
+    // ==================== QUẢN LÝ HOÀN TIỀN ====================
+
+    private final HoanTienRepository hoanTienRepository;
+
+    /**
+     * Lấy danh sách hoàn tiền với bộ lọc và tìm kiếm
+     */
+    public List<HoanTienResponse> getAllHoanTien(
+            String search,
+            String trangThai,
+            LocalDateTime tuNgay,
+            LocalDateTime denNgay
+    ) {
+        Specification<HoanTien> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // Filter by trạng thái
+            if (trangThai != null && !trangThai.isEmpty()) {
+                predicates.add(cb.equal(root.get("trangThai"), trangThai));
+            }
+
+            // Filter by date range
+            if (tuNgay != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("ngayYeuCau"), tuNgay));
+            }
+            if (denNgay != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("ngayYeuCau"), denNgay));
+            }
+
+            // Search by multiple fields
+            if (search != null && !search.isEmpty()) {
+                String searchLower = "%" + search.toLowerCase() + "%";
+                Predicate searchPredicate = cb.or(
+                    cb.like(cb.lower(root.get("datCho").get("hanhKhach").get("hoVaTen")), searchLower),
+                    cb.like(cb.lower(root.get("datCho").get("hanhKhach").get("email")), searchLower),
+                    cb.like(cb.lower(root.get("lyDoHoanTien")), searchLower)
+                );
+                predicates.add(searchPredicate);
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        List<HoanTien> hoanTienList = hoanTienRepository.findAll(spec);
+        return hoanTienList.stream()
+                .map(this::mapToHoanTienResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Lấy chi tiết hoàn tiền theo ID
+     */
+    public HoanTienDetailResponse getHoanTienById(Integer maHoanTien) {
+        HoanTien hoanTien = hoanTienRepository.findById(maHoanTien)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy yêu cầu hoàn tiền"));
+        return mapToHoanTienDetailResponse(hoanTien);
+    }
+
+    /**
+     * Duyệt hoàn tiền
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public HoanTienResponse duyetHoanTien(Integer maHoanTien, String nguoiXuLy, String ghiChu) {
+        HoanTien hoanTien = hoanTienRepository.findById(maHoanTien)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy yêu cầu hoàn tiền"));
+
+        if (!hoanTien.isPending()) {
+            throw new IllegalArgumentException("Yêu cầu hoàn tiền không ở trạng thái chờ xử lý");
+        }
+
+        // Cập nhật trạng thái
+        hoanTien.setTrangThai("DA_HOAN_TIEN");
+        hoanTien.setNguoiXuLy(nguoiXuLy);
+        hoanTien.setNgayHoan(LocalDateTime.now());
+        if (ghiChu != null && !ghiChu.isEmpty()) {
+            hoanTien.setGhiChu(ghiChu);
+        }
+
+        hoanTienRepository.save(hoanTien);
+
+        // Xử lý hoàn tiền (giải phóng ghế, cập nhật trạng thái)
+        processRefund(hoanTien.getDatCho().getMaDatCho());
+
+        log.info("Đã duyệt hoàn tiền {} bởi {}", maHoanTien, nguoiXuLy);
+        return mapToHoanTienResponse(hoanTien);
+    }
+
+    /**
+     * Từ chối hoàn tiền
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public HoanTienResponse tuChoiHoanTien(Integer maHoanTien, String nguoiXuLy, String lyDoTuChoi, String ghiChu) {
+        HoanTien hoanTien = hoanTienRepository.findById(maHoanTien)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy yêu cầu hoàn tiền"));
+
+        if (!hoanTien.isPending()) {
+            throw new IllegalArgumentException("Yêu cầu hoàn tiền không ở trạng thái chờ xử lý");
+        }
+
+        // Cập nhật trạng thái
+        hoanTien.setTrangThai("TU_CHOI");
+        hoanTien.setNguoiXuLy(nguoiXuLy);
+        hoanTien.setNgayHoan(LocalDateTime.now());
+        
+        // Ghi chú lý do từ chối
+        String fullGhiChu = "Từ chối: " + lyDoTuChoi;
+        if (ghiChu != null && !ghiChu.isEmpty()) {
+            fullGhiChu += " | " + ghiChu;
+        }
+        hoanTien.setGhiChu(fullGhiChu);
+
+        hoanTienRepository.save(hoanTien);
+
+        log.info("Đã từ chối hoàn tiền {} bởi {} - Lý do: {}", maHoanTien, nguoiXuLy, lyDoTuChoi);
+        return mapToHoanTienResponse(hoanTien);
+    }
+
+    /**
+     * Lấy thống kê hoàn tiền
+     */
+    public HoanTienThongKeDTO getThongKe() {
+        List<HoanTien> allHoanTien = hoanTienRepository.findAll();
+
+        long tongYeuCau = allHoanTien.size();
+        long choXuLy = allHoanTien.stream().filter(HoanTien::isPending).count();
+        long daHoanTien = allHoanTien.stream().filter(HoanTien::isCompleted).count();
+        long daTuChoi = allHoanTien.stream().filter(HoanTien::isRejected).count();
+
+        BigDecimal tongTienDaHoan = allHoanTien.stream()
+                .filter(HoanTien::isCompleted)
+                .map(HoanTien::getSoTienHoan)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal tongTienChoHoan = allHoanTien.stream()
+                .filter(HoanTien::isPending)
+                .map(HoanTien::getSoTienHoan)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return HoanTienThongKeDTO.builder()
+                .tongYeuCau(tongYeuCau)
+                .choXuLy(choXuLy)
+                .daHoanTien(daHoanTien)
+                .daTuChoi(daTuChoi)
+                .tongTienDaHoan(tongTienDaHoan)
+                .tongTienChoHoan(tongTienChoHoan)
+                .build();
+    }
+
+    // ==================== MAPPER METHODS ====================
+
+    private HoanTienResponse mapToHoanTienResponse(HoanTien hoanTien) {
+        DatCho datCho = hoanTien.getDatCho();
+        HanhKhach hanhKhach = datCho != null ? datCho.getHanhKhach() : null;
+        TrangThaiThanhToan thanhToan = hoanTien.getTrangThaiThanhToan();
+        
+        // Lấy phương thức hoàn tiền từ hoanTien hoặc từ trangThaiThanhToan nếu null
+        String phuongThucHoan = hoanTien.getPhuongThucHoan();
+        if (phuongThucHoan == null && thanhToan != null) {
+            phuongThucHoan = thanhToan.getPhuongThucThanhToan();
+        }
+
+        return HoanTienResponse.builder()
+                .maHoanTien(hoanTien.getMaHP())
+                .maHoaDon(datCho != null ? "HD" + String.format("%03d", datCho.getMaDatCho()) : null)
+                .maDatVe(datCho != null ? datCho.getMaDatCho() : null)
+                .hoTen(hanhKhach != null ? hanhKhach.getHoVaTen() : null)
+                .email(hanhKhach != null ? hanhKhach.getEmail() : null)
+                .soDienThoai(hanhKhach != null ? hanhKhach.getSoDienThoai() : null)
+                .ngayYeuCau(hoanTien.getNgayYeuCau())
+                .lyDo(hoanTien.getLyDoHoanTien())
+                .soTienHoan(hoanTien.getSoTienHoan())
+                .trangThai(hoanTien.getTrangThai())
+                .phuongThucHoan(phuongThucHoan)
+                .taiKhoanHoan(hoanTien.getTaiKhoanHoan())
+                .nguoiXuLy(hoanTien.getNguoiXuLy())
+                .ngayXuLy(hoanTien.getNgayHoan())
+                .lyDoTuChoi(hoanTien.getGhiChu() != null && hoanTien.getGhiChu().startsWith("Từ chối:") 
+                    ? hoanTien.getGhiChu().substring(9).split(" \\|")[0] 
+                    : null)
+                .build();
+    }
+
+    private HoanTienDetailResponse mapToHoanTienDetailResponse(HoanTien hoanTien) {
+        DatCho datCho = hoanTien.getDatCho();
+        HanhKhach hanhKhach = datCho != null ? datCho.getHanhKhach() : null;
+        ChiTietChuyenBay chuyenBay = datCho != null ? datCho.getChuyenBay() : null;
+        TrangThaiThanhToan thanhToan = hoanTien.getTrangThaiThanhToan();
+        
+        // Lấy phương thức hoàn tiền từ hoanTien hoặc từ trangThaiThanhToan nếu null
+        String phuongThucHoan = hoanTien.getPhuongThucHoan();
+        if (phuongThucHoan == null && thanhToan != null) {
+            phuongThucHoan = thanhToan.getPhuongThucThanhToan();
+        }
+
+        return HoanTienDetailResponse.builder()
+                .maHoanTien(hoanTien.getMaHP())
+                .maHoaDon(datCho != null ? "HD" + String.format("%03d", datCho.getMaDatCho()) : null)
+                .maDatVe(datCho != null ? datCho.getMaDatCho() : null)
+                .hoTen(hanhKhach != null ? hanhKhach.getHoVaTen() : null)
+                .email(hanhKhach != null ? hanhKhach.getEmail() : null)
+                .soDienThoai(hanhKhach != null ? hanhKhach.getSoDienThoai() : null)
+                .maChuyenBay(chuyenBay != null ? String.valueOf(chuyenBay.getMaChuyenBay()) : null)
+                .sanBayDi(chuyenBay != null && chuyenBay.getTuyenBay() != null 
+                    ? chuyenBay.getTuyenBay().getSanBayDi().getMaIATA() : null)
+                .sanBayDen(chuyenBay != null && chuyenBay.getTuyenBay() != null 
+                    ? chuyenBay.getTuyenBay().getSanBayDen().getMaIATA() : null)
+                .ngayYeuCau(hoanTien.getNgayYeuCau())
+                .lyDo(hoanTien.getLyDoHoanTien())
+                .soTienHoan(hoanTien.getSoTienHoan())
+                .giaVeGoc(datCho != null ? datCho.getGiaVe() : null)
+                .phiHuy(BigDecimal.ZERO) // Cần tính toán nếu cần
+                .trangThai(hoanTien.getTrangThai())
+                .phuongThucHoan(phuongThucHoan)
+                .taiKhoanHoan(hoanTien.getTaiKhoanHoan())
+                .nguoiXuLy(hoanTien.getNguoiXuLy())
+                .ngayXuLy(hoanTien.getNgayHoan())
+                .lyDoTuChoi(hoanTien.getGhiChu() != null && hoanTien.getGhiChu().startsWith("Từ chối:") 
+                    ? hoanTien.getGhiChu().substring(9).split(" \\|")[0] 
+                    : null)
+                .ghiChu(hoanTien.getGhiChu())
+                .build();
     }
 }

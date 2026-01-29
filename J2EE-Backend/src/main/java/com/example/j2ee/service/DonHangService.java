@@ -7,8 +7,14 @@ import com.example.j2ee.dto.donhang.UpdateTrangThaiDonHangRequest;
 import com.example.j2ee.model.ChiTietChuyenBay;
 import com.example.j2ee.model.DatCho;
 import com.example.j2ee.model.DonHang;
+import com.example.j2ee.model.HoaDon;
+import com.example.j2ee.model.HoanTien;
+import com.example.j2ee.model.TrangThaiThanhToan;
 import com.example.j2ee.repository.DatChoRepository;
 import com.example.j2ee.repository.DonHangRepository;
+import com.example.j2ee.repository.HoaDonRepository;
+import com.example.j2ee.repository.HoanTienRepository;
+import com.example.j2ee.repository.TrangThaiThanhToanRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -16,10 +22,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.criteria.Predicate;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +35,9 @@ public class DonHangService {
 
     private final DonHangRepository donHangRepository;
     private final DatChoRepository datChoRepository;
+    private final HoanTienRepository hoanTienRepository;
+    private final TrangThaiThanhToanRepository trangThaiThanhToanRepository;
+    private final HoaDonRepository hoaDonRepository;
 
     /**
      * Lấy danh sách đơn hàng với bộ lọc và sắp xếp
@@ -199,6 +210,11 @@ public class DonHangService {
         donHang.setTrangThai(newStatus);
         donHangRepository.save(donHang);
 
+        // Nếu chuyển sang ĐÃ THANH TOÁN, tạo hóa đơn
+        if ("ĐÃ THANH TOÁN".equals(newStatus)) {
+            taoHoaDon(donHang);
+        }
+
         // Map và trả về response
         return mapToResponse(donHang);
     }
@@ -280,6 +296,12 @@ public class DonHangService {
             ChiTietChuyenBay chuyenBay = firstDatCho.getChuyenBay();
 
             if (chuyenBay != null) {
+                // Kiểm tra trạng thái chuyến bay - không hủy nếu đang bay hoặc đã bay
+                String trangThaiChuyenBay = chuyenBay.getTrangThai();
+                if ("Đang bay".equals(trangThaiChuyenBay) || "Đã bay".equals(trangThaiChuyenBay)) {
+                    throw new IllegalArgumentException("Không thể hủy đơn hàng khi chuyến bay đang bay hoặc đã bay");
+                }
+
                 // Tính toán thời gian khởi hành dự kiến
                 LocalDateTime thoiGianKhoiHanh = LocalDateTime.of(
                     chuyenBay.getNgayDi(),
@@ -307,11 +329,36 @@ public class DonHangService {
         donHang.setTrangThai("ĐÃ HỦY");
         donHangRepository.save(donHang);
 
-        // Bước 7: Cập nhật tất cả DatCho sang trạng thái CANCELLED
+        // Bước 7: Cập nhật tất cả DatCho sang trạng thái CANCELLED và tạo bản ghi HoanTien
         if (danhSachDatCho != null && !danhSachDatCho.isEmpty()) {
             for (DatCho datCho : danhSachDatCho) {
                 datCho.setTrangThai("CANCELLED");
                 datChoRepository.save(datCho);
+
+                // Tìm TrangThaiThanhToan của DatCho này
+                TrangThaiThanhToan thanhToan = trangThaiThanhToanRepository
+                        .findByDatCho_MaDatCho(datCho.getMaDatCho());
+
+                // Chỉ tạo bản ghi HoanTien nếu đơn hàng đã thanh toán
+                if (thanhToan != null && thanhToan.getDaThanhToan() == 'Y') {
+                    // Tạo bản ghi HoanTien
+                    HoanTien hoanTien = new HoanTien();
+                    hoanTien.setDatCho(datCho);
+                    hoanTien.setTrangThaiThanhToan(thanhToan);
+                    hoanTien.setSoTienHoan(datCho.getGiaVe());
+                    hoanTien.setLyDoHoanTien(lyDoHuy);
+                    hoanTien.setTrangThai("DA_HOAN_TIEN");
+                    hoanTien.setNgayYeuCau(LocalDateTime.now());
+                    hoanTien.setNgayHoan(LocalDateTime.now());
+                    hoanTien.setNguoiXuLy("ADMIN");
+                    hoanTien.setPhuongThucHoan(thanhToan.getPhuongThucThanhToan());
+                    hoanTien.setTaiKhoanHoan(datCho.getHanhKhach().getEmail()); // Lấy email làm tài khoản hoàn
+                    hoanTienRepository.save(hoanTien);
+
+                    // Cập nhật trạng thái thanh toán thành R (Refunded)
+                    thanhToan.setDaThanhToan('R');
+                    trangThaiThanhToanRepository.save(thanhToan);
+                }
             }
         }
 
@@ -380,12 +427,20 @@ public class DonHangService {
         };
 
         // Apply sorting
-        Specification<DonHang> finalSpec = spec;
+        List<DonHang> deletedOrders;
         if (sort != null && !sort.isEmpty()) {
-            finalSpec = addSorting(spec, sort);
+            org.springframework.data.domain.Sort sortOption = createSortOption(sort);
+            deletedOrders = donHangRepository.findAll(spec, sortOption);
+        } else {
+            // Default sort by order date descending
+            deletedOrders = donHangRepository.findAll(
+                spec,
+                org.springframework.data.domain.Sort.by(
+                    org.springframework.data.domain.Sort.Direction.DESC,
+                    "ngayDat"
+                )
+            );
         }
-
-        List<DonHang> deletedOrders = donHangRepository.findAll(finalSpec);
         return deletedOrders.stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -428,6 +483,236 @@ public class DonHangService {
         donHangRepository.delete(donHang);
     }
 
+    // ==================== BATCH OPERATIONS METHODS ====================
+
+    /**
+     * Duyệt thanh toán hàng loạt cho nhiều đơn hàng
+     * Chỉ duyệt các đơn hàng có trạng thái CHỜ THANH TOÁN
+     * Validate trạng thái chuyến bay (không duyệt nếu đã bay hoặc đang bay)
+     *
+     * @param maDonHangs Danh sách mã đơn hàng cần duyệt
+     * @return Map chứa kết quả (successCount, failedCount, errors)
+     */
+    @Transactional
+    public java.util.Map<String, Object> batchApprovePayment(java.util.List<Integer> maDonHangs) {
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        java.util.List<String> errors = new java.util.ArrayList<>();
+        int successCount = 0;
+        int failedCount = 0;
+
+        for (Integer maDonHang : maDonHangs) {
+            try {
+                DonHang donHang = donHangRepository.findById(maDonHang)
+                        .orElse(null);
+
+                if (donHang == null) {
+                    errors.add("Đơn hàng #" + maDonHang + ": Không tìm thấy");
+                    failedCount++;
+                    continue;
+                }
+
+                // Chỉ duyệt đơn hàng chờ thanh toán
+                if (!"CHỜ THANH TOÁN".equals(donHang.getTrangThai())) {
+                    errors.add("Đơn hàng #" + maDonHang + ": Không phải trạng thái chờ thanh toán");
+                    failedCount++;
+                    continue;
+                }
+
+                // Kiểm tra trạng thái chuyến bay
+                Set<DatCho> danhSachDatCho = donHang.getDanhSachDatCho();
+                boolean shouldSkip = false;
+                if (danhSachDatCho != null && !danhSachDatCho.isEmpty()) {
+                    for (DatCho datCho : danhSachDatCho) {
+                        ChiTietChuyenBay chuyenBay = datCho.getChuyenBay();
+                        if (chuyenBay != null) {
+                            String trangThaiChuyenBay = chuyenBay.getTrangThai();
+                            if ("Đang bay".equals(trangThaiChuyenBay) || "Đã bay".equals(trangThaiChuyenBay)) {
+                                errors.add("Đơn hàng #" + maDonHang + ": Chuyến bay đã bay hoặc đang bay, không thể duyệt thanh toán");
+                                failedCount++;
+                                shouldSkip = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (shouldSkip) {
+                        continue;
+                    }
+                }
+
+                // Cập nhật trạng thái sang ĐÃ THANH TOÁN
+                donHang.setTrangThai("ĐÃ THANH TOÁN");
+                donHangRepository.save(donHang);
+
+                // Tạo hóa đơn cho đơn hàng đã thanh toán
+                taoHoaDon(donHang);
+
+                successCount++;
+
+            } catch (Exception e) {
+                errors.add("Đơn hàng #" + maDonHang + ": " + e.getMessage());
+                failedCount++;
+            }
+        }
+
+        result.put("successCount", successCount);
+        result.put("failedCount", failedCount);
+        result.put("errors", errors);
+        return result;
+    }
+
+    /**
+     * Hoàn tiền hàng loạt cho nhiều đơn hàng
+     * Chỉ hoàn tiền các đơn hàng có trạng thái ĐÃ THANH TOÁN
+     * Validate trạng thái chuyến bay (không hoàn tiền nếu đã bay hoặc đang bay)
+     *
+     * @param maDonHangs Danh sách mã đơn hàng cần hoàn tiền
+     * @param lyDoHoanTien Lý do hoàn tiền
+     * @return Map chứa kết quả (successCount, failedCount, errors)
+     */
+    @Transactional
+    public java.util.Map<String, Object> batchRefund(java.util.List<Integer> maDonHangs, String lyDoHoanTien) {
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        java.util.List<String> errors = new java.util.ArrayList<>();
+        int successCount = 0;
+        int failedCount = 0;
+
+        for (Integer maDonHang : maDonHangs) {
+            try {
+                DonHang donHang = donHangRepository.findById(maDonHang)
+                        .orElse(null);
+
+                if (donHang == null) {
+                    errors.add("Đơn hàng #" + maDonHang + ": Không tìm thấy");
+                    failedCount++;
+                    continue;
+                }
+
+                // Chỉ hoàn tiền đơn hàng đã thanh toán
+                if (!"ĐÃ THANH TOÁN".equals(donHang.getTrangThai())) {
+                    errors.add("Đơn hàng #" + maDonHang + ": Không phải trạng thái đã thanh toán");
+                    failedCount++;
+                    continue;
+                }
+
+                // Kiểm tra trạng thái chuyến bay
+                Set<DatCho> danhSachDatCho = donHang.getDanhSachDatCho();
+                boolean shouldSkip = false;
+                if (danhSachDatCho != null && !danhSachDatCho.isEmpty()) {
+                    for (DatCho datCho : danhSachDatCho) {
+                        ChiTietChuyenBay chuyenBay = datCho.getChuyenBay();
+                        if (chuyenBay != null) {
+                            String trangThaiChuyenBay = chuyenBay.getTrangThai();
+                            if ("Đang bay".equals(trangThaiChuyenBay) || "Đã bay".equals(trangThaiChuyenBay)) {
+                                errors.add("Đơn hàng #" + maDonHang + ": Chuyến bay đã bay hoặc đang bay, không thể hoàn tiền");
+                                failedCount++;
+                                shouldSkip = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (shouldSkip) {
+                        continue;
+                    }
+                }
+
+                // Cập nhật ghiChu với lý do hoàn tiền
+                String ghiChuHienTai = donHang.getGhiChu();
+                if (ghiChuHienTai != null && !ghiChuHienTai.isEmpty()) {
+                    donHang.setGhiChu(ghiChuHienTai + "\n[Lý do hoàn tiền: " + lyDoHoanTien + "]");
+                } else {
+                    donHang.setGhiChu("[Lý do hoàn tiền: " + lyDoHoanTien + "]");
+                }
+
+                // Cập nhật trạng thái đơn hàng sang ĐÃ HỦY
+                donHang.setTrangThai("ĐÃ HỦY");
+                donHangRepository.save(donHang);
+
+                // Cập nhật tất cả DatCho sang trạng thái CANCELLED và tạo bản ghi HoanTien
+                if (danhSachDatCho != null && !danhSachDatCho.isEmpty()) {
+                    for (DatCho datCho : danhSachDatCho) {
+                        datCho.setTrangThai("CANCELLED");
+                        datChoRepository.save(datCho);
+
+                        // Tìm TrangThaiThanhToan của DatCho này
+                        TrangThaiThanhToan thanhToan = trangThaiThanhToanRepository
+                                .findByDatCho_MaDatCho(datCho.getMaDatCho());
+
+                        if (thanhToan != null && thanhToan.getDaThanhToan() == 'Y') {
+                            // Tạo bản ghi HoanTien
+                            HoanTien hoanTien = new HoanTien();
+                            hoanTien.setDatCho(datCho);
+                            hoanTien.setTrangThaiThanhToan(thanhToan);
+                            hoanTien.setSoTienHoan(datCho.getGiaVe()); // Hoàn toàn bộ giá vé
+                            hoanTien.setLyDoHoanTien(lyDoHoanTien);
+                            hoanTien.setTrangThai("DA_HOAN_TIEN"); // Đã hoàn tiền ngay
+                            hoanTien.setNgayYeuCau(LocalDateTime.now());
+                            hoanTien.setNgayHoan(LocalDateTime.now());
+                            hoanTien.setNguoiXuLy("ADMIN");
+                            hoanTien.setPhuongThucHoan(thanhToan.getPhuongThucThanhToan());
+                            hoanTien.setTaiKhoanHoan(datCho.getHanhKhach().getEmail()); // Lấy email làm tài khoản hoàn
+                            hoanTienRepository.save(hoanTien);
+
+                            // Cập nhật trạng thái thanh toán thành R (Refunded)
+                            thanhToan.setDaThanhToan('R');
+                            trangThaiThanhToanRepository.save(thanhToan);
+                        }
+                    }
+                }
+
+                successCount++;
+
+            } catch (Exception e) {
+                errors.add("Đơn hàng #" + maDonHang + ": " + e.getMessage());
+                failedCount++;
+            }
+        }
+
+        result.put("successCount", successCount);
+        result.put("failedCount", failedCount);
+        result.put("errors", errors);
+        return result;
+    }
+
+    // ==================== HELPER METHODS ====================
+
+    /**
+     * Tạo hóa đơn cho đơn hàng khi xác nhận thanh toán
+     * @param donHang Đơn hàng cần tạo hóa đơn
+     * @return HoaDon đã tạo
+     */
+    private HoaDon taoHoaDon(DonHang donHang) {
+        // Kiểm tra xem đã có hóa đơn cho đơn hàng này chưa
+        List<HoaDon> existingHoaDon = hoaDonRepository.findByDonHang_MaDonHang(donHang.getMaDonHang());
+        if (!existingHoaDon.isEmpty()) {
+            // Đã có hóa đơn, không tạo mới
+            return existingHoaDon.get(0);
+        }
+
+        // Tạo số hóa đơn theo pattern: HD{YYYY}{NNNN}
+        int currentYear = Year.now().getValue();
+        long countInYear = hoaDonRepository.countHoaDonInCurrentYear();
+        String soHoaDon = String.format("HD%d%04d", currentYear, countInYear + 1);
+
+        // Tính toán tiền
+        BigDecimal tongTien = donHang.getTongGia() != null ? donHang.getTongGia() : BigDecimal.ZERO;
+        BigDecimal thueVAT = tongTien.multiply(BigDecimal.valueOf(0.1)); // 10% VAT
+        BigDecimal tongThanhToan = tongTien.add(thueVAT);
+
+        // Tạo hóa đơn
+        HoaDon hoaDon = new HoaDon();
+        hoaDon.setDonHang(donHang);
+        hoaDon.setSoHoaDon(soHoaDon);
+        hoaDon.setNgayLap(LocalDateTime.now());
+        hoaDon.setNgayHachToan(LocalDate.now());
+        hoaDon.setTongTien(tongTien);
+        hoaDon.setThueVAT(thueVAT);
+        hoaDon.setTongThanhToan(tongThanhToan);
+        hoaDon.setTrangThai("DA_PHAT_HANH");
+        hoaDon.setNguoiLap("ADMIN");
+
+        return hoaDonRepository.save(hoaDon);
+    }
+
     /**
      * Mapper từ DonHang entity sang DonHangResponse DTO
      */
@@ -435,6 +720,7 @@ public class DonHangService {
         DonHangResponse response = new DonHangResponse();
         response.setMaDonHang(donHang.getMaDonHang());
         response.setPnr(donHang.getPnr());
+        response.setHanhKhachNguoiDat(donHang.getHanhKhachNguoiDat());
         response.setNgayDat(donHang.getNgayDat());
         response.setTongGia(donHang.getTongGia());
         response.setTrangThai(donHang.getTrangThai());

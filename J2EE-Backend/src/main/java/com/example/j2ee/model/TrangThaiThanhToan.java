@@ -32,6 +32,9 @@ public class TrangThaiThanhToan {
     @Column(name = "dathanhtoan", nullable = false, length = 1)
     private char daThanhToan;
 
+    @Column(name = "phuongthucthanhtoan", length = 50)
+    private String phuongThucThanhToan; // VNPAY, CHUYEN_KHOAN, TIEN_MAT
+
     @Column(name = "ngayhethan")
     @Temporal(TemporalType.DATE)
     private Date ngayHetHan;

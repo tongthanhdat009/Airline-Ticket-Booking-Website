@@ -40,9 +40,8 @@ INSERT INTO `maybay` (`mamaybay`, `tenmaybay`, `hangmaybay`, `loaimaybay`, `sohi
 (7, 'Airbus A330', 'Vietnam Airlines', 'Airbus A330-200', 'VN-A330', 250, 'Retired', 2012, 1, 0, NULL);
 
 -- Bảng chi tiết ghế (sơ đồ ghế cho mỗi máy bay)
--- Máy bay 1 (VN-A320) - 180 ghế
+-- Máy bay 1 (VN-A320) - 180 ghế: Economy Class 24 ghế, Economy Saver 20 ghế, Deluxe 50 ghế, Business 80 ghế, First Class 6 ghế
 INSERT INTO `chitietghe` (`maghe`, `mamaybay`, `mahangve`, `soghe`, `vitrighe`, `hang`, `cot`) VALUES
--- Economy Class (24 ghế)
 (1, 1, 1, '1A', 'WINDOW', 1, 'A'), (2, 1, 1, '1B', 'MIDDLE', 1, 'B'), (3, 1, 1, '1C', 'AISLE', 1, 'C'),
 (4, 1, 1, '1D', 'AISLE', 1, 'D'), (5, 1, 1, '1E', 'MIDDLE', 1, 'E'), (6, 1, 1, '1F', 'WINDOW', 1, 'F'),
 (7, 1, 1, '2A', 'WINDOW', 2, 'A'), (8, 1, 1, '2B', 'MIDDLE', 2, 'B'), (9, 1, 1, '2C', 'AISLE', 2, 'C'),
@@ -51,7 +50,6 @@ INSERT INTO `chitietghe` (`maghe`, `mamaybay`, `mahangve`, `soghe`, `vitrighe`, 
 (16, 1, 1, '3D', 'AISLE', 3, 'D'), (17, 1, 1, '3E', 'MIDDLE', 3, 'E'), (18, 1, 1, '3F', 'WINDOW', 3, 'F'),
 (19, 1, 1, '4A', 'WINDOW', 4, 'A'), (20, 1, 1, '4B', 'MIDDLE', 4, 'B'), (21, 1, 1, '4C', 'AISLE', 4, 'C'),
 (22, 1, 1, '4D', 'AISLE', 4, 'D'), (23, 1, 1, '4E', 'MIDDLE', 4, 'E'), (24, 1, 1, '4F', 'WINDOW', 4, 'F'),
--- Economy Saver (20 ghế)
 (25, 1, 2, '5A', 'WINDOW', 5, 'A'), (26, 1, 2, '5B', 'MIDDLE', 5, 'B'), (27, 1, 2, '5C', 'AISLE', 5, 'C'),
 (28, 1, 2, '5D', 'AISLE', 5, 'D'), (29, 1, 2, '5E', 'MIDDLE', 5, 'E'), (30, 1, 2, '5F', 'WINDOW', 5, 'F'),
 (31, 1, 2, '6A', 'WINDOW', 6, 'A'), (32, 1, 2, '6B', 'MIDDLE', 6, 'B'), (33, 1, 2, '6C', 'AISLE', 6, 'C'),
@@ -59,7 +57,6 @@ INSERT INTO `chitietghe` (`maghe`, `mamaybay`, `mahangve`, `soghe`, `vitrighe`, 
 (37, 1, 2, '7A', 'WINDOW', 7, 'A'), (38, 1, 2, '7B', 'MIDDLE', 7, 'B'), (39, 1, 2, '7C', 'AISLE', 7, 'C'),
 (40, 1, 2, '7D', 'AISLE', 7, 'D'), (41, 1, 2, '7E', 'MIDDLE', 7, 'E'), (42, 1, 2, '7F', 'WINDOW', 7, 'F'),
 (43, 1, 2, '8A', 'WINDOW', 8, 'A'), (44, 1, 2, '8B', 'MIDDLE', 8, 'B'),
--- Deluxe (50 ghế)
 (45, 1, 3, '8C', 'AISLE', 8, 'C'), (46, 1, 3, '8D', 'AISLE', 8, 'D'), (47, 1, 3, '8E', 'MIDDLE', 8, 'E'), (48, 1, 3, '8F', 'WINDOW', 8, 'F'),
 (49, 1, 3, '9A', 'WINDOW', 9, 'A'), (50, 1, 3, '9B', 'MIDDLE', 9, 'B'), (51, 1, 3, '9C', 'AISLE', 9, 'C'),
 (52, 1, 3, '9D', 'AISLE', 9, 'D'), (53, 1, 3, '9E', 'MIDDLE', 9, 'E'), (54, 1, 3, '9F', 'WINDOW', 9, 'F'),
@@ -76,7 +73,6 @@ INSERT INTO `chitietghe` (`maghe`, `mamaybay`, `mahangve`, `soghe`, `vitrighe`, 
 (85, 1, 3, '15A', 'WINDOW', 15, 'A'), (86, 1, 3, '15B', 'MIDDLE', 15, 'B'), (87, 1, 3, '15C', 'AISLE', 15, 'C'),
 (88, 1, 3, '15D', 'AISLE', 15, 'D'), (89, 1, 3, '15E', 'MIDDLE', 15, 'E'), (90, 1, 3, '15F', 'WINDOW', 15, 'F'),
 (91, 1, 3, '16A', 'WINDOW', 16, 'A'), (92, 1, 3, '16B', 'MIDDLE', 16, 'B'),
--- Business (80 ghế)
 (93, 1, 4, '16C', 'AISLE', 16, 'C'), (94, 1, 4, '16D', 'AISLE', 16, 'D'), (95, 1, 4, '16E', 'MIDDLE', 16, 'E'), (96, 1, 4, '16F', 'WINDOW', 16, 'F'),
 (97, 1, 4, '17A', 'WINDOW', 17, 'A'), (98, 1, 4, '17B', 'MIDDLE', 17, 'B'), (99, 1, 4, '17C', 'AISLE', 17, 'C'),
 (100, 1, 4, '17D', 'AISLE', 17, 'D'), (101, 1, 4, '17E', 'MIDDLE', 17, 'E'), (102, 1, 4, '17F', 'WINDOW', 17, 'F'),
@@ -101,7 +97,6 @@ INSERT INTO `chitietghe` (`maghe`, `mamaybay`, `mahangve`, `soghe`, `vitrighe`, 
 (157, 1, 4, '27A', 'WINDOW', 27, 'A'), (158, 1, 4, '27B', 'MIDDLE', 27, 'B'), (159, 1, 4, '27C', 'AISLE', 27, 'C'),
 (160, 1, 4, '27D', 'AISLE', 27, 'D'), (161, 1, 4, '27E', 'MIDDLE', 27, 'E'), (162, 1, 4, '27F', 'WINDOW', 27, 'F'),
 (163, 1, 4, '28A', 'WINDOW', 28, 'A'), (164, 1, 4, '28B', 'MIDDLE', 28, 'B'),
--- First Class (52 ghế)
 (165, 1, 5, '28C', 'AISLE', 28, 'C'), (166, 1, 5, '28D', 'AISLE', 28, 'D'), (167, 1, 5, '28E', 'MIDDLE', 28, 'E'), (168, 1, 5, '28F', 'WINDOW', 28, 'F'),
 (169, 1, 5, '29A', 'WINDOW', 29, 'A'), (170, 1, 5, '29B', 'MIDDLE', 29, 'B'), (171, 1, 5, '29C', 'AISLE', 29, 'C'),
 (172, 1, 5, '29D', 'AISLE', 29, 'D'), (173, 1, 5, '29E', 'MIDDLE', 29, 'E'), (174, 1, 5, '29F', 'WINDOW', 29, 'F'),
@@ -285,13 +280,12 @@ INSERT INTO `chuc_nang` (`ma_chuc_nang`, `ma_code`, `ten_chuc_nang`, `nhom`) VAL
 (16, 'PERMISSION', 'Quản lý phân quyền', 'Hệ thống');
 
 -- 6.4. Bảng Phân quyền (Permissions)
+-- Super Admin có toàn quyền, QUAN_LY quản lý chính, NHAN_VIEN_VE bán vé và quản lý booking, KE_TOAN quản lý tài chính, VAN_HANH quản lý chuyến bay
 INSERT INTO `phan_quyen` (`ma_vai_tro`, `ma_chuc_nang`, `ma_hanh_dong`) VALUES
--- Super Admin có toàn quyền
 (1, 1, 'MANAGE'), (1, 2, 'MANAGE'), (1, 3, 'MANAGE'), (1, 4, 'MANAGE'),
 (1, 5, 'MANAGE'), (1, 6, 'MANAGE'), (1, 7, 'MANAGE'), (1, 8, 'MANAGE'),
 (1, 9, 'MANAGE'), (1, 10, 'MANAGE'), (1, 11, 'MANAGE'), (1, 12, 'MANAGE'),
 (1, 13, 'MANAGE'), (1, 14, 'MANAGE'), (1, 15, 'MANAGE'), (1, 16, 'MANAGE'),
--- QUAN_LY: Quyền quản lý chính
 (2, 1, 'VIEW'), (2, 1, 'CREATE'), (2, 1, 'UPDATE'), (2, 1, 'DELETE'),
 (2, 2, 'VIEW'), (2, 2, 'CREATE'), (2, 2, 'UPDATE'),
 (2, 5, 'VIEW'), (2, 5, 'UPDATE'), (2, 5, 'CANCEL'),
@@ -299,19 +293,16 @@ INSERT INTO `phan_quyen` (`ma_vai_tro`, `ma_chuc_nang`, `ma_hanh_dong`) VALUES
 (2, 7, 'VIEW'), (2, 7, 'CREATE'), (2, 7, 'UPDATE'),
 (2, 9, 'VIEW'), (2, 9, 'APPROVE'),
 (2, 13, 'VIEW'), (2, 13, 'EXPORT'),
--- NHAN_VIEN_VE: Bán vé và quản lý booking
 (3, 5, 'VIEW'), (3, 5, 'CREATE'), (3, 5, 'UPDATE'), (3, 5, 'CANCEL'),
 (3, 6, 'VIEW'), (3, 6, 'CREATE'), (3, 6, 'UPDATE'),
 (3, 7, 'VIEW'), (3, 7, 'CREATE'), (3, 7, 'UPDATE'),
 (3, 1, 'VIEW'),
 (3, 11, 'VIEW'),
--- KE_TOAN: Quản lý tài chính
 (4, 8, 'VIEW'), (4, 8, 'UPDATE'), (4, 8, 'APPROVE'),
 (4, 9, 'VIEW'), (4, 9, 'UPDATE'), (4, 9, 'APPROVE'),
 (4, 12, 'VIEW'), (4, 12, 'UPDATE'),
 (4, 13, 'VIEW'), (4, 13, 'EXPORT'),
 (4, 6, 'VIEW'),
--- VAN_HANH: Quản lý chuyến bay
 (5, 1, 'VIEW'), (5, 1, 'CREATE'), (5, 1, 'UPDATE'), (5, 1, 'DELETE'),
 (5, 2, 'VIEW'), (5, 2, 'CREATE'), (5, 2, 'UPDATE'),
 (5, 3, 'VIEW'),
@@ -331,3 +322,112 @@ INSERT INTO `admin_vai_tro` (`mataikhoan`, `ma_vai_tro`) VALUES
 (2, 1),
 (3, 2),
 (4, 3);
+
+-- =================================================================
+-- 7. DỮ LIỆU MẪU CHO ĐƠN HÀNG, ĐẶT CHỖ, THANH TOÁN
+-- =================================================================
+
+-- 7.1. Bảng đơn hàng (donhang)
+INSERT INTO `donhang` (`madonhang`, `pnr`, `mahanhkhach_nguoidat`, `ngaydat`, `tonggia`, `trangthai`, `email_nguoidat`, `sodienthoai_nguoidat`, `ghichu`, `created_at`, `updated_at`, `da_xoa`, `deleted_at`) VALUES
+(1, 'ABC123', 1, '2025-01-15 10:30:00', 2500000.00, 'ĐÃ THANH TOÁN', 'nguyenvana@example.com', '0909123456', 'Đặt vé HAN-SGN', '2025-01-15 10:30:00', '2025-01-15 10:30:00', 0, NULL),
+(2, 'DEF456', 2, '2025-01-16 14:20:00', 3500000.00, 'ĐÃ THANH TOÁN', 'levanc@example.com', '0912345678', 'Đặt vé SGN-DAD', '2025-01-16 14:20:00', '2025-01-16 14:20:00', 0, NULL),
+(3, 'GHI789', 3, '2025-01-17 09:15:00', 1000000.00, 'CHỜ THANH TOÁN', 'levanc@example.com', '0912345678', 'Đặt vé HAN-DAD', '2025-01-17 09:15:00', '2025-01-17 09:15:00', 0, NULL),
+(4, 'JKL012', 4, '2025-01-18 11:30:00', 5000000.00, 'CHỜ THANH TOÁN', 'phamthid@example.com', '0987654322', 'Đặt vé SGN-HAN', '2025-01-18 11:30:00', '2025-01-18 11:30:00', 0, NULL),
+(5, 'MNO345', 5, '2025-01-19 16:45:00', 1500000.00, 'ĐÃ THANH TOÁN', 'hoangmine@example.com', '0909876543', 'Đặt vé HAN-SGN', '2025-01-19 16:45:00', '2025-01-19 16:45:00', 0, NULL),
+(6, 'PQR678', 6, '2025-01-20 08:00:00', 2000000.00, 'CHỜ THANH TOÁN', 'nguyenthif@example.com', '0976543210', 'Đặt vé DAD-SGN', '2025-01-20 08:00:00', '2025-01-20 08:00:00', 0, NULL),
+(7, 'STU901', 7, '2025-01-21 13:10:00', 4000000.00, 'ĐÃ HỦY', 'tranvang@example.com', '0965432109', 'Đặt vé SGN-DAD (đã hủy)', '2025-01-21 13:10:00', '2025-01-21 13:10:00', 0, NULL),
+(8, 'VWX234', 2, '2025-01-22 10:15:00', 3000000.00, 'ĐÃ THANH TOÁN', 'levanc@example.com', '0912345678', 'Đặt vé SGN-HAN', '2025-01-22 10:15:00', '2025-01-22 10:15:00', 0, NULL);
+
+-- 7.2. Bảng đặt chỗ (datcho)
+-- Đơn hàng 1-2 hành khách, Đơn hàng 2-1 hành khách, Đơn hàng 3-1 hành khách, Đơn hàng 4-2 hành khách, Đơn hàng 5-3 hành khách, Đơn hàng 6-1 hành khách, Đơn hàng 7-đã hủy, Đơn hàng 8-1 hành khách
+INSERT INTO `datcho` (`madatcho`, `madonhang`, `mahanhkhach`, `machuyenbay`, `mahangve`, `giave`, `maghe_da_chon`, `ngaydatcho`, `trangthai`, `checkin_status`, `checkin_time`, `da_xoa`, `deleted_at`) VALUES
+(1, 1, 1, 1, 1, 1200000.00, 1, '2025-01-15 10:30:00', 'ACTIVE', 0, NULL, 0, NULL),
+(2, 1, 2, 1, 2, 1000000.00, 2, '2025-01-15 10:30:00', 'ACTIVE', 0, NULL, 0, NULL),
+(3, 2, 2, 2, 1, 1200000.00, 3, '2025-01-16 14:20:00', 'ACTIVE', 0, NULL, 0, NULL),
+(4, 3, 3, 3, 1, 900000.00, 4, '2025-01-17 09:15:00', 'ACTIVE', 0, NULL, 0, NULL),
+(5, 4, 4, 1, 1, 1200000.00, 5, '2025-01-18 11:30:00', 'ACTIVE', 0, NULL, 0, NULL),
+(6, 4, 5, 1, 2, 1000000.00, 6, '2025-01-18 11:30:00', 'ACTIVE', 0, NULL, 0, NULL),
+(7, 5, 5, 2, 1, 900000.00, 7, '2025-01-19 16:45:00', 'ACTIVE', 0, NULL, 0, NULL),
+(8, 5, 6, 2, 2, 750000.00, 8, '2025-01-19 16:45:00', 'ACTIVE', 0, NULL, 0, NULL),
+(9, 5, 7, 2, 3, 1500000.00, 9, '2025-01-19 16:45:00', 'ACTIVE', 0, NULL, 0, NULL),
+(10, 6, 6, 3, 1, 750000.00, 10, '2025-01-20 08:00:00', 'ACTIVE', 0, NULL, 0, NULL),
+(11, 7, 7, 4, 1, 1200000.00, 11, '2025-01-21 13:10:00', 'CANCELLED', 0, NULL, 0, NULL),
+(12, 8, 2, 1, 1, 1200000.00, 12, '2025-01-22 10:15:00', 'ACTIVE', 0, '2025-01-22 10:18:00', 0, NULL);
+
+-- 7.3. Bảng ghế đã đặt (ghe_da_dat)
+-- Đơn hàng 1 - 2 ghế, Đơn hàng 2 - 1 ghế, Đơn hàng 3 - 1 ghế, Đơn hàng 4 - 2 ghế, Đơn hàng 5 - 3 ghế, Đơn hàng 6 - 1 ghế, Đơn hàng 8 - 1 ghế
+INSERT INTO `ghe_da_dat` (`ma_ghe_da_dat`, `machuyenbay`, `maghe`, `madatcho`, `thoigian_dat`) VALUES
+(1, 1, 1, 1, '2025-01-15 10:30:00'),
+(2, 1, 2, 2, '2025-01-15 10:30:00'),
+(3, 2, 3, 3, '2025-01-16 14:20:00'),
+(4, 3, 4, 4, '2025-01-17 09:15:00'),
+(5, 4, 5, 5, '2025-01-18 11:30:00'),
+(6, 4, 6, 6, '2025-01-18 11:30:00'),
+(7, 5, 7, 7, '2025-01-19 16:45:00'),
+(8, 5, 8, 8, '2025-01-19 16:45:00'),
+(9, 5, 9, 9, '2025-01-19 16:45:00'),
+(10, 6, 10, 10, '2025-01-20 08:00:00'),
+(11, 8, 12, 12, '2025-01-22 10:15:00');
+
+-- 7.4. Bảng trạng thái thanh toán (trangthaithanhtoan)
+INSERT INTO `trangthaithanhtoan` (`mathanhtoan`, `dathanhtoan`, `phuongthucthanhtoan`, `ngayhethan`, `sotien`, `madatcho`, `da_xoa`, `deleted_at`) VALUES
+(1, 1, 'VNPAY', '2026-01-20', 1200000.00, 1, 0, NULL),
+(2, 1, 'CHUYEN_KHOAN', '2026-01-20', 1000000.00, 2, 0, NULL),
+(3, 1, 'VNPAY', '2026-01-18', 2000000.00, 3, 0, NULL),
+(4, 0, NULL, '2026-01-19', 1500000.00, 4, 0, NULL),
+(5, 1, 'VNPAY', '2026-01-22', 900000.00, 5, 0, NULL),
+(6, 1, 'CHUYEN_KHOAN', '2026-01-25', 2500000.00, 6, 0, NULL),
+(7, 1, 'VNPAY', '2026-01-21', 1800000.00, 7, 0, NULL),
+(8, 0, NULL, '2026-01-20', 750000.00, 8, 0, NULL);
+
+-- 7.5. Bảng hoàn tiền (hoantien)
+INSERT INTO `hoantien` (`mahp`, `madatcho`, `mathanhtoan`, `sotienhoan`, `lydohoantien`, `trangthai`, `phuongthuchoan`, `taikhoanhoan`, `ngayycau`, `ngayhoan`, `nguoixuly`, `ghichu`, `created_at`, `updated_at`, `da_xoa`, `deleted_at`) VALUES
+(1, 1, 1, 600000.00, 'Khách hàng yêu cầu hủy vé', 'CHO_XU_LY', 'VNPAY', 'VNPAY - 0909123456', '2025-01-21 13:15:00', NULL, NULL, NULL, '2025-01-21 13:15:00', '2025-01-21 13:15:00', 0, NULL),
+(2, 2, 2, 500000.00, 'Hoàn tiền thành công', 'DA_HOAN_TIEN', 'CHUYEN_KHOAN', '1234567890 - Vietcombank', '2025-01-22 10:20:00', '2025-01-22 10:25:00', 'admin', 'Hoàn tiền qua chuyển khoản', '2025-01-22 10:20:00', '2025-01-22 10:25:00', 0, NULL),
+(3, 3, 3, 1000000.00, 'Hoàn tiền 100%', 'DA_HOAN_TIEN', 'VNPAY', 'VNPAY - 0912345678', '2025-01-21 15:00:00', '2025-01-21 15:30:00', 'admin', 'Hoàn tiền đầy đủ do chuyến bay hủy', '2025-01-21 15:00:00', '2025-01-21 15:30:00', 0, NULL),
+(4, 5, 5, 450000.00, 'Thay đổi lịch trình', 'TU_CHOI', 'VNPAY', 'VNPAY - 0987654322', '2025-01-20 09:00:00', '2025-01-20 09:30:00', 'admin', 'Từ chối: Đã quá thờ hạn hoàn tiền theo quy định', '2025-01-20 09:00:00', '2025-01-20 09:30:00', 0, NULL);
+
+-- 7.6. Bảng hóa đơn (hoadon)
+INSERT INTO `hoadon` (`mahoadon`, `madonhang`, `sohoadon`, `ngaylap`, `ngayhachtoan`, `tongtien`, `thuevat`, `tongthanhtoan`, `trangthai`, `nguoi_lap`, `ghi_chu`, `created_at`, `updated_at`, `da_xoa`, `deleted_at`) VALUES
+(1, 1, 'HD20250001', '2025-01-15 11:00:00', '2025-01-15', 2500000.00, 250000.00, 2750000.00, 'DA_PHAT_HANH', 'admin', 'Hóa đơn cho đơn hàng ABC123', '2025-01-15 11:00:00', '2025-01-15 11:00:00', 0, NULL),
+(2, 2, 'HD20250002', '2025-01-16 15:00:00', '2025-01-16', 3500000.00, 350000.00, 3850000.00, 'DA_PHAT_HANH', 'admin', 'Hóa đơn cho đơn hàng DEF456', '2025-01-16 15:00:00', '2025-01-16 15:00:00', 0, NULL),
+(3, 5, 'HD20250003', '2025-01-19 17:00:00', '2025-01-19', 1500000.00, 150000.00, 1650000.00, 'DA_PHAT_HANH', 'admin', 'Hóa đơn cho đơn hàng MNO345', '2025-01-19 17:00:00', '2025-01-19 17:00:00', 0, NULL),
+(4, 8, 'HD20250004', '2025-01-22 11:00:00', '2025-01-22', 3000000.00, 300000.00, 3300000.00, 'DA_HUY', 'admin', 'Hủy: Khách hàng yêu cầu hủy - Ngưởi hủy: admin', '2025-01-22 11:00:00', '2025-01-22 12:00:00', 0, NULL);
+
+-- 7.7. Bảng đặt chỗ dịch vụ (datchodichvu)
+-- Đơn hàng 1-2 dịch vụ, Đơn hàng 2-3 dịch vụ, Đơn hàng 3-1 dịch vụ, Đơn hàng 4-4 dịch vụ, Đơn hàng 5-8 dịch vụ, Đơn hàng 8-2 dịch vụ
+INSERT INTO `datchodichvu` (`madatcho`, `maluachon`, `soluong`, `dongia`) VALUES
+(1, 1, 1, 250000.00),
+(1, 2, 1, 150000.00),
+(3, 1, 1, 250000.00),
+(3, 3, 1, 200000.00),
+(3, 2, 1, 150000.00),
+(4, 3, 1, 200000.00),
+(5, 1, 1, 250000.00),
+(5, 3, 1, 200000.00),
+(5, 2, 1, 150000.00),
+(5, 4, 1, 300000.00),
+(7, 1, 1, 250000.00),
+(7, 3, 1, 200000.00),
+(7, 2, 1, 150000.00),
+(7, 4, 1, 300000.00),
+(7, 5, 1, 4000000.00),
+(7, 6, 1, 200000.00),
+(7, 7, 1, 300000.00),
+(7, 8, 1, 4000000.00),
+(12, 1, 1, 250000.00),
+(12, 3, 1, 200000.00);
+
+-- 7.7. Bảng khuyến mãi đặt chỗ (khuyenmai_datcho)
+-- Áp dụng khuyến mãi cho các đơn hàng: SALE20, WEEKEND15, ECONOMY10, GIA100K, GIA200K, VIP50, CHRISTMAS25, NEWYEAR30
+INSERT INTO `khuyenmai_datcho` (`makhuyenmai`, `madatcho`, `sotiengiam`, `ngaysudung`) VALUES
+(1, 1, 500000.00, '2025-01-15 10:30:00'),
+(1, 2, 400000.00, '2025-01-16 14:20:00'),
+(2, 3, 100000.00, '2025-01-17 09:15:00'),
+(4, 5, 200000.00, '2025-01-18 11:30:00'),
+(4, 6, 150000.00, '2025-01-18 11:30:00'),
+(5, 7, 250000.00, '2025-01-19 16:45:00'),
+(6, 1, 300000.00, '2025-01-15 10:30:00'),
+(7, 5, 150000.00, '2025-01-19 16:45:00'),
+(8, 2, 500000.00, '2025-01-16 14:20:00');
+

@@ -19,10 +19,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -55,15 +59,15 @@ class DonHangServiceTest {
         // Create test customer
         testHanhKhach = new HanhKhach();
         testHanhKhach.setMaHanhKhach(1);
-        testHanhKhach.setHoTen("Nguyen Van A");
+        testHanhKhach.setHoVaTen("Nguyen Van A");
         testHanhKhach.setEmail("test@example.com");
         testHanhKhach.setSoDienThoai("0123456789");
 
         // Create test flight
         testChuyenBay = new ChiTietChuyenBay();
         testChuyenBay.setMaChuyenBay(1);
-        testChuyenBay.setNgayDi(LocalDateTime.now().plusDays(7));
-        testChuyenBay.setGioDi("10:00");
+        testChuyenBay.setNgayDi(LocalDateTime.now().plusDays(7).toLocalDate());
+        testChuyenBay.setGioDi(LocalTime.of(10, 0));
 
         // Create test booking
         testDatCho = new DatCho();
@@ -98,7 +102,7 @@ class DonHangServiceTest {
     void testGetAllDonHang_WithFilters() {
         // Given
         List<DonHang> expectedOrders = List.of(testDonHang);
-        when(donHangRepository.findAll(any())).thenReturn(expectedOrders);
+        when(donHangRepository.findAll(any(Specification.class))).thenReturn(expectedOrders);
 
         // When
         List<DonHangResponse> result = donHangService.getAllDonHang(
@@ -118,7 +122,7 @@ class DonHangServiceTest {
         assertEquals(1, result.size());
         assertEquals("ABC123", result.get(0).getPnr());
         assertEquals("CHỜ THANH TOÁN", result.get(0).getTrangThai());
-        verify(donHangRepository, times(1)).findAll(any());
+        verify(donHangRepository, times(1)).findAll(any(Specification.class));
     }
 
     @Test
@@ -135,7 +139,7 @@ class DonHangServiceTest {
         order2.setCreatedAt(LocalDateTime.now().minusDays(1));
 
         List<DonHang> orders = List.of(order2, testDonHang);
-        when(donHangRepository.findAll(any(), any())).thenReturn(orders);
+        when(donHangRepository.findAll(any(Specification.class), any(Sort.class))).thenReturn(orders);
 
         // When
         List<DonHangResponse> result = donHangService.getAllDonHang(
@@ -145,7 +149,7 @@ class DonHangServiceTest {
         // Then
         assertNotNull(result);
         assertEquals(2, result.size());
-        verify(donHangRepository, times(1)).findAll(any(), any());
+        verify(donHangRepository, times(1)).findAll(any(Specification.class), any(Sort.class));
     }
 
     // ==================== TEST: getDonHangById ====================
@@ -163,7 +167,7 @@ class DonHangServiceTest {
         assertEquals(1, result.getMaDonHang());
         assertEquals("ABC123", result.getPnr());
         assertNotNull(result.getHanhKhachNguoiDat());
-        assertEquals("Nguyen Van A", result.getHanhKhachNguoiDat().getHoTen());
+        assertEquals("Nguyen Van A", result.getHanhKhachNguoiDat().getHoVaTen());
         verify(donHangRepository, times(1)).findById(1);
     }
 
@@ -286,7 +290,7 @@ class DonHangServiceTest {
     @Test
     void testHuyDonHang_FlightDeparted() {
         // Given
-        testChuyenBay.setNgayDi(LocalDateTime.now().minusDays(1));
+        testChuyenBay.setNgayDi(LocalDateTime.now().minusDays(1).toLocalDate());
         HuyDonHangRequest request = new HuyDonHangRequest();
         request.setLyDoHuy("Test");
 

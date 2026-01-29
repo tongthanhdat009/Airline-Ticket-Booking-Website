@@ -1,5 +1,6 @@
 package com.example.j2ee.dto.donhang;
 
+import com.example.j2ee.model.HanhKhach;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 public class DonHangResponse {
     private Integer maDonHang;
     private String pnr;
+    private HanhKhach hanhKhachNguoiDat;
     private LocalDateTime ngayDat;
     private BigDecimal tongGia;
     private String trangThai;

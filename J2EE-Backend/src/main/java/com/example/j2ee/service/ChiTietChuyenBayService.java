@@ -560,7 +560,7 @@ public class ChiTietChuyenBayService {
             return "Không tìm thấy chuyến bay";
         }
 
-        if (!chuyenBay.isDaXoa()) {
+        if (!chuyenBay.getDaXoa()) {
             return "Chuyến bay này chưa bị xóa nên không cần khôi phục";
         }
 

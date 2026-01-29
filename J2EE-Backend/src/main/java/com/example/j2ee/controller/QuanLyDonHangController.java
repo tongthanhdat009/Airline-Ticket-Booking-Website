@@ -1,6 +1,8 @@
 package com.example.j2ee.controller;
 
 import com.example.j2ee.dto.ApiResponse;
+import com.example.j2ee.dto.donhang.BatchApproveRequest;
+import com.example.j2ee.dto.donhang.BatchRefundRequest;
 import com.example.j2ee.dto.donhang.DonHangDetailResponse;
 import com.example.j2ee.dto.donhang.DonHangResponse;
 import com.example.j2ee.dto.donhang.HuyDonHangRequest;
@@ -314,6 +316,61 @@ public class QuanLyDonHangController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.error("Lỗi khi xóa đơn hàng: " + e.getMessage()));
+        }
+    }
+
+    // ==================== BATCH OPERATIONS ENDPOINTS ====================
+
+    /**
+     * POST /donhang/batch/approve - Batch approve payment for multiple orders
+     *
+     * Approves payment for multiple orders at once with validation:
+     * - Only orders with status CHỜ THANH TOÁN will be processed
+     * - Validates flight status (cannot approve if flight is already completed)
+     *
+     * @param request Request body containing list of order IDs
+     * @return Result of batch approval operation
+     */
+    @PostMapping("/batch/approve")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Object>>> batchApprovePayment(
+            @Valid @RequestBody BatchApproveRequest request) {
+        try {
+            java.util.Map<String, Object> result = donHangService.batchApprovePayment(request.getMaDonHangs());
+            return ResponseEntity.ok(ApiResponse.success(result));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Lỗi khi duyệt thanh toán hàng loạt: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * POST /donhang/batch/refund - Batch refund for multiple orders
+     *
+     * Refunds multiple orders at once with validation:
+     * - Only orders with status ĐÃ THANH TOÁN will be processed
+     * - Cannot refund if flight status is ĐÃ BAY or ĐANG BAY
+     *
+     * @param request Request body containing list of order IDs and refund reason
+     * @return Result of batch refund operation
+     */
+    @PostMapping("/batch/refund")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Object>>> batchRefund(
+            @Valid @RequestBody BatchRefundRequest request) {
+        try {
+            java.util.Map<String, Object> result = donHangService.batchRefund(
+                    request.getMaDonHangs(),
+                    request.getLyDoHoanTien()
+            );
+            return ResponseEntity.ok(ApiResponse.success(result));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Lỗi khi hoàn tiền hàng loạt: " + e.getMessage()));
         }
     }
 }

@@ -46,7 +46,7 @@ public class HoanTien {
     private String lyDoHoanTien;
 
     @Column(name = "trangthai", nullable = false, length = 50)
-    private String trangThai = "ĐANG XỬ LÝ"; // ĐANG XỬ LÝ, HOÀN THÀNH, TỪ CHỐI
+    private String trangThai = "CHO_XU_LY"; // CHO_XU_LY, DA_HOAN_TIEN, TU_CHOI
 
     @Column(name = "ngayycau", nullable = false)
     private LocalDateTime ngayYeuCau;
@@ -59,6 +59,12 @@ public class HoanTien {
 
     @Column(name = "ghichu", length = 500)
     private String ghiChu;
+
+    @Column(name = "phuongthuchoan", length = 50)
+    private String phuongThucHoan; // VNPAY, CHUYEN_KHOAN, TIEN_MAT
+
+    @Column(name = "taikhoanhoan", length = 200)
+    private String taiKhoanHoan;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -80,15 +86,15 @@ public class HoanTien {
     }
 
     public boolean isPending() {
-        return "ĐANG XỬ LÝ".equals(trangThai);
+        return "CHO_XU_LY".equals(trangThai);
     }
 
     public boolean isCompleted() {
-        return "HOÀN THÀNH".equals(trangThai);
+        return "DA_HOAN_TIEN".equals(trangThai);
     }
 
     public boolean isRejected() {
-        return "TỪ CHỐI".equals(trangThai);
+        return "TU_CHOI".equals(trangThai);
     }
 
     // ==================== SOFT DELETE FIELDS ====================

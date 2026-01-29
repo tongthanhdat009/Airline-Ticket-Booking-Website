@@ -2,6 +2,7 @@ package com.example.j2ee.repository;
 
 import com.example.j2ee.model.HoanTien;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface HoanTienRepository extends JpaRepository<HoanTien, Integer> {
+public interface HoanTienRepository extends JpaRepository<HoanTien, Integer>, JpaSpecificationExecutor<HoanTien> {
     
     /**
      * Tìm hoàn tiền theo mã đặt chỗ

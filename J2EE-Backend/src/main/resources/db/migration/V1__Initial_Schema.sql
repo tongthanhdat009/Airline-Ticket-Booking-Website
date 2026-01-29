@@ -201,6 +201,7 @@ CREATE TABLE `trangthaithanhtoan` (
   `madatcho` int DEFAULT null,
   `sotien` decimal(10,2) NOT NULL,
   `dathanhtoan` char(1) NOT NULL,
+  `phuongthucthanhtoan` varchar(50) DEFAULT null COMMENT 'VNPAY, CHUYEN_KHOAN, TIEN_MAT',
   `ngayhethan` date DEFAULT null,
   `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
   `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
@@ -294,7 +295,9 @@ CREATE TABLE `hoantien` (
   `mathanhtoan` INT NOT NULL,
   `sotienhoan` DECIMAL(10,2) NOT NULL,
   `lydohoantien` VARCHAR(500) NOT NULL,
-  `trangthai` VARCHAR(50) NOT NULL DEFAULT 'PROCESSING' COMMENT 'PROCESSING, COMPLETED, REJECTED',
+  `trangthai` VARCHAR(50) NOT NULL DEFAULT 'CHO_XU_LY' COMMENT 'CHO_XU_LY, DA_HOAN_TIEN, TU_CHOI',
+  `phuongthuchoan` VARCHAR(50) DEFAULT null COMMENT 'VNPAY, CHUYEN_KHOAN, TIEN_MAT',
+  `taikhoanhoan` VARCHAR(200) DEFAULT null COMMENT 'Thông tin tài khoản nhận hoàn tiền',
   `ngayycau` DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   `ngayhoan` DATETIME COMMENT 'Ngày hoàn tiền thực tế',
   `nguoixuly` VARCHAR(100) COMMENT 'Người xử lý yêu cầu hoàn tiền',
@@ -303,6 +306,25 @@ CREATE TABLE `hoantien` (
   `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
   `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
+);
+
+-- Bảng hóa đơn
+CREATE TABLE `hoadon` (
+  `mahoadon` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `madonhang` INT NOT NULL,
+  `sohoadon` VARCHAR(50) UNIQUE NOT NULL COMMENT 'Số hóa đơn duy nhất',
+  `ngaylap` DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  `ngayhachtoan` DATE NOT NULL COMMENT 'Ngày hạch toán',
+  `tongtien` DECIMAL(10,2) NOT NULL COMMENT 'Tổng tiền hàng',
+  `thuevat` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT 'Thuế VAT',
+  `tongthanhtoan` DECIMAL(10,2) NOT NULL COMMENT 'Tổng thanh toán',
+  `trangthai` VARCHAR(30) NOT NULL DEFAULT 'DA_PHAT_HANH' COMMENT 'DA_PHAT_HANH, DA_HUY, DIEU_CHINH',
+  `nguoi_lap` VARCHAR(100) COMMENT 'Ngưởi lập hóa đơn',
+  `ghi_chu` VARCHAR(500) COMMENT 'Ghi chú',
+  `created_at` DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
+  `deleted_at` datetime DEFAULT null COMMENT 'Thờ gian xóa mềm'
 );
 
 -- Bảng khuyến mãi đặt chỗ
@@ -428,6 +450,7 @@ ALTER TABLE `refreshtoken` ADD CONSTRAINT `FK_refreshtoken_taikhoan` FOREIGN KEY
 ALTER TABLE `refreshtoken` ADD CONSTRAINT `FK_refreshtoken_taikhoanadmin` FOREIGN KEY (`mataikhoanadmin`) REFERENCES `taikhoanadmin` (`mataikhoan`);
 ALTER TABLE `hoantien` ADD CONSTRAINT `FK_hoantien_datcho` FOREIGN KEY (`madatcho`) REFERENCES `datcho` (`madatcho`);
 ALTER TABLE `hoantien` ADD CONSTRAINT `FK_hoantien_thanhtoan` FOREIGN KEY (`mathanhtoan`) REFERENCES `trangthaithanhtoan` (`mathanhtoan`);
+ALTER TABLE `hoadon` ADD CONSTRAINT `FK_hoadon_donhang` FOREIGN KEY (`madonhang`) REFERENCES `donhang` (`madonhang`);
 ALTER TABLE `khuyenmai_datcho` ADD CONSTRAINT `FK_kmd_khuyenmai` FOREIGN KEY (`makhuyenmai`) REFERENCES `khuyenmai` (`makhuyenmai`);
 ALTER TABLE `khuyenmai_datcho` ADD CONSTRAINT `FK_kmd_datcho` FOREIGN KEY (`madatcho`) REFERENCES `datcho` (`madatcho`);
 ALTER TABLE `phan_quyen` ADD CONSTRAINT `FK_pq_vaitro` FOREIGN KEY (`ma_vai_tro`) REFERENCES `vai_tro` (`ma_vai_tro`);

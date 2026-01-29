@@ -228,7 +228,7 @@ public class QuanLyChuyenBayController {
             if ("Khôi phục chuyến bay thành công".equals(msg)) {
                 var chuyenBayOpt = chiTietChuyenBayService.getChiTietChuyenBayById(maChuyenBay);
                 if (chuyenBayOpt.isPresent()) {
-                    return ResponseEntity.ok(ApiResponse.success(chuyenBayOpt.get(), msg));
+                    return ResponseEntity.ok(ApiResponse.success(msg, chuyenBayOpt.get()));
                 }
                 return ResponseEntity.ok(ApiResponse.successMessage(msg));
             }

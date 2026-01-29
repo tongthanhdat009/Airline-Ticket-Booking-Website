@@ -95,6 +95,7 @@ function TrangChuAdmin() {
             'TKAdmin': 'Quản lý Tài Khoản',
             'GiaBay': 'Quản lý Giá Bay',
             'KhuyenMai': 'Quản lý Khuyến Mãi',
+            'DonHang': 'Quản lý Đơn Hàng',
             'HoaDon': 'Quản lý Hóa Đơn',
             'HoanTien': 'Quản lý Hoàn Tiền',
             'LichSuThaoTac': 'Lịch Sử Thao Tác',

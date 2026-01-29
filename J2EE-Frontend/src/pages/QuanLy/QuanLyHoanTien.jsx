@@ -1,106 +1,109 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FaSearch, FaEye, FaUndo, FaCheck, FaTimes, FaCalendar } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
+import hoanTienApi from '../../services/hoanTienApi';
+import Toast from '../../components/common/Toast';
+import ConfirmDialog from '../../components/common/ConfirmDialog';
+import RefundDetailModal from '../../components/QuanLy/QuanLyHoanTien/RefundDetailModal';
 
 const QuanLyHoanTien = () => {
     const [search, setSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedRefund, setSelectedRefund] = useState(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [actionLoading, setActionLoading] = useState(false);
     const itemsPerPage = 5;
 
-    // Dữ liệu mẫu hard code
-    const [refunds, setRefunds] = useState([
-        {
-            maHoanTien: 'HT001',
-            maHoaDon: 'HD001',
-            maDatVe: 'DV001',
-            hoTen: 'Nguyễn Văn A',
-            email: 'nguyenvana@email.com',
-            soDienThoai: '0901234567',
-            ngayYeuCau: '2025-01-10T15:30:00',
-            lyDo: 'Hủy chuyến bay do lý do cá nhân',
-            soTienHoan: 3500000,
-            trangThai: 'CHO_XU_LY',
-            phuongThucHoan: 'CHUYEN_KHOAN',
-            taiKhoanHoan: '1234567890 - Vietcombank',
-            nguoiXuLy: null,
-            ngayXuLy: null
-        },
-        {
-            maHoanTien: 'HT002',
-            maHoaDon: 'HD002',
-            maDatVe: 'DV003',
-            hoTen: 'Trần Thị B',
-            email: 'tranthib@email.com',
-            soDienThoai: '0912345678',
-            ngayYeuCau: '2025-01-09T10:20:00',
-            lyDo: 'Chuyến bay bị hủy bởi hãng hàng không',
-            soTienHoan: 8500000,
-            trangThai: 'DA_HOAN_TIEN',
-            phuongThucHoan: 'VNPAY',
-            taiKhoanHoan: 'VNPAY - 0987654321',
-            nguoiXuLy: 'admin',
-            ngayXuLy: '2025-01-09T14:00:00'
-        },
-        {
-            maHoanTien: 'HT003',
-            maHoaDon: 'HD004',
-            maDatVe: 'DV004',
-            hoTen: 'Lê Văn C',
-            email: 'levanc@email.com',
-            soDienThoai: '0923456789',
-            ngayYeuCau: '2025-01-08T09:15:00',
-            lyDo: 'Thay đổi lịch trình đột xuất',
-            soTienHoan: 5400000,
-            trangThai: 'TU_CHOI',
-            phuongThucHoan: 'CHUYEN_KHOAN',
-            taiKhoanHoan: '9876543210 - BIDV',
-            nguoiXuLy: 'admin',
-            ngayXuLy: '2025-01-08T11:30:00',
-            lyDoTuChoi: 'Đã quá thời hạn hoàn tiền theo quy định'
-        },
-        {
-            maHoanTien: 'HT004',
-            maHoaDon: 'HD005',
-            maDatVe: 'DV002',
-            hoTen: 'Phạm Thị D',
-            email: 'phamthid@email.com',
-            soDienThoai: '0934567890',
-            ngayYeuCau: '2025-01-11T16:45:00',
-            lyDo: 'Khách hàng đổi ý không muốn bay',
-            soTienHoan: 12000000,
-            trangThai: 'CHO_XU_LY',
-            phuongThucHoan: 'VNPAY',
-            taiKhoanHoan: 'VNPAY - 0912345678',
-            nguoiXuLy: null,
-            ngayXuLy: null
-        },
-        {
-            maHoanTien: 'HT005',
-            maHoaDon: 'HD006',
-            maDatVe: 'DV005',
-            hoTen: 'Hoàng Văn E',
-            email: 'hoangvane@email.com',
-            soDienThoai: '0945678901',
-            ngayYeuCau: '2025-01-07T08:00:00',
-            lyDo: 'Sức khỏe không cho phép bay',
-            soTienHoan: 28000000,
-            trangThai: 'DA_HOAN_TIEN',
-            phuongThucHoan: 'CHUYEN_KHOAN',
-            taiKhoanHoan: '1122334455 - Techcombank',
-            nguoiXuLy: 'admin',
-            ngayXuLy: '2025-01-07T15:00:00'
-        }
-    ]);
+    // States cho dữ liệu từ API
+    const [refunds, setRefunds] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [thongKe, setThongKe] = useState({
+        tongYeuCau: 0,
+        choXuLy: 0,
+        daHoanTien: 0,
+        daTuChoi: 0,
+        tongTienDaHoan: 0,
+        tongTienChoHoan: 0
+    });
 
-    const filteredRefunds = refunds.filter(ht =>
-        ht.maHoanTien?.toLowerCase().includes(search.toLowerCase()) ||
-        ht.hoTen?.toLowerCase().includes(search.toLowerCase()) ||
-        ht.email?.toLowerCase().includes(search.toLowerCase()) ||
-        ht.maHoaDon?.toLowerCase().includes(search.toLowerCase()) ||
-        ht.maDatVe?.toLowerCase().includes(search.toLowerCase())
-    );
+    // States cho Toast
+    const [toast, setToast] = useState({
+        isVisible: false,
+        message: '',
+        type: 'success'
+    });
+
+    // States cho ConfirmDialog
+    const [confirmDialog, setConfirmDialog] = useState({
+        isVisible: false,
+        title: '',
+        message: '',
+        type: 'warning',
+        confirmText: 'Xác nhận',
+        onConfirm: null
+    });
+
+    // Toast handler
+    const showToast = (message, type = 'success') => {
+        setToast({ isVisible: true, message, type });
+    };
+
+    const hideToast = () => {
+        setToast(prev => ({ ...prev, isVisible: false }));
+    };
+
+    // ConfirmDialog handlers
+    const showConfirm = (title, message, type, confirmText, onConfirm) => {
+        setConfirmDialog({
+            isVisible: true,
+            title,
+            message,
+            type,
+            confirmText,
+            onConfirm
+        });
+    };
+
+    const hideConfirm = () => {
+        setConfirmDialog(prev => ({ ...prev, isVisible: false }));
+    };
+
+    // Load dữ liệu từ API
+    const loadData = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            // Load danh sách hoàn tiền
+            const response = await hoanTienApi.getHoanTienList({ search });
+            if (response.success && response.data) {
+                setRefunds(response.data);
+            } else {
+                setError(response.message || 'Không thể tải dữ liệu');
+                showToast(response.message || 'Không thể tải dữ liệu', 'error');
+            }
+
+            // Load thống kê
+            const thongKeResponse = await hoanTienApi.getThongKeHoanTien();
+            if (thongKeResponse.success && thongKeResponse.data) {
+                setThongKe(thongKeResponse.data);
+            }
+        } catch (err) {
+            console.error('Error loading hoan tien:', err);
+            const errorMsg = err.response?.data?.message || 'Lỗi khi tải dữ liệu';
+            setError(errorMsg);
+            showToast(errorMsg, 'error');
+        } finally {
+            setLoading(false);
+        }
+    }, [search]);
+
+    // Load dữ liệu khi component mount hoặc search thay đổi
+    useEffect(() => {
+        loadData();
+    }, [loadData]);
+
+    const filteredRefunds = refunds;
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -119,36 +122,86 @@ const QuanLyHoanTien = () => {
         setSelectedRefund(null);
     };
 
-    const handleApproveRefund = (maHoanTien) => {
-        if (window.confirm('Bạn có chắc chắn muốn duyệt yêu cầu hoàn tiền này?')) {
-            setRefunds(refunds.map(ht =>
-                ht.maHoanTien === maHoanTien
-                    ? {
-                        ...ht,
-                        trangThai: 'DA_HOAN_TIEN',
-                        nguoiXuLy: 'admin',
-                        ngayXuLy: new Date().toISOString()
-                    }
-                    : ht
-            ));
+    // Xử lý duyệt hoàn tiền
+    const handleApproveRefund = async (maHoanTien) => {
+        hideConfirm();
+        setActionLoading(true);
+        try {
+            const nguoiXuLy = 'admin';
+            const response = await hoanTienApi.duyetHoanTien(maHoanTien, nguoiXuLy);
+            
+            if (response.success) {
+                showToast('Duyệt hoàn tiền thành công!', 'success');
+                await loadData();
+            } else {
+                showToast(response.message || 'Duyệt hoàn tiền thất bại', 'error');
+            }
+        } catch (err) {
+            console.error('Error approving refund:', err);
+            const errorMsg = err.response?.data?.message || 'Lỗi khi duyệt hoàn tiền';
+            showToast(errorMsg, 'error');
+        } finally {
+            setActionLoading(false);
         }
     };
 
-    const handleRejectRefund = (maHoanTien) => {
-        const reason = prompt('Vui lòng nhập lý do từ chối:');
-        if (reason) {
-            setRefunds(refunds.map(ht =>
-                ht.maHoanTien === maHoanTien
-                    ? {
-                        ...ht,
-                        trangThai: 'TU_CHOI',
-                        nguoiXuLy: 'admin',
-                        ngayXuLy: new Date().toISOString(),
-                        lyDoTuChoi: reason
-                    }
-                    : ht
-            ));
+    // Hiển thị confirm dialog cho duyệt hoàn tiền
+    const handleApproveConfirm = (maHoanTien) => {
+        showConfirm(
+            'Xác nhận duyệt hoàn tiền',
+            'Bạn có chắc chắn muốn duyệt yêu cầu hoàn tiền này?',
+            'success',
+            'Duyệt hoàn tiền',
+            () => handleApproveRefund(maHoanTien)
+        );
+    };
+
+    // Xử lý từ chối hoàn tiền
+    const handleRejectRefund = async (maHoanTien, lyDoTuChoi) => {
+        if (!lyDoTuChoi || lyDoTuChoi.trim() === '') {
+            showToast('Vui lòng nhập lý do từ chối', 'warning');
+            return;
         }
+        
+        hideConfirm();
+        setActionLoading(true);
+        try {
+            const nguoiXuLy = 'admin';
+            const response = await hoanTienApi.tuChoiHoanTien(maHoanTien, nguoiXuLy, lyDoTuChoi);
+            
+            if (response.success) {
+                showToast('Từ chối hoàn tiền thành công!', 'success');
+                await loadData();
+            } else {
+                showToast(response.message || 'Từ chối hoàn tiền thất bại', 'error');
+            }
+        } catch (err) {
+            console.error('Error rejecting refund:', err);
+            const errorMsg = err.response?.data?.message || 'Lỗi khi từ chối hoàn tiền';
+            showToast(errorMsg, 'error');
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    // Hiển thị prompt nhập lý do từ chối
+    const handleRejectConfirm = (maHoanTien) => {
+        showConfirm(
+            'Xác nhận từ chối hoàn tiền',
+            'Bạn có chắc chắn muốn từ chối yêu cầu hoàn tiền này? Vui lòng nhập lý do bên dưới.',
+            'danger',
+            'Từ chối',
+            () => {
+                hideConfirm();
+                // Mở prompt để nhập lý do
+                const lyDo = prompt('Vui lòng nhập lý do từ chối:');
+                if (lyDo && lyDo.trim() !== '') {
+                    handleRejectRefund(maHoanTien, lyDo);
+                } else if (lyDo !== null) {
+                    showToast('Lý do từ chối không được để trống', 'warning');
+                }
+            }
+        );
     };
 
     const formatCurrency = (value) => {
@@ -175,29 +228,43 @@ const QuanLyHoanTien = () => {
             case 'VNPAY': return 'VNPay';
             case 'CHUYEN_KHOAN': return 'Chuyển khoản ngân hàng';
             case 'TIEN_MAT': return 'Tiền mặt';
-            default: return phuongThuc;
+            default: return phuongThuc || 'Chưa xác định';
         }
     };
 
-    // Tính toán thống kê
-    const totalRefundAmount = refunds
-        .filter(ref => ref.trangThai === 'DA_HOAN_TIEN')
-        .reduce((sum, ref) => sum + ref.soTienHoan, 0);
-
-    const pendingRefunds = refunds.filter(ref => ref.trangThai === 'CHO_XU_LY').length;
-    const pendingRefundAmount = refunds
-        .filter(ref => ref.trangThai === 'CHO_XU_LY')
-        .reduce((sum, ref) => sum + ref.soTienHoan, 0);
+    // Tính toán thống kê từ API data
+    const totalRefundAmount = thongKe.tongTienDaHoan || 0;
+    const pendingRefunds = thongKe.choXuLy || 0;
+    const pendingRefundAmount = thongKe.tongTienChoHoan || 0;
 
     return (
         <Card title="Quản lý hoàn tiền">
+            {/* Toast Component */}
+            <Toast
+                isVisible={toast.isVisible}
+                message={toast.message}
+                type={toast.type}
+                onClose={hideToast}
+            />
+
+            {/* ConfirmDialog Component */}
+            <ConfirmDialog
+                isVisible={confirmDialog.isVisible}
+                title={confirmDialog.title}
+                message={confirmDialog.message}
+                type={confirmDialog.type}
+                confirmText={confirmDialog.confirmText}
+                onConfirm={confirmDialog.onConfirm}
+                onCancel={hideConfirm}
+            />
+
             {/* Thống kê tổng quan */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <div className="bg-gradient-to-br from-amber-500 to-yellow-600 rounded-xl p-5 text-white shadow-lg">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Tổng yêu cầu</p>
-                            <p className="text-3xl font-bold mt-2">{refunds.length}</p>
+                            <p className="text-3xl font-bold mt-2">{thongKe.tongYeuCau || 0}</p>
                         </div>
                         <FaUndo size={40} className="opacity-80" />
                     </div>
@@ -215,7 +282,7 @@ const QuanLyHoanTien = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Đã hoàn tiền</p>
-                            <p className="text-3xl font-bold mt-2">{refunds.filter(ref => ref.trangThai === 'DA_HOAN_TIEN').length}</p>
+                            <p className="text-3xl font-bold mt-2">{thongKe.daHoanTien || 0}</p>
                         </div>
                         <FaCheck size={40} className="opacity-80" />
                     </div>
@@ -224,7 +291,7 @@ const QuanLyHoanTien = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Đã từ chối</p>
-                            <p className="text-3xl font-bold mt-2">{refunds.filter(ref => ref.trangThai === 'TU_CHOI').length}</p>
+                            <p className="text-3xl font-bold mt-2">{thongKe.daTuChoi || 0}</p>
                         </div>
                         <FaTimes size={40} className="opacity-80" />
                     </div>
@@ -270,108 +337,137 @@ const QuanLyHoanTien = () => {
                     <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
                 </div>
                 <div className="flex gap-3 w-full md:w-auto">
-                    <button className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-600 text-white px-5 py-3 rounded-lg hover:from-amber-600 hover:to-yellow-700 transition-all shadow-lg hover:shadow-xl font-semibold">
+                    <button 
+                        onClick={loadData}
+                        disabled={loading}
+                        className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-600 text-white px-5 py-3 rounded-lg hover:from-amber-600 hover:to-yellow-700 transition-all shadow-lg hover:shadow-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
                         <FaCalendar />
-                        <span className="hidden sm:inline">Lọc theo ngày</span>
+                        <span className="hidden sm:inline">{loading ? 'Đang tải...' : 'Làm mới'}</span>
                     </button>
                 </div>
             </div>
 
-            {/* Bảng dữ liệu */}
-            <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                        <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
-                            <tr>
-                                <th className="px-6 py-4 text-left font-semibold">Mã hoàn tiền</th>
-                                <th className="px-6 py-4 text-left font-semibold">Mã HĐ</th>
-                                <th className="px-6 py-4 text-left font-semibold">Khách hàng</th>
-                                <th className="px-6 py-4 text-left font-semibold">Email</th>
-                                <th className="px-6 py-4 text-left font-semibold">Ngày yêu cầu</th>
-                                <th className="px-6 py-4 text-right font-semibold">Số tiền hoàn</th>
-                                <th className="px-6 py-4 text-center font-semibold">PT hoàn</th>
-                                <th className="px-6 py-4 text-center font-semibold">Trạng thái</th>
-                                <th className="px-6 py-4 text-center font-semibold">Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {currentItems.length > 0 ? (
-                                currentItems.map((ht, index) => {
-                                    const status = getTrangThaiText(ht.trangThai);
-                                    return (
-                                        <tr key={ht.maHoanTien} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-amber-50 transition-colors`}>
-                                            <td className="px-6 py-4 font-bold text-amber-600">#{ht.maHoanTien}</td>
-                                            <td className="px-6 py-4">
-                                                <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold">
-                                                    {ht.maHoaDon}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div>
-                                                    <p className="font-medium text-gray-900">{ht.hoTen}</p>
-                                                    <p className="text-xs text-gray-500">{ht.soDienThoai}</p>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-gray-700">{ht.email}</td>
-                                            <td className="px-6 py-4 text-gray-700">{formatDateTime(ht.ngayYeuCau)}</td>
-                                            <td className="px-6 py-4 text-right font-bold text-gray-900">{formatCurrency(ht.soTienHoan)}</td>
-                                            <td className="px-6 py-4 text-center">
-                                                <span className="text-xs text-gray-600">{getPhuongThucText(ht.phuongThucHoan)}</span>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status.color}`}>
-                                                    {status.icon} {status.text}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex justify-center items-center gap-2">
-                                                    <button
-                                                        onClick={() => handleViewDetail(ht)}
-                                                        className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
-                                                        title="Xem chi tiết"
-                                                    >
-                                                        <FaEye />
-                                                    </button>
-                                                    {ht.trangThai === 'CHO_XU_LY' && (
-                                                        <>
-                                                            <button
-                                                                onClick={() => handleApproveRefund(ht.maHoanTien)}
-                                                                className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors"
-                                                                title="Duyệt hoàn tiền"
-                                                            >
-                                                                <FaCheck />
-                                                            </button>
-                                                            <button
-                                                                onClick={() => handleRejectRefund(ht.maHoanTien)}
-                                                                className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
-                                                                title="Từ chối"
-                                                            >
-                                                                <FaTimes />
-                                                            </button>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    );
-                                })
-                            ) : (
-                                <tr>
-                                    <td colSpan="9" className="text-center py-12">
-                                        <div className="flex flex-col items-center gap-3">
-                                            <FaUndo className="text-gray-300 text-5xl" />
-                                            <p className="text-gray-500 font-medium">Không tìm thấy yêu cầu hoàn tiền nào.</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+            {/* Loading và Error states */}
+            {loading && (
+                <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto"></div>
+                    <p className="mt-4 text-gray-500">Đang tải dữ liệu...</p>
                 </div>
-            </div>
+            )}
+
+            {error && !loading && (
+                <div className="text-center py-12">
+                    <FaTimes className="text-red-500 text-5xl mx-auto mb-4" />
+                    <p className="text-red-500 font-medium">{error}</p>
+                    <button 
+                        onClick={loadData}
+                        className="mt-4 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600"
+                    >
+                        Thử lại
+                    </button>
+                </div>
+            )}
+
+            {/* Bảng dữ liệu */}
+            {!loading && !error && (
+                <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                            <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
+                                <tr>
+                                    <th className="px-6 py-4 text-left font-semibold">Mã hoàn tiền</th>
+                                    <th className="px-6 py-4 text-left font-semibold">Mã HĐ</th>
+                                    <th className="px-6 py-4 text-left font-semibold">Khách hàng</th>
+                                    <th className="px-6 py-4 text-left font-semibold">Email</th>
+                                    <th className="px-6 py-4 text-left font-semibold">Ngày yêu cầu</th>
+                                    <th className="px-6 py-4 text-right font-semibold">Số tiền hoàn</th>
+                                    <th className="px-6 py-4 text-center font-semibold">PT hoàn</th>
+                                    <th className="px-6 py-4 text-center font-semibold">Trạng thái</th>
+                                    <th className="px-6 py-4 text-center font-semibold">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                                {currentItems.length > 0 ? (
+                                    currentItems.map((ht, index) => {
+                                        const status = getTrangThaiText(ht.trangThai);
+                                        return (
+                                            <tr key={ht.maHoanTien} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-amber-50 transition-colors`}>
+                                                <td className="px-6 py-4 font-bold text-amber-600">#{ht.maHoanTien}</td>
+                                                <td className="px-6 py-4">
+                                                    <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold">
+                                                        {ht.maHoaDon}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div>
+                                                        <p className="font-medium text-gray-900">{ht.hoTen}</p>
+                                                        <p className="text-xs text-gray-500">{ht.soDienThoai}</p>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-gray-700">{ht.email}</td>
+                                                <td className="px-6 py-4 text-gray-700">{formatDateTime(ht.ngayYeuCau)}</td>
+                                                <td className="px-6 py-4 text-right font-bold text-gray-900">{formatCurrency(ht.soTienHoan)}</td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <span className="text-xs text-gray-600">{getPhuongThucText(ht.phuongThucHoan)}</span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status.color}`}>
+                                                        {status.icon} {status.text}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex justify-center items-center gap-2">
+                                                        <button
+                                                            onClick={() => handleViewDetail(ht)}
+                                                            className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
+                                                            title="Xem chi tiết"
+                                                        >
+                                                            <FaEye />
+                                                        </button>
+                                                        {ht.trangThai === 'CHO_XU_LY' && (
+                                                            <>
+                                                                <button
+                                                                    onClick={() => handleApproveConfirm(ht.maHoanTien)}
+                                                                    disabled={actionLoading}
+                                                                    className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors disabled:opacity-50"
+                                                                    title="Duyệt hoàn tiền"
+                                                                >
+                                                                    <FaCheck />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleRejectConfirm(ht.maHoanTien)}
+                                                                    disabled={actionLoading}
+                                                                    className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors disabled:opacity-50"
+                                                                    title="Từ chối"
+                                                                >
+                                                                    <FaTimes />
+                                                                </button>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                ) : (
+                                    <tr>
+                                        <td colSpan="9" className="text-center py-12">
+                                            <div className="flex flex-col items-center gap-3">
+                                                <FaUndo className="text-gray-300 text-5xl" />
+                                                <p className="text-gray-500 font-medium">Không tìm thấy yêu cầu hoàn tiền nào.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
 
             {/* Thanh phân trang */}
-            {filteredRefunds.length > itemsPerPage && (
+            {!loading && !error && filteredRefunds.length > itemsPerPage && (
                 <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
                     <span className="text-sm text-gray-600 font-medium">
                         Hiển thị <span className="font-bold text-amber-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-amber-600">{Math.min(indexOfLastItem, filteredRefunds.length)}</span> của <span className="font-bold text-amber-600">{filteredRefunds.length}</span> kết quả
@@ -415,148 +511,19 @@ const QuanLyHoanTien = () => {
                 </div>
             )}
 
-            {/* Modal chi tiết hoàn tiền */}
-            {isDetailModalOpen && selectedRefund && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-                        <div className="bg-gradient-to-r from-amber-600 to-yellow-600 text-white p-6 rounded-t-xl sticky top-0">
-                            <div className="flex justify-between items-center">
-                                <div>
-                                    <h2 className="text-2xl font-bold">Chi tiết yêu cầu hoàn tiền</h2>
-                                    <p className="text-sm opacity-90 mt-1">Mã hoàn tiền: {selectedRefund.maHoanTien}</p>
-                                </div>
-                                <button
-                                    onClick={handleCloseDetailModal}
-                                    className="text-white hover:text-gray-200 transition-colors"
-                                >
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="p-6">
-                            {/* Thông tin khách hàng */}
-                            <div className="mb-6">
-                                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <div className="w-1 h-6 bg-amber-600 rounded-full"></div>
-                                    Thông tin khách hàng
-                                </h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
-                                    <div>
-                                        <p className="text-xs text-gray-500 font-semibold">Họ tên</p>
-                                        <p className="font-medium text-gray-900">{selectedRefund.hoTen}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 font-semibold">Email</p>
-                                        <p className="font-medium text-gray-900">{selectedRefund.email}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 font-semibold">Số điện thoại</p>
-                                        <p className="font-medium text-gray-900">{selectedRefund.soDienThoai}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 font-semibold">Ngày yêu cầu</p>
-                                        <p className="font-medium text-gray-900">{formatDateTime(selectedRefund.ngayYeuCau)}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Thông tin hoàn tiền */}
-                            <div className="mb-6">
-                                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <div className="w-1 h-6 bg-amber-600 rounded-full"></div>
-                                    Thông tin hoàn tiền
-                                </h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
-                                    <div className="md:col-span-2">
-                                        <p className="text-xs text-gray-500 font-semibold">Lý do hoàn tiền</p>
-                                        <p className="font-medium text-gray-900">{selectedRefund.lyDo}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 font-semibold">Số tiền hoàn</p>
-                                        <p className="font-bold text-lg text-amber-600">{formatCurrency(selectedRefund.soTienHoan)}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 font-semibold">Phương thức hoàn</p>
-                                        <p className="font-medium text-gray-900">{getPhuongThucText(selectedRefund.phuongThucHoan)}</p>
-                                    </div>
-                                    <div className="md:col-span-2">
-                                        <p className="text-xs text-gray-500 font-semibold">Tài khoản nhận hoàn tiền</p>
-                                        <p className="font-medium text-gray-900">{selectedRefund.taiKhoanHoan}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Thông tin xử lý */}
-                            <div className="mb-6">
-                                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <div className="w-1 h-6 bg-amber-600 rounded-full"></div>
-                                    Thông tin xử lý
-                                </h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
-                                    <div>
-                                        <p className="text-xs text-gray-500 font-semibold">Trạng thái</p>
-                                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mt-1 ${getTrangThaiText(selectedRefund.trangThai).color}`}>
-                                            {getTrangThaiText(selectedRefund.trangThai).icon} {getTrangThaiText(selectedRefund.trangThai).text}
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 font-semibold">Người xử lý</p>
-                                        <p className="font-medium text-gray-900">{selectedRefund.nguoiXuLy || 'Chưa xử lý'}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 font-semibold">Ngày xử lý</p>
-                                        <p className="font-medium text-gray-900">{formatDateTime(selectedRefund.ngayXuLy)}</p>
-                                    </div>
-                                    {selectedRefund.lyDoTuChoi && (
-                                        <div className="md:col-span-2">
-                                            <p className="text-xs text-gray-500 font-semibold">Lý do từ chối</p>
-                                            <p className="font-medium text-red-600">{selectedRefund.lyDoTuChoi}</p>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Nút hành động */}
-                            {selectedRefund.trangThai === 'CHO_XU_LY' && (
-                                <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
-                                    <button
-                                        onClick={() => {
-                                            handleRejectRefund(selectedRefund.maHoanTien);
-                                            handleCloseDetailModal();
-                                        }}
-                                        className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 font-semibold transition-colors flex items-center gap-2"
-                                    >
-                                        <FaTimes />
-                                        Từ chối
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            handleApproveRefund(selectedRefund.maHoanTien);
-                                            handleCloseDetailModal();
-                                        }}
-                                        className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 font-semibold transition-all shadow-lg flex items-center gap-2"
-                                    >
-                                        <FaCheck />
-                                        Duyệt hoàn tiền
-                                    </button>
-                                </div>
-                            )}
-
-                            <div className="flex justify-end gap-3 mt-6">
-                                <button
-                                    onClick={handleCloseDetailModal}
-                                    className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold transition-colors"
-                                >
-                                    Đóng
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* RefundDetailModal Component */}
+            <RefundDetailModal
+                isVisible={isDetailModalOpen}
+                refund={selectedRefund}
+                actionLoading={actionLoading}
+                onClose={handleCloseDetailModal}
+                onApprove={handleApproveConfirm}
+                onReject={handleRejectConfirm}
+                formatCurrency={formatCurrency}
+                formatDateTime={formatDateTime}
+                getTrangThaiText={getTrangThaiText}
+                getPhuongThucText={getPhuongThucText}
+            />
         </Card>
     );
 };
