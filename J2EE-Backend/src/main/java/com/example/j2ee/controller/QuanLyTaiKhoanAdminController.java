@@ -1,5 +1,6 @@
 package com.example.j2ee.controller;
 
+import com.example.j2ee.annotation.RequirePermission;
 import com.example.j2ee.dto.ApiResponse;
 import com.example.j2ee.dto.TaiKhoanAdminDTO;
 import com.example.j2ee.model.TaiKhoanAdmin;
@@ -22,12 +23,14 @@ public class QuanLyTaiKhoanAdminController {
     }
 
     @GetMapping
+    @RequirePermission(feature = "USER", action = "VIEW")
     public ResponseEntity<ApiResponse<List<TaiKhoanAdminDTO>>> getAllTaiKhoan() {
         List<TaiKhoanAdminDTO> taiKhoanAdminList = taiKhoanAdminService.getAllTaiKhoan();
         return ResponseEntity.ok(ApiResponse.success(taiKhoanAdminList));
     }
 
     @GetMapping("/{id}")
+    @RequirePermission(feature = "USER", action = "VIEW")
     public ResponseEntity<ApiResponse<TaiKhoanAdmin>> getTaiKhoanById(@PathVariable int id) {
         return taiKhoanAdminService.getTaiKhoanById(id)
                 .map(taiKhoan -> ResponseEntity.ok(ApiResponse.success(taiKhoan)))
@@ -37,6 +40,7 @@ public class QuanLyTaiKhoanAdminController {
 
     @PostMapping
     @Transactional
+    @RequirePermission(feature = "USER", action = "CREATE")
     public ResponseEntity<ApiResponse<TaiKhoanAdmin>> createTaiKhoan(@RequestBody Map<String, Object> payload) {
         try {
             // Extract tài khoản admin từ payload
@@ -68,7 +72,9 @@ public class QuanLyTaiKhoanAdminController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<ApiResponse<TaiKhoanAdmin>> updateTaiKhoan(@PathVariable int id, @RequestBody TaiKhoanAdmin taiKhoanAdmin) {
+    @RequirePermission(feature = "USER", action = "UPDATE")
+    public ResponseEntity<ApiResponse<TaiKhoanAdmin>> updateTaiKhoan(@PathVariable int id,
+            @RequestBody TaiKhoanAdmin taiKhoanAdmin) {
         try {
             taiKhoanAdminService.getTaiKhoanById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Tài khoản không tồn tại"));
@@ -81,6 +87,7 @@ public class QuanLyTaiKhoanAdminController {
     }
 
     @DeleteMapping("/{id}")
+    @RequirePermission(feature = "USER", action = "DELETE")
     public ResponseEntity<ApiResponse<Void>> deleteTaiKhoan(@PathVariable int id) {
         try {
             taiKhoanAdminService.deleteTaiKhoan(id);
@@ -92,6 +99,7 @@ public class QuanLyTaiKhoanAdminController {
     }
 
     @GetMapping("/search")
+    @RequirePermission(feature = "USER", action = "VIEW")
     public ResponseEntity<ApiResponse<List<TaiKhoanAdmin>>> searchTaiKhoan(
             @RequestParam(required = false) String tenDangNhap,
             @RequestParam(required = false) String email) {
@@ -105,6 +113,7 @@ public class QuanLyTaiKhoanAdminController {
      * Body: { "vaiTroIds": [1, 2, 3] }
      */
     @PutMapping("/{id}/assign-roles")
+    @RequirePermission(feature = "USER", action = "UPDATE")
     public ResponseEntity<ApiResponse<Void>> assignRoles(
             @PathVariable int id,
             @RequestBody Map<String, List<Integer>> request) {
@@ -126,6 +135,7 @@ public class QuanLyTaiKhoanAdminController {
      * POST /admin/dashboard/tkadmin/{id}/roles/{roleId}
      */
     @PostMapping("/{id}/roles/{roleId}")
+    @RequirePermission(feature = "USER", action = "UPDATE")
     public ResponseEntity<ApiResponse<Void>> addRole(
             @PathVariable int id,
             @PathVariable int roleId) {
@@ -146,6 +156,7 @@ public class QuanLyTaiKhoanAdminController {
      * DELETE /admin/dashboard/tkadmin/{id}/roles/{roleId}
      */
     @DeleteMapping("/{id}/roles/{roleId}")
+    @RequirePermission(feature = "USER", action = "UPDATE")
     public ResponseEntity<ApiResponse<Void>> removeRole(
             @PathVariable int id,
             @PathVariable int roleId) {

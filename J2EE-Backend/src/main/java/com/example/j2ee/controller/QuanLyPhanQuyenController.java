@@ -1,5 +1,6 @@
 package com.example.j2ee.controller;
 
+import com.example.j2ee.annotation.RequirePermission;
 import com.example.j2ee.dto.ApiResponse;
 import com.example.j2ee.dto.phanquyen.*;
 import com.example.j2ee.model.PhanQuyen;
@@ -31,6 +32,7 @@ public class QuanLyPhanQuyenController {
      * GET /admin/dashboard/phan-quyen/chuc-nang
      */
     @GetMapping("/chuc-nang")
+    @RequirePermission(feature = "PERMISSION", action = "VIEW")
     public ResponseEntity<ApiResponse<List<ChucNangDTO>>> getAllChucNang() {
         List<ChucNangDTO> chucNangList = phanQuyenService.getAllChucNang();
         return ResponseEntity.ok(ApiResponse.success(chucNangList));
@@ -41,6 +43,7 @@ public class QuanLyPhanQuyenController {
      * GET /admin/dashboard/phan-quyen/chuc-nang/grouped
      */
     @GetMapping("/chuc-nang/grouped")
+    @RequirePermission(feature = "PERMISSION", action = "VIEW")
     public ResponseEntity<ApiResponse<Map<String, List<ChucNangDTO>>>> getAllChucNangGrouped() {
         Map<String, List<ChucNangDTO>> grouped = phanQuyenService.getAllChucNangGrouped();
         return ResponseEntity.ok(ApiResponse.success(grouped));
@@ -51,6 +54,7 @@ public class QuanLyPhanQuyenController {
      * GET /admin/dashboard/phan-quyen/hanh-dong
      */
     @GetMapping("/hanh-dong")
+    @RequirePermission(feature = "PERMISSION", action = "VIEW")
     public ResponseEntity<ApiResponse<List<HanhDongDTO>>> getAllHanhDong() {
         List<HanhDongDTO> hanhDongList = phanQuyenService.getAllHanhDong();
         return ResponseEntity.ok(ApiResponse.success(hanhDongList));
@@ -61,6 +65,7 @@ public class QuanLyPhanQuyenController {
      * GET /admin/dashboard/phan-quyen/vai-tro
      */
     @GetMapping("/vai-tro")
+    @RequirePermission(feature = "PERMISSION", action = "VIEW")
     public ResponseEntity<ApiResponse<List<PhanQuyenResponse.VaiTroInfo>>> getAllVaiTro() {
         List<PhanQuyenResponse.VaiTroInfo> vaiTroList = phanQuyenService.getAllVaiTroWithSuperAdminFlag();
         return ResponseEntity.ok(ApiResponse.success(vaiTroList));
@@ -71,6 +76,7 @@ public class QuanLyPhanQuyenController {
      * GET /admin/dashboard/phan-quyen/vai-tro/{maVaiTro}
      */
     @GetMapping("/vai-tro/{maVaiTro}")
+    @RequirePermission(feature = "PERMISSION", action = "VIEW")
     public ResponseEntity<ApiResponse<PhanQuyenResponse>> getPhanQuyenByVaiTro(@PathVariable int maVaiTro) {
         try {
             PhanQuyenResponse response = phanQuyenService.getPhanQuyenByVaiTro(maVaiTro);
@@ -88,6 +94,7 @@ public class QuanLyPhanQuyenController {
      * Trả về map có key là "maChucNang-maHanhDong", value là true/false
      */
     @GetMapping("/vai-tro/{maVaiTro}/matrix")
+    @RequirePermission(feature = "PERMISSION", action = "VIEW")
     public ResponseEntity<ApiResponse<Map<String, Boolean>>> getPermissionMatrix(@PathVariable int maVaiTro) {
         try {
             Map<String, Boolean> matrix = phanQuyenService.getPermissionMatrix(maVaiTro);
@@ -104,16 +111,17 @@ public class QuanLyPhanQuyenController {
      * 
      * Request body:
      * {
-     *   "maVaiTro": 2,
-     *   "permissions": [
-     *     { "maChucNang": 1, "maHanhDong": "VIEW" },
-     *     { "maChucNang": 1, "maHanhDong": "CREATE" }
-     *   ]
+     * "maVaiTro": 2,
+     * "permissions": [
+     * { "maChucNang": 1, "maHanhDong": "VIEW" },
+     * { "maChucNang": 1, "maHanhDong": "CREATE" }
+     * ]
      * }
      * 
      * LƯU Ý: Không cho phép chỉnh sửa phân quyền của vai trò SUPER_ADMIN
      */
     @PutMapping("/vai-tro")
+    @RequirePermission(feature = "PERMISSION", action = "UPDATE")
     public ResponseEntity<ApiResponse<PhanQuyenResponse>> updatePhanQuyen(@RequestBody PhanQuyenRequest request) {
         try {
             PhanQuyenResponse response = phanQuyenService.updatePhanQuyen(request);
@@ -140,6 +148,7 @@ public class QuanLyPhanQuyenController {
      * LƯU Ý: Không cho phép chỉnh sửa phân quyền của vai trò SUPER_ADMIN
      */
     @PostMapping("/vai-tro/{maVaiTro}/permission")
+    @RequirePermission(feature = "PERMISSION", action = "UPDATE")
     public ResponseEntity<ApiResponse<PhanQuyen>> addPermission(
             @PathVariable int maVaiTro,
             @RequestParam int maChucNang,
@@ -169,6 +178,7 @@ public class QuanLyPhanQuyenController {
      * LƯU Ý: Không cho phép chỉnh sửa phân quyền của vai trò SUPER_ADMIN
      */
     @DeleteMapping("/vai-tro/{maVaiTro}/permission")
+    @RequirePermission(feature = "PERMISSION", action = "DELETE")
     public ResponseEntity<ApiResponse<Void>> removePermission(
             @PathVariable int maVaiTro,
             @RequestParam int maChucNang,
@@ -197,6 +207,7 @@ public class QuanLyPhanQuyenController {
      * LƯU Ý: Không cho phép sao chép sang vai trò SUPER_ADMIN
      */
     @PostMapping("/copy")
+    @RequirePermission(feature = "PERMISSION", action = "UPDATE")
     public ResponseEntity<ApiResponse<PhanQuyenResponse>> copyPermissions(
             @RequestParam int fromVaiTro,
             @RequestParam int toVaiTro) {

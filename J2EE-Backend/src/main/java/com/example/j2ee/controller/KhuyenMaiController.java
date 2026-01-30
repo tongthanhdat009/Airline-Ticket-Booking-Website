@@ -1,5 +1,6 @@
 package com.example.j2ee.controller;
 
+import com.example.j2ee.annotation.RequirePermission;
 import com.example.j2ee.dto.ApiResponse;
 import com.example.j2ee.dto.khuyenmai.CreateKhuyenMaiRequest;
 import com.example.j2ee.dto.khuyenmai.KhuyenMaiResponse;
@@ -10,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,7 +33,7 @@ public class KhuyenMaiController {
      * GET /api/khuyenmai
      */
     @GetMapping
-    @PreAuthorize("hasAuthority('PROMOTION_MANAGE')")
+    @RequirePermission(feature = "PROMOTION", action = "VIEW")
     public ResponseEntity<ApiResponse<List<KhuyenMaiResponse>>> findAll() {
         List<KhuyenMaiResponse> promotions = khuyenMaiService.findAll();
         return ResponseEntity.ok(ApiResponse.success(promotions));
@@ -44,7 +44,7 @@ public class KhuyenMaiController {
      * GET /api/khuyenmai/{id}
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('PROMOTION_MANAGE')")
+    @RequirePermission(feature = "PROMOTION", action = "VIEW")
     public ResponseEntity<ApiResponse<KhuyenMaiResponse>> findById(@PathVariable Integer id) {
         try {
             KhuyenMaiResponse promotion = khuyenMaiService.findById(id);
@@ -60,7 +60,7 @@ public class KhuyenMaiController {
      * POST /api/khuyenmai
      */
     @PostMapping
-    @PreAuthorize("hasAuthority('PROMOTION_CREATE')")
+    @RequirePermission(feature = "PROMOTION", action = "CREATE")
     public ResponseEntity<ApiResponse<KhuyenMaiResponse>> create(
             @Valid @RequestBody CreateKhuyenMaiRequest request) {
         try {
@@ -79,7 +79,7 @@ public class KhuyenMaiController {
      * PUT /api/khuyenmai/{id}
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('PROMOTION_UPDATE')")
+    @RequirePermission(feature = "PROMOTION", action = "UPDATE")
     public ResponseEntity<ApiResponse<KhuyenMaiResponse>> update(
             @PathVariable Integer id,
             @Valid @RequestBody UpdateKhuyenMaiRequest request) {
@@ -98,7 +98,7 @@ public class KhuyenMaiController {
      * DELETE /api/khuyenmai/{id}
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('PROMOTION_DELETE')")
+    @RequirePermission(feature = "PROMOTION", action = "DELETE")
     public ResponseEntity<ApiResponse<String>> delete(@PathVariable Integer id) {
         try {
             khuyenMaiService.delete(id);
@@ -115,7 +115,7 @@ public class KhuyenMaiController {
      * PUT /api/khuyenmai/{id}/restore
      */
     @PutMapping("/{id}/restore")
-    @PreAuthorize("hasAuthority('PROMOTION_RESTORE')")
+    @RequirePermission(feature = "PROMOTION", action = "RESTORE")
     public ResponseEntity<ApiResponse<KhuyenMaiResponse>> restore(@PathVariable Integer id) {
         try {
             KhuyenMaiResponse restored = khuyenMaiService.restore(id);
@@ -132,7 +132,7 @@ public class KhuyenMaiController {
      * PATCH /api/khuyenmai/{id}/status
      */
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasAuthority('PROMOTION_UPDATE')")
+    @RequirePermission(feature = "PROMOTION", action = "UPDATE")
     public ResponseEntity<ApiResponse<KhuyenMaiResponse>> updateStatus(
             @PathVariable Integer id,
             @RequestBody Map<String, String> request) {

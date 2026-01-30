@@ -1,5 +1,6 @@
 package com.example.j2ee.controller;
 
+import com.example.j2ee.annotation.RequirePermission;
 import com.example.j2ee.dto.ApiResponse;
 import com.example.j2ee.dto.hoantien.*;
 import com.example.j2ee.service.HoanTienService;
@@ -31,6 +32,7 @@ public class QuanLyHoanTienController {
 
     /**
      * Constructor injection of HoanTienService
+     * 
      * @param hoanTienService Service layer for refund management
      */
     public QuanLyHoanTienController(HoanTienService hoanTienService) {
@@ -43,20 +45,22 @@ public class QuanLyHoanTienController {
      * GET /hoantien - List refund requests with optional filters and search
      *
      * Query Parameters (all optional):
-     * - search: Search by customer name, email, or reason (case-insensitive partial match)
+     * - search: Search by customer name, email, or reason (case-insensitive partial
+     * match)
      * - trangThai: Filter by status (CHO_XU_LY, DA_HOAN_TIEN, TU_CHOI)
-     * - tuNgay: Filter by request date from (ISO-8601 format: yyyy-MM-dd'T'HH:mm:ss)
+     * - tuNgay: Filter by request date from (ISO-8601 format:
+     * yyyy-MM-dd'T'HH:mm:ss)
      * - denNgay: Filter by request date to (ISO-8601 format: yyyy-MM-dd'T'HH:mm:ss)
      *
      * @return List of refunds matching the filter criteria
      */
     @GetMapping
+    @RequirePermission(feature = "REFUND", action = "VIEW")
     public ResponseEntity<ApiResponse<List<HoanTienResponse>>> getAllHoanTien(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String trangThai,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime tuNgay,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime denNgay
-    ) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime denNgay) {
         try {
             List<HoanTienResponse> hoanTienList = hoanTienService.getAllHoanTien(search, trangThai, tuNgay, denNgay);
             return ResponseEntity.ok(ApiResponse.success(hoanTienList));
@@ -84,6 +88,7 @@ public class QuanLyHoanTienController {
      * @return Complete refund details
      */
     @GetMapping("/{id}")
+    @RequirePermission(feature = "REFUND", action = "VIEW")
     public ResponseEntity<ApiResponse<HoanTienDetailResponse>> getHoanTienById(@PathVariable Integer id) {
         try {
             HoanTienDetailResponse hoanTien = hoanTienService.getHoanTienById(id);
@@ -108,11 +113,12 @@ public class QuanLyHoanTienController {
      * - Records processor and processing date
      * - Processes the actual refund (releases seat, updates booking status)
      *
-     * @param id Refund ID (mahp)
+     * @param id      Refund ID (mahp)
      * @param request Request body containing processor info
      * @return Updated refund information
      */
     @PutMapping("/{id}/duyet")
+    @RequirePermission(feature = "REFUND", action = "APPROVE")
     public ResponseEntity<ApiResponse<HoanTienResponse>> duyetHoanTien(
             @PathVariable Integer id,
             @Valid @RequestBody DuyetHoanTienRequest request) {
@@ -138,21 +144,21 @@ public class QuanLyHoanTienController {
      * - Updates status to TU_CHOI
      * - Records processor, processing date, and rejection reason
      *
-     * @param id Refund ID (mahp)
+     * @param id      Refund ID (mahp)
      * @param request Request body containing processor info and rejection reason
      * @return Updated refund information
      */
     @PutMapping("/{id}/tuchoi")
+    @RequirePermission(feature = "REFUND", action = "APPROVE")
     public ResponseEntity<ApiResponse<HoanTienResponse>> tuChoiHoanTien(
             @PathVariable Integer id,
             @Valid @RequestBody TuChoiHoanTienRequest request) {
         try {
             HoanTienResponse hoanTien = hoanTienService.tuChoiHoanTien(
-                    id, 
-                    request.getNguoiXuLy(), 
+                    id,
+                    request.getNguoiXuLy(),
                     request.getLyDoTuChoi(),
-                    request.getGhiChu()
-            );
+                    request.getGhiChu());
             return ResponseEntity.ok(ApiResponse.success("Từ chối hoàn tiền thành công", hoanTien));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -179,6 +185,7 @@ public class QuanLyHoanTienController {
      * @return Refund statistics DTO
      */
     @GetMapping("/thongke")
+    @RequirePermission(feature = "REFUND", action = "VIEW")
     public ResponseEntity<ApiResponse<HoanTienThongKeDTO>> getThongKe() {
         try {
             HoanTienThongKeDTO thongKe = hoanTienService.getThongKe();

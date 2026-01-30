@@ -1,4 +1,4 @@
-﻿import React, { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { FaCheckCircle, FaExclamationCircle, FaTimes, FaInfoCircle } from 'react-icons/fa';
 
 const Toast = ({ message, type = 'success', isVisible, onClose, duration = 3000 }) => {
@@ -47,7 +47,7 @@ const Toast = ({ message, type = 'success', isVisible, onClose, duration = 3000 
                     <Icon className={`${style.icon} text-2xl shrink-0 mt-0.5`} />
                     <div className="flex-1">
                         <h3 className={`${style.text} font-semibold mb-1`}>
-                            {type === 'success' ? 'Thành công!' : 'Lỗi!'}
+                            {type === 'success' ? 'Thành công!' : type === 'error' ? 'Lỗi!' : 'Thông tin'}
                         </h3>
                         <p className={`${style.text} text-sm`}>{message}</p>
                     </div>
@@ -61,7 +61,7 @@ const Toast = ({ message, type = 'success', isVisible, onClose, duration = 3000 
                 {/* Progress bar */}
                 <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200 rounded-b-lg overflow-hidden">
                     <div 
-                        className={`h-full ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} animate-progress`}
+                        className={`h-full ${type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'} animate-progress`}
                         style={{ animationDuration: `${duration}ms` }}
                     ></div>
                 </div>

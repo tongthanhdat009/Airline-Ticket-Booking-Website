@@ -63,7 +63,7 @@ public class PermissionAspect {
                     String authority = grantedAuthority.getAuthority();
                     for (String requiredRole : requiredRoles) {
                         if (authority.equals("ROLE_" + requiredRole) ||
-                            authority.equals(requiredRole)) {
+                                authority.equals(requiredRole)) {
                             return true;
                         }
                     }
@@ -91,6 +91,16 @@ public class PermissionAspect {
             throw new ResponseStatusException(FORBIDDEN, "Chưa đăng nhập");
         }
 
+        // SUPER_ADMIN bypass: bỏ qua tất cả permission check
+        if (auth.getPrincipal() instanceof AdminUserDetails) {
+            AdminUserDetails adminUser = (AdminUserDetails) auth.getPrincipal();
+            if (adminUser.hasRole("SUPER_ADMIN")) {
+                log.debug("SUPER_ADMIN bypass cho user {}: {}",
+                        adminUser.getUsername(), joinPoint.getSignature().toShortString());
+                return;
+            }
+        }
+
         String feature = requirePermission.feature();
         String action = requirePermission.action();
         String requiredPermission = feature + "_" + action;
@@ -113,8 +123,7 @@ public class PermissionAspect {
 
         // Nếu không phải AdminUserDetails, kiểm tra authorities
         boolean hasPermission = auth.getAuthorities().stream()
-                .anyMatch(grantedAuthority ->
-                        grantedAuthority.getAuthority().equals(requiredPermission));
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(requiredPermission));
 
         if (!hasPermission) {
             log.warn("User {} không có permission yêu cầu: {}", auth.getName(), requiredPermission);

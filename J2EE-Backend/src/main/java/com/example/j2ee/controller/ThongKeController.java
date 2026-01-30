@@ -10,6 +10,8 @@ import com.example.j2ee.dto.ThongKeTongQuanDTO;
 import com.example.j2ee.annotation.RequirePermission;
 import com.example.j2ee.service.JasperRevenueReportService;
 import com.example.j2ee.service.ThongKeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -31,7 +33,8 @@ public class ThongKeController {
     private final ThongKeService thongKeService;
     private final JasperRevenueReportService jasperRevenueReportService;
 
-    public ThongKeController(ThongKeService thongKeService, JasperRevenueReportService jasperRevenueReportService) {
+    @Autowired
+    public ThongKeController(ThongKeService thongKeService, @Lazy JasperRevenueReportService jasperRevenueReportService) {
         this.thongKeService = thongKeService;
         this.jasperRevenueReportService = jasperRevenueReportService;
     }
@@ -44,6 +47,7 @@ public class ThongKeController {
      * @param endDate   Ngày kết thúc (optional, mặc định hôm nay)
      */
     @GetMapping("/tongquan")
+    @RequirePermission(feature = "REPORT", action = "VIEW")
     public ResponseEntity<ApiResponse<ThongKeTongQuanDTO>> getThongKeTongQuan(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
@@ -72,6 +76,7 @@ public class ThongKeController {
      * @param endDate   Ngày kết thúc (optional, mặc định hôm nay)
      */
     @GetMapping("/doanhthu-ngay")
+    @RequirePermission(feature = "REPORT", action = "VIEW")
     public ResponseEntity<ApiResponse<List<ThongKeDoanhThuNgayDTO>>> getDoanhThuTheoNgay(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
@@ -100,6 +105,7 @@ public class ThongKeController {
      * @param endDate   Ngày kết thúc (optional, mặc định hôm nay)
      */
     @GetMapping("/doanhthu-dichvu")
+    @RequirePermission(feature = "REPORT", action = "VIEW")
     public ResponseEntity<ApiResponse<List<ThongKeDichVuDTO>>> getDoanhThuTheoDichVu(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
@@ -128,6 +134,7 @@ public class ThongKeController {
      * @param endDate   Ngày kết thúc (optional, mặc định hôm nay)
      */
     @GetMapping("/doanhthu-hangve")
+    @RequirePermission(feature = "REPORT", action = "VIEW")
     public ResponseEntity<ApiResponse<List<ThongKeHangVeDTO>>> getDoanhThuTheoHangVe(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
@@ -195,6 +202,7 @@ public class ThongKeController {
      * @param endDate   Ngày kết thúc (optional)
      */
     @GetMapping("/export-pdf")
+    @RequirePermission(feature = "REPORT", action = "VIEW")
     public ResponseEntity<byte[]> exportStatisticsToPdf(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {

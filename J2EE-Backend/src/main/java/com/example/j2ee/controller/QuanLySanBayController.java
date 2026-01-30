@@ -1,5 +1,6 @@
 package com.example.j2ee.controller;
 
+import com.example.j2ee.annotation.RequirePermission;
 import com.example.j2ee.dto.ApiResponse;
 import com.example.j2ee.model.SanBay;
 import com.example.j2ee.service.SanBayService;
@@ -21,12 +22,14 @@ public class QuanLySanBayController {
     }
 
     @GetMapping
+    @RequirePermission(feature = "AIRPORT", action = "VIEW")
     public ResponseEntity<ApiResponse<List<SanBay>>> getAllSanBay() {
         List<SanBay> sanBayList = sanBayService.getAllSanBay();
         return ResponseEntity.ok(ApiResponse.success(sanBayList));
     }
 
     @PostMapping
+    @RequirePermission(feature = "AIRPORT", action = "CREATE")
     public ResponseEntity<ApiResponse<SanBay>> createSanBay(@RequestBody SanBay sanBay) {
         SanBay newSanBay = sanBayService.createSanBay(sanBay);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -34,6 +37,7 @@ public class QuanLySanBayController {
     }
 
     @DeleteMapping
+    @RequirePermission(feature = "AIRPORT", action = "DELETE")
     public ResponseEntity<ApiResponse<Void>> deleteSanBay(@RequestParam("maSanBay") int maSanBay) {
         try {
             sanBayService.deleteSanBay(maSanBay);
@@ -51,14 +55,14 @@ public class QuanLySanBayController {
     }
 
     @PutMapping("/trangthai")
+    @RequirePermission(feature = "AIRPORT", action = "UPDATE")
     public ResponseEntity<ApiResponse<SanBay>> updateTrangThaiSanBay(
             @RequestParam("maSanBay") int maSanBay,
             @RequestParam("trangThai") String trangThai) {
         try {
             SanBay updatedSanBay = sanBayService.updateTrangThaiSanBay(maSanBay, trangThai);
             return ResponseEntity.ok(
-                ApiResponse.success("Cập nhật trạng thái sân bay thành công", updatedSanBay)
-            );
+                    ApiResponse.success("Cập nhật trạng thái sân bay thành công", updatedSanBay));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.error(e.getMessage()));
@@ -73,10 +77,10 @@ public class QuanLySanBayController {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-
     @GetMapping("/{icaoCode}")
+    @RequirePermission(feature = "AIRPORT", action = "VIEW")
     public ResponseEntity<ApiResponse<Object>> getAirportByIcaoCode(@PathVariable String icaoCode) {
-        String baseUrl = "https://airportdb.io/api/v1/airport/"+icaoCode+"?apiToken="+apiKey;
+        String baseUrl = "https://airportdb.io/api/v1/airport/" + icaoCode + "?apiToken=" + apiKey;
 
         try {
             ResponseEntity<Object> response = restTemplate.getForEntity(baseUrl, Object.class);
@@ -88,6 +92,7 @@ public class QuanLySanBayController {
     }
 
     @GetMapping("/trangthai/active")
+    @RequirePermission(feature = "AIRPORT", action = "VIEW")
     public ResponseEntity<ApiResponse<List<SanBay>>> getActiveSanBay() {
         List<SanBay> sanBayList = sanBayService.getActiveSanBay();
         return ResponseEntity.ok(ApiResponse.success(sanBayList));

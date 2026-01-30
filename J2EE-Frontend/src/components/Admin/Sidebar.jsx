@@ -18,7 +18,8 @@ import {
   DollarSign,
   Menu,
   X,
-  ChevronDown
+  ChevronDown,
+  History
 } from 'lucide-react';
 import { hasPermission } from '../../utils/permissionUtils';
 import { useSidebar } from '../../context/SidebarContext';
@@ -151,6 +152,12 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       icon: DollarSign,
       permission: 'PRICE_VIEW',
       path: '/dashboard/gia-ve',
+    },
+    {
+      title: 'Lịch sử thao tác',
+      icon: History,
+      permission: 'AUDITLOG_VIEW',
+      path: '/dashboard/LichSuThaoTac',
     },
   ];
 

@@ -71,7 +71,24 @@ export const hasPermission = (permission) => {
   if (!userInfo || !userInfo.permissions) {
     return false;
   }
-  return userInfo.permissions.includes(permission);
+  
+  // Check trực tiếp permission
+  if (userInfo.permissions.includes(permission)) {
+    return true;
+  }
+  
+  // Nếu có MANAGE permission cho feature này -> có tất cả các quyền
+  // Ví dụ: AUDITLOG_MANAGE bao gồm cả AUDITLOG_VIEW, AUDITLOG_CREATE, etc.
+  const underscoreIndex = permission.lastIndexOf('_');
+  if (underscoreIndex > 0) {
+    const feature = permission.substring(0, underscoreIndex);
+    const managePermission = `${feature}_MANAGE`;
+    if (userInfo.permissions.includes(managePermission)) {
+      return true;
+    }
+  }
+  
+  return false;
 };
 
 /**

@@ -92,6 +92,7 @@ public class SecurityConfig {
                         // 3. Hiệu suất - roles được cache trong JWT token
                         // 4. Flexible - frontend ẩn/hiện UI dựa trên permissions
                         .requestMatchers("/admin/dashboard/**").access(dynamicAdminAuthManager)
+                        .requestMatchers("/api/admin/**").access(dynamicAdminAuthManager)
                         // rest yêu cầu authentication
                         .requestMatchers("/api/sanbay/**").permitAll()
                         .requestMatchers("/AnhDichVuCungCap/**").permitAll()

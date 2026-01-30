@@ -1,5 +1,6 @@
 package com.example.j2ee.controller;
 
+import com.example.j2ee.annotation.RequirePermission;
 import com.example.j2ee.dto.ApiResponse;
 import com.example.j2ee.dto.hoadon.*;
 import com.example.j2ee.service.ExcelExportService;
@@ -42,9 +43,9 @@ public class QuanLyHoaDonController {
     /**
      * Constructor injection
      */
-    public QuanLyHoaDonController(HoaDonService hoaDonService, 
-                                  JasperHoaDonService jasperHoaDonService,
-                                  ExcelExportService excelExportService) {
+    public QuanLyHoaDonController(HoaDonService hoaDonService,
+            JasperHoaDonService jasperHoaDonService,
+            ExcelExportService excelExportService) {
         this.hoaDonService = hoaDonService;
         this.jasperHoaDonService = jasperHoaDonService;
         this.excelExportService = excelExportService;
@@ -60,27 +61,27 @@ public class QuanLyHoaDonController {
      * - trangThai: Filter by invoice status (DA_PHAT_HANH, DA_HUY, DIEU_CHINH)
      * - tuNgay: Filter by invoice date from (ISO-8601 format: yyyy-MM-dd)
      * - denNgay: Filter by invoice date to (ISO-8601 format: yyyy-MM-dd)
-     * - sort: Sort by field (ngayLap, tongThanhToan, trangThai, soHoaDon) with optional direction
-     *          Default sort: ngayLap:desc
+     * - sort: Sort by field (ngayLap, tongThanhToan, trangThai, soHoaDon) with
+     * optional direction
+     * Default sort: ngayLap:desc
      *
      * @return List of invoices matching the filter criteria
      */
     @GetMapping
+    @RequirePermission(feature = "ORDER", action = "VIEW")
     public ResponseEntity<ApiResponse<List<HoaDonResponse>>> getAllHoaDon(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String trangThai,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate tuNgay,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate denNgay,
-            @RequestParam(required = false) String sort
-    ) {
+            @RequestParam(required = false) String sort) {
         try {
             List<HoaDonResponse> hoaDonList = hoaDonService.getAllHoaDon(
                     search,
                     trangThai,
                     tuNgay,
                     denNgay,
-                    sort
-            );
+                    sort);
             return ResponseEntity.ok(ApiResponse.success(hoaDonList));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -105,6 +106,7 @@ public class QuanLyHoaDonController {
      * @return Complete invoice details with nested data
      */
     @GetMapping("/{id}")
+    @RequirePermission(feature = "ORDER", action = "VIEW")
     public ResponseEntity<ApiResponse<HoaDonDetailResponse>> getHoaDonById(@PathVariable Integer id) {
         try {
             HoaDonDetailResponse hoaDon = hoaDonService.getHoaDonById(id);
@@ -127,6 +129,7 @@ public class QuanLyHoaDonController {
      * @return Complete invoice details with nested data
      */
     @GetMapping("/sohoadon/{soHoaDon}")
+    @RequirePermission(feature = "ORDER", action = "VIEW")
     public ResponseEntity<ApiResponse<HoaDonDetailResponse>> getHoaDonBySoHoaDon(@PathVariable String soHoaDon) {
         try {
             HoaDonDetailResponse hoaDon = hoaDonService.getHoaDonBySoHoaDon(soHoaDon);
@@ -154,6 +157,7 @@ public class QuanLyHoaDonController {
      * @return Created invoice information
      */
     @PostMapping
+    @RequirePermission(feature = "ORDER", action = "CREATE")
     public ResponseEntity<ApiResponse<HoaDonResponse>> createHoaDon(
             @Valid @RequestBody CreateHoaDonRequest request) {
         try {
@@ -178,11 +182,12 @@ public class QuanLyHoaDonController {
      * - Cannot update cancelled invoices
      * - Automatically recalculates total payment if VAT changes
      *
-     * @param id Invoice ID (mahoadon)
+     * @param id      Invoice ID (mahoadon)
      * @param request Request body containing updated information
      * @return Updated invoice information
      */
     @PutMapping("/{id}")
+    @RequirePermission(feature = "ORDER", action = "UPDATE")
     public ResponseEntity<ApiResponse<HoaDonResponse>> updateHoaDon(
             @PathVariable Integer id,
             @Valid @RequestBody UpdateHoaDonRequest request) {
@@ -208,11 +213,12 @@ public class QuanLyHoaDonController {
      * - Records cancellation reason and user
      * - Updates invoice status to DA_HUY
      *
-     * @param id Invoice ID (mahoadon)
+     * @param id      Invoice ID (mahoadon)
      * @param request Request body containing cancellation reason
      * @return Cancelled invoice information
      */
     @PutMapping("/{id}/huy")
+    @RequirePermission(feature = "ORDER", action = "CANCEL")
     public ResponseEntity<ApiResponse<HoaDonResponse>> huyHoaDon(
             @PathVariable Integer id,
             @Valid @RequestBody HuyHoaDonRequest request) {
@@ -220,8 +226,7 @@ public class QuanLyHoaDonController {
             HoaDonResponse hoaDon = hoaDonService.huyHoaDon(
                     id,
                     request.getLyDoHuy(),
-                    request.getNguoiThucHien()
-            );
+                    request.getNguoiThucHien());
             return ResponseEntity.ok(ApiResponse.success("Hủy hóa đơn thành công", hoaDon));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -246,6 +251,7 @@ public class QuanLyHoaDonController {
      * @return Success message confirming soft deletion
      */
     @DeleteMapping("/{id}")
+    @RequirePermission(feature = "ORDER", action = "DELETE")
     public ResponseEntity<ApiResponse<Void>> softDeleteHoaDon(@PathVariable Integer id) {
         try {
             hoaDonService.softDeleteHoaDon(id);
@@ -269,6 +275,7 @@ public class QuanLyHoaDonController {
      * @return Success message confirming restoration
      */
     @PutMapping("/{id}/restore")
+    @RequirePermission(feature = "ORDER", action = "RESTORE")
     public ResponseEntity<ApiResponse<Void>> restoreHoaDon(@PathVariable Integer id) {
         try {
             hoaDonService.restoreHoaDon(id);
@@ -293,6 +300,7 @@ public class QuanLyHoaDonController {
      * @return Generated invoice number
      */
     @GetMapping("/generate-sohoadon")
+    @RequirePermission(feature = "ORDER", action = "CREATE")
     public ResponseEntity<ApiResponse<String>> generateSoHoaDon() {
         try {
             String soHoaDon = hoaDonService.generateSoHoaDon();
@@ -320,6 +328,7 @@ public class QuanLyHoaDonController {
      * @return Invoice statistics DTO
      */
     @GetMapping("/thongke")
+    @RequirePermission(feature = "REPORT", action = "VIEW")
     public ResponseEntity<ApiResponse<HoaDonThongKeDTO>> getThongKe() {
         try {
             HoaDonThongKeDTO thongKe = hoaDonService.getThongKe();
@@ -341,15 +350,16 @@ public class QuanLyHoaDonController {
      * @return PDF file as byte array
      */
     @GetMapping("/{id}/pdf")
+    @RequirePermission(feature = "ORDER", action = "VIEW")
     public ResponseEntity<byte[]> exportHoaDonPdf(@PathVariable Integer id) {
         try {
             byte[] pdfBytes = jasperHoaDonService.generateHoaDonPdf(id);
-            
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDispositionFormData("filename", "hoadon_" + id + ".pdf");
             headers.setContentLength(pdfBytes.length);
-            
+
             return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -369,6 +379,7 @@ public class QuanLyHoaDonController {
      * @return Excel file as byte array
      */
     @GetMapping("/excel")
+    @RequirePermission(feature = "ORDER", action = "VIEW")
     public ResponseEntity<byte[]> exportHoaDonExcel(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String trangThai,
@@ -377,15 +388,15 @@ public class QuanLyHoaDonController {
         try {
             // Get filtered list
             List<HoaDonResponse> hoaDonList = hoaDonService.getAllHoaDon(search, trangThai, tuNgay, denNgay, null);
-            
+
             // Export to Excel
             byte[] excelBytes = excelExportService.exportHoaDonToExcel(hoaDonList);
-            
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
             headers.setContentDispositionFormData("filename", "danh_sach_hoa_don.xlsx");
             headers.setContentLength(excelBytes.length);
-            
+
             return new ResponseEntity<>(excelBytes, headers, HttpStatus.OK);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

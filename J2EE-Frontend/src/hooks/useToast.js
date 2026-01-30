@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, createElement } from 'react';
 import Toast from '../components/common/Toast';
 
 /**
@@ -27,19 +27,28 @@ export const useToast = () => {
     }, []);
 
     // Helper methods
-    const showSuccess = useCallback((message, duration) => showToast(message, 'success', duration), [showToast]);
-    const showError = useCallback((message, duration) => showToast(message, 'error', duration), [showToast]);
-    const showInfo = useCallback((message, duration) => showToast(message, 'info', duration), [showToast]);
+    const showSuccess = useCallback((message, duration) => {
+        return showToast(message, 'success', duration);
+    }, [showToast]);
 
-    const ToastComponent = () => (
-        <Toast
-            message={toast.message}
-            type={toast.type}
-            isVisible={toast.isVisible}
-            onClose={hideToast}
-            duration={toast.duration}
-        />
-    );
+    const showError = useCallback((message, duration) => {
+        return showToast(message, 'error', duration);
+    }, [showToast]);
+
+    const showInfo = useCallback((message, duration) => {
+        return showToast(message, 'info', duration);
+    }, [showToast]);
+
+    // Sử dụng createElement thay vì JSX để tránh lỗi parse
+    const ToastComponent = useCallback(() => {
+        return createElement(Toast, {
+            message: toast.message,
+            type: toast.type,
+            isVisible: toast.isVisible,
+            onClose: hideToast,
+            duration: toast.duration
+        });
+    }, [toast, hideToast]);
 
     return {
         ToastComponent,

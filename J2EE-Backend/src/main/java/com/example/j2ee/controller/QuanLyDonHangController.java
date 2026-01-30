@@ -1,5 +1,6 @@
 package com.example.j2ee.controller;
 
+import com.example.j2ee.annotation.RequirePermission;
 import com.example.j2ee.dto.ApiResponse;
 import com.example.j2ee.dto.donhang.BatchApproveRequest;
 import com.example.j2ee.dto.donhang.BatchRefundRequest;
@@ -37,6 +38,7 @@ public class QuanLyDonHangController {
 
     /**
      * Constructor injection of DonHangService
+     * 
      * @param donHangService Service layer for order management
      */
     public QuanLyDonHangController(DonHangService donHangService) {
@@ -57,12 +59,14 @@ public class QuanLyDonHangController {
      * - denNgay: Filter by order date to (ISO-8601 format: yyyy-MM-dd'T'HH:mm:ss)
      * - tuGia: Filter by total price from (BigDecimal)
      * - denGia: Filter by total price to (BigDecimal)
-     * - sort: Sort by field (ngayDat, tongGia, trangThai, pnr) with optional direction (field:asc or field:desc)
-     *          Default sort: ngayDat:desc
+     * - sort: Sort by field (ngayDat, tongGia, trangThai, pnr) with optional
+     * direction (field:asc or field:desc)
+     * Default sort: ngayDat:desc
      *
      * @return List of orders matching the filter criteria
      */
     @GetMapping
+    @RequirePermission(feature = "ORDER", action = "VIEW")
     public ResponseEntity<ApiResponse<List<DonHangResponse>>> getAllDonHang(
             @RequestParam(required = false) String trangThai,
             @RequestParam(required = false) String email,
@@ -72,8 +76,7 @@ public class QuanLyDonHangController {
             @RequestParam(required = false) LocalDateTime denNgay,
             @RequestParam(required = false) String tuGia,
             @RequestParam(required = false) String denGia,
-            @RequestParam(required = false) String sort
-    ) {
+            @RequestParam(required = false) String sort) {
         try {
             List<DonHangResponse> donHangList = donHangService.getAllDonHang(
                     trangThai,
@@ -84,8 +87,7 @@ public class QuanLyDonHangController {
                     denNgay,
                     tuGia != null ? new BigDecimal(tuGia) : null,
                     denGia != null ? new BigDecimal(denGia) : null,
-                    sort
-            );
+                    sort);
             return ResponseEntity.ok(ApiResponse.success(donHangList));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -110,6 +112,7 @@ public class QuanLyDonHangController {
      * @return Complete order details with nested data
      */
     @GetMapping("/{id}")
+    @RequirePermission(feature = "ORDER", action = "VIEW")
     public ResponseEntity<ApiResponse<DonHangDetailResponse>> getDonHangById(@PathVariable int id) {
         try {
             DonHangDetailResponse donHang = donHangService.getDonHangById(id);
@@ -126,13 +129,15 @@ public class QuanLyDonHangController {
     /**
      * GET /donhang/pnr/{pnr} - Find order by PNR code
      *
-     * Retrieves complete order details using the unique PNR (Passenger Name Record) code.
+     * Retrieves complete order details using the unique PNR (Passenger Name Record)
+     * code.
      * PNR is a unique identifier for each booking in the airline system.
      *
      * @param pnr PNR code (6-character alphanumeric code)
      * @return Complete order details with nested data
      */
     @GetMapping("/pnr/{pnr}")
+    @RequirePermission(feature = "ORDER", action = "VIEW")
     public ResponseEntity<ApiResponse<DonHangDetailResponse>> getDonHangByPnr(@PathVariable String pnr) {
         try {
             DonHangDetailResponse donHang = donHangService.getDonHangByPnr(pnr);
@@ -159,11 +164,12 @@ public class QuanLyDonHangController {
      *
      * Invalid transitions will be rejected with 400 Bad Request
      *
-     * @param id Order ID (madonhang)
+     * @param id      Order ID (madonhang)
      * @param request Request body containing new status
      * @return Updated order information
      */
     @PutMapping("/{id}/trangthai")
+    @RequirePermission(feature = "ORDER", action = "UPDATE")
     public ResponseEntity<ApiResponse<DonHangResponse>> updateTrangThaiDonHang(
             @PathVariable int id,
             @Valid @RequestBody UpdateTrangThaiDonHangRequest request) {
@@ -190,11 +196,12 @@ public class QuanLyDonHangController {
      * - Updates all related DatCho to CANCELLED
      * - Records cancellation reason in ghiChu
      *
-     * @param id Order ID (madonhang)
+     * @param id      Order ID (madonhang)
      * @param request Request body containing cancellation reason
      * @return Updated order information
      */
     @PutMapping("/{id}/huy")
+    @RequirePermission(feature = "ORDER", action = "CANCEL")
     public ResponseEntity<ApiResponse<DonHangResponse>> huyDonHang(
             @PathVariable int id,
             @Valid @RequestBody HuyDonHangRequest request) {
@@ -217,7 +224,8 @@ public class QuanLyDonHangController {
      *
      * Retrieves all orders that have been soft-deleted (da_xoa = true).
      * Includes the deletedAt timestamp for each order.
-     * Supports the same filtering and sorting capabilities as the main list endpoint.
+     * Supports the same filtering and sorting capabilities as the main list
+     * endpoint.
      *
      * Query Parameters (all optional):
      * - trangThai: Filter by order status (CHỜ THANH TOÁN, ĐÃ THANH TOÁN, ĐÃ HỦY)
@@ -228,12 +236,14 @@ public class QuanLyDonHangController {
      * - denNgay: Filter by order date to (ISO-8601 format: yyyy-MM-dd'T'HH:mm:ss)
      * - tuGia: Filter by total price from (BigDecimal)
      * - denGia: Filter by total price to (BigDecimal)
-     * - sort: Sort by field (ngayDat, tongGia, trangThai, pnr) with optional direction (field:asc or field:desc)
-     *          Default sort: ngayDat:desc
+     * - sort: Sort by field (ngayDat, tongGia, trangThai, pnr) with optional
+     * direction (field:asc or field:desc)
+     * Default sort: ngayDat:desc
      *
      * @return List of soft-deleted orders matching the filter criteria
      */
     @GetMapping("/deleted")
+    @RequirePermission(feature = "ORDER", action = "VIEW")
     public ResponseEntity<ApiResponse<List<DonHangResponse>>> getDeletedDonHang(
             @RequestParam(required = false) String trangThai,
             @RequestParam(required = false) String email,
@@ -243,8 +253,7 @@ public class QuanLyDonHangController {
             @RequestParam(required = false) LocalDateTime denNgay,
             @RequestParam(required = false) String tuGia,
             @RequestParam(required = false) String denGia,
-            @RequestParam(required = false) String sort
-    ) {
+            @RequestParam(required = false) String sort) {
         try {
             List<DonHangResponse> deletedDonHangList = donHangService.getDeletedDonHang(
                     trangThai,
@@ -255,8 +264,7 @@ public class QuanLyDonHangController {
                     denNgay,
                     tuGia != null ? new BigDecimal(tuGia) : null,
                     denGia != null ? new BigDecimal(denGia) : null,
-                    sort
-            );
+                    sort);
             return ResponseEntity.ok(ApiResponse.success(deletedDonHangList));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -280,6 +288,7 @@ public class QuanLyDonHangController {
      * @return Success message confirming restoration
      */
     @PutMapping("/{id}/restore")
+    @RequirePermission(feature = "ORDER", action = "RESTORE")
     public ResponseEntity<ApiResponse<Void>> restoreDonHang(@PathVariable int id) {
         try {
             donHangService.restoreDonHang(id);
@@ -306,6 +315,7 @@ public class QuanLyDonHangController {
      * @return Success message confirming soft deletion
      */
     @DeleteMapping("/{id}")
+    @RequirePermission(feature = "ORDER", action = "DELETE")
     public ResponseEntity<ApiResponse<Void>> softDeleteDonHang(@PathVariable int id) {
         try {
             donHangService.softDeleteDonHang(id);
@@ -332,6 +342,7 @@ public class QuanLyDonHangController {
      * @return Result of batch approval operation
      */
     @PostMapping("/batch/approve")
+    @RequirePermission(feature = "ORDER", action = "APPROVE")
     public ResponseEntity<ApiResponse<java.util.Map<String, Object>>> batchApprovePayment(
             @Valid @RequestBody BatchApproveRequest request) {
         try {
@@ -357,13 +368,13 @@ public class QuanLyDonHangController {
      * @return Result of batch refund operation
      */
     @PostMapping("/batch/refund")
+    @RequirePermission(feature = "ORDER", action = "CANCEL")
     public ResponseEntity<ApiResponse<java.util.Map<String, Object>>> batchRefund(
             @Valid @RequestBody BatchRefundRequest request) {
         try {
             java.util.Map<String, Object> result = donHangService.batchRefund(
                     request.getMaDonHangs(),
-                    request.getLyDoHoanTien()
-            );
+                    request.getLyDoHoanTien());
             return ResponseEntity.ok(ApiResponse.success(result));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

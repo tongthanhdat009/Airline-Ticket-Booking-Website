@@ -1,5 +1,6 @@
 package com.example.j2ee.controller; // Hoặc package controller của bạn
 
+import com.example.j2ee.annotation.RequirePermission;
 import com.example.j2ee.dto.ApiResponse;
 import com.example.j2ee.dto.ChuyenBayKhachHangDTO;
 import com.example.j2ee.model.HanhKhach;
@@ -27,6 +28,7 @@ public class QuanLyHanhKhachController {
      * GET: /admin/dashboard/hanhkhach
      */
     @GetMapping
+    @RequirePermission(feature = "CUSTOMER", action = "VIEW")
     public ResponseEntity<List<HanhKhach>> getAllHanhKhach() {
         List<HanhKhach> hanhKhachList = hanhKhachService.getAllHanhKhach();
         return ResponseEntity.ok(hanhKhachList); // Trả về status 200 OK và danh sách
@@ -36,6 +38,7 @@ public class QuanLyHanhKhachController {
      * GET: /admin/dashboard/hanhkhach/{id}
      */
     @GetMapping("/{id}")
+    @RequirePermission(feature = "CUSTOMER", action = "VIEW")
     public ResponseEntity<HanhKhach> getHanhKhachById(@PathVariable int id) {
         Optional<HanhKhach> hanhKhachOptional = hanhKhachService.getHanhKhachById(id);
         return hanhKhachOptional
@@ -48,6 +51,7 @@ public class QuanLyHanhKhachController {
      * Body JSON theo entity HanhKhach
      */
     @PostMapping
+    @RequirePermission(feature = "CUSTOMER", action = "CREATE")
     public ResponseEntity<ApiResponse<HanhKhach>> create(@RequestBody HanhKhach body) {
         try {
             HanhKhach created = hanhKhachService.createHanhKhach(body);
@@ -65,6 +69,7 @@ public class QuanLyHanhKhachController {
      * Body JSON theo entity HanhKhach
      */
     @PutMapping("/{id}")
+    @RequirePermission(feature = "CUSTOMER", action = "UPDATE")
     public ResponseEntity<ApiResponse<HanhKhach>> update(@PathVariable int id, @RequestBody HanhKhach body) {
         try {
             Optional<HanhKhach> updated = hanhKhachService.updateHanhKhach(id, body);
@@ -83,6 +88,7 @@ public class QuanLyHanhKhachController {
      * DELETE: /admin/dashboard/hanhkhach/{id}
      */
     @DeleteMapping("/{id}")
+    @RequirePermission(feature = "CUSTOMER", action = "DELETE")
     public ResponseEntity<Void> delete(@PathVariable int id) {
         boolean deleted = hanhKhachService.deleteHanhKhach(id);
         if (deleted) {
@@ -96,6 +102,7 @@ public class QuanLyHanhKhachController {
      * Lấy danh sách chuyến bay của khách hàng
      */
     @GetMapping("/{id}/chuyenbay")
+    @RequirePermission(feature = "CUSTOMER", action = "VIEW")
     public ResponseEntity<ApiResponse<List<ChuyenBayKhachHangDTO>>> getChuyenBayByKhachHang(@PathVariable int id) {
         try {
             List<ChuyenBayKhachHangDTO> chuyenBayList = hanhKhachService.getChuyenBayByKhachHang(id);

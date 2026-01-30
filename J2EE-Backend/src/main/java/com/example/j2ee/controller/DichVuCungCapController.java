@@ -1,5 +1,6 @@
 package com.example.j2ee.controller;
 
+import com.example.j2ee.annotation.RequirePermission;
 import com.example.j2ee.dto.ApiResponse;
 import com.example.j2ee.model.DichVuCungCap;
 import com.example.j2ee.model.LuaChonDichVu;
@@ -20,25 +21,30 @@ import java.util.List;
 @RequestMapping("/admin/dashboard/dichvu")
 public class DichVuCungCapController {
     private final DichVuCungCapService dichVuCungCapService;
+
     public DichVuCungCapController(DichVuCungCapService dichVuCungCapService) {
         this.dichVuCungCapService = dichVuCungCapService;
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<DichVuCungCap>>> getAllDichVuCungCap(){
+    @RequirePermission(feature = "SERVICE", action = "VIEW")
+    public ResponseEntity<ApiResponse<List<DichVuCungCap>>> getAllDichVuCungCap() {
         return ResponseEntity.ok(ApiResponse.success(dichVuCungCapService.getAllDichVuCungCap()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<DichVuCungCap>> getById(@PathVariable int id){
+    @RequirePermission(feature = "SERVICE", action = "VIEW")
+    public ResponseEntity<ApiResponse<DichVuCungCap>> getById(@PathVariable int id) {
         DichVuCungCap dv = dichVuCungCapService.getDichVuCungCapById(id);
-        if (dv == null) return ResponseEntity.status(404).body(ApiResponse.error("Không tìm thấy dịch vụ"));
+        if (dv == null)
+            return ResponseEntity.status(404).body(ApiResponse.error("Không tìm thấy dịch vụ"));
         return ResponseEntity.ok(ApiResponse.success(dv));
     }
 
     @PostMapping
+    @RequirePermission(feature = "SERVICE", action = "CREATE")
     public ResponseEntity<ApiResponse<DichVuCungCap>> create(
-            @RequestBody DichVuCungCap dichVuCungCap){
+            @RequestBody DichVuCungCap dichVuCungCap) {
         try {
             DichVuCungCap created = dichVuCungCapService.createDichVu(dichVuCungCap);
             return ResponseEntity.ok(ApiResponse.success("Tạo dịch vụ thành công", created));
@@ -50,12 +56,14 @@ public class DichVuCungCapController {
     }
 
     @PutMapping("/{id}")
+    @RequirePermission(feature = "SERVICE", action = "UPDATE")
     public ResponseEntity<ApiResponse<DichVuCungCap>> update(
             @PathVariable int id,
-            @RequestBody DichVuCungCap dichVuCungCap){
+            @RequestBody DichVuCungCap dichVuCungCap) {
         try {
             DichVuCungCap updated = dichVuCungCapService.updateDichVu(id, dichVuCungCap);
-            if (updated == null) return ResponseEntity.status(404).body(ApiResponse.error("Không tìm thấy dịch vụ"));
+            if (updated == null)
+                return ResponseEntity.status(404).body(ApiResponse.error("Không tìm thấy dịch vụ"));
             return ResponseEntity.ok(ApiResponse.success("Cập nhật dịch vụ thành công", updated));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
@@ -65,6 +73,7 @@ public class DichVuCungCapController {
     }
 
     @PostMapping(value = "/{id}/anh", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @RequirePermission(feature = "SERVICE", action = "UPDATE")
     public ResponseEntity<ApiResponse<DichVuCungCap>> uploadAnh(
             @PathVariable("id") int dichVuId,
             @RequestPart("anh") MultipartFile anh) {
@@ -83,40 +92,48 @@ public class DichVuCungCapController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable int id){
+    @RequirePermission(feature = "SERVICE", action = "DELETE")
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable int id) {
         boolean ok = dichVuCungCapService.deleteDichVu(id);
-        if (!ok) return ResponseEntity.status(404).body(ApiResponse.error("Không tìm thấy dịch vụ"));
+        if (!ok)
+            return ResponseEntity.status(404).body(ApiResponse.error("Không tìm thấy dịch vụ"));
         return ResponseEntity.ok(ApiResponse.successMessage("Xóa dịch vụ thành công"));
     }
 
     @GetMapping("/{id}/luachon")
-    public ResponseEntity<ApiResponse<List<LuaChonDichVu>>> getLuaChon(@PathVariable int id){
+    @RequirePermission(feature = "SERVICE", action = "VIEW")
+    public ResponseEntity<ApiResponse<List<LuaChonDichVu>>> getLuaChon(@PathVariable int id) {
         List<LuaChonDichVu> options = dichVuCungCapService.getLuaChonByDichVuId(id);
         return ResponseEntity.ok(ApiResponse.success(options));
     }
 
     @PostMapping("/{id}/luachon")
-    public ResponseEntity<ApiResponse<LuaChonDichVu>> addLuaChon(@PathVariable int id, @RequestBody LuaChonDichVu request){
-        if (request.getTenLuaChon() == null || request.getTenLuaChon().trim().isEmpty()){
+    @RequirePermission(feature = "SERVICE", action = "CREATE")
+    public ResponseEntity<ApiResponse<LuaChonDichVu>> addLuaChon(@PathVariable int id,
+            @RequestBody LuaChonDichVu request) {
+        if (request.getTenLuaChon() == null || request.getTenLuaChon().trim().isEmpty()) {
             return ResponseEntity.badRequest().body(ApiResponse.error("Tên lựa chọn không được để trống"));
         }
-        try{
+        try {
             LuaChonDichVu created = dichVuCungCapService.addLuaChonToDichVu(id, request);
-            if (created == null) return ResponseEntity.status(404).body(ApiResponse.error("Không tìm thấy dịch vụ"));
+            if (created == null)
+                return ResponseEntity.status(404).body(ApiResponse.error("Không tìm thấy dịch vụ"));
             return ResponseEntity.ok(ApiResponse.success("Thêm lựa chọn thành công", created));
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
     }
 
     @PutMapping("/{id}/luachon/{luachonId}")
+    @RequirePermission(feature = "SERVICE", action = "UPDATE")
     public ResponseEntity<ApiResponse<LuaChonDichVu>> updateLuaChon(
             @PathVariable int id,
             @PathVariable int luachonId,
             @RequestBody LuaChonDichVu request) {
         try {
             if (dichVuCungCapService.isLuaChonInUse(luachonId)) {
-                return ResponseEntity.badRequest().body(ApiResponse.error("Lựa chọn đang được sử dụng trong chuyến bay, không thể sửa."));
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error("Lựa chọn đang được sử dụng trong chuyến bay, không thể sửa."));
             }
             LuaChonDichVu updated = dichVuCungCapService.updateLuaChon(id, luachonId, request);
             if (updated == null) {
@@ -129,12 +146,14 @@ public class DichVuCungCapController {
     }
 
     @DeleteMapping("/{id}/luachon/{luachonId}")
+    @RequirePermission(feature = "SERVICE", action = "DELETE")
     public ResponseEntity<ApiResponse<Void>> deleteLuaChon(
             @PathVariable int id,
             @PathVariable int luachonId) {
         try {
             if (dichVuCungCapService.isLuaChonInUse(luachonId)) {
-                return ResponseEntity.badRequest().body(ApiResponse.error("Lựa chọn đang được sử dụng trong chuyến bay, không thể xóa."));
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error("Lựa chọn đang được sử dụng trong chuyến bay, không thể xóa."));
             }
             boolean deleted = dichVuCungCapService.deleteLuaChon(id, luachonId);
             if (!deleted) {
@@ -145,7 +164,7 @@ public class DichVuCungCapController {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
     }
-    
+
     @GetMapping("/anh/{filename:.+}")
     public ResponseEntity<Resource> getAnh(@PathVariable String filename) {
         try {
@@ -171,6 +190,7 @@ public class DichVuCungCapController {
     }
 
     @PostMapping(value = "/{id}/luachon/{luachonId}/anh", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @RequirePermission(feature = "SERVICE", action = "UPDATE")
     public ResponseEntity<ApiResponse<LuaChonDichVu>> uploadAnhLuaChon(
             @PathVariable("id") int dichVuId,
             @PathVariable("luachonId") int luachonId,
@@ -223,6 +243,7 @@ public class DichVuCungCapController {
      * Lấy danh sách dịch vụ đã xóa mềm
      */
     @GetMapping("/deleted")
+    @RequirePermission(feature = "SERVICE", action = "VIEW")
     public ResponseEntity<ApiResponse<List<DichVuCungCap>>> getDeletedDichVu() {
         return ResponseEntity.ok(ApiResponse.success(dichVuCungCapService.getAllDeletedDichVu()));
     }
@@ -231,6 +252,7 @@ public class DichVuCungCapController {
      * Khôi phục dịch vụ đã xóa mềm
      */
     @PostMapping("/{id}/restore")
+    @RequirePermission(feature = "SERVICE", action = "RESTORE")
     public ResponseEntity<ApiResponse<DichVuCungCap>> restoreDichVu(@PathVariable int id) {
         try {
             DichVuCungCap restored = dichVuCungCapService.restoreDichVu(id);
@@ -244,6 +266,7 @@ public class DichVuCungCapController {
      * Xóa cứng (vĩnh viễn) dịch vụ - CHỈ DÙNG KHI CẦN THIẾT
      */
     @DeleteMapping("/{id}/hard")
+    @RequirePermission(feature = "SERVICE", action = "DELETE")
     public ResponseEntity<ApiResponse<Void>> hardDeleteDichVu(@PathVariable int id) {
         try {
             boolean deleted = dichVuCungCapService.hardDeleteDichVu(id);

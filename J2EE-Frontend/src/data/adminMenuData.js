@@ -198,10 +198,10 @@ export const adminMenuItems = [
     path: 'LichSuThaoTac',
     text: 'Lịch sử thao tác',
     icon: FaHistory,
-    permissionKey: 'REPORT_VIEW',
-    featureCode: 'REPORT',
-    featureName: 'Báo cáo thống kê',
-    group: 'Báo cáo',
+    permissionKey: 'AUDITLOG_VIEW',
+    featureCode: 'AUDITLOG',
+    featureName: 'Lịch sử thao tác',
+    group: 'Hệ thống',
     color: 'from-green-500 to-emerald-600',
     description: 'Xem log lịch sử thao tác (Audit Log)'
   },
@@ -262,6 +262,7 @@ export const permissionMapping = {
   ADMIN: 'Quản lý Tài khoản Admin',
   VAITRO: 'Quản lý Vai trò',
   PHANQUYEN: 'Phân quyền',
+  AUDITLOG: 'Lịch sử thao tác',
 
   // Mapping cũ để tương thích (nếu cần)
   REPORT: 'Thống kê & Báo cáo',
@@ -323,15 +324,23 @@ export const getMenuItemsByPermissions = (userPermissions = []) => {
       // 1. Check trực tiếp permission key (format cũ: CUSTOMER_VIEW)
       if (perm === item.permissionKey) return true;
 
-      // 2. Check theo pattern FEATURE_ACTION (format mới: CUSTOMER_MANAGE)
-      const permParts = perm.split('_');
-      if (permParts.length >= 2) {
-        const feature = permParts[0];
-        const action = permParts.slice(1).join('_');
+      // 2. Check MANAGE permission - nếu có MANAGE thì có tất cả các quyền
+      const menuFeature = item.featureCode; // VD: 'AUDITLOG', 'FLIGHT'
+      if (menuFeature) {
+        const managePermission = `${menuFeature}_MANAGE`;
+        if (perm === managePermission) return true;
+      }
 
-        // Mapping với menu item
-        // Ví dụ: ROUTE_VIEW -> TuyenBay, ROUTE_MANAGE -> TuyenBay
-        return checkPermissionMatch(item, feature, action);
+      // 3. Check theo pattern FEATURE_ACTION (format mới: CUSTOMER_MANAGE)
+      // Tách action từ cuối chuỗi (VIEW, CREATE, UPDATE, DELETE, MANAGE, etc.)
+      const knownActions = ['MANAGE', 'VIEW', 'CREATE', 'UPDATE', 'DELETE', 'IMPORT', 'EXPORT', 'APPROVE', 'CANCEL', 'RESTORE'];
+      for (const action of knownActions) {
+        if (perm.endsWith(`_${action}`)) {
+          const feature = perm.substring(0, perm.length - action.length - 1);
+          if (feature && checkPermissionMatch(item, feature, action)) {
+            return true;
+          }
+        }
       }
 
       return false;
@@ -416,16 +425,12 @@ const checkPermissionMatch = (menuItem, feature, action) => {
     'REFUND': 'HoanTien',
     'USER': 'QuanLyTKAdmin',
     'ROLE': 'VaiTro',
-    'PERMISSION': 'PhanQuyen'
+    'PERMISSION': 'PhanQuyen',
+    'AUDITLOG': 'LichSuThaoTac'
   };
 
   // Special cases
-  // 1. LichSuThaoTac dùng chung REPORT (là phần của báo cáo)
-  if (menuItem.path === 'LichSuThaoTac' && feature === 'REPORT') {
-    return action === 'VIEW' || action === 'MANAGE';
-  }
-
-  // 2. HangVe và GiaBay dùng chung PRICE
+  // 1. HangVe và GiaBay dùng chung PRICE
   if (menuItem.path === 'HangVe' && feature === 'PRICE') {
     return action === 'VIEW' || action === 'MANAGE';
   }
@@ -433,9 +438,12 @@ const checkPermissionMatch = (menuItem, feature, action) => {
   // Check xem feature có match với menu item không
   const expectedPath = featureMap[feature];
   if (expectedPath === menuItem.path) {
-    // Cho phép cả VIEW và MANAGE (và các action khác)
+    // Cho phép cả VIEW và MANAGE
     // MANAGE có quyền cao nhất, bao gồm cả VIEW
-    return action === 'VIEW' || action === 'MANAGE';
+    if (action === 'MANAGE') return true;
+    if (action === 'VIEW') return true;
+    // Các action khác cũng được cho phép nếu có MANAGE (đã check ở trên)
+    return false;
   }
 
   return false;
@@ -492,7 +500,8 @@ export const rolePermissions = {
     'REPORT_MANAGE',
     'USER_MANAGE',
     'ROLE_MANAGE',
-    'PERMISSION_MANAGE'
+    'PERMISSION_MANAGE',
+    'AUDITLOG_MANAGE'
   ],
 
   // QUAN_LY - Quản lý chính

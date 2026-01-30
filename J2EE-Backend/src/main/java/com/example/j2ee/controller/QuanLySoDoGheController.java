@@ -1,5 +1,6 @@
 package com.example.j2ee.controller;
 
+import com.example.j2ee.annotation.RequirePermission;
 import com.example.j2ee.dto.ApiResponse;
 import com.example.j2ee.dto.maybay.SeatLayoutRequest;
 import com.example.j2ee.model.ChiTietGhe;
@@ -7,7 +8,6 @@ import com.example.j2ee.service.ChiTietGheService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public class QuanLySoDoGheController {
      * Lấy danh sách ghế của máy bay
      */
     @GetMapping("/{maMayBay}/ghe")
-    @PreAuthorize("hasAuthority('AIRCRAFT_VIEW')")
+    @RequirePermission(feature = "AIRCRAFT", action = "VIEW")
     public ResponseEntity<ApiResponse<List<ChiTietGhe>>> getSeatsByAircraft(@PathVariable Integer maMayBay) {
         try {
             List<ChiTietGhe> seats = chiTietGheService.getChiTietGheByMayBay(maMayBay);
@@ -49,7 +49,7 @@ public class QuanLySoDoGheController {
      * Thêm một ghế vào máy bay
      */
     @PostMapping("/{maMayBay}/ghe")
-    @PreAuthorize("hasAuthority('AIRCRAFT_UPDATE')")
+    @RequirePermission(feature = "AIRCRAFT", action = "UPDATE")
     public ResponseEntity<ApiResponse<ChiTietGhe>> addSeat(
             @PathVariable Integer maMayBay,
             @RequestBody SeatLayoutRequest request) {
@@ -70,15 +70,14 @@ public class QuanLySoDoGheController {
      * Cập nhật thông tin ghế
      */
     @PutMapping("/ghe/{maGhe}")
-    @PreAuthorize("hasAuthority('AIRCRAFT_UPDATE')")
+    @RequirePermission(feature = "AIRCRAFT", action = "UPDATE")
     public ResponseEntity<ApiResponse<ChiTietGhe>> updateSeat(
             @PathVariable Integer maGhe,
             @RequestBody SeatLayoutRequest request) {
         try {
             ChiTietGhe updatedSeat = chiTietGheService.updateSeat(maGhe, request);
             return ResponseEntity.ok(
-                    ApiResponse.success("Cập nhật ghế thành công", updatedSeat)
-            );
+                    ApiResponse.success("Cập nhật ghế thành công", updatedSeat));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.error(e.getMessage()));
@@ -92,7 +91,7 @@ public class QuanLySoDoGheController {
      * Xóa một ghế
      */
     @DeleteMapping("/ghe/{maGhe}")
-    @PreAuthorize("hasAuthority('AIRCRAFT_UPDATE')")
+    @RequirePermission(feature = "AIRCRAFT", action = "UPDATE")
     public ResponseEntity<ApiResponse<Void>> deleteSeat(@PathVariable Integer maGhe) {
         try {
             chiTietGheService.deleteSeat(maGhe);
@@ -110,7 +109,7 @@ public class QuanLySoDoGheController {
      * Xóa tất cả ghế của máy bay
      */
     @DeleteMapping("/{maMayBay}/ghe")
-    @PreAuthorize("hasAuthority('AIRCRAFT_MANAGE')")
+    @RequirePermission(feature = "AIRCRAFT", action = "DELETE")
     public ResponseEntity<ApiResponse<Void>> deleteAllSeats(@PathVariable Integer maMayBay) {
         try {
             chiTietGheService.deleteAllSeatsByAircraft(maMayBay);
@@ -128,19 +127,19 @@ public class QuanLySoDoGheController {
      * Tự động tạo sơ đồ ghế cho máy bay
      * Body format:
      * {
-     *   "configs": [
-     *     {
-     *       "maHangVe": 1,
-     *       "startRow": 1,
-     *       "endRow": 5,
-     *       "columns": ["A", "B", "C", "D", "E", "F"],
-     *       "viTriGhe": "CỬA SỔ"
-     *     }
-     *   ]
+     * "configs": [
+     * {
+     * "maHangVe": 1,
+     * "startRow": 1,
+     * "endRow": 5,
+     * "columns": ["A", "B", "C", "D", "E", "F"],
+     * "viTriGhe": "CỬA SỔ"
+     * }
+     * ]
      * }
      */
     @PostMapping("/{maMayBay}/ghe/auto-generate")
-    @PreAuthorize("hasAuthority('AIRCRAFT_MANAGE')")
+    @RequirePermission(feature = "AIRCRAFT", action = "UPDATE")
     public ResponseEntity<ApiResponse<List<ChiTietGhe>>> autoGenerateSeats(
             @PathVariable Integer maMayBay,
             @RequestBody Map<String, List<SeatConfigRequest>> request) {
@@ -152,14 +151,12 @@ public class QuanLySoDoGheController {
                             req.getStartRow(),
                             req.getEndRow(),
                             req.getColumns(),
-                            req.getViTriGhe()
-                    ))
+                            req.getViTriGhe()))
                     .toList();
 
             List<ChiTietGhe> createdSeats = chiTietGheService.autoGenerateSeatLayout(maMayBay, configs);
             return ResponseEntity.ok(
-                    ApiResponse.success("Tự động tạo sơ đồ ghế thành công", createdSeats)
-            );
+                    ApiResponse.success("Tự động tạo sơ đồ ghế thành công", createdSeats));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.error(e.getMessage()));
@@ -179,19 +176,44 @@ public class QuanLySoDoGheController {
         private List<String> columns;
         private String viTriGhe;
 
-        public Integer getMaHangVe() { return maHangVe; }
-        public void setMaHangVe(Integer maHangVe) { this.maHangVe = maHangVe; }
+        public Integer getMaHangVe() {
+            return maHangVe;
+        }
 
-        public int getStartRow() { return startRow; }
-        public void setStartRow(int startRow) { this.startRow = startRow; }
+        public void setMaHangVe(Integer maHangVe) {
+            this.maHangVe = maHangVe;
+        }
 
-        public int getEndRow() { return endRow; }
-        public void setEndRow(int endRow) { this.endRow = endRow; }
+        public int getStartRow() {
+            return startRow;
+        }
 
-        public List<String> getColumns() { return columns; }
-        public void setColumns(List<String> columns) { this.columns = columns; }
+        public void setStartRow(int startRow) {
+            this.startRow = startRow;
+        }
 
-        public String getViTriGhe() { return viTriGhe; }
-        public void setViTriGhe(String viTriGhe) { this.viTriGhe = viTriGhe; }
+        public int getEndRow() {
+            return endRow;
+        }
+
+        public void setEndRow(int endRow) {
+            this.endRow = endRow;
+        }
+
+        public List<String> getColumns() {
+            return columns;
+        }
+
+        public void setColumns(List<String> columns) {
+            this.columns = columns;
+        }
+
+        public String getViTriGhe() {
+            return viTriGhe;
+        }
+
+        public void setViTriGhe(String viTriGhe) {
+            this.viTriGhe = viTriGhe;
+        }
     }
 }

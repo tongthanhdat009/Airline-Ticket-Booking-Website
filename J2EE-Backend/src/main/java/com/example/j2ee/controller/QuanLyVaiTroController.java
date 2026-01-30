@@ -1,5 +1,6 @@
 package com.example.j2ee.controller;
 
+import com.example.j2ee.annotation.RequirePermission;
 import com.example.j2ee.dto.ApiResponse;
 import com.example.j2ee.model.VaiTro;
 import com.example.j2ee.service.VaiTroService;
@@ -24,6 +25,7 @@ public class QuanLyVaiTroController {
      * GET /admin/dashboard/vai-tro
      */
     @GetMapping
+    @RequirePermission(feature = "ROLE", action = "VIEW")
     public ResponseEntity<ApiResponse<List<VaiTro>>> getAllVaiTro() {
         List<VaiTro> vaiTroList = vaiTroService.getAllVaiTro();
         return ResponseEntity.ok(ApiResponse.success(vaiTroList));
@@ -34,6 +36,7 @@ public class QuanLyVaiTroController {
      * GET /admin/dashboard/vai-tro/{id}
      */
     @GetMapping("/{id}")
+    @RequirePermission(feature = "ROLE", action = "VIEW")
     public ResponseEntity<ApiResponse<VaiTro>> getVaiTroById(@PathVariable int id) {
         return vaiTroService.getVaiTroById(id)
                 .map(vaiTro -> ResponseEntity.ok(ApiResponse.success(vaiTro)))
@@ -47,6 +50,7 @@ public class QuanLyVaiTroController {
      * Validation: Tên vai trò không được để trống, trạng thái mặc định là Active
      */
     @PostMapping
+    @RequirePermission(feature = "ROLE", action = "CREATE")
     public ResponseEntity<ApiResponse<VaiTro>> createVaiTro(@RequestBody VaiTro vaiTro) {
         try {
             VaiTro created = vaiTroService.createVaiTro(vaiTro);
@@ -67,6 +71,7 @@ public class QuanLyVaiTroController {
      * Validation: Tên vai trò không được để trống
      */
     @PutMapping("/update/{id}")
+    @RequirePermission(feature = "ROLE", action = "UPDATE")
     public ResponseEntity<ApiResponse<VaiTro>> updateVaiTro(
             @PathVariable int id,
             @RequestBody VaiTro vaiTro) {
@@ -88,6 +93,7 @@ public class QuanLyVaiTroController {
      * Validation: Không được xóa khi có tài khoản đang sử dụng
      */
     @DeleteMapping("/{id}")
+    @RequirePermission(feature = "ROLE", action = "DELETE")
     public ResponseEntity<ApiResponse<Void>> deleteVaiTro(@PathVariable int id) {
         try {
             vaiTroService.deleteVaiTro(id);
@@ -106,6 +112,7 @@ public class QuanLyVaiTroController {
      * GET /admin/dashboard/vai-tro/trang-thai?trangThai=true
      */
     @GetMapping("/trang-thai")
+    @RequirePermission(feature = "ROLE", action = "VIEW")
     public ResponseEntity<ApiResponse<List<VaiTro>>> getVaiTroByTrangThai(
             @RequestParam Boolean trangThai) {
         List<VaiTro> vaiTroList = vaiTroService.getVaiTroByTrangThai(trangThai);
@@ -117,6 +124,7 @@ public class QuanLyVaiTroController {
      * GET /admin/dashboard/vai-tro/search?keyword=admin
      */
     @GetMapping("/search")
+    @RequirePermission(feature = "ROLE", action = "VIEW")
     public ResponseEntity<ApiResponse<List<VaiTro>>> searchVaiTro(
             @RequestParam String keyword) {
         List<VaiTro> vaiTroList = vaiTroService.searchVaiTro(keyword);
@@ -128,6 +136,7 @@ public class QuanLyVaiTroController {
      * GET /admin/dashboard/vai-tro/{id}/count-admin
      */
     @GetMapping("/{id}/count-admin")
+    @RequirePermission(feature = "ROLE", action = "VIEW")
     public ResponseEntity<ApiResponse<Long>> countAdminByVaiTro(@PathVariable int id) {
         long count = vaiTroService.countAdminByVaiTro(id);
         return ResponseEntity.ok(ApiResponse.success(count));

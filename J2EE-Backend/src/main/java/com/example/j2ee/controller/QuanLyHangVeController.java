@@ -1,5 +1,6 @@
 package com.example.j2ee.controller;
 
+import com.example.j2ee.annotation.RequirePermission;
 import com.example.j2ee.dto.ApiResponse;
 import com.example.j2ee.dto.hangve.CreateHangVeRequest;
 import com.example.j2ee.dto.hangve.UpdateHangVeRequest;
@@ -9,7 +10,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,7 +31,7 @@ public class QuanLyHangVeController {
      * Lấy danh sách tất cả hạng vé
      */
     @GetMapping
-    @PreAuthorize("hasAuthority('TICKET_CLASS_VIEW')")
+    @RequirePermission(feature = "TICKET_CLASS", action = "VIEW")
     public ResponseEntity<ApiResponse<List<HangVe>>> getAllHangVe() {
         List<HangVe> hangVeList = hangVeService.findAll();
         return ResponseEntity.ok(ApiResponse.success(hangVeList));
@@ -41,7 +41,7 @@ public class QuanLyHangVeController {
      * Lấy thông tin hạng vé theo ID
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('TICKET_CLASS_VIEW')")
+    @RequirePermission(feature = "TICKET_CLASS", action = "VIEW")
     public ResponseEntity<ApiResponse<HangVe>> getHangVeById(@PathVariable Integer id) {
         try {
             HangVe hangVe = hangVeService.findById(id);
@@ -56,7 +56,7 @@ public class QuanLyHangVeController {
      * Tạo hạng vé mới
      */
     @PostMapping
-    @PreAuthorize("hasAuthority('TICKET_CLASS_CREATE')")
+    @RequirePermission(feature = "TICKET_CLASS", action = "CREATE")
     public ResponseEntity<ApiResponse<HangVe>> createHangVe(
             @Valid @RequestBody CreateHangVeRequest request) {
         try {
@@ -77,7 +77,7 @@ public class QuanLyHangVeController {
      * Cập nhật thông tin hạng vé
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('TICKET_CLASS_UPDATE')")
+    @RequirePermission(feature = "TICKET_CLASS", action = "UPDATE")
     public ResponseEntity<ApiResponse<HangVe>> updateHangVe(
             @PathVariable Integer id,
             @Valid @RequestBody UpdateHangVeRequest request) {
@@ -87,8 +87,7 @@ public class QuanLyHangVeController {
 
             HangVe updatedHangVe = hangVeService.updateHangVe(id, hangVe);
             return ResponseEntity.ok(
-                    ApiResponse.success("Cập nhật hạng vé thành công", updatedHangVe)
-            );
+                    ApiResponse.success("Cập nhật hạng vé thành công", updatedHangVe));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.error(e.getMessage()));
@@ -102,7 +101,7 @@ public class QuanLyHangVeController {
      * Xóa mềm hạng vé (cascade soft-delete)
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('TICKET_CLASS_DELETE')")
+    @RequirePermission(feature = "TICKET_CLASS", action = "DELETE")
     public ResponseEntity<ApiResponse<Void>> deleteHangVe(@PathVariable Integer id) {
         try {
             hangVeService.deleteHangVe(id);
@@ -120,13 +119,12 @@ public class QuanLyHangVeController {
      * Khôi phục hạng vé đã xóa mềm
      */
     @PutMapping("/{id}/restore")
-    @PreAuthorize("hasAuthority('TICKET_CLASS_MANAGE')")
+    @RequirePermission(feature = "TICKET_CLASS", action = "RESTORE")
     public ResponseEntity<ApiResponse<HangVe>> restoreHangVe(@PathVariable Integer id) {
         try {
             HangVe restoredHangVe = hangVeService.restoreHangVe(id);
             return ResponseEntity.ok(
-                    ApiResponse.success("Khôi phục hạng vé thành công", restoredHangVe)
-            );
+                    ApiResponse.success("Khôi phục hạng vé thành công", restoredHangVe));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.error(e.getMessage()));
@@ -140,7 +138,7 @@ public class QuanLyHangVeController {
      * Lấy danh sách hạng vé đã xóa mềm
      */
     @GetMapping("/deleted")
-    @PreAuthorize("hasAuthority('TICKET_CLASS_VIEW')")
+    @RequirePermission(feature = "TICKET_CLASS", action = "VIEW")
     public ResponseEntity<ApiResponse<List<HangVe>>> getDeletedHangVe() {
         List<HangVe> deletedHangVeList = hangVeService.getDeletedHangVe();
         return ResponseEntity.ok(ApiResponse.success(deletedHangVeList));
