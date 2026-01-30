@@ -79,7 +79,7 @@ const AddSeatModal = ({ initialData, onSave, onClose, seats }) => {
             />
             <div className="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50 p-4" onClick={onClose}>
                 <div className="bg-white rounded-xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
-                    <div className="bg-gradient-to-r from-green-600 to-emerald-700 text-white p-6 rounded-t-xl">
+                    <div className="bg-linear-to-r from-green-600 to-emerald-700 text-white p-6 rounded-t-xl">
                         <h3 className="text-xl font-bold flex items-center gap-2">
                             <FaPlus />
                             Thêm ghế mới

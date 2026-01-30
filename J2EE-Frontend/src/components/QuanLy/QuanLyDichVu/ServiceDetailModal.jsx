@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { FaPlus, FaEdit, FaTrash, FaConciergeBell } from 'react-icons/fa';
 import CreateOptionModal from './CreateOptionModal';
 import EditOptionModal from './EditOptionModal';
@@ -43,7 +43,7 @@ const ServiceDetailModal = ({ service, options, onClose, onCreateOption, onEditO
     <>
       <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
         <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col">
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl flex-shrink-0">
+          <div className="bg-linear-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl shrink-0">
             <h2 className="text-2xl font-bold">Chi tiết dịch vụ: {service.tenDichVu}</h2>
           </div>
           
@@ -68,7 +68,7 @@ const ServiceDetailModal = ({ service, options, onClose, onCreateOption, onEditO
               <h3 className="text-lg font-semibold text-gray-900">Danh sách lựa chọn</h3>
               <button
                 onClick={() => setIsCreateOptionModalOpen(true)}
-                className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all"
+                className="flex items-center gap-2 bg-linear-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all"
               >
                 <FaPlus size={14} />
                 <span>Tạo lựa chọn mới</span>
@@ -85,7 +85,7 @@ const ServiceDetailModal = ({ service, options, onClose, onCreateOption, onEditO
                         <img 
                           src={option.anh ? `http://localhost:8080/admin/dashboard/dichvu/luachon/anh/${option.anh}` : '/no-product.png'} 
                           alt={option.tenLuaChon} 
-                          className="w-16 h-16 object-contain border border-gray-300 rounded-lg flex-shrink-0"
+                          className="w-16 h-16 object-contain border border-gray-300 rounded-lg shrink-0"
                           onError={(e) => {
                             e.target.src = '/no-product.png';
                           }}
@@ -171,7 +171,7 @@ const ServiceDetailModal = ({ service, options, onClose, onCreateOption, onEditO
             )}
           </div>
 
-          <div className="flex justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50 flex-shrink-0">
+          <div className="flex justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50 shrink-0">
             <button 
               type="button" 
               onClick={onClose} 

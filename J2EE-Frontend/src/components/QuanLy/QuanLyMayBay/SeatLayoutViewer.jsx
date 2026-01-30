@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { FaChair, FaTimes, FaSync, FaPlane, FaWindowMaximize, FaWalking, FaUser } from 'react-icons/fa';
+﻿import React, { useState, useEffect } from 'react';
+import { FaTimes, FaSync, FaPlane, FaWindowMaximize, FaWalking, FaUser } from 'react-icons/fa';
 
 const SeatLayoutViewer = ({ maMayBay, onClose }) => {
     const [seats, setSeats] = useState([]);
@@ -127,7 +127,7 @@ const SeatLayoutViewer = ({ maMayBay, onClose }) => {
         <div className="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-hidden flex flex-col">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-sky-600 to-blue-700 text-white p-6 flex justify-between items-center">
+                <div className="bg-linear-to-r from-sky-600 to-blue-700 text-white p-6 flex justify-between items-center">
                     <div>
                         <h2 className="text-2xl font-bold flex items-center gap-3">
                             <FaPlane className="text-sky-200" />
@@ -196,7 +196,7 @@ const SeatLayoutViewer = ({ maMayBay, onClose }) => {
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-6 bg-gradient-to-b from-sky-50 to-white">
+                <div className="flex-1 overflow-y-auto p-6 bg-linear-to-b from-sky-50 to-white">
                     {seats.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-16">
                             <FaPlane className="text-gray-300 text-6xl mb-4" />
@@ -207,7 +207,7 @@ const SeatLayoutViewer = ({ maMayBay, onClose }) => {
                         // Group by class view
                         Object.entries(groupedSeats).map(([className, classSeats]) => (
                             <div key={className} className="mb-8 bg-white rounded-xl shadow-lg overflow-hidden">
-                                <div className="bg-gradient-to-r from-sky-50 to-blue-50 px-6 py-4 border-b-2 border-sky-200">
+                                <div className="bg-linear-to-r from-sky-50 to-blue-50 px-6 py-4 border-b-2 border-sky-200">
                                     <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                                         <FaPlane className="text-sky-600" />
                                         {className}
@@ -248,14 +248,14 @@ const SeatLayoutViewer = ({ maMayBay, onClose }) => {
                                 <div className="text-xs text-gray-500">Left Window</div>
                             </div>
                             <div className="flex items-center gap-2">
-                                <div className="w-16 h-3 bg-gradient-to-r from-blue-400 via-green-400 to-blue-400 rounded"></div>
+                                <div className="w-16 h-3 bg-linear-to-r from-blue-400 via-green-400 to-blue-400 rounded"></div>
                             </div>
                             <div className="text-center">
                                 <div className="font-bold text-gray-800">Lối đi</div>
                                 <div className="text-xs text-gray-500">Aisle</div>
                             </div>
                             <div className="flex items-center gap-2">
-                                <div className="w-16 h-3 bg-gradient-to-r from-blue-400 via-green-400 to-blue-400 rounded"></div>
+                                <div className="w-16 h-3 bg-linear-to-r from-blue-400 via-green-400 to-blue-400 rounded"></div>
                             </div>
                             <div className="text-center">
                                 <div className="font-bold text-gray-800">Cửa sổ phải</div>
@@ -374,30 +374,30 @@ const SeatGrid = ({ seats, getSeatStyle, onSeatHover, onSeatLeave }) => {
                                 <div className="w-0 h-0 border-l-[12px] border-r-[12px] border-b-[12px] border-l-transparent border-r-transparent border-b-sky-600"></div>
                             </div>
                             {/* Body */}
-                            <div className="h-6 bg-gradient-to-r from-sky-400 via-sky-500 to-sky-400 rounded-t-full w-64 shadow-md"></div>
+                            <div className="h-6 bg-linear-to-r from-sky-400 via-sky-500 to-sky-400 rounded-t-full w-64 shadow-md"></div>
                         </div>
                     </div>
 
                     {/* Seat layout */}
                     <div className="relative">
                         {/* Left windows */}
-                        <div className="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-b from-blue-300 to-blue-400 rounded-l-lg border-r-2 border-blue-200"></div>
+                        <div className="absolute left-0 top-0 bottom-0 w-3 bg-linear-to-b from-blue-300 to-blue-400 rounded-l-lg border-r-2 border-blue-200"></div>
 
                         {/* Right windows */}
-                        <div className="absolute right-0 top-0 bottom-0 w-3 bg-gradient-to-b from-blue-300 to-blue-400 rounded-r-lg border-l-2 border-blue-200"></div>
+                        <div className="absolute right-0 top-0 bottom-0 w-3 bg-linear-to-b from-blue-300 to-blue-400 rounded-r-lg border-l-2 border-blue-200"></div>
 
                         {/* Column headers */}
                         <div className="flex border-b-2 border-gray-300 mb-4 px-12 py-2 bg-gray-50">
-                            <div className="w-20 flex-shrink-0"></div>
+                            <div className="w-20 shrink-0"></div>
                             {sortedColumns.map((col, index) => {
                                 const isAisleAfter = hasAisleAfter(index);
                                 return (
                                     <React.Fragment key={`header-${col}`}>
-                                        <div className="w-16 flex-shrink-0 text-center font-bold text-gray-700 text-sm">
+                                        <div className="w-16 shrink-0 text-center font-bold text-gray-700 text-sm">
                                             {col}
                                         </div>
                                         {isAisleAfter && (
-                                            <div className="w-12 flex-shrink-0 flex items-center justify-center">
+                                            <div className="w-12 shrink-0 flex items-center justify-center">
                                                 <div className="text-xs text-green-600 font-semibold">LỐI ĐI</div>
                                             </div>
                                         )}
@@ -410,7 +410,7 @@ const SeatGrid = ({ seats, getSeatStyle, onSeatHover, onSeatLeave }) => {
                         <div className="px-12">
                             {sortedRows.map((row) => (
                                 <div key={row} className="flex items-center mb-3">
-                                    <div className="w-20 flex-shrink-0 text-center font-bold text-gray-700 text-sm bg-gray-100 rounded-lg py-2">
+                                    <div className="w-20 shrink-0 text-center font-bold text-gray-700 text-sm bg-gray-100 rounded-lg py-2">
                                         Hàng {row}
                                     </div>
                                     {sortedColumns.map((col, index) => {
@@ -420,7 +420,7 @@ const SeatGrid = ({ seats, getSeatStyle, onSeatHover, onSeatLeave }) => {
 
                                         return (
                                             <React.Fragment key={`${row}-${col}`}>
-                                                <div className="w-16 flex-shrink-0 p-1.5">
+                                                <div className="w-16 shrink-0 p-1.5">
                                                     {seat ? (
                                                         <div
                                                             className={`w-full aspect-square border-2 rounded-xl flex flex-col items-center justify-center shadow-md hover:shadow-xl transition-all cursor-pointer hover:scale-110 ${seatStyle.bg} ${seatStyle.bgHover} ${seatStyle.border} ${seatStyle.text}`}
@@ -438,8 +438,8 @@ const SeatGrid = ({ seats, getSeatStyle, onSeatHover, onSeatLeave }) => {
                                                     )}
                                                 </div>
                                                 {isAisleAfter && (
-                                                    <div className="w-12 flex-shrink-0 flex items-center justify-center">
-                                                        <div className="h-16 w-1.5 bg-gradient-to-b from-green-300 to-green-400 rounded-full shadow-sm"></div>
+                                                    <div className="w-12 shrink-0 flex items-center justify-center">
+                                                        <div className="h-16 w-1.5 bg-linear-to-b from-green-300 to-green-400 rounded-full shadow-sm"></div>
                                                     </div>
                                                 )}
                                             </React.Fragment>
@@ -451,7 +451,7 @@ const SeatGrid = ({ seats, getSeatStyle, onSeatHover, onSeatLeave }) => {
 
                         {/* Aircraft bottom */}
                         <div className="flex justify-center mt-6">
-                            <div className="h-6 bg-gradient-to-r from-sky-400 via-sky-500 to-sky-400 rounded-b-full w-64 shadow-md"></div>
+                            <div className="h-6 bg-linear-to-r from-sky-400 via-sky-500 to-sky-400 rounded-b-full w-64 shadow-md"></div>
                         </div>
                     </div>
                 </div>

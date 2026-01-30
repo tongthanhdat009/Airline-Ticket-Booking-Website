@@ -192,7 +192,7 @@ function HoanThienThongTin() {
           className="min-h-[calc(100vh-70px)] flex items-center justify-center py-8 px-4 bg-cover bg-center bg-no-repeat relative"
           style={{ backgroundImage: 'url(/background/auth/bg_footer.2f611c1f.webp)' }}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-red-50/80 via-orange-50/80 to-yellow-50/80"></div>
+          <div className="absolute inset-0 bg-linear-to-br from-red-50/80 via-orange-50/80 to-yellow-50/80"></div>
           <div className="relative z-10 text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-red-600 mx-auto mb-4"></div>
             <p className="text-gray-700 font-medium">Đang tải thông tin...</p>
@@ -208,10 +208,10 @@ function HoanThienThongTin() {
         className="min-h-[calc(100vh-70px)] flex items-center justify-center py-8 px-4 bg-cover bg-center bg-no-repeat relative"
         style={{ backgroundImage: 'url(/background/auth/bg_footer.2f611c1f.webp)' }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-red-50/80 via-orange-50/80 to-yellow-50/80"></div>
+        <div className="absolute inset-0 bg-linear-to-br from-red-50/80 via-orange-50/80 to-yellow-50/80"></div>
         
         <div className="max-w-2xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden relative z-10">
-          <div className="bg-gradient-to-r from-red-600 to-orange-600 p-6 text-center relative overflow-hidden">
+          <div className="bg-linear-to-r from-red-600 to-orange-600 p-6 text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,213,0,0.2),transparent_50%)]" />
             <div className="relative z-10">
               <div className="text-5xl mb-3">✨</div>
@@ -340,7 +340,7 @@ function HoanThienThongTin() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex-1 py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-lg text-sm font-semibold transition-all shadow-lg shadow-red-500/30 hover:-translate-y-0.5 hover:shadow-xl hover:from-red-700 hover:to-orange-700 disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="flex-1 py-3 bg-linear-to-r from-red-600 to-orange-600 text-white rounded-lg text-sm font-semibold transition-all shadow-lg shadow-red-500/30 hover:-translate-y-0.5 hover:shadow-xl hover:from-red-700 hover:to-orange-700 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {isLoading ? '⏳ Đang lưu...' : '💾 Lưu thông tin'}
                 </button>

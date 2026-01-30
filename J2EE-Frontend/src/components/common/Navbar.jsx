@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { getClientAccessToken, getClientUserEmail } from "../../utils/cookieUtils";
 import { logoutClient } from "../../services/ClientAuthService";
-import Cookies from "js-cookie";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -79,7 +78,7 @@ function Navbar() {
   };
 
   return (
-    <nav className="bg-gradient-to-r from-red-600 to-red-700 shadow-lg sticky top-0 z-[1000]">
+    <nav className="bg-linear-to-r from-red-600 to-red-700 shadow-lg sticky top-0 z-[1000]">
       {/* Top Bar - Right aligned items */}
       <div className="bg-red-700/50 border-b border-red-800/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-1.5 flex justify-end items-center gap-4 text-xs">

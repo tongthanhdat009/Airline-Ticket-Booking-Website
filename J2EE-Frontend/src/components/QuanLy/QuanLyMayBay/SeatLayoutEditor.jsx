@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { FaChair, FaTimes, FaPlus, FaTrash, FaSave, FaMagic } from 'react-icons/fa';
 import * as SoDoGheService from '../../../services/SoDoGheService';
 import * as QLHangVeService from '../../../services/QLHangVeService';
 
-const SeatLayoutEditor = ({ maMayBay, onClose, onSave }) => {
+const SeatLayoutEditor = ({ maMayBay, onClose }) => {
     const [seats, setSeats] = useState([]);
     const [hangVeList, setHangVeList] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -132,7 +132,7 @@ const SeatLayoutEditor = ({ maMayBay, onClose, onSave }) => {
         <div className="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-hidden flex flex-col">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-purple-600 to-indigo-700 text-white p-6 flex justify-between items-center">
+                <div className="bg-linear-to-r from-purple-600 to-indigo-700 text-white p-6 flex justify-between items-center">
                     <div>
                         <h2 className="text-2xl font-bold">Chỉnh sửa sơ đồ ghế</h2>
                         <p className="text-purple-100 text-sm mt-1">Mã máy bay: #{maMayBay} | Số ghế hiện tại: {seats.length}</p>
@@ -227,7 +227,7 @@ const SeatLayoutEditor = ({ maMayBay, onClose, onSave }) => {
                 {showAutoGenerate && (
                     <div className="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50 p-4">
                         <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
-                            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-t-xl">
+                            <div className="bg-linear-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-t-xl">
                                 <h3 className="text-xl font-bold">Tự động tạo sơ đồ ghế</h3>
                             </div>
                             <div className="p-6 space-y-4">
@@ -388,11 +388,11 @@ const SeatGridView = ({ seats, hangVeList, onSeatClick, onDeleteSeat, getHangVeN
                         <div className="min-w-max">
                             {sortedRows.map(row => (
                                 <div key={row} className="flex items-center gap-2 mb-2">
-                                    <div className="w-20 flex-shrink-0 text-sm font-semibold text-gray-600">Hàng {row}</div>
+                                    <div className="w-20 shrink-0 text-sm font-semibold text-gray-600">Hàng {row}</div>
                                     {sortedColumns.map(col => {
                                         const seat = seatMap[row]?.[col];
                                         return (
-                                            <div key={`${row}-${col}`} className="w-16 flex-shrink-0">
+                                            <div key={`${row}-${col}`} className="w-16 shrink-0">
                                                 {seat ? (
                                                     <div
                                                         className={`relative group cursor-pointer border-2 rounded-lg p-2 transition-all ${getHangVeColor(seat.maHangVe)} hover:shadow-md`}

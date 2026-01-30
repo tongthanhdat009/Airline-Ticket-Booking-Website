@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { getChuyenBayByKhachHangId } from '../../services/QLKhachHangService';
 
 const ViewKhachHangModal = ({ isOpen, onClose, customer }) => {
@@ -49,7 +49,7 @@ const ViewKhachHangModal = ({ isOpen, onClose, customer }) => {
         <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-hidden flex flex-col">
                 {/* Header */}
-                <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex justify-between items-center">
+                <div className="sticky top-0 bg-linear-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex justify-between items-center">
                     <h3 className="text-xl font-bold">Thông tin chi tiết khách hàng</h3>
                     <button onClick={onClose} className="text-white hover:text-gray-200">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -138,7 +138,7 @@ const ViewKhachHangModal = ({ isOpen, onClose, customer }) => {
                     <div className="flex-1 overflow-y-auto bg-white">
                         {/* Thống kê */}
                         {flights.length > 0 && (
-                                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 shadow-sm border border-blue-100">
+                                <div className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-lg p-4 shadow-sm border border-blue-100">
                                     <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                                         <svg className="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -230,7 +230,7 @@ const ViewKhachHangModal = ({ isOpen, onClose, customer }) => {
                                                     
                                                     <div className="grid grid-cols-2 gap-3 text-sm">
                                                         <div className="flex items-center space-x-2">
-                                                            <svg className="w-4 h-4 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <svg className="w-4 h-4 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                                             </svg>
@@ -241,7 +241,7 @@ const ViewKhachHangModal = ({ isOpen, onClose, customer }) => {
                                                         </div>
                                                         
                                                         <div className="flex items-center space-x-2">
-                                                            <svg className="w-4 h-4 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <svg className="w-4 h-4 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                                             </svg>
@@ -252,7 +252,7 @@ const ViewKhachHangModal = ({ isOpen, onClose, customer }) => {
                                                         </div>
                                                         
                                                         <div className="flex items-center space-x-2">
-                                                            <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <svg className="w-4 h-4 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                             </svg>
                                                             <div>
@@ -262,7 +262,7 @@ const ViewKhachHangModal = ({ isOpen, onClose, customer }) => {
                                                         </div>
                                                         
                                                         <div className="flex items-center space-x-2">
-                                                            <svg className="w-4 h-4 text-orange-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <svg className="w-4 h-4 text-orange-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                                                             </svg>
                                                             <div>
@@ -296,7 +296,7 @@ const ViewKhachHangModal = ({ isOpen, onClose, customer }) => {
                                                                     {flight.dichVuDaDat.map((dv, idx) => (
                                                                         <div 
                                                                             key={idx} 
-                                                                            className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-lg p-3 hover:shadow-md transition-shadow"
+                                                                            className="bg-linear-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-lg p-3 hover:shadow-md transition-shadow"
                                                                         >
                                                                             <div className="flex justify-between items-start">
                                                                                 <div className="flex-1">

@@ -3,9 +3,9 @@ import { SEAT_POSITIONS } from '../../../../constants/aircraftConfig';
 
 const BulkEditModal = ({ selectedCount, bulkEditData, setBulkEditData, hangVeList, onSave, onClose }) => {
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+        <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
-                <div className="bg-gradient-to-r from-sky-600 to-blue-700 text-white p-6 rounded-t-xl">
+                <div className="bg-linear-to-r from-sky-600 to-blue-700 text-white p-6 rounded-t-xl">
                     <h3 className="text-xl font-bold">Sửa hàng loạt</h3>
                     <p className="text-sky-100 text-sm mt-1">Đang chỉnh sửa {selectedCount} ghế</p>
                 </div>

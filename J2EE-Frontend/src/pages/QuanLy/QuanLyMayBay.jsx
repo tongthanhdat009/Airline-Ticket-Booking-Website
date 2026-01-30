@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaPlus, FaSearch, FaEdit, FaTrash, FaFighterJet, FaChair, FaWrench } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
@@ -166,7 +166,7 @@ const QuanLyMayBay = () => {
 
             {/* Delete confirmation dialog */}
             {showDeleteConfirm && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
                     <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
                         <h3 className="text-xl font-bold text-gray-800 mb-4">Xác nhận xóa</h3>
                         <p className="text-gray-600 mb-6">
@@ -204,7 +204,7 @@ const QuanLyMayBay = () => {
                 </div>
                 <button
                     onClick={handleOpenModalForAdd}
-                    className="flex items-center gap-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-sky-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
+                    className="flex items-center gap-2 bg-linear-to-r from-sky-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-sky-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
                 >
                     <FaPlus />
                     <span>Thêm máy bay</span>
@@ -213,7 +213,7 @@ const QuanLyMayBay = () => {
 
             {/* Thống kê tổng quan */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div className="bg-gradient-to-br from-sky-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
+                <div className="bg-linear-to-br from-sky-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Tổng số máy bay</p>
@@ -222,7 +222,7 @@ const QuanLyMayBay = () => {
                         <FaFighterJet size={40} className="opacity-80" />
                     </div>
                 </div>
-                <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-5 text-white shadow-lg">
+                <div className="bg-linear-to-br from-green-500 to-emerald-600 rounded-xl p-5 text-white shadow-lg">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Đang hoạt động</p>
@@ -231,7 +231,7 @@ const QuanLyMayBay = () => {
                         <FaFighterJet size={40} className="opacity-80" />
                     </div>
                 </div>
-                <div className="bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl p-5 text-white shadow-lg">
+                <div className="bg-linear-to-br from-yellow-500 to-orange-600 rounded-xl p-5 text-white shadow-lg">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Đang bảo trì</p>
@@ -240,7 +240,7 @@ const QuanLyMayBay = () => {
                         <FaFighterJet size={40} className="opacity-80" />
                     </div>
                 </div>
-                <div className="bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl p-5 text-white shadow-lg">
+                <div className="bg-linear-to-br from-purple-500 to-violet-600 rounded-xl p-5 text-white shadow-lg">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Tổng số ghế</p>
@@ -255,7 +255,7 @@ const QuanLyMayBay = () => {
             <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
+                        <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
                             <tr>
                                 <th className="px-6 py-4 text-left font-semibold">Mã máy bay</th>
                                 <th className="px-6 py-4 text-left font-semibold">Tên máy bay</th>
@@ -276,7 +276,7 @@ const QuanLyMayBay = () => {
                                             <td className="px-6 py-4 font-bold text-sky-600">#{mb.maMayBay}</td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center flex-shrink-0">
+                                                    <div className="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center shrink-0">
                                                         <FaFighterJet className="text-sky-600" />
                                                     </div>
                                                     <div>

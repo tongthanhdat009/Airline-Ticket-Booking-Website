@@ -263,7 +263,7 @@ const ThongKeDoanhThu = () => {
                 {/* Title và Actions */}
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
                     <div className="flex items-center gap-3">
-                        <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg">
+                        <div className="p-3 bg-linear-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg">
                             <FaChartLine className="text-white text-2xl" />
                         </div>
                         <div>
@@ -286,7 +286,7 @@ const ThongKeDoanhThu = () => {
                         <button
                             onClick={exportToPDF}
                             disabled={loading || !overviewData}
-                            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                            className="flex items-center gap-2 px-4 py-2.5 bg-linear-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                         >
                             <FaFilePdf className="text-sm" />
                             <span className="hidden sm:inline">Xuất PDF</span>
@@ -295,7 +295,7 @@ const ThongKeDoanhThu = () => {
                 </div>
 
                 {/* Bộ lọc thời gian - Redesigned */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-100 shadow-sm">
+                <div className="bg-linear-to-r from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-100 shadow-sm">
                     <div className="flex flex-col gap-4">
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                             <div className="flex items-center gap-2 min-w-[140px]">
@@ -344,7 +344,7 @@ const ThongKeDoanhThu = () => {
                                 <button
                                     onClick={fetchAllStatistics}
                                     disabled={!startDate || !endDate}
-                                    className="w-full sm:w-auto px-5 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white rounded-lg text-sm font-semibold transition-all shadow-md hover:shadow-lg"
+                                    className="w-full sm:w-auto px-5 py-2 bg-linear-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white rounded-lg text-sm font-semibold transition-all shadow-md hover:shadow-lg"
                                 >
                                     Áp dụng
                                 </button>

@@ -247,7 +247,6 @@ function ChoNgoiPanel({
 
   const setQuantity = (id, value) => {
     const num = Math.max(0, parseInt(value, 10) || 0);
-    const price = currentService.options?.find((x) => x.maLuaChon === id)?.gia || 0;
 
     const newQuantities = {
       ...(currentService.quantities || {}),
@@ -314,7 +313,7 @@ function ChoNgoiPanel({
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex bg-gradient-to-b from-red-500 to-red-700 items-center px-4 py-3 ">
+          <div className="flex bg-linear-to-b from-red-500 to-red-700 items-center px-4 py-3 ">
             <h2 className="text-xl text-white font-bold">Chọn dịch vụ</h2>
             <button onClick={onClose} className="text-white text-2xl ml-auto">
               ×
@@ -346,7 +345,7 @@ function ChoNgoiPanel({
           {/* Hành khách */}
           <div className="bg-gray-100">
             <div className="w-full flex flex-col justify-center items-center py-4 px-4">
-              <div className="flex flex-col justify-center items-center rounded-t-lg bg-gradient-to-b from-red-500 to-red-700 py-2 px-2 text-white w-4/5 min-h-[60px]">
+              <div className="flex flex-col justify-center items-center rounded-t-lg bg-linear-to-b from-red-500 to-red-700 py-2 px-2 text-white w-4/5 min-h-[60px]">
                 <span className="text-sm">Hành Khách</span>
                 <div className="flex">
                   {(formData?.passengerInfo || []).map((p, i) => (
@@ -498,7 +497,7 @@ function ChoNgoiPanel({
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t bg-gradient-to-b from-red-500 to-red-700 flex justify-between items-center text-white">
+          <div className="p-4 border-t bg-linear-to-b from-red-500 to-red-700 flex justify-between items-center text-white">
             {tab === "di" || formData.flightType === "round" ? (
               <>
                 <div>

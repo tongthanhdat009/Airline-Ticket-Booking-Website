@@ -21,14 +21,14 @@ function SignUpForm() {
             </div>
             <button 
                 type="submit" 
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded px-16 py-2 self-center mb-2 transition-all duration-300"
+                className="bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded px-16 py-2 self-center mb-2 transition-all duration-300"
             >
                 Confirm
             </button>
             <span className="text-gray-600 text-xl text-center mb-2 pt-20">Nếu bạn đã có tài khoản!</span>
             <button 
                 type="button" 
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded px-14 py-2 self-center mb-2 transition-all duration-300"
+                className="bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded px-14 py-2 self-center mb-2 transition-all duration-300"
             >
                 Login
             </button>

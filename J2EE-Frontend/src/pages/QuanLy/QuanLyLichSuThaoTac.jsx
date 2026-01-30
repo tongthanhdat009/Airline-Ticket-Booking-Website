@@ -214,7 +214,7 @@ const QuanLyLichSuThaoTac = () => {
         <Card title="Lịch sử thao tác">
             {/* Thống kê tổng quan */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-5 text-white shadow-lg">
+                <div className="bg-linear-to-br from-green-500 to-emerald-600 rounded-xl p-5 text-white shadow-lg">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Tổng thao tác</p>
@@ -223,7 +223,7 @@ const QuanLyLichSuThaoTac = () => {
                         <FaHistory size={40} className="opacity-80" />
                     </div>
                 </div>
-                <div className="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl p-5 text-white shadow-lg">
+                <div className="bg-linear-to-br from-blue-500 to-cyan-600 rounded-xl p-5 text-white shadow-lg">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Thao tác Admin</p>
@@ -232,7 +232,7 @@ const QuanLyLichSuThaoTac = () => {
                         <FaHistory size={40} className="opacity-80" />
                     </div>
                 </div>
-                <div className="bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl p-5 text-white shadow-lg">
+                <div className="bg-linear-to-br from-purple-500 to-violet-600 rounded-xl p-5 text-white shadow-lg">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Thao tác KH</p>
@@ -241,7 +241,7 @@ const QuanLyLichSuThaoTac = () => {
                         <FaHistory size={40} className="opacity-80" />
                     </div>
                 </div>
-                <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-xl p-5 text-white shadow-lg">
+                <div className="bg-linear-to-br from-orange-500 to-red-600 rounded-xl p-5 text-white shadow-lg">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Hôm nay</p>
@@ -291,7 +291,7 @@ const QuanLyLichSuThaoTac = () => {
                         ))}
                     </select>
                 </div>
-                <button className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-5 py-3 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto">
+                <button className="flex items-center gap-2 bg-linear-to-r from-green-500 to-emerald-600 text-white px-5 py-3 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto">
                     <FaFilter />
                     <span>Bộ lọc nâng cao</span>
                 </button>
@@ -301,7 +301,7 @@ const QuanLyLichSuThaoTac = () => {
             <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
+                        <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
                             <tr>
                                 <th className="px-6 py-4 text-left font-semibold">Mã Log</th>
                                 <th className="px-6 py-4 text-left font-semibold">Loại thao tác</th>
@@ -419,9 +419,9 @@ const QuanLyLichSuThaoTac = () => {
 
             {/* Modal chi tiết */}
             {isDetailModalOpen && selectedLog && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
                     <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                        <div className="bg-gradient-to-r from-green-600 to-emerald-700 text-white p-6 rounded-t-xl sticky top-0">
+                        <div className="bg-linear-to-r from-green-600 to-emerald-700 text-white p-6 rounded-t-xl sticky top-0">
                             <div className="flex justify-between items-center">
                                 <div>
                                     <h2 className="text-2xl font-bold">Chi tiết thao tác</h2>

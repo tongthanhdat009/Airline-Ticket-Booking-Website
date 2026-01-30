@@ -40,12 +40,12 @@ function TrangChu() {
       
       {/* Announcement Banner */}
       {showBanner && (
-        <div className="relative isolate flex items-center gap-x-6 overflow-hidden bg-gradient-to-r from-red-600 via-pink-600 to-red-600 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
+        <div className="relative isolate flex items-center gap-x-6 overflow-hidden bg-linear-to-r from-red-600 via-pink-600 to-red-600 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
           <div className="absolute left-[max(-7rem,calc(50%-52rem))] top-1/2 -z-10 -translate-y-1/2 transform-gpu blur-2xl" aria-hidden="true">
-            <div className="aspect-[577/310] w-[36.0625rem] bg-gradient-to-r from-yellow-400 to-pink-600 opacity-30" style={{ clipPath: 'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)' }}></div>
+            <div className="aspect-[577/310] w-[36.0625rem] bg-linear-to-r from-yellow-400 to-pink-600 opacity-30" style={{ clipPath: 'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)' }}></div>
           </div>
           <div className="absolute left-[max(45rem,calc(50%+8rem))] top-1/2 -z-10 -translate-y-1/2 transform-gpu blur-2xl" aria-hidden="true">
-            <div className="aspect-[577/310] w-[36.0625rem] bg-gradient-to-r from-yellow-400 to-orange-600 opacity-30" style={{ clipPath: 'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)' }}></div>
+            <div className="aspect-[577/310] w-[36.0625rem] bg-linear-to-r from-yellow-400 to-orange-600 opacity-30" style={{ clipPath: 'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)' }}></div>
           </div>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <p className="text-sm leading-6 text-white">
@@ -73,7 +73,7 @@ function TrangChu() {
         style={{ backgroundImage: 'url(/background/home/bgBannerHomePage.72a61446.webp)' }}
       >
         {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-pink-50/60 to-yellow-50/60"></div>
+        <div className="absolute inset-0 bg-linear-to-br from-white/70 via-pink-50/60 to-yellow-50/60"></div>
         
         {/* Content wrapper */}
         <div className="relative z-10">
@@ -91,7 +91,7 @@ function TrangChu() {
                   className="h-[500px] bg-cover bg-center bg-no-repeat relative"
                   style={{ backgroundImage: `url(${slide.image})` }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30"></div>
+                  <div className="absolute inset-0 bg-linear-to-b from-black/20 via-transparent to-black/30"></div>
                 </div>
               </div>
             ))}
@@ -127,13 +127,13 @@ function TrangChu() {
               {/* Banner 1 - Quy định thủ tục bay quốc tế */}
               <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 group">
                 <img src="/artboard/1200x600vn1647922449867-1695094342588.webp" alt="..." className="inset-0 -z-10 h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
               </div>
 
               {/* Banner 2 - Khách sạn */}
               <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 group">
                 <img src="/artboard/artboard216418031278341695094349731-1715833806513.webp" alt="..." className="inset-0 -z-10 h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
               </div>
             </div>
           </div>
@@ -142,7 +142,7 @@ function TrangChu() {
           <div className="container mx-auto px-4 lg:px-20 py-5">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold text-gray-800 mb-4">
-                {t('home_page.why_choose')} <span className="bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent text-4xl">SGU Airline?</span>
+                {t('home_page.why_choose')} <span className="bg-linear-to-r from-red-600 to-pink-600 bg-clip-text text-transparent text-4xl">SGU Airline?</span>
               </h2>
               <p className="text-lg text-gray-600 max-w-1xl mx-auto">
                 {t('home_page.why_choose_desc')}
@@ -175,7 +175,7 @@ function TrangChu() {
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                 {/* Đặt chuyến bay */}
-                <a href="/" className="flex flex-col items-center p-6 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
+                <a href="/" className="flex flex-col items-center p-6 bg-linear-to-br from-red-500 to-red-600 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
                   <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 p-3">
                     <img src="/service/booking-1634319183743.svg" alt="Booking" className="w-full h-full" />
                   </div>
@@ -183,7 +183,7 @@ function TrangChu() {
                 </a>
 
                 {/* Mua thêm */}
-                <a href="/dich-vu-chuyen-bay" className="flex flex-col items-center p-6 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
+                <a href="/dich-vu-chuyen-bay" className="flex flex-col items-center p-6 bg-linear-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
                   <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 p-3">
                     <img src="/service/buymore-1634319183745.svg" alt="Buy more" className="w-full h-full" />
                   </div>
@@ -191,7 +191,7 @@ function TrangChu() {
                 </a>
 
                 {/* Check-in */}
-                <a href="/online-check-in" className="flex flex-col items-center p-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
+                <a href="/online-check-in" className="flex flex-col items-center p-6 bg-linear-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
                   <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 p-3">
                     <img src="/service/checkin-1634319183747.svg" alt="Check-in" className="w-full h-full" />
                   </div>
@@ -199,7 +199,7 @@ function TrangChu() {
                 </a>
 
                 {/* Khách sạn & xe */}
-                <a href="/dich-vu-khac" className="flex flex-col items-center p-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
+                <a href="/dich-vu-khac" className="flex flex-col items-center p-6 bg-linear-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
                   <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 p-3">
                     <img src="/service/hotelbus-1634319183749.svg" alt="Hotel" className="w-full h-full" />
                   </div>
@@ -207,7 +207,7 @@ function TrangChu() {
                 </a>
 
                 {/* Bảo hiểm */}
-                <a href="/dich-vu-khac" className="flex flex-col items-center p-6 bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
+                <a href="/dich-vu-khac" className="flex flex-col items-center p-6 bg-linear-to-br from-pink-500 to-pink-600 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
                   <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 p-3">
                     <img src="/service/insurance-1634319183751.svg" alt="Insurance" className="w-full h-full" />
                   </div>
@@ -226,7 +226,7 @@ function TrangChu() {
               {/* Card 1 - Với ảnh nền */}
               <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all h-[280px] group">
                 <img src="/artboard/1200x600vn1647922449867-1695094342588.webp" alt="Vé SGU Airline" className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-br from-red-500/90 to-pink-600/90 group-hover:from-red-500/80 group-hover:to-pink-600/80 transition-all"></div>
+                <div className="absolute inset-0 bg-linear-to-br from-red-500/90 to-pink-600/90 group-hover:from-red-500/80 group-hover:to-pink-600/80 transition-all"></div>
                 <div className="relative h-full p-6 text-white flex flex-col justify-between">
                   <div>
                     <div className="text-4xl mb-3">🎟️</div>
@@ -242,7 +242,7 @@ function TrangChu() {
               {/* Card 2 - Với ảnh nền */}
               <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all h-[280px] group">
                 <img src="/artboard/swift2471592284169014-1695094650429.webp" alt="Gói hàng nhanh" className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/90 to-cyan-600/90 group-hover:from-blue-500/80 group-hover:to-cyan-600/80 transition-all"></div>
+                <div className="absolute inset-0 bg-linear-to-br from-blue-500/90 to-cyan-600/90 group-hover:from-blue-500/80 group-hover:to-cyan-600/80 transition-all"></div>
                 <div className="relative h-full p-6 text-white flex flex-col justify-between">
                   <div>
                     <div className="text-4xl mb-3">💳</div>
@@ -258,7 +258,7 @@ function TrangChu() {
               {/* Card 3 - Với ảnh nền */}
               <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all h-[280px] group">
                 <img src="/artboard/anhviber20240917110241588-1727233373363.jpg" alt="Thẻ HiBank" className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/90 to-pink-600/90 group-hover:from-purple-500/80 group-hover:to-pink-600/80 transition-all"></div>
+                <div className="absolute inset-0 bg-linear-to-br from-purple-500/90 to-pink-600/90 group-hover:from-purple-500/80 group-hover:to-pink-600/80 transition-all"></div>
                 <div className="relative h-full p-6 text-white flex flex-col justify-between">
                   <div>
                     <div className="text-4xl mb-3">🎁</div>
@@ -274,11 +274,11 @@ function TrangChu() {
           </div>
 
           {/* Popular Destinations - CẬP NHẬT VỚI ẢNH TỪ THỦ MỤC DESTINATION */}
-          <div className="bg-gradient-to-br from-pink-50 to-yellow-50 py-24 sm:py-32">
+          <div className="bg-linear-to-br from-pink-50 to-yellow-50 py-24 sm:py-32">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
               <div className="mx-auto max-w-2xl text-center">
                 <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 mb-4">
-                  {t('home_page.popular_destinations')} <span className="bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">{t('home_page.popular_destinations_highlight')}</span>
+                  {t('home_page.popular_destinations')} <span className="bg-linear-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">{t('home_page.popular_destinations_highlight')}</span>
                 </h2>
                 <p className="text-xl leading-8 text-gray-600">
                   {t('home_page.popular_destinations_desc')}
@@ -288,7 +288,7 @@ function TrangChu() {
                 {/* Destination 1 - TP. Hồ Chí Minh */}
                 <article className="relative isolate flex flex-col justify-end overflow-hidden rounded-2xl bg-gray-900 px-8 pb-8 pt-80 sm:pt-48 lg:pt-80 hover:scale-105 transition-transform duration-300">
                   <img src="/destination/tphcm.jpg" alt={t('home_page.destinations.tphcm.title')} className="absolute inset-0 -z-10 h-full w-full object-cover" />
-                  <div className="absolute inset-0 -z-10 bg-gradient-to-t from-gray-900 via-gray-900/40"></div>
+                  <div className="absolute inset-0 -z-10 bg-linear-to-t from-gray-900 via-gray-900/40"></div>
                   <div className="absolute inset-0 -z-10 rounded-2xl ring-1 ring-inset ring-gray-900/10"></div>
 
                   <div className="flex flex-wrap items-center gap-y-1 overflow-hidden text-sm leading-6 text-gray-300">
@@ -314,7 +314,7 @@ function TrangChu() {
                 {/* Destination 2 - Hà Nội */}
                 <article className="relative isolate flex flex-col justify-end overflow-hidden rounded-2xl bg-gray-900 px-8 pb-8 pt-80 sm:pt-48 lg:pt-80 hover:scale-105 transition-transform duration-300">
                   <img src="/destination/hanoi.jpg" alt={t('home_page.destinations.hanoi.title')} className="absolute inset-0 -z-10 h-full w-full object-cover" />
-                  <div className="absolute inset-0 -z-10 bg-gradient-to-t from-gray-900 via-gray-900/40"></div>
+                  <div className="absolute inset-0 -z-10 bg-linear-to-t from-gray-900 via-gray-900/40"></div>
                   <div className="absolute inset-0 -z-10 rounded-2xl ring-1 ring-inset ring-gray-900/10"></div>
 
                   <div className="flex flex-wrap items-center gap-y-1 overflow-hidden text-sm leading-6 text-gray-300">
@@ -340,7 +340,7 @@ function TrangChu() {
                 {/* Destination 3 - Đà Nẵng */}
                 <article className="relative isolate flex flex-col justify-end overflow-hidden rounded-2xl bg-gray-900 px-8 pb-8 pt-80 sm:pt-48 lg:pt-80 hover:scale-105 transition-transform duration-300">
                   <img src="/destination/danang.jpg" alt={t('home_page.destinations.danang.title')} className="absolute inset-0 -z-10 h-full w-full object-cover" />
-                  <div className="absolute inset-0 -z-10 bg-gradient-to-t from-gray-900 via-gray-900/40"></div>
+                  <div className="absolute inset-0 -z-10 bg-linear-to-t from-gray-900 via-gray-900/40"></div>
                   <div className="absolute inset-0 -z-10 rounded-2xl ring-1 ring-inset ring-gray-900/10"></div>
 
                   <div className="flex flex-wrap items-center gap-y-1 overflow-hidden text-sm leading-6 text-gray-300">
@@ -366,7 +366,7 @@ function TrangChu() {
                 {/* Destination 4 - Phú Quốc */}
                 <article className="relative isolate flex flex-col justify-end overflow-hidden rounded-2xl bg-gray-900 px-8 pb-8 pt-80 sm:pt-48 lg:pt-80 hover:scale-105 transition-transform duration-300">
                   <img src="/destination/phuquoc.jpeg" alt={t('home_page.destinations.phuquoc.title')} className="absolute inset-0 -z-10 h-full w-full object-cover" />
-                  <div className="absolute inset-0 -z-10 bg-gradient-to-t from-gray-900 via-gray-900/40"></div>
+                  <div className="absolute inset-0 -z-10 bg-linear-to-t from-gray-900 via-gray-900/40"></div>
                   <div className="absolute inset-0 -z-10 rounded-2xl ring-1 ring-inset ring-gray-900/10"></div>
 
                   <div className="flex flex-wrap items-center gap-y-1 overflow-hidden text-sm leading-6 text-gray-300">
@@ -392,7 +392,7 @@ function TrangChu() {
                 {/* Destination 5 - Nha Trang */}
                 <article className="relative isolate flex flex-col justify-end overflow-hidden rounded-2xl bg-gray-900 px-8 pb-8 pt-80 sm:pt-48 lg:pt-80 hover:scale-105 transition-transform duration-300">
                   <img src="/destination/nha-trang.png" alt={t('home_page.destinations.nhatrang.title')} className="absolute inset-0 -z-10 h-full w-full object-cover" />
-                  <div className="absolute inset-0 -z-10 bg-gradient-to-t from-gray-900 via-gray-900/40"></div>
+                  <div className="absolute inset-0 -z-10 bg-linear-to-t from-gray-900 via-gray-900/40"></div>
                   <div className="absolute inset-0 -z-10 rounded-2xl ring-1 ring-inset ring-gray-900/10"></div>
 
                   <div className="flex flex-wrap items-center gap-y-1 overflow-hidden text-sm leading-6 text-gray-300">
@@ -418,7 +418,7 @@ function TrangChu() {
                 {/* Destination 6 - Đà Lạt */}
                 <article className="relative isolate flex flex-col justify-end overflow-hidden rounded-2xl bg-gray-900 px-8 pb-8 pt-80 sm:pt-48 lg:pt-80 hover:scale-105 transition-transform duration-300">
                   <img src="/destination/dalat.jpg" alt={t('home_page.destinations.dalat.title')} className="absolute inset-0 -z-10 h-full w-full object-cover" />
-                  <div className="absolute inset-0 -z-10 bg-gradient-to-t from-gray-900 via-gray-900/40"></div>
+                  <div className="absolute inset-0 -z-10 bg-linear-to-t from-gray-900 via-gray-900/40"></div>
                   <div className="absolute inset-0 -z-10 rounded-2xl ring-1 ring-inset ring-gray-900/10"></div>
 
                   <div className="flex flex-wrap items-center gap-y-1 overflow-hidden text-sm leading-6 text-gray-300">
@@ -451,7 +451,7 @@ function TrangChu() {
                 <div className="lg:grid lg:grid-cols-12 lg:gap-8">
                   <div className="lg:col-span-5">
                     <h2 className="text-3xl font-bold leading-10 tracking-tight text-gray-900">
-                      {t('home_page.faq_title')} <span className="bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">{t('home_page.faq_highlight')}</span>
+                      {t('home_page.faq_title')} <span className="bg-linear-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">{t('home_page.faq_highlight')}</span>
                     </h2>
                     <p className="mt-4 text-base leading-7 text-gray-600">
                       {t('home_page.faq_contact')}{' '}

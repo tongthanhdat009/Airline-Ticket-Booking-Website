@@ -75,7 +75,7 @@ function OnlineCheckIn() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-yellow-50 to-white py-12 px-4">
+      <div className="min-h-screen bg-linear-to-br from-pink-50 via-yellow-50 to-white py-12 px-4">
         <div className="max-w-5xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
@@ -130,7 +130,7 @@ function OnlineCheckIn() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full py-3 bg-linear-to-r from-red-600 to-red-700 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {loading ? t('pages.online_checkin.searching') : t('pages.online_checkin.checkin_btn')}
                     </button>
@@ -206,7 +206,7 @@ function OnlineCheckIn() {
                       <button
                         onClick={handleConfirmCheckIn}
                         disabled={loading}
-                        className="flex-1 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50"
+                        className="flex-1 py-3 bg-linear-to-r from-green-600 to-green-700 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50"
                       >
                         {loading ? t('pages.online_checkin.processing') : t('pages.online_checkin.confirm_checkin_btn')}
                       </button>
@@ -300,7 +300,7 @@ function OnlineCheckIn() {
                 </div>
                 <button
                   onClick={resetForm}
-                  className="px-8 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all"
+                  className="px-8 py-3 bg-linear-to-r from-red-600 to-red-700 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all"
                 >
                   {t('pages.online_checkin.search_another')}
                 </button>

@@ -19,10 +19,10 @@ const RefundDetailModal = ({
     if (!isVisible || !refund) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+        <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-amber-600 to-yellow-600 text-white p-6 rounded-t-xl sticky top-0">
+                <div className="bg-linear-to-r from-amber-600 to-yellow-600 text-white p-6 rounded-t-xl sticky top-0">
                     <div className="flex justify-between items-center">
                         <div>
                             <h2 className="text-2xl font-bold">Chi tiết yêu cầu hoàn tiền</h2>
@@ -142,7 +142,7 @@ const RefundDetailModal = ({
                                     onApprove(refund.maHoanTien);
                                 }}
                                 disabled={actionLoading}
-                                className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 font-semibold transition-all shadow-lg flex items-center gap-2 disabled:opacity-50"
+                                className="px-6 py-3 bg-linear-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 font-semibold transition-all shadow-lg flex items-center gap-2 disabled:opacity-50"
                             >
                                 <FaCheck />
                                 Duyệt hoàn tiền

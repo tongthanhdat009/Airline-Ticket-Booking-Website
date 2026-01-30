@@ -87,7 +87,7 @@ const MayBayModal = ({ isOpen, onClose, onSave, aircraft }) => {
     return (
         <div className="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                <div className="bg-gradient-to-r from-sky-600 to-blue-700 text-white p-6 rounded-t-xl sticky top-0">
+                <div className="bg-linear-to-r from-sky-600 to-blue-700 text-white p-6 rounded-t-xl sticky top-0">
                     <div className="flex justify-between items-center">
                         <h2 className="text-2xl font-bold">{aircraft ? 'Cập nhật máy bay' : 'Thêm máy bay mới'}</h2>
                         <button onClick={onClose} className="text-white hover:text-gray-200 transition-colors">
@@ -245,7 +245,7 @@ const MayBayModal = ({ isOpen, onClose, onSave, aircraft }) => {
                         </button>
                         <button
                             type="submit"
-                            className="px-6 py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-lg hover:from-sky-600 hover:to-blue-700 font-semibold transition-all shadow-lg"
+                            className="px-6 py-3 bg-linear-to-r from-sky-500 to-blue-600 text-white rounded-lg hover:from-sky-600 hover:to-blue-700 font-semibold transition-all shadow-lg"
                         >
                             {aircraft ? 'Cập nhật' : 'Thêm mới'}
                         </button>

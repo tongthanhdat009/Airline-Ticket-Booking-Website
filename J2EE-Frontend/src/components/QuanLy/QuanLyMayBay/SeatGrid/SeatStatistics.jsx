@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { FaChair, FaChevronLeft, FaChevronRight, FaWindowMaximize, FaDoorOpen } from 'react-icons/fa';
-import { MdEventSeat, MdAirlineSeatReclineExtra, MdAirlineSeatReclineNormal } from 'react-icons/md';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { MdEventSeat } from 'react-icons/md';
 import { HiChartPie, HiViewGrid } from 'react-icons/hi';
 
 const SeatStatistics = ({ seats, hangVeList, sidebarCollapsed, setSidebarCollapsed }) => {
@@ -66,7 +66,7 @@ const SeatStatistics = ({ seats, hangVeList, sidebarCollapsed, setSidebarCollaps
             <div className="flex flex-col items-center">
                 <button
                     onClick={() => setSidebarCollapsed(false)}
-                    className="fixed right-0 top-1/2 -translate-y-1/2 bg-gradient-to-l from-blue-600 to-indigo-600 text-white p-3 rounded-l-xl shadow-lg z-30 hover:from-blue-700 hover:to-indigo-700 transition-all group"
+                    className="fixed right-0 top-1/2 -translate-y-1/2 bg-linear-to-l from-blue-600 to-indigo-600 text-white p-3 rounded-l-xl shadow-lg z-30 hover:from-blue-700 hover:to-indigo-700 transition-all group"
                     title="Hiển thị thống kê"
                 >
                     <div className="flex flex-col items-center gap-2">
@@ -79,9 +79,9 @@ const SeatStatistics = ({ seats, hangVeList, sidebarCollapsed, setSidebarCollaps
     }
 
     return (
-        <div className="w-80 bg-gradient-to-b from-white to-gray-50 border-l border-gray-200 flex flex-col h-full shadow-lg">
+        <div className="w-80 bg-linear-to-b from-white to-gray-50 border-l border-gray-200 flex flex-col h-full shadow-lg">
             {/* Header */}
-            <div className="bg-gradient-to-r from-slate-800 to-slate-900 text-white p-4 flex justify-between items-center">
+            <div className="bg-linear-to-r from-slate-800 to-slate-900 text-white p-4 flex justify-between items-center">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-white/20 rounded-lg">
                         <HiChartPie className="text-xl" />
@@ -102,7 +102,7 @@ const SeatStatistics = ({ seats, hangVeList, sidebarCollapsed, setSidebarCollaps
 
             <div className="flex-1 overflow-y-auto p-4 space-y-5">
                 {/* Total seats - Hero card */}
-                <div className="relative overflow-hidden bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700 text-white p-5 rounded-2xl shadow-lg">
+                <div className="relative overflow-hidden bg-linear-to-br from-blue-500 via-blue-600 to-indigo-700 text-white p-5 rounded-2xl shadow-lg">
                     <div className="absolute -top-4 -right-4 opacity-20">
                         <MdAirlineSeatReclineNormal size={100} />
                     </div>
@@ -207,7 +207,7 @@ const SeatStatistics = ({ seats, hangVeList, sidebarCollapsed, setSidebarCollaps
                 </div>
 
                 {/* Info tip */}
-                <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4">
+                <div className="bg-linear-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4">
                     <p className="text-xs text-amber-800">
                         💡 <strong>Mẹo:</strong> Click vào ghế để chọn, Ctrl+Click để chọn nhiều, hoặc chuột phải để xem menu.
                     </p>

@@ -83,19 +83,19 @@ const SeatGridDisplay = ({
         // Selected state - Glowing gold
         if (isSelected) {
             return {
-                bg: 'bg-gradient-to-br from-yellow-400 to-amber-500',
+                bg: 'bg-linear-to-br from-yellow-400 to-amber-500',
                 border: 'border-amber-500',
                 text: 'text-white',
                 shadow: 'shadow-xl shadow-amber-400/60',
                 scale: 'scale-110',
-                glow: 'before:content-[""] before:absolute before:inset-0 before:bg-gradient-to-br before:from-yellow-400/50 before:to-amber-500/50 before:blur-xl before:rounded-xl before:-z-10'
+                glow: 'before:content-[""] before:absolute before:inset-0 before:bg-linear-to-br before:from-yellow-400/50 before:to-amber-500/50 before:blur-xl before:rounded-xl before:-z-10'
             };
         }
 
         // Exit row - Rose gradient
         if (isExitRow) {
             return {
-                bg: 'bg-gradient-to-br from-rose-400 to-pink-500',
+                bg: 'bg-linear-to-br from-rose-400 to-pink-500',
                 border: 'border-rose-500',
                 text: 'text-white',
                 shadow: 'shadow-lg shadow-rose-400/50',
@@ -107,7 +107,7 @@ const SeatGridDisplay = ({
         // First class (maHangVe = 5) - Amber/Gold
         if (maHangVe === 5) {
             return {
-                bg: 'bg-gradient-to-br from-amber-500 to-orange-500',
+                bg: 'bg-linear-to-br from-amber-500 to-orange-500',
                 border: 'border-orange-500',
                 text: 'text-white',
                 shadow: 'shadow-lg shadow-orange-400/40',
@@ -119,7 +119,7 @@ const SeatGridDisplay = ({
         // Business class (maHangVe = 4) - Blue/Indigo
         if (maHangVe === 4) {
             return {
-                bg: 'bg-gradient-to-br from-blue-500 to-indigo-600',
+                bg: 'bg-linear-to-br from-blue-500 to-indigo-600',
                 border: 'border-indigo-600',
                 text: 'text-white',
                 shadow: 'shadow-lg shadow-indigo-400/40',
@@ -131,7 +131,7 @@ const SeatGridDisplay = ({
         // Deluxe/Premium (maHangVe = 3) - Teal/Emerald
         if (maHangVe === 3) {
             return {
-                bg: 'bg-gradient-to-br from-teal-500 to-emerald-600',
+                bg: 'bg-linear-to-br from-teal-500 to-emerald-600',
                 border: 'border-teal-600',
                 text: 'text-white',
                 shadow: 'shadow-lg shadow-teal-400/40',
@@ -143,7 +143,7 @@ const SeatGridDisplay = ({
         // Economy Saver (maHangVe = 2) - Cyan/Blue
         if (maHangVe === 2) {
             return {
-                bg: 'bg-gradient-to-br from-cyan-500 to-blue-600',
+                bg: 'bg-linear-to-br from-cyan-500 to-blue-600',
                 border: 'border-blue-600',
                 text: 'text-white',
                 shadow: 'shadow-md shadow-blue-400/40',
@@ -154,7 +154,7 @@ const SeatGridDisplay = ({
 
         // Economy (maHangVe = 1) - Light gray
         return {
-            bg: 'bg-gradient-to-br from-slate-100 to-slate-200',
+            bg: 'bg-linear-to-br from-slate-100 to-slate-200',
             border: 'border-slate-300',
             text: 'text-slate-700',
             shadow: 'shadow-sm',
@@ -177,7 +177,7 @@ const SeatGridDisplay = ({
         return (
             <td key={`aisle-${columnIndex}`} className="px-1">
                 <div className="w-6 h-full flex items-center justify-center">
-                    <div className="w-px h-10 bg-gradient-to-b from-transparent via-gray-300 to-transparent"></div>
+                    <div className="w-px h-10 bg-linear-to-b from-transparent via-gray-300 to-transparent"></div>
                 </div>
             </td>
         );
@@ -194,14 +194,14 @@ const SeatGridDisplay = ({
             {cabinGroups.length > 1 && (
                 <div className="relative">
                     {/* Glow effect behind tabs */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 blur-3xl rounded-3xl"></div>
+                    <div className="absolute inset-0 bg-linear-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 blur-3xl rounded-3xl"></div>
 
                     <div className="relative flex items-center gap-3 flex-wrap bg-white/80 backdrop-blur-xl rounded-3xl p-3 border border-white/50 shadow-2xl">
                         <button
                             onClick={() => setSelectedCabin('all')}
                             className={`px-6 py-3 rounded-2xl text-sm font-bold transition-all duration-300 relative overflow-hidden group ${
                                 selectedCabin === 'all'
-                                    ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-xl shadow-indigo-500/50 scale-105'
+                                    ? 'bg-linear-to-r from-violet-600 to-indigo-600 text-white shadow-xl shadow-indigo-500/50 scale-105'
                                     : 'bg-white text-slate-600 hover:bg-slate-50 hover:shadow-lg'
                             }`}
                         >
@@ -210,7 +210,7 @@ const SeatGridDisplay = ({
                                 All Cabins
                             </span>
                             {selectedCabin === 'all' && (
-                                <div className="absolute inset-0 bg-gradient-to-r from-violet-600/50 to-indigo-600/50 animate-pulse"></div>
+                                <div className="absolute inset-0 bg-linear-to-r from-violet-600/50 to-indigo-600/50 animate-pulse"></div>
                             )}
                         </button>
                         {cabinGroups.map((cabin) => (
@@ -219,7 +219,7 @@ const SeatGridDisplay = ({
                                 onClick={() => setSelectedCabin(cabin.tenHangVe)}
                                 className={`px-6 py-3 rounded-2xl text-sm font-bold transition-all duration-300 relative overflow-hidden ${
                                     selectedCabin === cabin.tenHangVe
-                                        ? `bg-gradient-to-r ${getCabinColor(cabin.tenHangVe)} text-white shadow-xl scale-105`
+                                        ? `bg-linear-to-r ${getCabinColor(cabin.tenHangVe)} text-white shadow-xl scale-105`
                                         : 'bg-white text-slate-600 hover:bg-slate-50 hover:shadow-lg'
                                 }`}
                             >
@@ -233,14 +233,14 @@ const SeatGridDisplay = ({
             {/* Stunning Seat Grid with 3D Effects */}
             <div className="relative">
                 {/* Animated gradient background */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-3xl animate-gradient-xy"></div>
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-100/50 via-purple-100/50 to-pink-100/50 rounded-3xl blur-3xl opacity-40"></div>
+                <div className="absolute inset-0 bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-3xl animate-gradient-xy"></div>
+                <div className="absolute inset-0 bg-linear-to-br from-blue-100/50 via-purple-100/50 to-pink-100/50 rounded-3xl blur-3xl opacity-40"></div>
 
                 <div className="relative bg-white/80 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/60 overflow-hidden">
                     {filteredCabins.length === 0 ? (
                         <div className="p-20 text-center">
                             <div className="relative inline-block">
-                                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 blur-2xl opacity-50 animate-pulse"></div>
+                                <div className="absolute inset-0 bg-linear-to-r from-blue-500 to-purple-500 blur-2xl opacity-50 animate-pulse"></div>
                                 <div className="relative text-8xl mb-6">✈️</div>
                             </div>
                             <div className="text-slate-600 font-bold text-xl mb-2">No seats available</div>
@@ -261,10 +261,10 @@ const SeatGridDisplay = ({
                                     </div>
 
                                     {/* Stunning Cabin Header */}
-                                    <div className={`relative bg-gradient-to-r ${getCabinColor(cabin.tenHangVe)} px-8 py-5 overflow-hidden`}>
+                                    <div className={`relative bg-linear-to-r ${getCabinColor(cabin.tenHangVe)} px-8 py-5 overflow-hidden`}>
                                         {/* Animated wave overlay */}
                                         <div className="absolute inset-0 opacity-20">
-                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-100%] animate-shimmer"></div>
+                                            <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent translate-x-[-100%] animate-shimmer"></div>
                                         </div>
 
                                         <div className="relative flex items-center justify-between">
@@ -297,19 +297,19 @@ const SeatGridDisplay = ({
                                     </div>
 
                                     {/* Premium Seat Table */}
-                                    <div className="p-6 overflow-auto max-h-[calc(100vh-350px)] bg-gradient-to-br from-slate-50/50 to-white/50">
+                                    <div className="p-6 overflow-auto max-h-[calc(100vh-350px)] bg-linear-to-br from-slate-50/50 to-white/50">
                                         <table className="border-collapse mx-auto">
                                             <thead className="sticky top-0 z-20">
                                                 <tr>
                                                     <th className="px-3 py-3">
-                                                        <div className="w-10 h-10 flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl text-[10px] font-black text-white shadow-lg">
+                                                        <div className="w-10 h-10 flex items-center justify-center bg-linear-to-br from-slate-700 to-slate-900 rounded-xl text-[10px] font-black text-white shadow-lg">
                                                             ROW
                                                         </div>
                                                     </th>
                                                     {cabin.columns.map((col, idx) => (
                                                         <React.Fragment key={col}>
                                                             <th className="px-2 py-3">
-                                                                <div className="w-12 h-9 flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl text-xs font-black text-white shadow-lg border-2 border-white/30">
+                                                                <div className="w-12 h-9 flex items-center justify-center bg-linear-to-br from-indigo-500 to-purple-600 rounded-xl text-xs font-black text-white shadow-lg border-2 border-white/30">
                                                                     {col}
                                                                 </div>
                                                             </th>
@@ -328,8 +328,8 @@ const SeatGridDisplay = ({
                                                             <td className="px-3 py-2">
                                                                 <div className={`flex items-center justify-center w-10 h-10 rounded-xl text-xs font-black transition-all duration-200 ${
                                                                     isExitRow
-                                                                        ? 'bg-gradient-to-br from-rose-400 to-pink-500 text-white shadow-lg shadow-rose-400/40'
-                                                                        : 'bg-gradient-to-br from-slate-200 to-slate-300 text-slate-700 shadow-md'
+                                                                        ? 'bg-linear-to-br from-rose-400 to-pink-500 text-white shadow-lg shadow-rose-400/40'
+                                                                        : 'bg-linear-to-br from-slate-200 to-slate-300 text-slate-700 shadow-md'
                                                                 }`}>
                                                                     {row}
                                                                 </div>
@@ -363,7 +363,7 @@ const SeatGridDisplay = ({
                                                                                     title={`${seat.soGhe} - ${seat.hangVe?.tenHangVe || 'N/A'}`}
                                                                                 >
                                                                                     {/* Inner glow effect */}
-                                                                                    <div className="absolute inset-1 bg-gradient-to-br from-white/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                                                                    <div className="absolute inset-1 bg-linear-to-br from-white/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                                                                                     <span className={`relative z-10 ${getSeatStyle(seat).text} text-sm transition-transform duration-300 drop-shadow-md group-hover:scale-110`}>
                                                                                         {getSeatIcon(seat)}
@@ -373,7 +373,7 @@ const SeatGridDisplay = ({
                                                                                     </span>
 
                                                                                     {/* Premium tooltip */}
-                                                                                    <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-gradient-to-r from-slate-900 to-slate-800 text-white text-xs px-4 py-2 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-30 shadow-2xl font-semibold border border-white/10">
+                                                                                    <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-linear-to-r from-slate-900 to-slate-800 text-white text-xs px-4 py-2 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-30 shadow-2xl font-semibold border border-white/10">
                                                                                         {seat.hangVe?.tenHangVe || 'N/A'}
                                                                                         <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-6 border-transparent border-t-slate-800"></div>
                                                                                     </div>

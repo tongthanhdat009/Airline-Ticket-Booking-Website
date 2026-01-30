@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { FaPlus, FaSearch, FaToggleOn, FaToggleOff, FaPlane, FaTimes } from 'react-icons/fa';
 import { getAllSanBay, addSanBay, updateTrangThaiSanBay, thongTinSanBay } from '../../services/QLSanBayServices';
 import Card from '../../components/QuanLy/CardChucNang';
@@ -96,7 +96,7 @@ const QuanLySanBay = () => {
                 </div>
                 <button
                     onClick={handleOpenModalForAdd}
-                    className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
+                    className="flex items-center gap-2 bg-linear-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
                 >
                     <FaPlus />
                     <span>Thêm sân bay</span>
@@ -122,7 +122,7 @@ const QuanLySanBay = () => {
                 <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
-                            <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
+                            <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
                                 <tr>
                                     <th className="px-6 py-4 text-left font-semibold">Mã sân bay</th>
                                     <th className="px-6 py-4 text-left font-semibold">Mã IATA</th>
@@ -150,7 +150,7 @@ const QuanLySanBay = () => {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
                                                         <MdLocalAirport className="text-blue-600 text-xl" />
                                                     </div>
                                                     <span className="font-medium text-gray-900">{sb.tenSanBay}</span>
@@ -349,9 +349,9 @@ const SanBayModal = ({ isOpen, onClose, onSave }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+        <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg">
-                <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl">
+                <div className="bg-linear-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl">
                     <div className="flex justify-between items-center">
                         <h2 className="text-2xl font-bold">Thêm sân bay mới</h2>
                         <button onClick={onClose} className="text-white hover:text-gray-200 transition-colors">
@@ -443,7 +443,7 @@ const SanBayModal = ({ isOpen, onClose, onSave }) => {
                         </button>
                         <button 
                             type="submit" 
-                            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg"
+                            className="px-6 py-3 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg"
                         >
                             Lưu
                         </button>

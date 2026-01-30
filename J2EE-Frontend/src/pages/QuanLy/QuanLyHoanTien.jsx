@@ -260,7 +260,7 @@ const QuanLyHoanTien = () => {
 
             {/* Thống kê tổng quan */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div className="bg-gradient-to-br from-amber-500 to-yellow-600 rounded-xl p-5 text-white shadow-lg">
+                <div className="bg-linear-to-br from-amber-500 to-yellow-600 rounded-xl p-5 text-white shadow-lg">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Tổng yêu cầu</p>
@@ -269,7 +269,7 @@ const QuanLyHoanTien = () => {
                         <FaUndo size={40} className="opacity-80" />
                     </div>
                 </div>
-                <div className="bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl p-5 text-white shadow-lg">
+                <div className="bg-linear-to-br from-yellow-500 to-orange-600 rounded-xl p-5 text-white shadow-lg">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Chờ xử lý</p>
@@ -278,7 +278,7 @@ const QuanLyHoanTien = () => {
                         <FaUndo size={40} className="opacity-80" />
                     </div>
                 </div>
-                <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-5 text-white shadow-lg">
+                <div className="bg-linear-to-br from-green-500 to-emerald-600 rounded-xl p-5 text-white shadow-lg">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Đã hoàn tiền</p>
@@ -287,7 +287,7 @@ const QuanLyHoanTien = () => {
                         <FaCheck size={40} className="opacity-80" />
                     </div>
                 </div>
-                <div className="bg-gradient-to-br from-red-500 to-rose-600 rounded-xl p-5 text-white shadow-lg">
+                <div className="bg-linear-to-br from-red-500 to-rose-600 rounded-xl p-5 text-white shadow-lg">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Đã từ chối</p>
@@ -300,7 +300,7 @@ const QuanLyHoanTien = () => {
 
             {/* Thông tin tổng tiền */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-5">
+                <div className="bg-linear-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-5">
                     <div className="flex justify-between items-center">
                         <div>
                             <p className="text-sm font-semibold text-amber-800">Tổng tiền đã hoàn</p>
@@ -311,7 +311,7 @@ const QuanLyHoanTien = () => {
                         </div>
                     </div>
                 </div>
-                <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-xl p-5">
+                <div className="bg-linear-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-xl p-5">
                     <div className="flex justify-between items-center">
                         <div>
                             <p className="text-sm font-semibold text-orange-800">Tổng tiền chờ hoàn</p>
@@ -340,7 +340,7 @@ const QuanLyHoanTien = () => {
                     <button 
                         onClick={loadData}
                         disabled={loading}
-                        className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-600 text-white px-5 py-3 rounded-lg hover:from-amber-600 hover:to-yellow-700 transition-all shadow-lg hover:shadow-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 bg-linear-to-r from-amber-500 to-yellow-600 text-white px-5 py-3 rounded-lg hover:from-amber-600 hover:to-yellow-700 transition-all shadow-lg hover:shadow-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <FaCalendar />
                         <span className="hidden sm:inline">{loading ? 'Đang tải...' : 'Làm mới'}</span>
@@ -374,7 +374,7 @@ const QuanLyHoanTien = () => {
                 <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
-                            <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
+                            <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
                                 <tr>
                                     <th className="px-6 py-4 text-left font-semibold">Mã hoàn tiền</th>
                                     <th className="px-6 py-4 text-left font-semibold">Mã HĐ</th>

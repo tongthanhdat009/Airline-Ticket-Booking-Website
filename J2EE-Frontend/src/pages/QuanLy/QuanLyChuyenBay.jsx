@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../../components/QuanLy/CardChucNang';
 import { FaPlus, FaSearch, FaPlane, FaEdit, FaEye, FaRecycle, FaEyeSlash, FaTrash } from 'react-icons/fa';
-import { getAllChuyenBay, createChuyenBay, updateChuyenBay, updateTrangThaiChuyenBay, updateDelay, updateCancel, addGheToChuyenBay, getAllDeletedChuyenBay, restoreChuyenBay, deleteChuyenBay } from '../../services/QLChuyenBayService';
+import { getAllChuyenBay, createChuyenBay, updateChuyenBay, updateTrangThaiChuyenBay, updateDelay, updateCancel, getAllDeletedChuyenBay, restoreChuyenBay, deleteChuyenBay } from '../../services/QLChuyenBayService';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import { getAllTuyenBay } from '../../services/QLTuyenBayService';
 import { getActiveSanBay } from '../../services/QLSanBayService';
@@ -50,7 +50,7 @@ const QuanLyChuyenBay = () => {
     const itemsPerPage = 5;
 
     // --- WEBSOCKET ---
-    const { flightUpdates, latestUpdate, isConnected, clearLatestUpdate } = useWebSocket();
+    const { latestUpdate, isConnected, clearLatestUpdate } = useWebSocket();
 
     // --- FETCH DATA ---
     const fetchFlights = async () => {
@@ -150,7 +150,7 @@ const QuanLyChuyenBay = () => {
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     // --- MODAL HANDLERS ---
-    const handleOpenModal = async (flight = null) => {
+    const _handleOpenModal = async (flight = null) => {
         // Nếu chuyến bay có trạng thái Delay, mở DelayModal
         if (flight && flight.trangThai === 'Delay') {
             setDelayFlightId(flight.maChuyenBay);
@@ -590,7 +590,7 @@ const QuanLyChuyenBay = () => {
                 {!showDeleted && (
                     <button
                         onClick={() => navigate('/admin/dashboard/ChuyenBay/them')}
-                        className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
+                        className="flex items-center gap-2 bg-linear-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
                     >
                         <FaPlus />
                         <span>Thêm chuyến bay</span>
@@ -602,7 +602,7 @@ const QuanLyChuyenBay = () => {
             <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
+                        <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
                             <tr>
                                 <th scope="col" className="px-6 py-4 text-left font-semibold">Số hiệu</th>
                                 <th scope="col" className="px-6 py-4 text-left font-semibold">Tuyến bay</th>

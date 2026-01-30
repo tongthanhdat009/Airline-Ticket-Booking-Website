@@ -24,7 +24,7 @@ const DeleteConfirmationModal = ({ onClose, onConfirm, serviceName }) => {
             <button 
               type="button" 
               onClick={onConfirm} 
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 font-semibold transition-all shadow-lg"
+              className="flex-1 px-6 py-3 bg-linear-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 font-semibold transition-all shadow-lg"
             >
               Xóa
             </button>

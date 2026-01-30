@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import HeaderTimKiemChuyen from '../../../components/KhachHang/HeaderTimKiemChuyen';
 import { useTranslation } from 'react-i18next'
-import Navbar from '../../../components/common/Navbar';
+
 import { formatCurrencyWithCommas, formatTime, formatDate } from '../../../services/utils';
 import VNPayService from '../../../services/VNPayService';
 import apiClient from '../../../services/apiClient';
@@ -111,7 +111,7 @@ function ThanhToan() {
             style={{ backgroundImage: 'url(/background/home/bgBannerHomePage.72a61446.webp)' }}
         >
             {/* Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-pink-50/60 to-yellow-50/60"></div>
+            <div className="absolute inset-0 bg-linear-to-br from-white/70 via-pink-50/60 to-yellow-50/60"></div>
             
             {/* Content wrapper */}
             <div className="relative z-10">
@@ -273,7 +273,7 @@ function ThanhToan() {
                             className={`px-8 py-3 rounded-lg font-bold transition ${
                                 isProcessing
                                     ? 'bg-gray-400 cursor-not-allowed'
-                                    : 'bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600'
+                                    : 'bg-linear-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600'
                             }`}
                         >
                                 {isProcessing ? (

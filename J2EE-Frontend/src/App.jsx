@@ -20,6 +20,7 @@ import QuanLyGiaBay from "./pages/QuanLy/QuanLyGiaBay"
 import QuanLyKhuyenMai from "./pages/QuanLy/QuanLyKhuyenMai"
 import QuanLyMayBay from "./pages/QuanLy/QuanLyMayBay"
 import QuanLyDonHang from "./pages/QuanLy/QuanLyDonHang"
+import QuanLyDatCho from "./pages/QuanLy/QuanLyDatCho"
 import QuanLyHoaDon from "./pages/QuanLy/QuanLyHoaDon"
 import QuanLyHoanTien from "./pages/QuanLy/QuanLyHoanTien"
 import QuanLyLichSuThaoTac from "./pages/QuanLy/QuanLyLichSuThaoTac"
@@ -136,6 +137,7 @@ function AppContent() {
             <Route path="KhuyenMai" element={<QuanLyKhuyenMai />} />
             <Route path="MayBay" element={<QuanLyMayBay />} />
             <Route path="DonHang" element={<QuanLyDonHang />} />
+            <Route path="DatCho" element={<QuanLyDatCho />} />
             <Route path="HoaDon" element={<QuanLyHoaDon />} />
             <Route path="HoanTien" element={<QuanLyHoanTien />} />
             <Route path="LichSuThaoTac" element={<QuanLyLichSuThaoTac />} />
@@ -164,6 +166,7 @@ function AppContent() {
             <Route path="KhuyenMai" element={<QuanLyKhuyenMai />} />
             <Route path="MayBay" element={<QuanLyMayBay />} />
             <Route path="DonHang" element={<QuanLyDonHang />} />
+            <Route path="DatCho" element={<QuanLyDatCho />} />
             <Route path="HoaDon" element={<QuanLyHoaDon />} />
             <Route path="HoanTien" element={<QuanLyHoanTien />} />
             <Route path="LichSuThaoTac" element={<QuanLyLichSuThaoTac />} />

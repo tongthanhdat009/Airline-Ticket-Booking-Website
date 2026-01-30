@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
+﻿import React, { useState, useEffect, createContext, useContext } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import { FaSignOutAlt, FaBars, FaTimes, FaUserCircle, FaChevronDown, FaChevronRight } from 'react-icons/fa';
 import { logout } from '../../services/AuthService';
@@ -102,6 +102,7 @@ function TrangChuAdmin() {
             'VaiTro': 'Quản lý Vai Trò',
             'PhanQuyen': 'Quản lý Phân Quyền',
             'HangVe': 'Quản lý Hạng Vé',
+            'DatCho': 'Quản lý Đặt Chỗ',
             'ThongKe': 'Thống Kê Doanh Thu',
         };
         
@@ -128,16 +129,16 @@ function TrangChuAdmin() {
     };
 
     return (
-        <div className="flex h-screen bg-gradient-to-br from-slate-50 to-slate-200 font-sans">
+        <div className="flex h-screen bg-linear-to-br from-slate-50 to-slate-200 font-sans">
             {/* Sidebar */}
-            <aside className={`${isSidebarOpen ? 'w-72' : 'w-0'} bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col justify-between shadow-2xl transition-all duration-300 ease-in-out overflow-hidden flex-shrink-0`}>
+            <aside className={`${isSidebarOpen ? 'w-72' : 'w-0'} bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col justify-between shadow-2xl transition-all duration-300 ease-in-out overflow-hidden shrink-0`}>
                 {/* Decorative gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-sky-500/10 to-purple-500/10 pointer-events-none"></div>
+                <div className="absolute inset-0 bg-linear-to-br from-sky-500/10 to-purple-500/10 pointer-events-none"></div>
                 
                 <div className="relative z-10 flex flex-col h-full w-72">
                     {/* Logo */}
                     <div className="flex items-center justify-center h-24 border-b border-slate-700/50 bg-slate-900/80">
-                        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 shadow-lg shadow-sky-500/50">
+                        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-linear-to-r from-sky-500 to-blue-600 shadow-lg shadow-sky-500/50">
                             <FaUserCircle className="text-white" size={28} />
                             <h1 className="text-2xl font-bold text-white tracking-tight">Admin</h1>
                         </div>
@@ -154,7 +155,7 @@ function TrangChuAdmin() {
                                         {/* Group Header - Collapsible */}
                                         <button
                                             onClick={() => toggleGroup(groupName)}
-                                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-slate-700/50 to-slate-600/50 hover:from-slate-700/70 hover:to-slate-600/70 text-white font-semibold text-sm tracking-wide transition-all duration-300 border border-slate-600/30"
+                                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-linear-to-r from-slate-700/50 to-slate-600/50 hover:from-slate-700/70 hover:to-slate-600/70 text-white font-semibold text-sm tracking-wide transition-all duration-300 border border-slate-600/30"
                                         >
                                             <span className={`transform transition-transform duration-300 ${isExpanded ? 'rotate-0' : '-rotate-90'}`}>
                                                 <FaChevronDown size={14} />
@@ -181,7 +182,7 @@ function TrangChuAdmin() {
                                                             className={({ isActive }) =>
                                                                 `group flex items-center gap-4 px-5 py-3.5 rounded-xl transition-all duration-200 relative overflow-hidden ${
                                                                     isActive
-                                                                    ? `bg-gradient-to-r ${item.color} text-white shadow-lg`
+                                                                    ? `bg-linear-to-r ${item.color} text-white shadow-lg`
                                                                     : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
                                                                 }`
                                                             }
@@ -207,7 +208,7 @@ function TrangChuAdmin() {
                     <div className="p-4 border-t border-slate-700/50 bg-slate-900/50">
                         <div className="mb-4 p-4 rounded-xl bg-slate-800/50 border border-slate-700/50">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-sky-400 to-blue-500 flex items-center justify-center font-bold text-white shadow-lg flex-shrink-0">
+                                <div className="w-10 h-10 rounded-full bg-linear-to-r from-sky-400 to-blue-500 flex items-center justify-center font-bold text-white shadow-lg shrink-0">
                                     {getInitial()}
                                 </div>
                                 <div className="overflow-hidden">
@@ -235,7 +236,7 @@ function TrangChuAdmin() {
             {/* Main Content */}
             <main className="flex-1 flex flex-col overflow-hidden">
                 {/* Header with Breadcrumb */}
-                <header className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 shadow-lg">
+                <header className="bg-linear-to-r from-blue-600 via-blue-700 to-indigo-700 shadow-lg">
                     <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex items-center justify-between h-16">
                             {/* Left side - Menu toggle + Breadcrumb */}

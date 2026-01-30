@@ -14,7 +14,7 @@ const ServiceModal = ({ service, onClose, onSave }) => {
   useEffect(() => {
     if (service?.anh) {
       // If editing, try to get image from cache or API
-      const imageName = service.anh.split('/').pop();
+      const _imageName = service.anh.split('/').pop();
       // For now, just set the path, we'll handle preview in the component
       setImagePreview(service.anh);
     }
@@ -61,7 +61,7 @@ const ServiceModal = ({ service, onClose, onSave }) => {
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg">
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl">
+        <div className="bg-linear-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl">
           <h2 className="text-2xl font-bold">{service ? 'Chỉnh sửa dịch vụ' : 'Thêm dịch vụ mới'}</h2>
         </div>
         <form onSubmit={handleSubmit} className="p-6">
@@ -135,7 +135,7 @@ const ServiceModal = ({ service, onClose, onSave }) => {
             </button>
             <button 
               type="submit" 
-              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg"
+              className="px-6 py-3 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg"
             >
               Lưu
             </button>

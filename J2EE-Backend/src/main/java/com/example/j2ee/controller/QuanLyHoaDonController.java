@@ -2,9 +2,13 @@ package com.example.j2ee.controller;
 
 import com.example.j2ee.dto.ApiResponse;
 import com.example.j2ee.dto.hoadon.*;
+import com.example.j2ee.service.ExcelExportService;
 import com.example.j2ee.service.HoaDonService;
+import com.example.j2ee.service.JasperHoaDonService;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,13 +36,18 @@ import java.util.List;
 public class QuanLyHoaDonController {
 
     private final HoaDonService hoaDonService;
+    private final JasperHoaDonService jasperHoaDonService;
+    private final ExcelExportService excelExportService;
 
     /**
-     * Constructor injection of HoaDonService
-     * @param hoaDonService Service layer for invoice management
+     * Constructor injection
      */
-    public QuanLyHoaDonController(HoaDonService hoaDonService) {
+    public QuanLyHoaDonController(HoaDonService hoaDonService, 
+                                  JasperHoaDonService jasperHoaDonService,
+                                  ExcelExportService excelExportService) {
         this.hoaDonService = hoaDonService;
+        this.jasperHoaDonService = jasperHoaDonService;
+        this.excelExportService = excelExportService;
     }
 
     // ==================== LIST INVOICES ENDPOINTS ====================
@@ -318,6 +327,68 @@ public class QuanLyHoaDonController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.error("Lỗi khi lấy thống kê hóa đơn: " + e.getMessage()));
+        }
+    }
+
+    // ==================== EXPORT ENDPOINTS ====================
+
+    /**
+     * GET /hoadon/{id}/pdf - Export invoice as PDF
+     *
+     * Generates a PDF invoice using JasperReports template
+     *
+     * @param id Invoice ID (mahoadon)
+     * @return PDF file as byte array
+     */
+    @GetMapping("/{id}/pdf")
+    public ResponseEntity<byte[]> exportHoaDonPdf(@PathVariable Integer id) {
+        try {
+            byte[] pdfBytes = jasperHoaDonService.generateHoaDonPdf(id);
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("filename", "hoadon_" + id + ".pdf");
+            headers.setContentLength(pdfBytes.length);
+            
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * GET /hoadon/excel - Export invoices list as Excel
+     *
+     * Exports filtered invoices to Excel format
+     *
+     * Query Parameters (same as getAllHoaDon):
+     * - search, trangThai, tuNgay, denNgay
+     *
+     * @return Excel file as byte array
+     */
+    @GetMapping("/excel")
+    public ResponseEntity<byte[]> exportHoaDonExcel(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String trangThai,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate tuNgay,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate denNgay) {
+        try {
+            // Get filtered list
+            List<HoaDonResponse> hoaDonList = hoaDonService.getAllHoaDon(search, trangThai, tuNgay, denNgay, null);
+            
+            // Export to Excel
+            byte[] excelBytes = excelExportService.exportHoaDonToExcel(hoaDonList);
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("filename", "danh_sach_hoa_don.xlsx");
+            headers.setContentLength(excelBytes.length);
+            
+            return new ResponseEntity<>(excelBytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

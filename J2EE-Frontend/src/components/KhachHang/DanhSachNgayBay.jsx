@@ -100,7 +100,7 @@ function DanhSachNgayBay({ ngayChon, onSelect = () => {} }) {
             onClick={() => handleSelect(index)}
             className={`flex flex-col items-center justify-center rounded-xl py-3 cursor-pointer transition-all duration-300 ${
               selectedIndex === index
-                ? "bg-gradient-to-tl from-yellow-500 to-yellow-400 text-white scale-105 drop-shadow-lg"
+                ? "bg-linear-to-tl from-yellow-500 to-yellow-400 text-white scale-105 drop-shadow-lg"
                 : " text-gray-700"
             }`}
             style={{

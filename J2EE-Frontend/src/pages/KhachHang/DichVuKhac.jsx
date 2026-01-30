@@ -1,7 +1,7 @@
 // src/pages/KhachHang/DichVuKhac.jsx
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Navbar from "../../components/common/Navbar";
+
 
 function DichVuKhac() {
   const { t } = useTranslation();
@@ -18,7 +18,7 @@ function DichVuKhac() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-yellow-50 to-white py-12 px-4">
+      <div className="min-h-screen bg-linear-to-br from-pink-50 via-yellow-50 to-white py-12 px-4">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
@@ -60,7 +60,7 @@ function DichVuKhac() {
           </div>
 
           {/* CTA Banner */}
-          <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-2xl p-8 text-white text-center">
+          <div className="bg-linear-to-r from-red-600 to-red-700 rounded-2xl p-8 text-white text-center">
             <h2 className="text-2xl font-bold mb-4">{t('pages.dich_vu_khac.cta_title')}</h2>
             <p className="text-lg mb-6">{t('pages.dich_vu_khac.cta_desc')}</p>
             <button className="px-8 py-3 bg-yellow-400 text-gray-900 rounded-xl font-bold hover:bg-yellow-500 transition-colors">

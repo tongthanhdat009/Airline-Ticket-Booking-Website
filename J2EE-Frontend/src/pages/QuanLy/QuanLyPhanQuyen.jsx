@@ -267,7 +267,7 @@ const QuanLyPhanQuyen = () => {
 
     if (loading) {
         return (
-            <div className="p-6 bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen flex items-center justify-center">
+            <div className="p-6 bg-linear-to-br from-slate-50 to-slate-100 min-h-screen flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <FaSpinner className="text-4xl text-amber-600 animate-spin" />
                     <p className="text-slate-600">Đang tải dữ liệu...</p>
@@ -277,12 +277,12 @@ const QuanLyPhanQuyen = () => {
     }
 
     return (
-        <div className="p-6 bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
+        <div className="p-6 bg-linear-to-br from-slate-50 to-slate-100 min-h-screen">
             <div className="max-w-full mx-auto">
 
                 {/* Header */}
                 <div className="mb-6">
-                    <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600 flex items-center gap-3">
+                    <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-linear-to-r from-amber-600 to-orange-600 flex items-center gap-3">
                         <FaKey className="text-amber-600" />
                         Ma trận Phân quyền (Permission Matrix)
                     </h1>
@@ -392,7 +392,7 @@ const QuanLyPhanQuyen = () => {
                                 className={`px-8 py-3 rounded-xl transition-all shadow-lg flex items-center gap-2 font-bold
                                     ${isSuperAdmin 
                                         ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                                        : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 shadow-amber-500/50 disabled:opacity-50'
+                                        : 'bg-linear-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 shadow-amber-500/50 disabled:opacity-50'
                                     }`}
                             >
                                 {saving ? (
@@ -550,7 +550,7 @@ const QuanLyPhanQuyen = () => {
 
             {/* Copy Permissions Modal */}
             {showCopyModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
                         <h2 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-3">
                             <FaCopy className="text-blue-500" />

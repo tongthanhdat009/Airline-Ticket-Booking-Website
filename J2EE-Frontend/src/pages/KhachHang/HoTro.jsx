@@ -6,7 +6,7 @@ import Chatbot from '../../components/common/Chatbot'
 function HoTro() {
   const { t } = useTranslation()
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-yellow-50">
+    <div className="min-h-screen bg-linear-to-br from-pink-50 to-yellow-50">
       <div className="container mx-auto px-4 lg:px-20 py-16">
         <div className="max-w-4xl mx-auto text-center mb-12">
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">{t('pages.support_page.title')}</h1>

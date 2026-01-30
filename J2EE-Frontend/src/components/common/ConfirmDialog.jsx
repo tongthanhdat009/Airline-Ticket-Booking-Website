@@ -96,7 +96,7 @@ const ConfirmDialog = ({
       {/* Dialog Content */}
       <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md transform transition-all animate-fade-in-up">
         {/* Header */}
-        <div className={`bg-gradient-to-r ${styles.bgGradient} text-white p-6 rounded-t-xl`}>
+        <div className={`bg-linear-to-r ${styles.bgGradient} text-white p-6 rounded-t-xl`}>
           <div className="flex items-center gap-3">
             {Icon && <Icon className="text-2xl" />}
             <h2 className="text-xl font-bold">{title}</h2>

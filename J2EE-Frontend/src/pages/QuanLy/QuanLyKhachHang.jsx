@@ -257,14 +257,14 @@ const QuanLyKhachHang = () => {
                 <div className="flex gap-2">
                     <button 
                         onClick={handleExportExcel}
-                        className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-5 py-3 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl"
+                        className="flex items-center gap-2 bg-linear-to-r from-green-500 to-emerald-600 text-white px-5 py-3 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl"
                     >
                         <FaFileExport />
                         <span className="font-semibold">Xuất Excel</span>
                     </button>
                     <button 
                         onClick={() => handleOpenModal()}
-                        className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl"
+                        className="flex items-center gap-2 bg-linear-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl"
                     >
                         <FaUserPlus />
                         <span className="font-semibold">Thêm mới</span>
@@ -276,7 +276,7 @@ const QuanLyKhachHang = () => {
             <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
+                        <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
                             <tr>
                                 <th scope="col" className="px-6 py-4 text-left font-semibold">Mã KH</th>
                                 <th scope="col" className="px-6 py-4 text-left font-semibold">Họ và tên</th>
@@ -391,7 +391,7 @@ const QuanLyKhachHang = () => {
             {isModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex justify-between items-center">
+                        <div className="sticky top-0 bg-linear-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex justify-between items-center">
                             <h3 className="text-xl font-bold">
                                 {currentCustomer ? 'Chỉnh sửa khách hàng' : 'Thêm khách hàng mới'}
                             </h3>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { formatCurrencyWithCommas } from '../../../services/utils';
 import { isClientAuthenticated } from '../../../utils/cookieUtils';
@@ -52,7 +52,7 @@ function VNPayCallback() {
             style={{ backgroundImage: 'url(/background/home/bgBannerHomePage.72a61446.webp)' }}
         >
             {/* Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-pink-50/60 to-yellow-50/60"></div>
+            <div className="absolute inset-0 bg-linear-to-br from-white/70 via-pink-50/60 to-yellow-50/60"></div>
             
             {/* Content wrapper */}
             <div className="relative z-10">
@@ -142,7 +142,7 @@ function VNPayCallback() {
                             <div className="bg-blue-50 p-4 rounded-lg mb-6 border-l-4 border-blue-500">
                                 <div className="flex items-start">
                                     <svg 
-                                        className="w-6 h-6 text-blue-600 mr-3 flex-shrink-0 mt-1" 
+                                        className="w-6 h-6 text-blue-600 mr-3 shrink-0 mt-1" 
                                         fill="none" 
                                         stroke="currentColor" 
                                         viewBox="0 0 24 24"
@@ -177,7 +177,7 @@ function VNPayCallback() {
                                 )}
                                 <button
                                     onClick={handleBackHome}
-                                    className="px-8 py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black rounded-lg hover:from-yellow-500 hover:to-yellow-600 transition font-semibold"
+                                    className="px-8 py-3 bg-linear-to-r from-yellow-400 to-yellow-500 text-black rounded-lg hover:from-yellow-500 hover:to-yellow-600 transition font-semibold"
                                 >
                                     Về trang chủ
                                 </button>
@@ -224,7 +224,7 @@ function VNPayCallback() {
                             <div className="bg-yellow-50 p-4 rounded-lg mb-6 border-l-4 border-yellow-500">
                                 <div className="flex items-start">
                                     <svg 
-                                        className="w-6 h-6 text-yellow-600 mr-3 flex-shrink-0 mt-1" 
+                                        className="w-6 h-6 text-yellow-600 mr-3 shrink-0 mt-1" 
                                         fill="none" 
                                         stroke="currentColor" 
                                         viewBox="0 0 24 24"
@@ -258,7 +258,7 @@ function VNPayCallback() {
                                 </button>
                                 <button
                                     onClick={() => navigate(-1)}
-                                    className="px-8 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition font-semibold"
+                                    className="px-8 py-3 bg-linear-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition font-semibold"
                                 >
                                     Thử lại
                                 </button>

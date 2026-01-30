@@ -154,7 +154,7 @@ function QuenMatKhau() {
   if (isCheckingAuth) {
     return (
       <>
-        <div className="min-h-[calc(100vh-70px)] flex items-center justify-center bg-gradient-to-br from-pink-50 via-yellow-50 to-white">
+        <div className="min-h-[calc(100vh-70px)] flex items-center justify-center bg-linear-to-br from-pink-50 via-yellow-50 to-white">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mb-4"></div>
             <p className="text-gray-600 font-medium">Đang kiểm tra...</p>
@@ -171,7 +171,7 @@ function QuenMatKhau() {
         style={{ backgroundImage: 'url(/background/auth/bg_footer.2f611c1f.webp)' }}
       >
         {/* Overlay để làm nổi bật form */}
-        <div className="absolute inset-0 bg-gradient-to-br from-pink-50/80 via-yellow-50/80 to-white/80"></div>
+        <div className="absolute inset-0 bg-linear-to-br from-pink-50/80 via-yellow-50/80 to-white/80"></div>
         
         <div className="max-w-2xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden relative z-10">
           <div className="p-12 md:p-16">
@@ -208,7 +208,7 @@ function QuenMatKhau() {
                   {error && <div className="py-3 px-4 rounded-lg text-sm mb-5 font-medium bg-red-50 text-red-700 border border-red-200">{error}</div>}
                   {message && <div className="py-3 px-4 rounded-lg text-sm mb-5 font-medium bg-green-50 text-green-800 border border-green-300">{message}</div>}
 
-                  <button type="submit" className="w-full py-4 bg-gradient-to-r from-red-600 to-red-700 text-white border-none rounded-xl text-base font-semibold cursor-pointer transition-all shadow-[0_4px_15px_rgba(227,6,19,0.3)] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(227,6,19,0.4)] disabled:opacity-60 disabled:cursor-not-allowed" disabled={isLoading}>
+                  <button type="submit" className="w-full py-4 bg-linear-to-r from-red-600 to-red-700 text-white border-none rounded-xl text-base font-semibold cursor-pointer transition-all shadow-[0_4px_15px_rgba(227,6,19,0.3)] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(227,6,19,0.4)] disabled:opacity-60 disabled:cursor-not-allowed" disabled={isLoading}>
                     {isLoading ? "Đang gửi..." : "Gửi mã xác thực"}
                   </button>
 
@@ -246,7 +246,7 @@ function QuenMatKhau() {
                   {error && <div className="py-3 px-4 rounded-lg text-sm mb-5 font-medium bg-red-50 text-red-700 border border-red-200">{error}</div>}
                   {message && <div className="py-3 px-4 rounded-lg text-sm mb-5 font-medium bg-green-50 text-green-800 border border-green-300">{message}</div>}
 
-                  <button type="submit" className="w-full py-4 bg-gradient-to-r from-red-600 to-red-700 text-white border-none rounded-xl text-base font-semibold cursor-pointer transition-all shadow-[0_4px_15px_rgba(227,6,19,0.3)] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(227,6,19,0.4)] disabled:opacity-60 disabled:cursor-not-allowed" disabled={isLoading}>
+                  <button type="submit" className="w-full py-4 bg-linear-to-r from-red-600 to-red-700 text-white border-none rounded-xl text-base font-semibold cursor-pointer transition-all shadow-[0_4px_15px_rgba(227,6,19,0.3)] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(227,6,19,0.4)] disabled:opacity-60 disabled:cursor-not-allowed" disabled={isLoading}>
                     {isLoading ? "Đang xác thực..." : "Xác thực OTP"}
                   </button>
 
@@ -305,7 +305,7 @@ function QuenMatKhau() {
                   {error && <div className="py-3 px-4 rounded-lg text-sm mb-5 font-medium bg-red-50 text-red-700 border border-red-200">{error}</div>}
                   {message && <div className="py-3 px-4 rounded-lg text-sm mb-5 font-medium bg-green-50 text-green-800 border border-green-300">{message}</div>}
 
-                  <button type="submit" className="w-full py-4 bg-gradient-to-r from-red-600 to-red-700 text-white border-none rounded-xl text-base font-semibold cursor-pointer transition-all shadow-[0_0_0_3px_rgba(227,6,19,0.3)] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(227,6,19,0.4)] disabled:opacity-60 disabled:cursor-not-allowed" disabled={isLoading}>
+                  <button type="submit" className="w-full py-4 bg-linear-to-r from-red-600 to-red-700 text-white border-none rounded-xl text-base font-semibold cursor-pointer transition-all shadow-[0_0_0_3px_rgba(227,6,19,0.3)] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(227,6,19,0.4)] disabled:opacity-60 disabled:cursor-not-allowed" disabled={isLoading}>
                     {isLoading ? "Đang xử lý..." : "Đặt lại mật khẩu"}
                   </button>
                 </form>

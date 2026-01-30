@@ -5,10 +5,10 @@ import {
   FaShoppingCart,
   FaCalendar,
   FaFilter,
-  FaCheck,
   FaCheckSquare,
   FaSquare,
   FaUndo,
+  FaCheck,
 } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
 import donHangApi from '../../services/donHangApi';
@@ -17,6 +17,7 @@ import ConfirmDialog from '../../components/common/ConfirmDialog';
 import DonHangDetailModal from '../../components/QuanLy/QuanLyDonHang/DonHangDetailModal';
 import FilterModal from '../../components/QuanLy/QuanLyDonHang/FilterModal';
 import HoanTienModal from '../../components/QuanLy/QuanLyDonHang/HoanTienModal';
+import HuyDonHangModal from '../../components/QuanLy/QuanLyDonHang/HuyDonHangModal';
 
 const QuanLyDonHang = () => {
   // States cho dữ liệu
@@ -48,6 +49,8 @@ const QuanLyDonHang = () => {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [isHoanTienModalOpen, setIsHoanTienModalOpen] = useState(false);
+  const [isHuyDonHangModalOpen, setIsHuyDonHangModalOpen] = useState(false);
+  const [selectedDonHangToHuy, setSelectedDonHangToHuy] = useState(null);
   const [batchActionLoading, setBatchActionLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -78,17 +81,6 @@ const QuanLyDonHang = () => {
   };
 
   // ConfirmDialog handlers
-  const showConfirm = (title, message, type, confirmText, onConfirm) => {
-    setConfirmDialog({
-      isVisible: true,
-      title,
-      message,
-      type,
-      confirmText,
-      onConfirm
-    });
-  };
-
   const hideConfirm = () => {
     setConfirmDialog(prev => ({ ...prev, isVisible: false }));
   };
@@ -169,33 +161,6 @@ const QuanLyDonHang = () => {
     setSelectedDonHang(null);
   };
 
-  const handleUpdateTrangThai = async (maDonHang, trangThaiMoi) => {
-    hideConfirm();
-    setActionLoading(true);
-    try {
-      await donHangApi.updateTrangThaiDonHang(maDonHang, trangThaiMoi);
-      await loadDonHang();
-      showToast('Cập nhật trạng thái thành công');
-      handleCloseDetailModal();
-    } catch (err) {
-      console.error('Error updating trang thai:', err);
-      const errorMsg = err.response?.data?.message || 'Lỗi khi cập nhật trạng thái';
-      showToast(errorMsg, 'error');
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const handleUpdateTrangThaiConfirm = (maDonHang, trangThaiMoi, message) => {
-    showConfirm(
-      'Xác nhận thay đổi trạng thái',
-      message,
-      'warning',
-      'Xác nhận',
-      () => handleUpdateTrangThai(maDonHang, trangThaiMoi)
-    );
-  };
-
   const handleHuyDonHang = async (maDonHang, lyDoHuy) => {
     hideConfirm();
     setActionLoading(true);
@@ -214,26 +179,43 @@ const QuanLyDonHang = () => {
   };
 
   const handleHuyDonHangConfirm = (maDonHang) => {
-    showConfirm(
-      'Xác nhận hủy đơn hàng',
-      'Đơn hàng sẽ bị hủy và không thể khôi phục. Bạn có chắc chắn muốn hủy?',
-      'danger',
-      'Hủy đơn hàng',
-      () => {
-        hideConfirm();
-        // Mở prompt để nhập lý do hủy
-        const lyDo = prompt('Nhập lý do hủy đơn hàng:');
-        if (lyDo) {
-          handleHuyDonHang(maDonHang, lyDo);
-        }
-      }
-    );
+    setSelectedDonHangToHuy(maDonHang);
+    setIsHuyDonHangModalOpen(true);
   };
 
-  const handleHoanTienConfirm = (maDonHang) => {
+  const handleHuyDonHangConfirmFromModal = async (lyDoHuy) => {
+    setIsHuyDonHangModalOpen(false);
+    await handleHuyDonHang(selectedDonHangToHuy, lyDoHuy);
+    setSelectedDonHangToHuy(null);
+  };
+
+  const handleCloseHuyDonHangModal = () => {
+    setIsHuyDonHangModalOpen(false);
+    setSelectedDonHangToHuy(null);
+  };
+
+  const handleHoanTienConfirm = async (maDonHang) => {
     // Mở modal hoàn tiền cho đơn hàng đơn lẻ
     const donHang = donHangList.find(dh => dh.maDonHang === maDonHang);
     if (donHang) {
+      // Kiểm tra trạng thái chuyến bay trước khi hoàn tiền
+      try {
+        const response = await donHangApi.getDonHangById(maDonHang);
+        if (response.success && response.data && response.data.danhSachDatCho) {
+          const blockedStatuses = ['Đang bay', 'Đã bay', 'Đã hạ cánh'];
+          const hasBlockedFlight = response.data.danhSachDatCho.some(datCho =>
+            datCho.chuyenBay && blockedStatuses.includes(datCho.chuyenBay.trangThai)
+          );
+
+          if (hasBlockedFlight) {
+            showToast('Không thể hoàn tiền cho đơn hàng có chuyến bay đã bay, đang bay hoặc đã hạ cánh!', 'error');
+            return;
+          }
+        }
+      } catch (err) {
+        console.error('Error checking flight status:', err);
+      }
+
       setSelectedDonHangs([donHang]);
       setIsHoanTienModalOpen(true);
     }
@@ -259,40 +241,6 @@ const QuanLyDonHang = () => {
       setSelectedDonHangs([...currentItems]);
       setIsAllSelected(true);
     }
-  };
-
-  // Handler cho batch approve payment
-  const handleBatchApprove = async () => {
-    const choThanhToanList = selectedDonHangs.filter(dh => dh.trangThai === 'CHỜ THANH TOÁN');
-    if (choThanhToanList.length === 0) {
-      showToast('Không có đơn hàng nào chờ thanh toán trong danh sách đã chọn', 'warning');
-      return;
-    }
-
-    showConfirm(
-      'Xác nhận duyệt thanh toán hàng loạt',
-      `Bạn có chắc chắn muốn duyệt thanh toán cho ${choThanhToanList.length} đơn hàng đã chọn?`,
-      'warning',
-      'Duyệt thanh toán',
-      async () => {
-        hideConfirm();
-        setBatchActionLoading(true);
-        try {
-          const maDonHangs = choThanhToanList.map(dh => dh.maDonHang);
-          await donHangApi.batchApprovePayment(maDonHangs);
-          await loadDonHang();
-          setSelectedDonHangs([]);
-          setIsAllSelected(false);
-          showToast(`Đã duyệt thanh toán thành công ${choThanhToanList.length} đơn hàng`);
-        } catch (err) {
-          console.error('Error batch approve:', err);
-          const errorMsg = err.response?.data?.message || 'Lỗi khi duyệt thanh toán hàng loạt';
-          showToast(errorMsg, 'error');
-        } finally {
-          setBatchActionLoading(false);
-        }
-      }
-    );
   };
 
   // Handler cho batch refund
@@ -322,12 +270,39 @@ const QuanLyDonHang = () => {
     }
   };
 
-  const handleOpenBatchRefundModal = () => {
+  const handleOpenBatchRefundModal = async () => {
     const daThanhToanList = selectedDonHangs.filter(dh => dh.trangThai === 'ĐÃ THANH TOÁN');
     if (daThanhToanList.length === 0) {
       showToast('Không có đơn hàng nào đã thanh toán trong danh sách đã chọn', 'warning');
       return;
     }
+
+    // Kiểm tra trạng thái chuyến bay của các đơn hàng đã thanh toán
+    const blockedStatuses = ['Đang bay', 'Đã bay', 'Đã hạ cánh'];
+    let hasBlockedFlight = false;
+
+    for (const dh of daThanhToanList) {
+      try {
+        const response = await donHangApi.getDonHangById(dh.maDonHang);
+        if (response.success && response.data && response.data.danhSachDatCho) {
+          const flightBlocked = response.data.danhSachDatCho.some(datCho =>
+            datCho.chuyenBay && blockedStatuses.includes(datCho.chuyenBay.trangThai)
+          );
+          if (flightBlocked) {
+            hasBlockedFlight = true;
+            break;
+          }
+        }
+      } catch (err) {
+        console.error('Error checking flight status:', err);
+      }
+    }
+
+    if (hasBlockedFlight) {
+      showToast('Không thể hoàn tiền cho đơn hàng có chuyến bay đã bay, đang bay hoặc đã hạ cánh!', 'error');
+      return;
+    }
+
     setSelectedDonHangs(daThanhToanList);
     setIsHoanTienModalOpen(true);
   };
@@ -407,7 +382,6 @@ const QuanLyDonHang = () => {
         donHang={selectedDonHang}
         actionLoading={actionLoading}
         onClose={handleCloseDetailModal}
-        onUpdateTrangThai={handleUpdateTrangThaiConfirm}
         onHuyDonHang={handleHuyDonHangConfirm}
         onHoanTien={handleHoanTienConfirm}
       />
@@ -424,7 +398,7 @@ const QuanLyDonHang = () => {
 
       {/* Thống kê tổng quan */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl p-5 text-white shadow-lg">
+        <div className="bg-linear-to-br from-violet-500 to-purple-600 rounded-xl p-5 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium opacity-90">Tổng đơn hàng</p>
@@ -433,7 +407,7 @@ const QuanLyDonHang = () => {
             <FaShoppingCart size={40} className="opacity-80" />
           </div>
         </div>
-        <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-5 text-white shadow-lg">
+        <div className="bg-linear-to-br from-green-500 to-emerald-600 rounded-xl p-5 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium opacity-90">Đã thanh toán</p>
@@ -444,7 +418,7 @@ const QuanLyDonHang = () => {
             <FaCheck size={40} className="opacity-80" />
           </div>
         </div>
-        <div className="bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl p-5 text-white shadow-lg">
+        <div className="bg-linear-to-br from-yellow-500 to-orange-600 rounded-xl p-5 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium opacity-90">Chờ thanh toán</p>
@@ -455,7 +429,7 @@ const QuanLyDonHang = () => {
             <FaCalendar size={40} className="opacity-80" />
           </div>
         </div>
-        <div className="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl p-5 text-white shadow-lg">
+        <div className="bg-linear-to-br from-blue-500 to-cyan-600 rounded-xl p-5 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium opacity-90">Tổng doanh thu</p>
@@ -483,14 +457,14 @@ const QuanLyDonHang = () => {
         <div className="flex gap-3 w-full md:w-auto">
           <button
             onClick={() => setIsFilterModalOpen(true)}
-            className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-cyan-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-cyan-700 transition-all shadow-lg hover:shadow-xl font-semibold"
+            className="flex items-center gap-2 bg-linear-to-r from-blue-500 to-cyan-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-cyan-700 transition-all shadow-lg hover:shadow-xl font-semibold"
           >
             <FaFilter />
             <span className="hidden sm:inline">Bộ lọc</span>
           </button>
           <button
             onClick={() => loadDonHang()}
-            className="flex items-center gap-2 bg-gradient-to-r from-violet-500 to-purple-600 text-white px-5 py-3 rounded-lg hover:from-violet-600 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl font-semibold"
+            className="flex items-center gap-2 bg-linear-to-r from-violet-500 to-purple-600 text-white px-5 py-3 rounded-lg hover:from-violet-600 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl font-semibold"
           >
             <FaCalendar />
             <span className="hidden sm:inline">Làm mới</span>
@@ -500,7 +474,7 @@ const QuanLyDonHang = () => {
 
       {/* Batch action buttons */}
       {selectedDonHangs.length > 0 && (
-        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-4 mb-6 flex flex-col sm:flex-row justify-between items-center gap-3">
+        <div className="bg-linear-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-4 mb-6 flex flex-col sm:flex-row justify-between items-center gap-3">
           <div className="flex items-center gap-2">
             <span className="text-indigo-700 font-semibold">
               Đã chọn {selectedDonHangs.length} đơn hàng
@@ -508,17 +482,9 @@ const QuanLyDonHang = () => {
           </div>
           <div className="flex gap-3">
             <button
-              onClick={handleBatchApprove}
-              disabled={batchActionLoading}
-              className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-lg hover:from-green-600 hover:to-emerald-700 font-semibold transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <FaCheck />
-              {batchActionLoading ? 'Đang xử lý...' : 'Duyệt thanh toán'}
-            </button>
-            <button
               onClick={handleOpenBatchRefundModal}
               disabled={batchActionLoading}
-              className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-amber-600 text-white px-4 py-2 rounded-lg hover:from-orange-600 hover:to-amber-700 font-semibold transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 bg-linear-to-r from-orange-500 to-amber-600 text-white px-4 py-2 rounded-lg hover:from-orange-600 hover:to-amber-700 font-semibold transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <FaUndo />
               {batchActionLoading ? 'Đang xử lý...' : 'Hoàn tiền'}
@@ -557,7 +523,7 @@ const QuanLyDonHang = () => {
         <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
+              <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
                 <tr>
                   <th className="px-4 py-4 text-center font-semibold w-12">
                     <button
@@ -718,6 +684,14 @@ const QuanLyDonHang = () => {
         actionLoading={batchActionLoading}
         onClose={() => setIsHoanTienModalOpen(false)}
         onConfirm={handleBatchRefund}
+      />
+
+      {/* HuyDonHangModal Component */}
+      <HuyDonHangModal
+        isVisible={isHuyDonHangModalOpen}
+        maDonHang={selectedDonHangToHuy}
+        onCancel={handleCloseHuyDonHangModal}
+        onConfirm={handleHuyDonHangConfirmFromModal}
       />
     </Card>
   );

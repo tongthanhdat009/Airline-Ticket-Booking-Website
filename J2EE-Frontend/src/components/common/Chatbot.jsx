@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
 const Chatbot = () => {
@@ -78,7 +78,7 @@ const Chatbot = () => {
       {isOpen ? (
         <div className="bg-white rounded-3xl shadow-2xl w-[450px] h-[650px] flex flex-col overflow-hidden animate-slideUp">
           {/* Header */}
-          <div className="bg-gradient-to-r from-red-600 via-red-700 to-pink-600 text-white px-6 py-5 flex items-center justify-between shadow-lg">
+          <div className="bg-linear-to-r from-red-600 via-red-700 to-pink-600 text-white px-6 py-5 flex items-center justify-between shadow-lg">
             <div className="flex items-center gap-3">
               <div className="relative">
                 <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center overflow-hidden ring-4 ring-white/30">
@@ -109,7 +109,7 @@ const Chatbot = () => {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-gradient-to-br from-gray-50 to-gray-100">
+          <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-linear-to-br from-gray-50 to-gray-100">
             {messages.map((msg, index) => (
               <div
                 key={index}
@@ -117,14 +117,14 @@ const Chatbot = () => {
               >
                 <div className={`flex gap-2 max-w-[85%] ${msg.type === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                   {msg.type === 'bot' && (
-                    <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-pink-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
+                    <div className="w-8 h-8 bg-linear-to-br from-red-500 to-pink-600 rounded-full flex items-center justify-center shrink-0 shadow-md">
                       <img src="/chatbot/logo-vj.png" alt="Bot" className="w-5 h-5" />
                     </div>
                   )}
                   <div
                     className={`px-4 py-3 rounded-2xl shadow-md whitespace-pre-line ${
                       msg.type === 'user'
-                        ? 'bg-gradient-to-r from-red-600 to-red-700 text-white rounded-br-sm'
+                        ? 'bg-linear-to-r from-red-600 to-red-700 text-white rounded-br-sm'
                         : 'bg-white text-gray-800 rounded-bl-sm border border-gray-200'
                     }`}
                   >
@@ -137,7 +137,7 @@ const Chatbot = () => {
             {isLoading && (
               <div className="flex justify-start animate-fadeIn">
                 <div className="flex gap-2 items-center">
-                  <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-pink-600 rounded-full flex items-center justify-center shadow-md">
+                  <div className="w-8 h-8 bg-linear-to-br from-red-500 to-pink-600 rounded-full flex items-center justify-center shadow-md">
                     <img src="/chatbot/logo-vj.png" alt="Bot" className="w-5 h-5" />
                   </div>
                   <div className="bg-white px-5 py-3 rounded-2xl rounded-bl-sm shadow-md border border-gray-200">
@@ -163,7 +163,7 @@ const Chatbot = () => {
                   <button
                     key={index}
                     onClick={() => handleQuickQuestion(question)}
-                    className="px-3 py-1.5 text-xs bg-gradient-to-r from-red-50 to-pink-50 text-red-700 rounded-full hover:from-red-100 hover:to-pink-100 transition-all border border-red-200 hover:shadow-md"
+                    className="px-3 py-1.5 text-xs bg-linear-to-r from-red-50 to-pink-50 text-red-700 rounded-full hover:from-red-100 hover:to-pink-100 transition-all border border-red-200 hover:shadow-md"
                   >
                     {question}
                   </button>
@@ -187,7 +187,7 @@ const Chatbot = () => {
               <button
                 onClick={handleSendMessage}
                 disabled={!inputMessage.trim() || isLoading}
-                className="px-5 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
+                className="px-5 py-3 bg-linear-to-r from-red-600 to-red-700 text-white rounded-2xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -202,7 +202,7 @@ const Chatbot = () => {
       ) : (
         <button
           onClick={() => setIsOpen(true)}
-          className="group relative w-16 h-16 bg-gradient-to-br from-red-600 via-red-700 to-pink-600 rounded-full shadow-2xl hover:scale-110 transition-all flex items-center justify-center overflow-hidden animate-bounce hover:animate-none"
+          className="group relative w-16 h-16 bg-linear-to-br from-red-600 via-red-700 to-pink-600 rounded-full shadow-2xl hover:scale-110 transition-all flex items-center justify-center overflow-hidden animate-bounce hover:animate-none"
         >
           <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></div>
           <img 

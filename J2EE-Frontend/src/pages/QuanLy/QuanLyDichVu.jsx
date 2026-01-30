@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { FaPlus, FaEdit, FaTrash, FaSearch, FaConciergeBell, FaEye } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
 import { getAllServices, fetchImageByName, getServiceOptions, createServiceOption, createService, updateServiceImage, updateService, deleteService, updateOption, deleteOption, updateOptionImage } from '../../services/QLDichVuService';
@@ -323,7 +323,7 @@ const QuanLyDichVu = () => {
         </div>
         <button
           onClick={handleAddNew}
-          className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-5 rounded-lg shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
+          className="flex items-center justify-center gap-2 bg-linear-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-5 rounded-lg shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
         >
           <FaPlus size={18} />
           <span>Thêm dịch vụ mới</span>
@@ -334,7 +334,7 @@ const QuanLyDichVu = () => {
       <div className="overflow-hidden bg-white shadow-lg rounded-xl border border-gray-200">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
+            <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
               <tr>
                 <th className="px-6 py-4 text-left font-semibold">Tên dịch vụ</th>
                 <th className="px-6 py-4 text-left font-semibold">Mô tả</th>
@@ -348,7 +348,7 @@ const QuanLyDichVu = () => {
                   <tr key={service.maDichVu} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
                           <FaConciergeBell className="text-purple-600" />
                         </div>
                         <span className="font-medium text-gray-900">{service.tenDichVu}</span>

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { FaCheckCircle, FaClock, FaMoneyBillWave, FaUser, FaEnvelope, FaCalendarAlt, FaPlane, FaConciergeBell, FaBox, FaFilePdf } from 'react-icons/fa';
+﻿import React, { useEffect, useState } from 'react';
+import { FaCheckCircle, FaMoneyBillWave, FaUser, FaEnvelope, FaCalendarAlt, FaPlane, FaConciergeBell, FaBox, FaFilePdf } from 'react-icons/fa';
 import { getDichVuByMaDatCho, fetchServiceImageByName, fetchOptionImageByName } from '../../../services/QLDichVuService';
 import { getThanhToanChiTiet, downloadInvoicePdf } from '../../../services/QLThanhToanService';
 
@@ -128,7 +128,7 @@ const ViewPaymentDetailModal = ({
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-y-auto">
-                <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex justify-between items-center z-10">
+                <div className="sticky top-0 bg-linear-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex justify-between items-center z-10">
                     <h3 className="text-xl font-bold">Chi tiết thanh toán #{currentPayment.maThanhToan}</h3>
                     <div className="flex items-center gap-3">
                         <button onClick={onClose} className="text-white hover:text-gray-200">
@@ -140,7 +140,7 @@ const ViewPaymentDetailModal = ({
                 </div>
                 
                 <div className="p-6">
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border mt-3 mb-3 border-blue-200">
+                    <div className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border mt-3 mb-3 border-blue-200">
                         <div className="flex justify-between items-center">
                             <div>
                                 <h4 className="text-sm font-semibold text-gray-600 mb-2">Trạng thái thanh toán</h4>
@@ -155,7 +155,7 @@ const ViewPaymentDetailModal = ({
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         {/* Cột trái - Thông tin thanh toán */}
                         <div className="space-y-6">
-                            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200 h-full">
+                            <div className="bg-linear-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200 h-full">
                                 <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                                     <FaUser className="text-purple-600" />
                                     Thông tin khách hàng
@@ -200,12 +200,12 @@ const ViewPaymentDetailModal = ({
 
                         <div className="space-y-6">
                             
-                            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-200 h-full">
+                            <div className="bg-linear-to-br from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-200 h-full">
                                 <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                                     <FaConciergeBell className="text-indigo-600" />
                                     Dịch vụ đã đặt
                                 </h4>
-                                <div className="bg-gradient-to-r from-indigo-100 to-purple-100 rounded-lg p-4 border-2 border-indigo-300 mb-5 mt-4">
+                                <div className="bg-linear-to-r from-indigo-100 to-purple-100 rounded-lg p-4 border-2 border-indigo-300 mb-5 mt-4">
                                     <div className="flex justify-between items-center">
                                         <span className="font-bold text-gray-800">Tổng tiền dịch vụ:</span>
                                         <span className="text-2xl font-bold text-indigo-600">
@@ -230,7 +230,7 @@ const ViewPaymentDetailModal = ({
                                             return (
                                                 <div key={index} className="bg-white rounded-lg p-4 shadow-md border border-gray-200 hover:shadow-lg transition-shadow">
                                                     <div className="flex items-start gap-3">
-                                                        <div className="w-16 h-16 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                                        <div className="w-16 h-16 rounded-lg bg-indigo-100 flex items-center justify-center shrink-0 overflow-hidden">
                                                             {imageUrl ? (
                                                                 <img 
                                                                     src={imageUrl} 
@@ -302,7 +302,7 @@ const ViewPaymentDetailModal = ({
                             </div>
                         </div>
                         {chuyenBayInfo && (
-                                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+                                <div className="bg-linear-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
                                     <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                                         <FaPlane className="text-green-600" />
                                         Thông tin chuyến bay
@@ -360,7 +360,7 @@ const ViewPaymentDetailModal = ({
                                     </div>
                                 </div>)}
                     </div>
-                        <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-6 mt-6 border border-yellow-200">
+                        <div className="bg-linear-to-br from-yellow-50 to-orange-50 rounded-xl p-6 mt-6 border border-yellow-200">
                             <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                                 <FaMoneyBillWave className="text-yellow-600" />
                                 Thông tin thanh toán

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../../components/common/Footer';
 import TaiKhoanService from '../../services/TaiKhoanService';
@@ -173,17 +173,7 @@ function LichSuGiaoDich() {
     return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
   };
 
-  // const formatDateTime = (dateString) => {
-  //   if (!dateString) return '';
-  //   const date = new Date(dateString);
-  //   return date.toLocaleString('vi-VN', { 
-  //     day: '2-digit', 
-  //     month: '2-digit', 
-  //     year: 'numeric',
-  //     hour: '2-digit',
-  //     minute: '2-digit'
-  //   });
-  // };
+
 
   const formatTime = (timeString) => {
     if (!timeString) return '';
@@ -225,10 +215,10 @@ function LichSuGiaoDich() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Left Sidebar - Profile Card */}
-          <div className="lg:w-80 flex-shrink-0">
+          <div className="lg:w-80 shrink-0">
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden border-t-4 border-red-600">
               {/* Profile Header */}
-              <div className="relative bg-gradient-to-br from-red-500 via-red-600 to-orange-600 h-32">
+              <div className="relative bg-linear-to-br from-red-500 via-red-600 to-orange-600 h-32">
                 <div className="absolute inset-0 opacity-10">
                   <div className="absolute inset-0" style={{
                     backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,.1) 10px, rgba(255,255,255,.1) 20px)`
@@ -241,7 +231,7 @@ function LichSuGiaoDich() {
                 <div className="flex flex-col items-center -mt-16">
                   <div className="relative">
                     <div className="w-32 h-32 rounded-full bg-white p-1 shadow-xl">
-                      <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-5xl">
+                      <div className="w-full h-full rounded-full bg-linear-to-br from-gray-200 to-gray-300 flex items-center justify-center text-5xl">
                         👤
                       </div>
                     </div>
@@ -269,7 +259,7 @@ function LichSuGiaoDich() {
                 <div className="mt-6 space-y-2">
                   <button
                     onClick={() => navigate('/ca-nhan')}
-                    className="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition shadow-md"
+                    className="w-full flex items-center gap-3 px-4 py-3 bg-linear-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition shadow-md"
                   >
                     <span className="text-xl">👤</span>
                     <div className="text-left flex-1">
@@ -280,7 +270,7 @@ function LichSuGiaoDich() {
                   
                   <button
                     onClick={() => navigate('/quan-ly-chuyen-bay')}
-                    className="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition shadow-md"
+                    className="w-full flex items-center gap-3 px-4 py-3 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition shadow-md"
                   >
                     <span className="text-xl">✈️</span>
                     <div className="text-left flex-1">
@@ -291,7 +281,7 @@ function LichSuGiaoDich() {
                   
                   <button
                     onClick={() => navigate('/dat-ve')}
-                    className="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition shadow-md"
+                    className="w-full flex items-center gap-3 px-4 py-3 bg-linear-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition shadow-md"
                   >
                     <span className="text-xl">🎫</span>
                     <div className="text-left flex-1">
@@ -469,7 +459,7 @@ function LichSuGiaoDich() {
         <div className="fixed inset-0 flex items-center justify-center z-[1100] p-2 sm:p-4">
           <div className="absolute inset-0 " onClick={() => setShowDetailModal(false)}></div>
           <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[95vh] overflow-auto flex flex-col relative z-10">
-            <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center flex-shrink-0">
+            <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center shrink-0">
               <h2 className="text-lg sm:text-2xl font-bold text-gray-900">Chi tiết hóa đơn</h2>
               <button
                 onClick={() => setShowDetailModal(false)}
@@ -481,7 +471,7 @@ function LichSuGiaoDich() {
             
             <div className="overflow-y-auto flex-1 p-4 sm:p-6 space-y-4 sm:space-y-6">
               {/* Payment Status */}
-              <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-lg p-3 sm:p-4 border border-red-200">
+              <div className="bg-linear-to-r from-red-50 to-orange-50 rounded-lg p-3 sm:p-4 border border-red-200">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <div>
                     <p className="text-xs sm:text-sm text-gray-600 mb-1">Mã giao dịch</p>
@@ -606,7 +596,7 @@ function LichSuGiaoDich() {
               )}
 
               {/* Payment Summary */}
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3 sm:p-4 border border-green-200">
+              <div className="bg-linear-to-r from-green-50 to-emerald-50 rounded-lg p-3 sm:p-4 border border-green-200">
                 <h3 className="font-semibold text-base sm:text-lg mb-2 sm:mb-3 flex items-center gap-2">
                   💰 Tổng thanh toán
                 </h3>
@@ -627,7 +617,7 @@ function LichSuGiaoDich() {
               </div>
             </div>
             
-            <div className="border-t border-gray-200 px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 flex-shrink-0">
+            <div className="border-t border-gray-200 px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 shrink-0">
               <button
                 onClick={() => setShowDetailModal(false)}
                 className="px-4 sm:px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition text-sm sm:text-base"

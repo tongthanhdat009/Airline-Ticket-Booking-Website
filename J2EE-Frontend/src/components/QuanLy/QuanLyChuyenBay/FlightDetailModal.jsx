@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { FaPlane, FaTimes, FaCog, FaPlus, FaTrash, FaCalendarAlt, FaClock } from 'react-icons/fa';
 import { getDichVuByChuyenBay, addDichVuToChuyenBay, removeDichVuFromChuyenBay } from '../../../services/QLDichVuChuyenBayService';
 import { getAllServices, fetchImageByName } from '../../../services/QLDichVuService';
@@ -109,10 +109,10 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
     if (!isOpen || !flight) return null;
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
                 {/* Header */}
-                <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex justify-between items-center z-10">
+                <div className="sticky top-0 bg-linear-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex justify-between items-center z-10">
                     <h3 className="text-xl font-bold">Chi tiết chuyến bay</h3>
                     <button onClick={onClose} className="text-white hover:text-gray-200 transition-colors">
                         <FaTimes size={24} />
@@ -123,7 +123,7 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
                     {/* Thông tin chuyến bay */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                         {/* Cột trái - Thông tin cơ bản */}
-                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+                        <div className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
                             <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                                 <FaPlane className="text-blue-600" />
                                 Thông tin chuyến bay
@@ -169,7 +169,7 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
                                     </div>
                                 </div>
 
-                                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
+                                <div className="bg-linear-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
                                     <div className="text-sm text-gray-600 mb-1">Trạng thái</div>
                                     <div className="text-xl font-bold text-green-600">{flight.trangThai}</div>
                                     {flight.lyDoDelay && (
@@ -181,7 +181,7 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
 
                                 {/* Thời gian thực tế - hiển thị trong cột trái nếu có */}
                                 {(flight.thoiGianDiThucTe || flight.thoiGianDenThucTe) && (
-                                    <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg p-4 border border-yellow-200">
+                                    <div className="bg-linear-to-br from-yellow-50 to-orange-50 rounded-lg p-4 border border-yellow-200">
                                         <div className="text-sm font-semibold text-gray-700 mb-3">Thời gian thực tế</div>
                                         <div className="space-y-2">
                                             {flight.thoiGianDiThucTe && (
@@ -207,7 +207,7 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
                         </div>
 
                         {/* Cột phải - Quản lý dịch vụ */}
-                        <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200">
+                        <div className="bg-linear-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200">
                             <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                                 <FaCog className="text-purple-600" />
                                 Dịch vụ trên chuyến bay
@@ -235,10 +235,10 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
                                                             <img
                                                                 src={serviceImages[service.maDichVu]}
                                                                 alt={service.tenDichVu}
-                                                                className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
+                                                                className="w-14 h-14 rounded-lg object-cover shrink-0"
                                                             />
                                                         ) : (
-                                                            <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center flex-shrink-0">
+                                                            <div className="w-14 h-14 rounded-lg bg-linear-to-br from-purple-100 to-pink-100 flex items-center justify-center shrink-0">
                                                                 <FaCog className="text-purple-400 text-xl" />
                                                             </div>
                                                         )}
@@ -248,7 +248,7 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
                                                         </div>
                                                         <button
                                                             onClick={() => handleRemoveService(service.maDichVu)}
-                                                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
+                                                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0"
                                                             title="Xóa dịch vụ"
                                                         >
                                                             <FaTrash size={14} />
@@ -280,10 +280,10 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
                                                                 <img
                                                                     src={serviceImages[service.maDichVu]}
                                                                     alt={service.tenDichVu}
-                                                                    className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
+                                                                    className="w-14 h-14 rounded-lg object-cover shrink-0"
                                                                 />
                                                             ) : (
-                                                                <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center flex-shrink-0">
+                                                                <div className="w-14 h-14 rounded-lg bg-linear-to-br from-blue-100 to-indigo-100 flex items-center justify-center shrink-0">
                                                                     <FaPlane className="text-blue-400 text-xl" />
                                                                 </div>
                                                             )}
@@ -292,7 +292,7 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
                                                                 <div className="text-xs text-gray-500 line-clamp-2">{service.moTa}</div>
                                                             </div>
                                                             <button
-                                                                className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors flex-shrink-0"
+                                                                className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors shrink-0"
                                                                 title="Thêm dịch vụ"
                                                             >
                                                                 <FaPlus size={16} />

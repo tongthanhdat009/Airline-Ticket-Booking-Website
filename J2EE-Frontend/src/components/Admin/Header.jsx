@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, Search, LogOut, User, Menu } from 'lucide-react';
+import { Bell, Search, LogOut, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { getAdminUserInfo, getCurrentUsername } from '../../utils/permissionUtils';

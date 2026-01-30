@@ -61,7 +61,7 @@ const SeatMapCompactPreview = ({ maMayBay }) => {
     }, {});
 
     return (
-        <div className="bg-gradient-to-b from-sky-50 to-white rounded-lg border border-sky-200 p-4 space-y-3">
+        <div className="bg-linear-to-b from-sky-50 to-white rounded-lg border border-sky-200 p-4 space-y-3">
             <div className="flex flex-wrap gap-4 text-xs">
                 <div className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-blue-500 rounded"></div>

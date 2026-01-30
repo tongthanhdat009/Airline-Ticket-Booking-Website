@@ -67,7 +67,7 @@ function OAuth2Callback() {
     }, [searchParams, navigate]);
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 via-yellow-50 to-white">
+        <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-pink-50 via-yellow-50 to-white">
             <div className="text-center bg-white p-8 rounded-xl shadow-xl max-w-md w-full mx-4">
                 <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-red-600 mb-6"></div>
                 <h2 className="text-xl font-bold text-gray-800 mb-2">{message}</h2>

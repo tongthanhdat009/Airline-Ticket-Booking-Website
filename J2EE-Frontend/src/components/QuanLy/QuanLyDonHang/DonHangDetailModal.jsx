@@ -1,12 +1,11 @@
 import React from 'react';
-import { FaCheck, FaTimesCircle, FaUndo } from 'react-icons/fa';
+import { FaTimesCircle } from 'react-icons/fa';
 
 const DonHangDetailModal = ({
   isVisible,
   donHang,
   actionLoading,
   onClose,
-  onUpdateTrangThai,
   onHuyDonHang,
   onHoanTien
 }) => {
@@ -27,10 +26,10 @@ const DonHangDetailModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+    <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="bg-gradient-to-r from-violet-600 to-purple-700 text-white p-6 rounded-t-xl sticky top-0">
+        <div className="bg-linear-to-r from-violet-600 to-purple-700 text-white p-6 rounded-t-xl sticky top-0">
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-2xl font-bold">Chi tiết đơn hàng</h2>
@@ -102,7 +101,7 @@ const DonHangDetailModal = ({
             </h3>
             <div className="bg-gray-50 rounded-lg overflow-hidden">
               <table className="w-full text-sm">
-                <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
+                <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
                   <tr>
                     <th className="px-4 py-3 text-left font-semibold">Hành khách</th>
                     <th className="px-4 py-3 text-left font-semibold">Chuyến bay</th>
@@ -169,7 +168,7 @@ const DonHangDetailModal = ({
           )}
 
           {/* Tổng tiền */}
-          <div className="bg-gradient-to-r from-violet-100 to-purple-100 p-6 rounded-lg">
+          <div className="bg-linear-to-r from-violet-100 to-purple-100 p-6 rounded-lg">
             <div className="flex justify-between items-center">
               <span className="text-xl font-bold text-gray-800">Tổng thanh toán:</span>
               <span className="text-3xl font-bold text-violet-600">
@@ -188,31 +187,21 @@ const DonHangDetailModal = ({
             </button>
 
             {donHang.trangThai === 'CHỜ THANH TOÁN' && (
-              <>
-                <button
-                  onClick={() => onUpdateTrangThai(donHang.maDonHang, 'ĐÃ THANH TOÁN')}
-                  disabled={actionLoading}
-                  className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 font-semibold transition-all shadow-lg flex items-center gap-2 disabled:opacity-50"
-                >
-                  <FaCheck />
-                  Xác nhận thanh toán
-                </button>
-                <button
-                  onClick={() => onHuyDonHang(donHang.maDonHang)}
-                  disabled={actionLoading}
-                  className="px-6 py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-lg hover:from-red-600 hover:to-rose-700 font-semibold transition-all shadow-lg flex items-center gap-2 disabled:opacity-50"
-                >
-                  <FaTimesCircle />
-                  Hủy đơn hàng
-                </button>
-              </>
+              <button
+                onClick={() => onHuyDonHang(donHang.maDonHang)}
+                disabled={actionLoading}
+                className="px-6 py-3 bg-linear-to-r from-red-500 to-rose-600 text-white rounded-lg hover:from-red-600 hover:to-rose-700 font-semibold transition-all shadow-lg flex items-center gap-2 disabled:opacity-50"
+              >
+                <FaTimesCircle />
+                Hủy đơn hàng
+              </button>
             )}
 
             {donHang.trangThai === 'ĐÃ THANH TOÁN' && (
               <button
                 onClick={() => onHoanTien(donHang.maDonHang)}
                 disabled={actionLoading}
-                className="px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-lg hover:from-orange-600 hover:to-amber-700 font-semibold transition-all shadow-lg flex items-center gap-2 disabled:opacity-50"
+                className="px-6 py-3 bg-linear-to-r from-orange-500 to-amber-600 text-white rounded-lg hover:from-orange-600 hover:to-amber-700 font-semibold transition-all shadow-lg flex items-center gap-2 disabled:opacity-50"
               >
                 <FaUndo />
                 Hoàn tiền

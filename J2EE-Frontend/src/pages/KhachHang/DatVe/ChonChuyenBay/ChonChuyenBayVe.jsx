@@ -1,7 +1,7 @@
 import { useNavigate, useLocation} from "react-router-dom"
 import { useState, useEffect } from 'react';
 import { getSanBayByThanhPhoSanBay, searchChuyenBay, getGiaVe , kiemTraConGhe} from "../../../../services/datVeServices"
-import { formatCurrency, formatCurrencyWithCommas,formatDate, formatDateType, formatTime, calcFlightDuration } from "../../../../services/utils";
+import { formatCurrency, formatCurrencyWithCommas, formatDate, formatDateType, formatTime, calcFlightDuration } from "../../../../services/utils";
 import { FaLongArrowAltRight, FaLongArrowAltLeft} from 'react-icons/fa';
 import { MdAirplanemodeInactive } from 'react-icons/md';
 import { MdKeyboardArrowDown } from 'react-icons/md';
@@ -194,7 +194,7 @@ function ChonChuyenBayVe() {
             style={{ backgroundImage: 'url(/background/home/bgBannerHomePage.72a61446.webp)' }}
         >
             {/* Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-pink-50/60 to-yellow-50/60"></div>
+            <div className="absolute inset-0 bg-linear-to-br from-white/70 via-pink-50/60 to-yellow-50/60"></div>
             
             {/* Content wrapper */}
             <div className="relative z-10">
@@ -237,7 +237,7 @@ function ChonChuyenBayVe() {
                                     <div className="bg-green-500 flex items-center justify-center text-white font-bold rounded-t-lg mx-[4px]">
                                         Economy
                                     </div>
-                                    <div className="bg-gradient-to-r from-yellow-500 to-yellow-300 flex flex-col items-center justify-center p-2 rounded-tl-lg text-center cursor-pointer" onClick={() => handleExpand(cb, cb.maChuyenBay, 6)}>
+                                    <div className="bg-linear-to-r from-yellow-500 to-yellow-300 flex flex-col items-center justify-center p-2 rounded-tl-lg text-center cursor-pointer" onClick={() => handleExpand(cb, cb.maChuyenBay, 6)}>
                                         <div className="text-[15px] mt-2">{cb.soHieuChuyenBay}</div>
                                         <div><span className="text-xl font-bold">{formatTime(cb.gioDi)}</span> <span className="font-[12px]">đến</span > <span className="text-xl font-bold">{formatTime(cb.gioDen)}</span></div>
                                         <div className="text-[12px] text-red-500 font-bold">{t('booking.flight.direct')}</div>
@@ -267,7 +267,7 @@ function ChonChuyenBayVe() {
                                             <div className="flex flex-col items-center h-24 mt-[6px]">
                                                 <GoDotFill className="border border-red-500 rounded-full w-[16px] h-[16px] text-red-500" />
                                                 <div className="w-[2px] bg-gray-300 flex-1 my-1" />
-                                                <span className="inline-flex w-[17px] h-[17px] bg-gradient-to-r from-green-500 to-green-400 items-center justify-center rounded-full mb-3">
+                                                <span className="inline-flex w-[17px] h-[17px] bg-linear-to-r from-green-500 to-green-400 items-center justify-center rounded-full mb-3">
                                                     <GoGoal className="w-[12px] h-[12px] text-white" />
                                                 </span>
                                             </div>
@@ -503,7 +503,7 @@ function ChonChuyenBayVe() {
                     <span className="text-xl">{t('common.total_price')}</span>
                     <span className="text-2xl font-bold">{selectedTuyenBayVe ? formatCurrencyWithCommas(calcTotalPrice())+" VND" : formatCurrencyWithCommas(formData.totalPrice)+" VND"}</span>
                 </div>
-                <span className="bg-gradient-to-bl from-yellow-400 to-yellow-500 rounded-xl flex items-center justify-center px-10 py-2 text-black cursor-pointer" onClick={() => tiepTucOnClick()}>Đi tiếp</span>
+                <span className="bg-linear-to-bl from-yellow-400 to-yellow-500 rounded-xl flex items-center justify-center px-10 py-2 text-black cursor-pointer" onClick={() => tiepTucOnClick()}>Đi tiếp</span>
             </div>
             </div>
         </div>

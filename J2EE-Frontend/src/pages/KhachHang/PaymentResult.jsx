@@ -75,7 +75,7 @@ function PaymentResult() {
       <div className="max-w-2xl mx-auto px-4 py-16">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Header */}
-          <div className={`p-8 text-center ${isSuccess ? 'bg-gradient-to-r from-green-500 to-green-600' : 'bg-gradient-to-r from-red-500 to-red-600'}`}>
+          <div className={`p-8 text-center ${isSuccess ? 'bg-linear-to-r from-green-500 to-green-600' : 'bg-linear-to-r from-red-500 to-red-600'}`}>
             <div className="text-6xl mb-4">
               {isSuccess ? '✓' : '✕'}
             </div>

@@ -6,7 +6,7 @@ import { getAllTuyenBay } from '../../../services/QLTuyenBayService';
 import { getActiveMayBay } from '../../../services/QLMayBayService';
 import { getAllServices } from '../../../services/QLDichVuService';
 import { createChuyenBay } from '../../../services/QLChuyenBayService';
-import { getDichVuByChuyenBay, addDichVuToChuyenBay } from '../../../services/QLDichVuChuyenBayService';
+// import { getDichVuByChuyenBay, addDichVuToChuyenBay } from '../../../services/QLDichVuChuyenBayService';
 import Toast from '../../../components/common/Toast';
 import SeatLayoutViewer from '../../../components/QuanLy/QuanLyMayBay/SeatLayoutViewer';
 import SeatMapCompactPreview from '../../../components/QuanLy/QuanLyMayBay/SeatMapCompactPreview';
@@ -678,7 +678,7 @@ const ThemChuyenBay = () => {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 px-6 py-3 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <FaSave />
                         <span>{isSubmitting ? 'Đang lưu...' : 'Lưu chuyến bay'}</span>

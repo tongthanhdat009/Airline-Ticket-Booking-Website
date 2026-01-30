@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { FaWindowMaximize, FaDoorOpen, FaCrown, FaStar, FaChair } from 'react-icons/fa';
 import { MdAirlineSeatReclineExtra, MdAirlineSeatReclineNormal, MdEventSeat } from 'react-icons/md';
 
@@ -7,37 +7,37 @@ const SeatLegend = () => {
         {
             icon: <FaCrown className="text-white text-xs" />,
             label: 'First Class',
-            bgClass: 'bg-gradient-to-br from-amber-500 to-orange-500 border-orange-500'
+            bgClass: 'bg-linear-to-br from-amber-500 to-orange-500 border-orange-500'
         },
         {
             icon: <MdAirlineSeatReclineNormal className="text-white text-xs" />,
             label: 'Business',
-            bgClass: 'bg-gradient-to-br from-blue-500 to-indigo-600 border-indigo-600'
+            bgClass: 'bg-linear-to-br from-blue-500 to-indigo-600 border-indigo-600'
         },
         {
             icon: <FaStar className="text-white text-xs" />,
             label: 'Deluxe',
-            bgClass: 'bg-gradient-to-br from-teal-500 to-emerald-600 border-teal-600'
+            bgClass: 'bg-linear-to-br from-teal-500 to-emerald-600 border-teal-600'
         },
         {
             icon: <MdEventSeat className="text-white text-xs" />,
             label: 'Economy Saver',
-            bgClass: 'bg-gradient-to-br from-cyan-500 to-blue-600 border-blue-600'
+            bgClass: 'bg-linear-to-br from-cyan-500 to-blue-600 border-blue-600'
         },
         {
             icon: <MdEventSeat className="text-slate-700 text-xs" />,
             label: 'Economy',
-            bgClass: 'bg-gradient-to-br from-slate-100 to-slate-200 border-slate-300'
+            bgClass: 'bg-linear-to-br from-slate-100 to-slate-200 border-slate-300'
         },
         {
             icon: <MdEventSeat className="text-white text-xs" />,
             label: 'Selected',
-            bgClass: 'bg-gradient-to-br from-yellow-400 to-amber-500 border-amber-500'
+            bgClass: 'bg-linear-to-br from-yellow-400 to-amber-500 border-amber-500'
         },
         {
             icon: <FaDoorOpen className="text-white text-[10px]" />,
             label: 'Exit Row',
-            bgClass: 'bg-gradient-to-br from-rose-400 to-pink-500 border-rose-500'
+            bgClass: 'bg-linear-to-br from-rose-400 to-pink-500 border-rose-500'
         },
     ];
 
@@ -53,7 +53,7 @@ const SeatLegend = () => {
             <div className="grid grid-cols-2 gap-2">
                 {legendItems.map((item, idx) => (
                     <div key={idx} className="flex items-center gap-2 group">
-                        <div className={`w-8 h-8 ${item.bgClass} border rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-200 group-hover:scale-105`}>
+                        <div className={`w-8 h-8 ${item.bgClass} border rounded-lg flex items-center justify-center shrink-0 transition-all duration-200 group-hover:scale-105`}>
                             {item.icon}
                         </div>
                         <span className="text-[10px] text-gray-600 font-medium leading-tight">{item.label}</span>

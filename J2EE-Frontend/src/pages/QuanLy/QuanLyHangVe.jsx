@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { FaPlus, FaSearch, FaEdit, FaTrash, FaTicketAlt, FaRecycle, FaEyeSlash, FaEye } from 'react-icons/fa';
 import { getAllHangVeAdmin, getAllDeleted, createHangVe, updateHangVe, deleteHangVe, restoreHangVe } from '../../services/QLHangVeService';
 import Card from '../../components/QuanLy/CardChucNang';
@@ -195,7 +195,7 @@ const QuanLyHangVe = () => {
                     <button
                         onClick={handleOpenModalForAdd}
                         disabled={actionLoading}
-                        className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 bg-linear-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <FaPlus />
                         <span>Thêm hạng vé</span>
@@ -229,7 +229,7 @@ const QuanLyHangVe = () => {
                 <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
-                            <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
+                            <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
                                 <tr>
                                     <th className="px-6 py-4 text-left font-semibold">Mã hạng vé</th>
                                     <th className="px-6 py-4 text-left font-semibold">Tên hạng vé</th>
@@ -244,7 +244,7 @@ const QuanLyHangVe = () => {
                                             <td className="px-6 py-4 font-bold text-blue-600">#{hv.maHangVe}</td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+                                                    <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
                                                         <FaTicketAlt className="text-purple-600 text-xl" />
                                                     </div>
                                                     <span className="font-medium text-gray-900">{hv.tenHangVe}</span>

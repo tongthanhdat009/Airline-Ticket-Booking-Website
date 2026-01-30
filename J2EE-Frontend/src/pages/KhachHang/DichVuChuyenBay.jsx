@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Navbar from "../../components/common/Navbar";
+
 import ClientDichVuService from "../../services/ClientDichVuService";
 
 function DichVuChuyenBay() {
@@ -12,7 +12,7 @@ function DichVuChuyenBay() {
   const [bookingInfo, setBookingInfo] = useState(null);
   const [error, setError] = useState("");
   const [selectedServices, setSelectedServices] = useState({});
-  const [showPayment, setShowPayment] = useState(false);
+
 
   const handleSearchServices = async (e) => {
     e.preventDefault();
@@ -95,7 +95,6 @@ function DichVuChuyenBay() {
       }
       
       setSelectedServices({});
-      setShowPayment(false);
       
     } catch (err) {
       console.error("Error adding services:", err);
@@ -111,7 +110,7 @@ function DichVuChuyenBay() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-yellow-50 to-white py-12 px-4">
+      <div className="min-h-screen bg-linear-to-br from-pink-50 via-yellow-50 to-white py-12 px-4">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
@@ -145,7 +144,7 @@ function DichVuChuyenBay() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50"
+                className="w-full py-3 bg-linear-to-r from-red-600 to-red-700 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50"
               >
                 {loading ? t('pages.dich_vu_chuyen_bay.searching') : t('pages.dich_vu_chuyen_bay.search_btn')}
               </button>
@@ -244,7 +243,7 @@ function DichVuChuyenBay() {
                   <button
                     onClick={handlePayment}
                     disabled={loading}
-                    className="w-full py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50"
+                    className="w-full py-3 bg-linear-to-r from-red-600 to-red-700 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50"
                   >
                     {loading ? t('pages.dich_vu_chuyen_bay.processing') : t('pages.dich_vu_chuyen_bay.process_btn')}
                   </button>
@@ -255,7 +254,7 @@ function DichVuChuyenBay() {
 
           {/* Info Banner */}
           {!availableServices.length && !loading && !error && (
-            <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-2xl p-8 text-white">
+            <div className="bg-linear-to-r from-red-600 to-red-700 rounded-2xl p-8 text-white">
               <div className="max-w-3xl mx-auto text-center">
                 <h2 className="text-2xl font-bold mb-4">🎁 {t('pages.dich_vu_chuyen_bay_extra.info_banner_title')}</h2>
                 <p className="text-lg mb-6">

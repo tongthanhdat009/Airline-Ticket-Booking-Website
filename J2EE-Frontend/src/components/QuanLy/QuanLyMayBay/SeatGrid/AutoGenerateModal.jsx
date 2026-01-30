@@ -168,7 +168,7 @@ const AutoGenerateModal = ({
     return (
         <div className="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                <div className="bg-gradient-to-r from-purple-600 to-indigo-700 text-white p-6 rounded-t-xl sticky top-0">
+                <div className="bg-linear-to-r from-purple-600 to-indigo-700 text-white p-6 rounded-t-xl sticky top-0">
                     <div className="flex justify-between items-start">
                         <div>
                             <h3 className="text-2xl font-bold">Tự động tạo sơ đồ ghế</h3>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/common/Navbar';
 import Footer from '../../components/common/Footer';
@@ -129,10 +129,10 @@ function CaNhan() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Left Sidebar - Profile Card */}
-          <div className="lg:w-80 flex-shrink-0">
+          <div className="lg:w-80 shrink-0">
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden border-t-4 border-red-600">
               {/* Profile Header */}
-              <div className="relative bg-gradient-to-br from-red-500 via-red-600 to-orange-600 h-32">
+              <div className="relative bg-linear-to-br from-red-500 via-red-600 to-orange-600 h-32">
                 <div className="absolute inset-0 opacity-10">
                   <div className="absolute inset-0" style={{
                     backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,.1) 10px, rgba(255,255,255,.1) 20px)`
@@ -145,7 +145,7 @@ function CaNhan() {
                 <div className="flex flex-col items-center -mt-16">
                   <div className="relative">
                     <div className="w-32 h-32 rounded-full bg-white p-1 shadow-xl">
-                      <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-5xl">
+                      <div className="w-full h-full rounded-full bg-linear-to-br from-gray-200 to-gray-300 flex items-center justify-center text-5xl">
                         👤
                       </div>
                     </div>
@@ -173,7 +173,7 @@ function CaNhan() {
                 <div className="mt-6 space-y-2">
                   <button
                     onClick={() => navigate('/quan-ly-chuyen-bay')}
-                    className="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition shadow-md"
+                    className="w-full flex items-center gap-3 px-4 py-3 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition shadow-md"
                   >
                     <span className="text-xl">✈️</span>
                     <div className="text-left flex-1">
@@ -184,7 +184,7 @@ function CaNhan() {
                   
                   <button
                     onClick={() => navigate('/lich-su-giao-dich')}
-                    className="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition shadow-md"
+                    className="w-full flex items-center gap-3 px-4 py-3 bg-linear-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition shadow-md"
                   >
                     <span className="text-xl">💳</span>
                     <div className="text-left flex-1">
@@ -195,7 +195,7 @@ function CaNhan() {
                   
                   <button
                     onClick={() => navigate('/')}
-                    className="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition shadow-md"
+                    className="w-full flex items-center gap-3 px-4 py-3 bg-linear-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition shadow-md"
                   >
                     <span className="text-xl">🎫</span>
                     <div className="text-left flex-1">

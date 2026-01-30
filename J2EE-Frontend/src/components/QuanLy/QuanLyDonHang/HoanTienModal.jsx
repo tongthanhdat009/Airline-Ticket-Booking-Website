@@ -30,10 +30,10 @@ const HoanTienModal = ({
   const totalRefund = donHangs.reduce((sum, dh) => sum + (dh.tongGia || 0), 0);
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-60 p-4">
+    <div className="fixed inset-0 flex justify-center items-center z-60 p-4">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg">
         {/* Header */}
-        <div className="bg-gradient-to-r from-orange-500 to-amber-600 text-white p-5 rounded-t-xl">
+        <div className="bg-linear-to-r from-orange-500 to-amber-600 text-white p-5 rounded-t-xl">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
               <FaUndo size={24} />
@@ -120,7 +120,7 @@ const HoanTienModal = ({
             <button
               onClick={handleSubmit}
               disabled={actionLoading || !lyDoHoanTien.trim()}
-              className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-lg hover:from-orange-600 hover:to-amber-700 font-semibold transition-all shadow-lg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-2.5 bg-linear-to-r from-orange-500 to-amber-600 text-white rounded-lg hover:from-orange-600 hover:to-amber-700 font-semibold transition-all shadow-lg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <FaUndo />
               {actionLoading ? 'Đang xử lý...' : 'Xác nhận hoàn tiền'}

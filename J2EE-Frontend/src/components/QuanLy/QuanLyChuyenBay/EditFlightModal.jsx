@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaPlane, FaConciergeBell } from 'react-icons/fa';
+import { FaConciergeBell } from 'react-icons/fa';
 
 const EditFlightModal = ({ isOpen, onClose, onSubmit, formData, onFormChange, routes, getRouteInfo, currentFlight, services = [], selectedServices = [], onServiceChange, aircraft = [] }) => {
     const [loaiChuyenBay, setLoaiChuyenBay] = useState('1-chieu'); // '1-chieu' hoặc 'khu-hoi'
@@ -93,7 +93,7 @@ const EditFlightModal = ({ isOpen, onClose, onSubmit, formData, onFormChange, ro
     return (
         <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl">
+                <div className="sticky top-0 bg-linear-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl">
                     <h2 className="text-2xl font-bold">{currentFlight ? 'Chỉnh sửa chuyến bay' : 'Thêm chuyến bay mới'}</h2>
                 </div>
                 <form onSubmit={handleFormSubmit} className="p-6">
@@ -352,7 +352,7 @@ const EditFlightModal = ({ isOpen, onClose, onSubmit, formData, onFormChange, ro
                         </button>
                         <button 
                             type="submit" 
-                            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg"
+                            className="px-6 py-3 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg"
                         >
                             Lưu
                         </button>

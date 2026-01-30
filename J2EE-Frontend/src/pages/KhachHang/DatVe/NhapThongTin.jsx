@@ -17,7 +17,7 @@ function NhapThongTin() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const [formData, setFormData] = useState(location.state);
+    const [formData, _setFormData] = useState(location.state);
     const [expanded, setExpanded] = useState(
         Array(Number(location.state.passengers)).fill(true)
     );
@@ -535,7 +535,7 @@ function NhapThongTin() {
                     </span>
                 </div>
                 <span
-                    className="bg-gradient-to-bl from-yellow-400 to-yellow-500 rounded-xl flex items-center justify-center px-10 py-2 text-black cursor-pointer"
+                    className="bg-linear-to-bl from-yellow-400 to-yellow-500 rounded-xl flex items-center justify-center px-10 py-2 text-black cursor-pointer"
                     onClick={tiepTucOnClick}
                 >
                     {t('common.continue')}

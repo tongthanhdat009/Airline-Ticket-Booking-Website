@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaTicketAlt } from 'react-icons/fa';
 import { Modal, message } from 'antd';
-import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+
 
 /**
  * Modal Component để thêm/cập nhật hạng vé
@@ -71,7 +71,7 @@ const HangVeModal = ({ isOpen, onClose, onSave, isEditMode, hangVe }) => {
             setSubmitting(true);
             await onSave(formData);
             // Success message is handled in parent component
-        } catch (err) {
+        } catch {
             // Error is handled in parent component
         } finally {
             setSubmitting(false);
@@ -159,7 +159,7 @@ const HangVeModal = ({ isOpen, onClose, onSave, isEditMode, hangVe }) => {
                     <button
                         type="submit"
                         disabled={submitting}
-                        className="px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 font-semibold transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        className="px-6 py-3 bg-linear-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 font-semibold transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                     >
                         {submitting ? (
                             <>

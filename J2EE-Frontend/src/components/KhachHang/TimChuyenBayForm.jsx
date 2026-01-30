@@ -129,7 +129,7 @@ function TimChuyenBayForm() {
                     onClick={() => setFlightType('round')}
                     className={`flex-1 py-3 rounded-lg font-semibold transition-all ${
                         flightType === 'round'
-                            ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-md"
+                            ? "bg-linear-to-r from-red-600 to-red-700 text-white shadow-md"
                             : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                 >
@@ -140,7 +140,7 @@ function TimChuyenBayForm() {
                     onClick={() => setFlightType('one')}
                     className={`flex-1 py-3 rounded-lg font-semibold transition-all ${
                         flightType === 'one'
-                            ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-md"
+                            ? "bg-linear-to-r from-red-600 to-red-700 text-white shadow-md"
                             : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                 >
@@ -262,7 +262,7 @@ function TimChuyenBayForm() {
             {/* Nút tìm chuyến bay */}
             <button
                 type="submit"
-                className="w-full py-4 bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-gray-900 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all"
+                className="w-full py-4 bg-linear-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-gray-900 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all"
             >
                 🔍 {t('booking.search_form.btn_search')}
             </button>

@@ -424,9 +424,9 @@ const ChinhSuaSoDoGhe = () => {
                 </div>
 
                 {/* Right - Controls & Statistics */}
-                <div className="w-96 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 border-l border-blue-100 flex flex-col overflow-hidden flex-shrink-0 shadow-2xl">
+                <div className="w-96 bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50 border-l border-blue-100 flex flex-col overflow-hidden shrink-0 shadow-2xl">
                     {/* Aircraft Info */}
-                    <div className="p-5 border-b border-blue-200 bg-gradient-to-r from-blue-600 to-indigo-600 shadow-md">
+                    <div className="p-5 border-b border-blue-200 bg-linear-to-r from-blue-600 to-indigo-600 shadow-md">
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg border border-white/30">
                                 <FaPlane className="text-white text-xl" />
@@ -450,7 +450,7 @@ const ChinhSuaSoDoGhe = () => {
                             <div className="space-y-2">
                                 <button
                                     onClick={() => setShowAutoGenerate(true)}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 font-medium transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 font-medium transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                                 >
                                     <FaMagic className="text-sm" />
                                     Tự động tạo
@@ -460,14 +460,14 @@ const ChinhSuaSoDoGhe = () => {
                                         setEditingSeat(null);
                                         setShowAddSeat(true);
                                     }}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg hover:from-emerald-600 hover:to-teal-700 font-medium transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-linear-to-r from-emerald-500 to-teal-600 text-white rounded-lg hover:from-emerald-600 hover:to-teal-700 font-medium transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                                 >
                                     <FaPlus className="text-sm" />
                                     Thêm ghế
                                 </button>
                                 <button
                                     onClick={handleDeleteAllSeats}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-rose-500 to-red-600 text-white rounded-lg hover:from-rose-600 hover:to-red-700 font-medium transition-all shadow-md hover:shadow-lg border border-rose-300"
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-linear-to-r from-rose-500 to-red-600 text-white rounded-lg hover:from-rose-600 hover:to-red-700 font-medium transition-all shadow-md hover:shadow-lg border border-rose-300"
                                 >
                                     <FaTrash className="text-sm" />
                                     Xóa tất cả
@@ -477,10 +477,10 @@ const ChinhSuaSoDoGhe = () => {
 
                         {/* Selection Actions */}
                         {selectedSeats.length > 0 && (
-                            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 border-2 border-amber-300 shadow-lg animate-pulse-slow">
+                            <div className="bg-linear-to-br from-amber-50 to-orange-50 rounded-xl p-4 border-2 border-amber-300 shadow-lg animate-pulse-slow">
                                 <div className="flex items-center justify-between mb-3">
                                     <div className="flex items-center gap-2">
-                                        <div className="w-7 h-7 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                        <div className="w-7 h-7 bg-linear-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-md">
                                             {selectedSeats.length}
                                         </div>
                                         <span className="text-amber-900 text-sm font-bold">ghế đã chọn</span>
@@ -496,14 +496,14 @@ const ChinhSuaSoDoGhe = () => {
                                 <div className="space-y-2">
                                     <button
                                         onClick={() => setShowBulkEdit(true)}
-                                        className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 text-sm font-medium transition-all shadow-md"
+                                        className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 text-sm font-medium transition-all shadow-md"
                                     >
                                         <FaEdit size={12} />
                                         Sửa hàng loạt
                                     </button>
                                     <button
                                         onClick={handleDeleteSelectedSeats}
-                                        className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-rose-500 to-red-600 text-white rounded-lg hover:from-rose-600 hover:to-red-700 text-sm font-medium transition-all shadow-md"
+                                        className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-linear-to-r from-rose-500 to-red-600 text-white rounded-lg hover:from-rose-600 hover:to-red-700 text-sm font-medium transition-all shadow-md"
                                     >
                                         <FaTrash size={12} />
                                         Xóa đã chọn

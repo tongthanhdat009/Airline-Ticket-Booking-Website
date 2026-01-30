@@ -20,18 +20,20 @@
     <parameter name="departureDate" class="java.lang.String"/>
     <parameter name="departureTime" class="java.lang.String"/>
     <parameter name="ticketClass" class="java.lang.String"/>
-    <parameter name="subtotal" class="java.math.BigDecimal"/>
-    <parameter name="tax" class="java.math.BigDecimal"/>
-    <parameter name="total" class="java.math.BigDecimal"/>
+    <parameter name="subtotal" class="java.lang.Double"/>
+    <parameter name="tax" class="java.lang.Double"/>
+    <parameter name="total" class="java.lang.Double"/>
     <parameter name="paymentStatus" class="java.lang.String"/>
     <parameter name="paymentDate" class="java.lang.String"/>
     
     <!-- Fields for services -->
-    <field name="rowNumber" class="java.lang.Integer"/>
+    <field name="itemNo" class="java.lang.Integer"/>
     <field name="description" class="java.lang.String"/>
-    <field name="quantity" class="java.lang.String"/>
-    <field name="unitPrice" class="java.math.BigDecimal"/>
-    <field name="amount" class="java.math.BigDecimal"/>
+    <field name="quantity" class="java.lang.Integer"/>
+    <field name="unitPrice" class="java.lang.Double"/>
+    <field name="totalPrice" class="java.lang.Double"/>
+    <field name="unitPriceFormatted" class="java.lang.String"/>
+    <field name="totalPriceFormatted" class="java.lang.String"/>
     
     <!-- Title -->
     <title>
@@ -364,7 +366,7 @@
                 <textElement textAlignment="Center" verticalAlignment="Middle">
                     <font fontName="DejaVu Sans" size="9"/>
                 </textElement>
-                <textFieldExpression><![CDATA[$F{rowNumber}]]></textFieldExpression>
+                <textFieldExpression><![CDATA[$F{itemNo}]]></textFieldExpression>
             </textField>
             
             <textField>
@@ -393,7 +395,7 @@
                     <font fontName="DejaVu Sans" size="9"/>
                     <paragraph rightIndent="8"/>
                 </textElement>
-                <textFieldExpression><![CDATA[new java.text.DecimalFormat("#,##0").format($F{unitPrice})]]></textFieldExpression>
+                <textFieldExpression><![CDATA[$F{unitPriceFormatted} != null ? $F{unitPriceFormatted} : "0"]]></textFieldExpression>
             </textField>
             
             <textField>
@@ -403,7 +405,7 @@
                     <font fontName="DejaVu Sans" size="9"/>
                     <paragraph rightIndent="8"/>
                 </textElement>
-                <textFieldExpression><![CDATA[new java.text.DecimalFormat("#,##0").format($F{amount})]]></textFieldExpression>
+                <textFieldExpression><![CDATA[$F{totalPriceFormatted} != null ? $F{totalPriceFormatted} : "0"]]></textFieldExpression>
             </textField>
         </band>
     </detail>
@@ -434,7 +436,7 @@
                     <font fontName="DejaVu Sans" size="10"/>
                     <paragraph rightIndent="8"/>
                 </textElement>
-                <textFieldExpression><![CDATA[new java.text.DecimalFormat("#,##0").format($P{subtotal}) + " VND"]]></textFieldExpression>
+                <textFieldExpression><![CDATA[new java.text.DecimalFormat("#,##0").format($P{subtotal} != null ? $P{subtotal} : 0) + " VND"]]></textFieldExpression>
             </textField>
             
             <staticText>
@@ -444,7 +446,7 @@
                     <font fontName="DejaVu Sans" size="10" isBold="true"/>
                     <paragraph rightIndent="8"/>
                 </textElement>
-                <text><![CDATA[Tax (0%):]]></text>
+                <text><![CDATA[Tax (VAT):]]></text>
             </staticText>
             <textField>
                 <reportElement x="450" y="42" width="105" height="20"/>
@@ -453,7 +455,7 @@
                     <font fontName="DejaVu Sans" size="10"/>
                     <paragraph rightIndent="8"/>
                 </textElement>
-                <textFieldExpression><![CDATA[new java.text.DecimalFormat("#,##0").format($P{tax}) + " VND"]]></textFieldExpression>
+                <textFieldExpression><![CDATA[new java.text.DecimalFormat("#,##0").format($P{tax} != null ? $P{tax} : 0) + " VND"]]></textFieldExpression>
             </textField>
             
             <staticText>
@@ -472,7 +474,7 @@
                     <font fontName="DejaVu Sans" size="12" isBold="true"/>
                     <paragraph rightIndent="8"/>
                 </textElement>
-                <textFieldExpression><![CDATA[new java.text.DecimalFormat("#,##0").format($P{total}) + " VND"]]></textFieldExpression>
+                <textFieldExpression><![CDATA[new java.text.DecimalFormat("#,##0").format($P{total} != null ? $P{total} : 0) + " VND"]]></textFieldExpression>
             </textField>
             
             <!-- Payment Status -->

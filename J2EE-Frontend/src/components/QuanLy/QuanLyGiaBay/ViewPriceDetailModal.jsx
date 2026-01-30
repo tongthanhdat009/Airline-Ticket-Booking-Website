@@ -69,7 +69,7 @@ const ViewPriceDetailModal = ({
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50 p-4 ">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
-                <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex justify-between items-center z-10">
+                <div className="sticky top-0 bg-linear-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex justify-between items-center z-10">
                     <h3 className="text-xl font-bold">Chi tiết giá chuyến bay</h3>
                     <div className="flex items-center gap-3">
                         <button 
@@ -90,7 +90,7 @@ const ViewPriceDetailModal = ({
                 <div className="p-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Thông tin tuyến bay */}
-                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+                        <div className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
                             <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                                 <FaPlane className="text-blue-600" />
                                 Thông tin tuyến bay
@@ -123,7 +123,7 @@ const ViewPriceDetailModal = ({
                                     <div className="text-xs text-gray-500 mt-1">{selectedRoute.tuyenBay?.sanBayDen?.quocGiaSanBay}</div>
                                 </div>
                                 
-                                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
+                                <div className="bg-linear-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
                                     <div className="text-sm text-gray-600 mb-2">Tổng quan giá vé</div>
                                     <div className="space-y-2">
                                         {groupPricesByClass(selectedRoute.prices).map((ticketClass) => (
@@ -139,7 +139,7 @@ const ViewPriceDetailModal = ({
                         </div>
                         
                         {/* Danh sách giá theo hạng vé */}
-                        <div className="h-100% bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-6 border border-yellow-200">
+                        <div className="h-100% bg-linear-to-br from-yellow-50 to-orange-50 rounded-xl p-6 border border-yellow-200">
                             <div className="flex justify-between items-center mb-4">
                                 <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                                     <FaMoneyBillWave className="text-green-600" />
@@ -147,7 +147,7 @@ const ViewPriceDetailModal = ({
                                 </h4>
                                 <button 
                                     onClick={onAddNew}
-                                    className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-md hover:shadow-lg text-sm font-semibold"
+                                    className="flex items-center gap-2 bg-linear-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-md hover:shadow-lg text-sm font-semibold"
                                 >
                                     <FaPlus size={14} />
                                     <span>Thêm giá</span>

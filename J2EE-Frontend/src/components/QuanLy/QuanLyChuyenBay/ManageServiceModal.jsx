@@ -26,7 +26,7 @@ const ManageServiceModal = ({ isOpen, onClose, flight, showToast }) => {
                 const assignedRes = await getDichVuByChuyenBay(flight.maChuyenBay);
                 const assignedData = assignedRes.data?.data;
                 setAssignedServices(Array.isArray(assignedData) ? assignedData : []);
-            } catch (error) {
+            } catch {
                 setAssignedServices([]);
             }
 
@@ -91,9 +91,9 @@ const ManageServiceModal = ({ isOpen, onClose, flight, showToast }) => {
     if (!isOpen || !flight) return null;
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-4 flex justify-between items-center z-10">
+                <div className="sticky top-0 bg-linear-to-r from-purple-600 to-purple-700 text-white px-6 py-4 flex justify-between items-center z-10">
                     <h3 className="text-xl font-bold flex items-center gap-2">
                         <FaCog />
                         Quản lý dịch vụ chuyến bay {flight.soHieuChuyenBay}
@@ -116,7 +116,7 @@ const ManageServiceModal = ({ isOpen, onClose, flight, showToast }) => {
                                 {assignedServices.length > 0 ? (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {assignedServices.map((service) => (
-                                            <div key={service.maDichVu} className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 shadow-md border border-green-200 flex items-center gap-3">
+                                            <div key={service.maDichVu} className="bg-linear-to-br from-green-50 to-emerald-50 rounded-lg p-4 shadow-md border border-green-200 flex items-center gap-3">
                                                 {serviceImages[service.maDichVu] && (
                                                     <img
                                                         src={serviceImages[service.maDichVu]}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { FaPlus, FaSearch, FaEdit, FaTrash, FaToggleOn, FaToggleOff, FaTags } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
@@ -157,7 +157,7 @@ const QuanLyKhuyenMai = () => {
                 </div>
                 <button
                     onClick={handleOpenModalForAdd}
-                    className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-5 py-3 rounded-lg hover:from-pink-600 hover:to-rose-600 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
+                    className="flex items-center gap-2 bg-linear-to-r from-pink-500 to-rose-500 text-white px-5 py-3 rounded-lg hover:from-pink-600 hover:to-rose-600 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
                 >
                     <FaPlus />
                     <span>Thêm khuyến mãi</span>
@@ -168,7 +168,7 @@ const QuanLyKhuyenMai = () => {
             <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
+                        <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
                             <tr>
                                 <th className="px-6 py-4 text-left font-semibold">ID</th>
                                 <th className="px-6 py-4 text-left font-semibold">Tên khuyến mãi</th>
@@ -189,7 +189,7 @@ const QuanLyKhuyenMai = () => {
                                         <td className="px-6 py-4 font-bold text-pink-600">#{km.maKhuyenMai}</td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
-                                                <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center flex-shrink-0">
+                                                <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center shrink-0">
                                                     <FaTags className="text-pink-600" />
                                                 </div>
                                                 <span className="font-medium text-gray-900">{km.tenKhuyenMai}</span>

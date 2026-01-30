@@ -85,7 +85,7 @@ function DangNhap() {
   if (isCheckingAuth) {
     return (
       <>
-        <div className="min-h-[calc(100vh-70px)] flex items-center justify-center bg-gradient-to-br from-pink-50 via-yellow-50 to-white">
+        <div className="min-h-[calc(100vh-70px)] flex items-center justify-center bg-linear-to-br from-pink-50 via-yellow-50 to-white">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mb-4"></div>
             <p className="text-gray-600 font-medium">Đang kiểm tra...</p>
@@ -102,7 +102,7 @@ function DangNhap() {
         style={{ backgroundImage: 'url(/background/auth/bg_footer.2f611c1f.webp)' }}
       >
         {/* Overlay để làm nổi bật form */}
-        <div className="absolute inset-0 bg-gradient-to-br from-pink-50/80 via-yellow-50/80 to-white/80"></div>
+        <div className="absolute inset-0 bg-linear-to-br from-pink-50/80 via-yellow-50/80 to-white/80"></div>
         
         <div className="max-w-4xl w-full bg-white rounded-2xl shadow-xl grid md:grid-cols-2 overflow-hidden relative z-10">
           {/* Left Side - Form */}
@@ -179,7 +179,7 @@ function DangNhap() {
 
                 <button 
                   type="submit" 
-                  className="w-full py-3 bg-gradient-to-r from-red-600 to-red-700 text-white border-none rounded-lg text-sm font-semibold cursor-pointer transition-all shadow-[0_4px_15px_rgba(227,6,19,0.3)] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(227,6,19,0.4)] disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full py-3 bg-linear-to-r from-red-600 to-red-700 text-white border-none rounded-lg text-sm font-semibold cursor-pointer transition-all shadow-[0_4px_15px_rgba(227,6,19,0.3)] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(227,6,19,0.4)] disabled:opacity-60 disabled:cursor-not-allowed"
                   disabled={isLoading}
                 >
                   {isLoading ? t('common.processing') : t('common.login')}
@@ -216,7 +216,7 @@ function DangNhap() {
           </div>
 
           {/* Right Side - Banner */}
-          <div className="bg-gradient-to-br from-red-600 to-red-700 p-8 md:p-10 flex items-center justify-center relative overflow-hidden">
+          <div className="bg-linear-to-br from-red-600 to-red-700 p-8 md:p-10 flex items-center justify-center relative overflow-hidden">
             <div className="absolute -top-1/2 -right-1/2 w-[200%] h-[200%] bg-[radial-gradient(circle,rgba(255,213,0,0.15)_0%,transparent_70%)] animate-pulse-slow"></div>
             
             <div className="relative z-10 text-white">
