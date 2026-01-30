@@ -57,6 +57,34 @@ const ThongKeService = {
         }
     },
 
+    // Lấy thống kê trong ngày hôm nay
+    getThongKeNgay: async () => {
+        try {
+            const response = await apiClient.get('/admin/dashboard/thongke/trong-ngay');
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching daily statistics:', error);
+            throw error;
+        }
+    },
+
+    // Lấy thống kê so sánh giữa các kỳ
+    // kyTruoc: 'WEEK' | 'MONTH' | 'YEAR'
+    getThongKeSoSanh: async (tuNgay, denNgay, kyTruoc = 'WEEK') => {
+        try {
+            const params = {
+                tuNgay,
+                denNgay,
+                kyTruoc
+            };
+            const response = await apiClient.get('/admin/dashboard/thongke/so-sanh', { params });
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching comparison statistics:', error);
+            throw error;
+        }
+    },
+
     // Xuất báo cáo PDF từ backend
     exportPdf: async (startDate, endDate) => {
         try {

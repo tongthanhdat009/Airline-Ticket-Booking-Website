@@ -26,8 +26,7 @@ public class AdminUserDetails implements UserDetails {
     public AdminUserDetails(
             TaiKhoanAdmin taiKhoanAdmin,
             Set<String> roles,
-            Set<String> permissions
-    ) {
+            Set<String> permissions) {
         this.taiKhoanAdmin = taiKhoanAdmin;
         this.roles = roles;
         this.permissions = permissions;
@@ -36,14 +35,10 @@ public class AdminUserDetails implements UserDetails {
         this.authorities = new HashSet<>();
 
         // Add role authorities with ROLE_ prefix
-        roles.forEach(role ->
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + role))
-        );
+        roles.forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role)));
 
         // Add permission authorities
-        permissions.forEach(permission ->
-            authorities.add(new SimpleGrantedAuthority(permission))
-        );
+        permissions.forEach(permission -> authorities.add(new SimpleGrantedAuthority(permission)));
     }
 
     @Override
@@ -90,9 +85,27 @@ public class AdminUserDetails implements UserDetails {
 
     /**
      * Kiểm tra xem admin có quyền cụ thể không
+     * Lưu ý: MANAGE bao gồm tất cả actions (VIEW, CREATE, UPDATE, DELETE, EXPORT,
+     * APPROVE...)
      */
     public boolean hasPermission(String permission) {
-        return permissions.contains(permission);
+        // Kiểm tra trực tiếp
+        if (permissions.contains(permission)) {
+            return true;
+        }
+
+        // Kiểm tra nếu có quyền MANAGE trên feature thì có tất cả actions
+        // permission format: FEATURE_ACTION (e.g., REPORT_VIEW, FLIGHT_CREATE)
+        int underscoreIndex = permission.lastIndexOf('_');
+        if (underscoreIndex > 0) {
+            String feature = permission.substring(0, underscoreIndex);
+            String managePermission = feature + "_MANAGE";
+            if (permissions.contains(managePermission)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

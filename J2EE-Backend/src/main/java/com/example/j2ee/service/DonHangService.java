@@ -16,6 +16,7 @@ import com.example.j2ee.repository.HoaDonRepository;
 import com.example.j2ee.repository.HoanTienRepository;
 import com.example.j2ee.repository.TrangThaiThanhToanRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,8 +52,7 @@ public class DonHangService {
             LocalDateTime denNgay,
             BigDecimal tuGia,
             BigDecimal denGia,
-            String sort
-    ) {
+            String sort) {
         Specification<DonHang> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -64,25 +64,22 @@ public class DonHangService {
             // Filter by email
             if (email != null && !email.isEmpty()) {
                 predicates.add(cb.like(
-                    cb.lower(root.get("emailNguoiDat")),
-                    "%" + email.toLowerCase() + "%"
-                ));
+                        cb.lower(root.get("emailNguoiDat")),
+                        "%" + email.toLowerCase() + "%"));
             }
 
             // Filter by phone number
             if (soDienThoai != null && !soDienThoai.isEmpty()) {
                 predicates.add(cb.like(
-                    root.get("soDienThoaiNguoiDat"),
-                    "%" + soDienThoai + "%"
-                ));
+                        root.get("soDienThoaiNguoiDat"),
+                        "%" + soDienThoai + "%"));
             }
 
             // Filter by PNR
             if (pnr != null && !pnr.isEmpty()) {
                 predicates.add(cb.like(
-                    cb.upper(root.get("pnr")),
-                    "%" + pnr.toUpperCase() + "%"
-                ));
+                        cb.upper(root.get("pnr")),
+                        "%" + pnr.toUpperCase() + "%"));
             }
 
             // Filter by date range (ngày đặt)
@@ -112,12 +109,10 @@ public class DonHangService {
         } else {
             // Default sort by order date descending
             donHangList = donHangRepository.findAll(
-                spec,
-                org.springframework.data.domain.Sort.by(
-                    org.springframework.data.domain.Sort.Direction.DESC,
-                    "ngayDat"
-                )
-            );
+                    spec,
+                    org.springframework.data.domain.Sort.by(
+                            org.springframework.data.domain.Sort.Direction.DESC,
+                            "ngayDat"));
         }
 
         return donHangList.stream()
@@ -132,8 +127,7 @@ public class DonHangService {
     private org.springframework.data.domain.Sort createSortOption(String sort) {
         String[] parts = sort.split(":");
         String field = parts[0];
-        org.springframework.data.domain.Sort.Direction direction =
-            org.springframework.data.domain.Sort.Direction.DESC;
+        org.springframework.data.domain.Sort.Direction direction = org.springframework.data.domain.Sort.Direction.DESC;
 
         if (parts.length > 1) {
             String dir = parts[1].toLowerCase();
@@ -183,6 +177,7 @@ public class DonHangService {
     /**
      * Cập nhật trạng thái đơn hàng
      */
+    @CacheEvict(value = { "thongKeTongQuan", "doanhThuTheoNgay", "thongKeNgay" }, allEntries = true)
     @Transactional
     public DonHangResponse updateTrangThai(int id, UpdateTrangThaiDonHangRequest request) {
         // Tìm đơn hàng theo ID
@@ -195,15 +190,13 @@ public class DonHangService {
         // Validate trạng thái mới
         if (!isValidStatus(newStatus)) {
             throw new IllegalArgumentException(
-                "Trạng thái không hợp lệ. Giá trị hợp lệ: CHỜ THANH TOÁN, ĐÃ THANH TOÁN, ĐÃ HỦY"
-            );
+                    "Trạng thái không hợp lệ. Giá trị hợp lệ: CHỜ THANH TOÁN, ĐÃ THANH TOÁN, ĐÃ HỦY");
         }
 
         // Validate chuyển đổi trạng thái
         if (!isValidStateTransition(currentStatus, newStatus)) {
             throw new IllegalArgumentException(
-                "Không thể chuyển từ trạng thái '" + currentStatus + "' sang '" + newStatus + "'"
-            );
+                    "Không thể chuyển từ trạng thái '" + currentStatus + "' sang '" + newStatus + "'");
         }
 
         // Cập nhật trạng thái
@@ -224,8 +217,8 @@ public class DonHangService {
      */
     private boolean isValidStatus(String status) {
         return "CHỜ THANH TOÁN".equals(status)
-            || "ĐÃ THANH TOÁN".equals(status)
-            || "ĐÃ HỦY".equals(status);
+                || "ĐÃ THANH TOÁN".equals(status)
+                || "ĐÃ HỦY".equals(status);
     }
 
     /**
@@ -268,6 +261,7 @@ public class DonHangService {
      * - Không thể hủy đơn hàng đã ở trạng thái ĐÃ HỦY
      * - Cập nhật tất cả DatCho sang trạng thái CANCELLED
      */
+    @CacheEvict(value = { "thongKeTongQuan", "doanhThuTheoNgay", "thongKeNgay" }, allEntries = true)
     @Transactional
     public DonHangResponse huyDonHang(int id, HuyDonHangRequest request) {
         // Bước 1: Tìm đơn hàng theo ID
@@ -291,7 +285,8 @@ public class DonHangService {
 
         // Bước 4: Kiểm tra thời gian khởi hành của chuyến bay
         if (danhSachDatCho != null && !danhSachDatCho.isEmpty()) {
-            // Lấy chuyến bay đầu tiên (giả sử tất cả DatCho trong cùng một đơn hàng là cùng một chuyến bay)
+            // Lấy chuyến bay đầu tiên (giả sử tất cả DatCho trong cùng một đơn hàng là cùng
+            // một chuyến bay)
             DatCho firstDatCho = danhSachDatCho.iterator().next();
             ChiTietChuyenBay chuyenBay = firstDatCho.getChuyenBay();
 
@@ -304,9 +299,8 @@ public class DonHangService {
 
                 // Tính toán thời gian khởi hành dự kiến
                 LocalDateTime thoiGianKhoiHanh = LocalDateTime.of(
-                    chuyenBay.getNgayDi(),
-                    chuyenBay.getGioDi()
-                );
+                        chuyenBay.getNgayDi(),
+                        chuyenBay.getGioDi());
 
                 // Kiểm tra nếu chuyến bay đã khởi hành
                 LocalDateTime thoiGianHienTai = LocalDateTime.now();
@@ -329,7 +323,8 @@ public class DonHangService {
         donHang.setTrangThai("ĐÃ HỦY");
         donHangRepository.save(donHang);
 
-        // Bước 7: Cập nhật tất cả DatCho sang trạng thái CANCELLED và tạo bản ghi HoanTien
+        // Bước 7: Cập nhật tất cả DatCho sang trạng thái CANCELLED và tạo bản ghi
+        // HoanTien
         if (danhSachDatCho != null && !danhSachDatCho.isEmpty()) {
             for (DatCho datCho : danhSachDatCho) {
                 datCho.setTrangThai("CANCELLED");
@@ -378,8 +373,7 @@ public class DonHangService {
             LocalDateTime denNgay,
             BigDecimal tuGia,
             BigDecimal denGia,
-            String sort
-    ) {
+            String sort) {
         // Create specification for filtering
         Specification<DonHang> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -434,12 +428,10 @@ public class DonHangService {
         } else {
             // Default sort by order date descending
             deletedOrders = donHangRepository.findAll(
-                spec,
-                org.springframework.data.domain.Sort.by(
-                    org.springframework.data.domain.Sort.Direction.DESC,
-                    "ngayDat"
-                )
-            );
+                    spec,
+                    org.springframework.data.domain.Sort.by(
+                            org.springframework.data.domain.Sort.Direction.DESC,
+                            "ngayDat"));
         }
         return deletedOrders.stream()
                 .map(this::mapToResponse)
@@ -493,6 +485,7 @@ public class DonHangService {
      * @param maDonHangs Danh sách mã đơn hàng cần duyệt
      * @return Map chứa kết quả (successCount, failedCount, errors)
      */
+    @CacheEvict(value = { "thongKeTongQuan", "doanhThuTheoNgay", "thongKeNgay" }, allEntries = true)
     @Transactional
     public java.util.Map<String, Object> batchApprovePayment(java.util.List<Integer> maDonHangs) {
         java.util.Map<String, Object> result = new java.util.HashMap<>();
@@ -527,7 +520,8 @@ public class DonHangService {
                         if (chuyenBay != null) {
                             String trangThaiChuyenBay = chuyenBay.getTrangThai();
                             if ("Đang bay".equals(trangThaiChuyenBay) || "Đã bay".equals(trangThaiChuyenBay)) {
-                                errors.add("Đơn hàng #" + maDonHang + ": Chuyến bay đã bay hoặc đang bay, không thể duyệt thanh toán");
+                                errors.add("Đơn hàng #" + maDonHang
+                                        + ": Chuyến bay đã bay hoặc đang bay, không thể duyệt thanh toán");
                                 failedCount++;
                                 shouldSkip = true;
                                 break;
@@ -565,10 +559,11 @@ public class DonHangService {
      * Chỉ hoàn tiền các đơn hàng có trạng thái ĐÃ THANH TOÁN
      * Validate trạng thái chuyến bay (không hoàn tiền nếu đã bay hoặc đang bay)
      *
-     * @param maDonHangs Danh sách mã đơn hàng cần hoàn tiền
+     * @param maDonHangs   Danh sách mã đơn hàng cần hoàn tiền
      * @param lyDoHoanTien Lý do hoàn tiền
      * @return Map chứa kết quả (successCount, failedCount, errors)
      */
+    @CacheEvict(value = { "thongKeTongQuan", "doanhThuTheoNgay", "thongKeNgay" }, allEntries = true)
     @Transactional
     public java.util.Map<String, Object> batchRefund(java.util.List<Integer> maDonHangs, String lyDoHoanTien) {
         java.util.Map<String, Object> result = new java.util.HashMap<>();
@@ -603,7 +598,8 @@ public class DonHangService {
                         if (chuyenBay != null) {
                             String trangThaiChuyenBay = chuyenBay.getTrangThai();
                             if ("Đang bay".equals(trangThaiChuyenBay) || "Đã bay".equals(trangThaiChuyenBay)) {
-                                errors.add("Đơn hàng #" + maDonHang + ": Chuyến bay đã bay hoặc đang bay, không thể hoàn tiền");
+                                errors.add("Đơn hàng #" + maDonHang
+                                        + ": Chuyến bay đã bay hoặc đang bay, không thể hoàn tiền");
                                 failedCount++;
                                 shouldSkip = true;
                                 break;
@@ -677,6 +673,7 @@ public class DonHangService {
 
     /**
      * Tạo hóa đơn cho đơn hàng khi xác nhận thanh toán
+     * 
      * @param donHang Đơn hàng cần tạo hóa đơn
      * @return HoaDon đã tạo
      */

@@ -4,7 +4,7 @@ import {
     PieChart, Pie, Cell, BarChart, Bar
 } from 'recharts';
 import Card from '../../components/QuanLy/CardChucNang';
-import { FaCalendarAlt, FaDollarSign, FaTicketAlt, FaConciergeBell, FaUsers, FaFilePdf, FaChartLine, FaSync } from 'react-icons/fa';
+import { FaCalendarAlt, FaDollarSign, FaTicketAlt, FaConciergeBell, FaUsers, FaFilePdf, FaChartLine, FaSync, FaFileInvoice, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import ThongKeService from '../../services/ThongKeService';
 import Toast from '../../components/common/Toast';
 import StatCard from '../../components/QuanLy/ThongKe/StatCard';
@@ -16,6 +16,7 @@ const ThongKeDoanhThu = () => {
     const [dailyRevenueData, setDailyRevenueData] = useState([]);
     const [serviceRevenueData, setServiceRevenueData] = useState([]);
     const [ticketClassRevenueData, setTicketClassRevenueData] = useState([]);
+    const [todayData, setTodayData] = useState(null); // Thống kê trong ngày
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
@@ -51,6 +52,10 @@ const ThongKeDoanhThu = () => {
         let start, end;
 
         switch (timeRange) {
+            case 'today':
+                start = new Date(today);
+                end = new Date(today);
+                break;
             case '7days':
                 start = new Date(today);
                 start.setDate(today.getDate() - 6);
@@ -100,14 +105,18 @@ const ThongKeDoanhThu = () => {
 
     // Lấy tên hiển thị của khoảng thời gian
     const getTimeRangeLabel = useCallback(() => {
+        if (timeRange === 'today') {
+            return `Hôm nay - ${new Date().toLocaleDateString('vi-VN')}`;
+        }
+
         const dateRange = getDateRange();
         if (!dateRange || (!dateRange.startDate && !dateRange.endDate)) return 'Chọn khoảng thời gian';
-        
+
         const start = new Date(dateRange.startDate);
         const end = new Date(dateRange.endDate);
-        
+
         return `${start.toLocaleDateString('vi-VN')} - ${end.toLocaleDateString('vi-VN')}`;
-    }, [getDateRange]);
+    }, [getDateRange, timeRange]);
 
     const showToast = useCallback((message, type = 'success') => {
         setToast({ isVisible: true, message, type });
@@ -117,11 +126,48 @@ const ThongKeDoanhThu = () => {
         setToast(prev => ({ ...prev, isVisible: false }));
     }, []);
 
-    // Fetch dữ liệu với error handling tốt hơn
-    const fetchAllStatistics = useCallback(async () => {
+    // Fetch thống kê trong ngày
+    const fetchTodayStatistics = useCallback(async () => {
         try {
             setLoading(true);
             setError(null);
+
+            const response = await ThongKeService.getThongKeNgay();
+            if (response.success) {
+                setTodayData(response.data);
+                // Clear các dữ liệu khác khi chọn "Hôm nay"
+                setDailyRevenueData([]);
+                setServiceRevenueData([]);
+                setTicketClassRevenueData([]);
+                setOverviewData(null);
+            } else {
+                setTodayData(null);
+                setError('Không thể tải dữ liệu thống kê trong ngày');
+            }
+
+            showToast('Tải dữ liệu thống kê trong ngày thành công!', 'success');
+
+        } catch (err) {
+            console.error('Error fetching today statistics:', err);
+            setError('Không thể tải dữ liệu thống kê trong ngày. Vui lòng thử lại sau.');
+            showToast('Không thể tải dữ liệu thống kê trong ngày!', 'error');
+        } finally {
+            setLoading(false);
+        }
+    }, [showToast]);
+
+    // Fetch dữ liệu với error handling tốt hơn
+    const fetchAllStatistics = useCallback(async () => {
+        // Nếu chọn "today", dùng API riêng
+        if (timeRange === 'today') {
+            await fetchTodayStatistics();
+            return;
+        }
+
+        try {
+            setLoading(true);
+            setError(null);
+            setTodayData(null); // Clear dữ liệu today khi chọn khoảng thời gian khác
 
             const dateRange = getDateRange();
             if (!dateRange) {
@@ -189,7 +235,7 @@ const ThongKeDoanhThu = () => {
         } finally {
             setLoading(false);
         }
-    }, [showToast, getDateRange]);
+    }, [showToast, getDateRange, timeRange, fetchTodayStatistics]);
 
     // Debounce fetch function để tránh gọi quá nhiều lần
     useEffect(() => {
@@ -273,7 +319,7 @@ const ThongKeDoanhThu = () => {
                             </p>
                         </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-3 w-full lg:w-auto">
                         <button
                             onClick={fetchAllStatistics}
@@ -309,6 +355,7 @@ const ThongKeDoanhThu = () => {
                                 onChange={(e) => setTimeRange(e.target.value)}
                                 className="flex-1 px-4 py-2.5 border-2 border-blue-200 rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white cursor-pointer hover:border-blue-300 transition-all shadow-sm"
                             >
+                                <option value="today">Hôm nay</option>
                                 <option value="7days">7 ngày qua</option>
                                 <option value="30days">30 ngày qua</option>
                                 <option value="thisMonth">Tháng này</option>
@@ -381,152 +428,231 @@ const ThongKeDoanhThu = () => {
                 </div>
             ) : (
                 <>
-                    {/* Các thẻ số liệu - Improved */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                        <StatCard
-                            title="Tổng doanh thu"
-                            value={overviewData ? formatShortCurrency(overviewData.tongDoanhThu) : '0đ'}
-                            icon={<FaDollarSign size={24}/>}
-                            color="green"
-                        />
-                        <StatCard
-                            title="Doanh thu bán vé"
-                            value={overviewData ? formatShortCurrency(overviewData.doanhThuBanVe) : '0đ'}
-                            icon={<FaTicketAlt size={24}/>}
-                            color="blue"
-                        />
-                        <StatCard
-                            title="Doanh thu dịch vụ"
-                            value={overviewData ? formatShortCurrency(overviewData.doanhThuDichVu) : '0đ'}
-                            icon={<FaConciergeBell size={24}/>}
-                            color="purple"
-                        />
-                        <StatCard
-                            title="Khách hàng mới"
-                            value={overviewData ? overviewData.khachHangMoi : '0'}
-                            icon={<FaUsers size={24}/>}
-                            color="orange"
-                        />
-                    </div>
+                    {/* Thống kê trong ngày - Hiển thị khi chọn "Hôm nay" */}
+                    {timeRange === 'today' && todayData ? (
+                        <div className="space-y-6">
+                            {/* Tiêu đề thống kê trong ngày */}
+                            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 rounded-2xl shadow-lg text-white">
+                                <h3 className="text-2xl font-bold mb-2">📊 Thống kê hôm nay</h3>
+                                <p className="text-blue-100">{new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                            </div>
 
-                    {/* Biểu đồ đường - Enhanced */}
-                    <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 mb-6 hover:shadow-xl transition-shadow">
-                        <div className="flex justify-between items-center mb-6">
-                            <div>
-                                <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                            {/* Các thẻ thống kê trong ngày */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <StatCard
+                                    title="Doanh thu hôm nay"
+                                    value={formatShortCurrency(todayData.doanhThuHomNay || 0)}
+                                    icon={<FaDollarSign size={24} />}
+                                    color="green"
+                                />
+                                <StatCard
+                                    title="Số đơn hàng"
+                                    value={todayData.soDonHangHomNay || 0}
+                                    icon={<FaTicketAlt size={24} />}
+                                    color="blue"
+                                />
+                                <StatCard
+                                    title="Vé đã bán"
+                                    value={todayData.soVeDaBanHomNay || 0}
+                                    icon={<FaConciergeBell size={24} />}
+                                    color="purple"
+                                />
+                                <StatCard
+                                    title="Khách check-in"
+                                    value={todayData.soKhachCheckInHomNay || 0}
+                                    icon={<FaCheckCircle size={24} />}
+                                    color="teal"
+                                />
+                                <StatCard
+                                    title="Tỷ lệ hủy"
+                                    value={`${todayData.tyLeHuyHomNay || 0}%`}
+                                    icon={<FaTimesCircle size={24} />}
+                                    color="red"
+                                />
+                                <StatCard
+                                    title="Hóa đơn phát hành"
+                                    value={todayData.soHoaDonHomNay || 0}
+                                    icon={<FaFileInvoice size={24} />}
+                                    color="orange"
+                                />
+                            </div>
+
+                            {/* Thông tin chi tiết */}
+                            <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                                <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                                     <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
-                                    Xu hướng doanh thu
+                                    Chi tiết doanh thu hôm nay
                                 </h4>
-                                <p className="text-sm text-gray-500 mt-1">Biểu đồ doanh thu theo từng ngày</p>
-                            </div>
-                        </div>
-                        {dailyRevenueData.length > 0 ? (
-                            <ResponsiveContainer id="line-chart" width="100%" height={380} debounce={150}>
-                                <LineChart data={dailyRevenueData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                                    <defs>
-                                        <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8}/>
-                                            <stop offset="95%" stopColor="#3B82F6" stopOpacity={0.1}/>
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                                    <XAxis dataKey="date" fontSize={12} stroke="#6B7280" />
-                                    <YAxis tickFormatter={formatShortCurrency} fontSize={12} stroke="#6B7280" />
-                                    <Tooltip content={<CustomTooltip formatter={formatCurrency} />} />
-                                    <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                                    <Line
-                                        type="monotone"
-                                        dataKey="Doanh thu"
-                                        stroke="#3B82F6"
-                                        strokeWidth={3}
-                                        dot={{ fill: '#3B82F6', r: 5, strokeWidth: 2, stroke: '#fff' }}
-                                        activeDot={{ r: 7, fill: '#1D4ED8', stroke: '#fff', strokeWidth: 2 }}
-                                        isAnimationActive={true}
-                                        fill="url(#colorRevenue)"
-                                    />
-                                </LineChart>
-                            </ResponsiveContainer>
-                        ) : (
-                            <div className="flex flex-col justify-center items-center h-80 text-gray-400">
-                                <FaChartLine className="text-6xl mb-4 opacity-30" />
-                                <p className="font-medium">Không có dữ liệu doanh thu theo ngày</p>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Biểu đồ tròn và cột - Grid Layout */}
-                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                        {/* Biểu đồ tròn - Enhanced */}
-                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-                            <div className="mb-6">
-                                <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                                    <div className="w-1 h-6 bg-green-600 rounded-full"></div>
-                                    Cơ cấu doanh thu vé
-                                </h4>
-                                <p className="text-sm text-gray-500 mt-1">Phân bổ theo hạng vé</p>
-                            </div>
-                            {ticketClassRevenueData.length > 0 ? (
-                                <ResponsiveContainer id="pie-chart" width="100%" height={340} debounce={150}>
-                                    <PieChart>
-                                        <Pie
-                                            data={ticketClassRevenueData}
-                                            cx="50%"
-                                            cy="50%"
-                                            labelLine={false}
-                                            outerRadius={120}
-                                            fill="#8884d8"
-                                            dataKey="value"
-                                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                                            isAnimationActive={true}
-                                        >
-                                            {ticketClassRevenueData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={COLORS_CLASS[index % COLORS_CLASS.length]} />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip content={<CustomTooltip formatter={formatCurrency} />} />
-                                        <Legend />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            ) : (
-                                <div className="flex flex-col justify-center items-center h-80 text-gray-400">
-                                    <FaTicketAlt className="text-6xl mb-4 opacity-30" />
-                                    <p className="font-medium">Không có dữ liệu doanh thu theo hạng vé</p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-xl border border-green-200">
+                                        <p className="text-sm text-green-600 font-medium mb-1">Doanh thu</p>
+                                        <p className="text-2xl font-bold text-green-800">{formatCurrency(todayData.doanhThuHomNay || 0)}</p>
+                                    </div>
+                                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl border border-blue-200">
+                                        <p className="text-sm text-blue-600 font-medium mb-1">Đơn hàng thành công</p>
+                                        <p className="text-2xl font-bold text-blue-800">{todayData.soDonHangHomNay || 0} đơn</p>
+                                    </div>
+                                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-xl border border-purple-200">
+                                        <p className="text-sm text-purple-600 font-medium mb-1">Vé đã bán</p>
+                                        <p className="text-2xl font-bold text-purple-800">{todayData.soVeDaBanHomNay || 0} vé</p>
+                                    </div>
+                                    <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-xl border border-orange-200">
+                                        <p className="text-sm text-orange-600 font-medium mb-1">Hóa đơn phát hành</p>
+                                        <p className="text-2xl font-bold text-orange-800">{todayData.soHoaDonHomNay || 0} hóa đơn</p>
+                                    </div>
                                 </div>
-                            )}
-                        </div>
-
-                        {/* Biểu đồ cột - Enhanced */}
-                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-                            <div className="mb-6">
-                                <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                                    <div className="w-1 h-6 bg-purple-600 rounded-full"></div>
-                                    Cơ cấu doanh thu dịch vụ
-                                </h4>
-                                <p className="text-sm text-gray-500 mt-1">So sánh các dịch vụ</p>
                             </div>
-                            {serviceRevenueData.length > 0 ? (
-                                <ResponsiveContainer id="bar-chart" width="100%" height={340} debounce={150}>
-                                    <BarChart data={serviceRevenueData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                                        <XAxis dataKey="name" fontSize={12} stroke="#6B7280" />
-                                        <YAxis tickFormatter={formatShortCurrency} fontSize={12} stroke="#6B7280" />
-                                        <Tooltip content={<CustomTooltip formatter={formatCurrency} />} />
-                                        <Legend />
-                                        <Bar dataKey="Doanh thu" fill="#8884d8" radius={[10, 10, 0, 0]} isAnimationActive={true}>
-                                            {serviceRevenueData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={COLORS_SERVICE[index % COLORS_SERVICE.length]} />
-                                            ))}
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            ) : (
-                                <div className="flex flex-col justify-center items-center h-80 text-gray-400">
-                                    <FaConciergeBell className="text-6xl mb-4 opacity-30" />
-                                    <p className="font-medium">Không có dữ liệu doanh thu theo dịch vụ</p>
-                                </div>
-                            )}
                         </div>
-                    </div>
+                    ) : (
+                        <>
+                            {/* Các thẻ số liệu - Improved (hiển thị khi không phải "Hôm nay") */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                                <StatCard
+                                    title="Tổng doanh thu"
+                                    value={overviewData ? formatShortCurrency(overviewData.tongDoanhThu) : '0đ'}
+                                    icon={<FaDollarSign size={24} />}
+                                    color="green"
+                                />
+                                <StatCard
+                                    title="Doanh thu bán vé"
+                                    value={overviewData ? formatShortCurrency(overviewData.doanhThuBanVe) : '0đ'}
+                                    icon={<FaTicketAlt size={24} />}
+                                    color="blue"
+                                />
+                                <StatCard
+                                    title="Doanh thu dịch vụ"
+                                    value={overviewData ? formatShortCurrency(overviewData.doanhThuDichVu) : '0đ'}
+                                    icon={<FaConciergeBell size={24} />}
+                                    color="purple"
+                                />
+                                <StatCard
+                                    title="Khách hàng mới"
+                                    value={overviewData ? overviewData.khachHangMoi : '0'}
+                                    icon={<FaUsers size={24} />}
+                                    color="orange"
+                                />
+                            </div>
+
+                            {/* Biểu đồ đường - Enhanced */}
+                            <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 mb-6 hover:shadow-xl transition-shadow">
+                                <div className="flex justify-between items-center mb-6">
+                                    <div>
+                                        <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                                            <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
+                                            Xu hướng doanh thu
+                                        </h4>
+                                        <p className="text-sm text-gray-500 mt-1">Biểu đồ doanh thu theo từng ngày</p>
+                                    </div>
+                                </div>
+                                {dailyRevenueData.length > 0 ? (
+                                    <ResponsiveContainer id="line-chart" width="100%" height={380} debounce={150}>
+                                        <LineChart data={dailyRevenueData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                                            <defs>
+                                                <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8} />
+                                                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0.1} />
+                                                </linearGradient>
+                                            </defs>
+                                            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                                            <XAxis dataKey="date" fontSize={12} stroke="#6B7280" />
+                                            <YAxis tickFormatter={formatShortCurrency} fontSize={12} stroke="#6B7280" />
+                                            <Tooltip content={<CustomTooltip formatter={formatCurrency} />} />
+                                            <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="Doanh thu"
+                                                stroke="#3B82F6"
+                                                strokeWidth={3}
+                                                dot={{ fill: '#3B82F6', r: 5, strokeWidth: 2, stroke: '#fff' }}
+                                                activeDot={{ r: 7, fill: '#1D4ED8', stroke: '#fff', strokeWidth: 2 }}
+                                                isAnimationActive={true}
+                                                fill="url(#colorRevenue)"
+                                            />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                ) : (
+                                    <div className="flex flex-col justify-center items-center h-80 text-gray-400">
+                                        <FaChartLine className="text-6xl mb-4 opacity-30" />
+                                        <p className="font-medium">Không có dữ liệu doanh thu theo ngày</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Biểu đồ tròn và cột - Grid Layout */}
+                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                                {/* Biểu đồ tròn - Enhanced */}
+                                <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+                                    <div className="mb-6">
+                                        <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                                            <div className="w-1 h-6 bg-green-600 rounded-full"></div>
+                                            Cơ cấu doanh thu vé
+                                        </h4>
+                                        <p className="text-sm text-gray-500 mt-1">Phân bổ theo hạng vé</p>
+                                    </div>
+                                    {ticketClassRevenueData.length > 0 ? (
+                                        <ResponsiveContainer id="pie-chart" width="100%" height={340} debounce={150}>
+                                            <PieChart>
+                                                <Pie
+                                                    data={ticketClassRevenueData}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                    labelLine={false}
+                                                    outerRadius={120}
+                                                    fill="#8884d8"
+                                                    dataKey="value"
+                                                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                                    isAnimationActive={true}
+                                                >
+                                                    {ticketClassRevenueData.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={COLORS_CLASS[index % COLORS_CLASS.length]} />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip content={<CustomTooltip formatter={formatCurrency} />} />
+                                                <Legend />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    ) : (
+                                        <div className="flex flex-col justify-center items-center h-80 text-gray-400">
+                                            <FaTicketAlt className="text-6xl mb-4 opacity-30" />
+                                            <p className="font-medium">Không có dữ liệu doanh thu theo hạng vé</p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Biểu đồ cột - Enhanced */}
+                                <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+                                    <div className="mb-6">
+                                        <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                                            <div className="w-1 h-6 bg-purple-600 rounded-full"></div>
+                                            Cơ cấu doanh thu dịch vụ
+                                        </h4>
+                                        <p className="text-sm text-gray-500 mt-1">So sánh các dịch vụ</p>
+                                    </div>
+                                    {serviceRevenueData.length > 0 ? (
+                                        <ResponsiveContainer id="bar-chart" width="100%" height={340} debounce={150}>
+                                            <BarChart data={serviceRevenueData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                                                <XAxis dataKey="name" fontSize={12} stroke="#6B7280" />
+                                                <YAxis tickFormatter={formatShortCurrency} fontSize={12} stroke="#6B7280" />
+                                                <Tooltip content={<CustomTooltip formatter={formatCurrency} />} />
+                                                <Legend />
+                                                <Bar dataKey="Doanh thu" fill="#8884d8" radius={[10, 10, 0, 0]} isAnimationActive={true}>
+                                                    {serviceRevenueData.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={COLORS_SERVICE[index % COLORS_SERVICE.length]} />
+                                                    ))}
+                                                </Bar>
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    ) : (
+                                        <div className="flex flex-col justify-center items-center h-80 text-gray-400">
+                                            <FaConciergeBell className="text-6xl mb-4 opacity-30" />
+                                            <p className="font-medium">Không có dữ liệu doanh thu theo dịch vụ</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </>
             )}
         </Card>

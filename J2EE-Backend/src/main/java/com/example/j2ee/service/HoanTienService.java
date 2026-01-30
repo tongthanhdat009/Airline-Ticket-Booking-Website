@@ -6,6 +6,7 @@ import com.example.j2ee.model.*;
 import com.example.j2ee.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,7 +74,7 @@ public class HoanTienService {
         // Lưu yêu cầu hoàn tiền (tạo record trong bảng hoàn tiền nếu cần)
         // Trong thực tế sẽ có bảng HoanTien để lưu yêu cầu
 
-        log.info("Yêu cầu hoàn tiền cho đặt chỗ {}: Hạng vé={}, Tiền hoàn={}", 
+        log.info("Yêu cầu hoàn tiền cho đặt chỗ {}: Hạng vé={}, Tiền hoàn={}",
                 maDatCho, datCho.getHangVe().getTenHangVe(), calculation.getSoTienHoan());
 
         return ApiResponse.success("Yêu cầu hoàn tiền đã được tạo", response);
@@ -83,6 +84,7 @@ public class HoanTienService {
      * Xử lý hoàn tiền thành công
      * Giải phóng ghế và cập nhật trạng thái
      */
+    @CacheEvict(value = { "thongKeTongQuan", "doanhThuTheoNgay", "thongKeNgay" }, allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void processRefund(int maDatCho) {
         DatCho datCho = datChoRepository.findById(maDatCho)
@@ -127,7 +129,7 @@ public class HoanTienService {
         policy.setRefundable(true);
 
         // Kiểm tra theo tên hạng vé
-        if (tenHangVe.contains("promo") || tenHangVe.contains("khuyến mãi") 
+        if (tenHangVe.contains("promo") || tenHangVe.contains("khuyến mãi")
                 || tenHangVe.contains("siêu tiết kiệm") || tenHangVe.contains("economy saver")) {
             // Vé Promo/Siêu tiết kiệm - KHÔNG được hoàn
             policy.setRefundable(false);
@@ -160,22 +162,23 @@ public class HoanTienService {
 
     /**
      * Tính toán số tiền hoàn thực tế
-     * Công thức: Tiền hoàn = (Giá vé + Thuế phí) - (Khuyến mãi đã dùng) - (Phí hủy vé)
+     * Công thức: Tiền hoàn = (Giá vé + Thuế phí) - (Khuyến mãi đã dùng) - (Phí hủy
+     * vé)
      */
     private HoanTienCalculation calculateRefundAmount(DatCho datCho, RefundPolicy policy) {
         BigDecimal giaVe = datCho.getGiaVe();
-        
+
         // Lấy tổng khuyến mãi đã áp dụng
         BigDecimal tongKhuyenMai = khuyenMaiService.getTongKhuyenMai(datCho.getMaDatCho());
-        
+
         // Tính phí hủy
         BigDecimal phiHuy = policy.getPhiHuy();
-        
+
         // Tính số tiền hoàn: (Giá vé - Khuyến mãi - Phí hủy)
         // Không hoàn tiền nếu kết quả âm
         BigDecimal giaVeSauKM = giaVe.subtract(tongKhuyenMai);
         BigDecimal soTienHoan = giaVeSauKM.subtract(phiHuy);
-        
+
         if (soTienHoan.compareTo(BigDecimal.ZERO) < 0) {
             soTienHoan = BigDecimal.ZERO;
         }
@@ -186,7 +189,7 @@ public class HoanTienService {
         calculation.setPhiHuy(phiHuy);
         calculation.setSoTienHoan(soTienHoan);
 
-        log.info("Tính toán hoàn tiền cho đặt {}: Giá vé={}, Khuyến mãi={}, Phí hủy={}, Tiền hoàn={}", 
+        log.info("Tính toán hoàn tiền cho đặt {}: Giá vé={}, Khuyến mãi={}, Phí hủy={}, Tiền hoàn={}",
                 datCho.getMaDatCho(), giaVe, tongKhuyenMai, phiHuy, soTienHoan);
 
         return calculation;
@@ -199,7 +202,7 @@ public class HoanTienService {
     private void releaseSeat(DatCho datCho) {
         int maChuyenBay = datCho.getChuyenBay().getMaChuyenBay();
         ChiTietGhe chiTietGhe = datCho.getChiTietGhe();
-        
+
         if (chiTietGhe != null) {
             int maGhe = chiTietGhe.getMaGhe();
             // Xóa GheDaDat
@@ -221,12 +224,13 @@ public class HoanTienService {
 
         GiaChuyenBay giaChuyenBay = giaChuyenBayRepository
                 .findByTuyenBay_MaTuyenBayAndHangVe_MaHangVe(maTuyenBay, maHangVe);
-        
+
         if (giaChuyenBay != null && giaChuyenBay.getSoLuongDaBan() > 0) {
             giaChuyenBay.setSoLuongDaBan(giaChuyenBay.getSoLuongDaBan() - 1);
             giaChuyenBayRepository.save(giaChuyenBay);
-            
-            log.info("Đã cập nhật soluong_daban cho maGia={}: {}", giaChuyenBay.getMaGia(), giaChuyenBay.getSoLuongDaBan());
+
+            log.info("Đã cập nhật soluong_daban cho maGia={}: {}", giaChuyenBay.getMaGia(),
+                    giaChuyenBay.getSoLuongDaBan());
         }
     }
 
@@ -239,14 +243,37 @@ public class HoanTienService {
         private BigDecimal tyLeHoan;
         private String message;
 
-        public boolean isRefundable() { return refundable; }
-        public void setRefundable(boolean refundable) { this.refundable = refundable; }
-        public BigDecimal getPhiHuy() { return phiHuy; }
-        public void setPhiHuy(BigDecimal phiHuy) { this.phiHuy = phiHuy; }
-        public BigDecimal getTyLeHoan() { return tyLeHoan; }
-        public void setTyLeHoan(BigDecimal tyLeHoan) { this.tyLeHoan = tyLeHoan; }
-        public String getMessage() { return message; }
-        public void setMessage(String message) { this.message = message; }
+        public boolean isRefundable() {
+            return refundable;
+        }
+
+        public void setRefundable(boolean refundable) {
+            this.refundable = refundable;
+        }
+
+        public BigDecimal getPhiHuy() {
+            return phiHuy;
+        }
+
+        public void setPhiHuy(BigDecimal phiHuy) {
+            this.phiHuy = phiHuy;
+        }
+
+        public BigDecimal getTyLeHoan() {
+            return tyLeHoan;
+        }
+
+        public void setTyLeHoan(BigDecimal tyLeHoan) {
+            this.tyLeHoan = tyLeHoan;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
     }
 
     /**
@@ -258,14 +285,37 @@ public class HoanTienService {
         private BigDecimal phiHuy;
         private BigDecimal soTienHoan;
 
-        public BigDecimal getGiaVe() { return giaVe; }
-        public void setGiaVe(BigDecimal giaVe) { this.giaVe = giaVe; }
-        public BigDecimal getTongKhuyenMai() { return tongKhuyenMai; }
-        public void setTongKhuyenMai(BigDecimal tongKhuyenMai) { this.tongKhuyenMai = tongKhuyenMai; }
-        public BigDecimal getPhiHuy() { return phiHuy; }
-        public void setPhiHuy(BigDecimal phiHuy) { this.phiHuy = phiHuy; }
-        public BigDecimal getSoTienHoan() { return soTienHoan; }
-        public void setSoTienHoan(BigDecimal soTienHoan) { this.soTienHoan = soTienHoan; }
+        public BigDecimal getGiaVe() {
+            return giaVe;
+        }
+
+        public void setGiaVe(BigDecimal giaVe) {
+            this.giaVe = giaVe;
+        }
+
+        public BigDecimal getTongKhuyenMai() {
+            return tongKhuyenMai;
+        }
+
+        public void setTongKhuyenMai(BigDecimal tongKhuyenMai) {
+            this.tongKhuyenMai = tongKhuyenMai;
+        }
+
+        public BigDecimal getPhiHuy() {
+            return phiHuy;
+        }
+
+        public void setPhiHuy(BigDecimal phiHuy) {
+            this.phiHuy = phiHuy;
+        }
+
+        public BigDecimal getSoTienHoan() {
+            return soTienHoan;
+        }
+
+        public void setSoTienHoan(BigDecimal soTienHoan) {
+            this.soTienHoan = soTienHoan;
+        }
     }
 
     /**
@@ -280,20 +330,61 @@ public class HoanTienService {
         private BigDecimal soTienHoan;
         private String lyDo;
 
-        public int getMaDatCho() { return maDatCho; }
-        public void setMaDatCho(int maDatCho) { this.maDatCho = maDatCho; }
-        public String getTenHanhKhach() { return tenHanhKhach; }
-        public void setTenHanhKhach(String tenHanhKhach) { this.tenHanhKhach = tenHanhKhach; }
-        public BigDecimal getGiaVe() { return giaVe; }
-        public void setGiaVe(BigDecimal giaVe) { this.giaVe = giaVe; }
-        public BigDecimal getTongKhuyenMai() { return tongKhuyenMai; }
-        public void setTongKhuyenMai(BigDecimal tongKhuyenMai) { this.tongKhuyenMai = tongKhuyenMai; }
-        public BigDecimal getPhiHuyVe() { return phiHuyVe; }
-        public void setPhiHuyVe(BigDecimal phiHuyVe) { this.phiHuyVe = phiHuyVe; }
-        public BigDecimal getSoTienHoan() { return soTienHoan; }
-        public void setSoTienHoan(BigDecimal soTienHoan) { this.soTienHoan = soTienHoan; }
-        public String getLyDo() { return lyDo; }
-        public void setLyDo(String lyDo) { this.lyDo = lyDo; }
+        public int getMaDatCho() {
+            return maDatCho;
+        }
+
+        public void setMaDatCho(int maDatCho) {
+            this.maDatCho = maDatCho;
+        }
+
+        public String getTenHanhKhach() {
+            return tenHanhKhach;
+        }
+
+        public void setTenHanhKhach(String tenHanhKhach) {
+            this.tenHanhKhach = tenHanhKhach;
+        }
+
+        public BigDecimal getGiaVe() {
+            return giaVe;
+        }
+
+        public void setGiaVe(BigDecimal giaVe) {
+            this.giaVe = giaVe;
+        }
+
+        public BigDecimal getTongKhuyenMai() {
+            return tongKhuyenMai;
+        }
+
+        public void setTongKhuyenMai(BigDecimal tongKhuyenMai) {
+            this.tongKhuyenMai = tongKhuyenMai;
+        }
+
+        public BigDecimal getPhiHuyVe() {
+            return phiHuyVe;
+        }
+
+        public void setPhiHuyVe(BigDecimal phiHuyVe) {
+            this.phiHuyVe = phiHuyVe;
+        }
+
+        public BigDecimal getSoTienHoan() {
+            return soTienHoan;
+        }
+
+        public void setSoTienHoan(BigDecimal soTienHoan) {
+            this.soTienHoan = soTienHoan;
+        }
+
+        public String getLyDo() {
+            return lyDo;
+        }
+
+        public void setLyDo(String lyDo) {
+            this.lyDo = lyDo;
+        }
     }
 
     // ==================== QUẢN LÝ HOÀN TIỀN ====================
@@ -307,8 +398,7 @@ public class HoanTienService {
             String search,
             String trangThai,
             LocalDateTime tuNgay,
-            LocalDateTime denNgay
-    ) {
+            LocalDateTime denNgay) {
         Specification<HoanTien> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -329,10 +419,9 @@ public class HoanTienService {
             if (search != null && !search.isEmpty()) {
                 String searchLower = "%" + search.toLowerCase() + "%";
                 Predicate searchPredicate = cb.or(
-                    cb.like(cb.lower(root.get("datCho").get("hanhKhach").get("hoVaTen")), searchLower),
-                    cb.like(cb.lower(root.get("datCho").get("hanhKhach").get("email")), searchLower),
-                    cb.like(cb.lower(root.get("lyDoHoanTien")), searchLower)
-                );
+                        cb.like(cb.lower(root.get("datCho").get("hanhKhach").get("hoVaTen")), searchLower),
+                        cb.like(cb.lower(root.get("datCho").get("hanhKhach").get("email")), searchLower),
+                        cb.like(cb.lower(root.get("lyDoHoanTien")), searchLower));
                 predicates.add(searchPredicate);
             }
 
@@ -357,6 +446,7 @@ public class HoanTienService {
     /**
      * Duyệt hoàn tiền
      */
+    @CacheEvict(value = { "thongKeTongQuan", "doanhThuTheoNgay", "thongKeNgay" }, allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public HoanTienResponse duyetHoanTien(Integer maHoanTien, String nguoiXuLy, String ghiChu) {
         HoanTien hoanTien = hoanTienRepository.findById(maHoanTien)
@@ -399,7 +489,7 @@ public class HoanTienService {
         hoanTien.setTrangThai("TU_CHOI");
         hoanTien.setNguoiXuLy(nguoiXuLy);
         hoanTien.setNgayHoan(LocalDateTime.now());
-        
+
         // Ghi chú lý do từ chối
         String fullGhiChu = "Từ chối: " + lyDoTuChoi;
         if (ghiChu != null && !ghiChu.isEmpty()) {
@@ -450,7 +540,7 @@ public class HoanTienService {
         DatCho datCho = hoanTien.getDatCho();
         HanhKhach hanhKhach = datCho != null ? datCho.getHanhKhach() : null;
         TrangThaiThanhToan thanhToan = hoanTien.getTrangThaiThanhToan();
-        
+
         // Lấy phương thức hoàn tiền từ hoanTien hoặc từ trangThaiThanhToan nếu null
         String phuongThucHoan = hoanTien.getPhuongThucHoan();
         if (phuongThucHoan == null && thanhToan != null) {
@@ -472,9 +562,9 @@ public class HoanTienService {
                 .taiKhoanHoan(hoanTien.getTaiKhoanHoan())
                 .nguoiXuLy(hoanTien.getNguoiXuLy())
                 .ngayXuLy(hoanTien.getNgayHoan())
-                .lyDoTuChoi(hoanTien.getGhiChu() != null && hoanTien.getGhiChu().startsWith("Từ chối:") 
-                    ? hoanTien.getGhiChu().substring(9).split(" \\|")[0] 
-                    : null)
+                .lyDoTuChoi(hoanTien.getGhiChu() != null && hoanTien.getGhiChu().startsWith("Từ chối:")
+                        ? hoanTien.getGhiChu().substring(9).split(" \\|")[0]
+                        : null)
                 .build();
     }
 
@@ -483,7 +573,7 @@ public class HoanTienService {
         HanhKhach hanhKhach = datCho != null ? datCho.getHanhKhach() : null;
         ChiTietChuyenBay chuyenBay = datCho != null ? datCho.getChuyenBay() : null;
         TrangThaiThanhToan thanhToan = hoanTien.getTrangThaiThanhToan();
-        
+
         // Lấy phương thức hoàn tiền từ hoanTien hoặc từ trangThaiThanhToan nếu null
         String phuongThucHoan = hoanTien.getPhuongThucHoan();
         if (phuongThucHoan == null && thanhToan != null) {
@@ -498,10 +588,12 @@ public class HoanTienService {
                 .email(hanhKhach != null ? hanhKhach.getEmail() : null)
                 .soDienThoai(hanhKhach != null ? hanhKhach.getSoDienThoai() : null)
                 .maChuyenBay(chuyenBay != null ? String.valueOf(chuyenBay.getMaChuyenBay()) : null)
-                .sanBayDi(chuyenBay != null && chuyenBay.getTuyenBay() != null 
-                    ? chuyenBay.getTuyenBay().getSanBayDi().getMaIATA() : null)
-                .sanBayDen(chuyenBay != null && chuyenBay.getTuyenBay() != null 
-                    ? chuyenBay.getTuyenBay().getSanBayDen().getMaIATA() : null)
+                .sanBayDi(chuyenBay != null && chuyenBay.getTuyenBay() != null
+                        ? chuyenBay.getTuyenBay().getSanBayDi().getMaIATA()
+                        : null)
+                .sanBayDen(chuyenBay != null && chuyenBay.getTuyenBay() != null
+                        ? chuyenBay.getTuyenBay().getSanBayDen().getMaIATA()
+                        : null)
                 .ngayYeuCau(hoanTien.getNgayYeuCau())
                 .lyDo(hoanTien.getLyDoHoanTien())
                 .soTienHoan(hoanTien.getSoTienHoan())
@@ -512,9 +604,9 @@ public class HoanTienService {
                 .taiKhoanHoan(hoanTien.getTaiKhoanHoan())
                 .nguoiXuLy(hoanTien.getNguoiXuLy())
                 .ngayXuLy(hoanTien.getNgayHoan())
-                .lyDoTuChoi(hoanTien.getGhiChu() != null && hoanTien.getGhiChu().startsWith("Từ chối:") 
-                    ? hoanTien.getGhiChu().substring(9).split(" \\|")[0] 
-                    : null)
+                .lyDoTuChoi(hoanTien.getGhiChu() != null && hoanTien.getGhiChu().startsWith("Từ chối:")
+                        ? hoanTien.getGhiChu().substring(9).split(" \\|")[0]
+                        : null)
                 .ghiChu(hoanTien.getGhiChu())
                 .build();
     }
