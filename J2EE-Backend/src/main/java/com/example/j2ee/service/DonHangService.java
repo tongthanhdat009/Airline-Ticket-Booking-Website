@@ -1,5 +1,6 @@
 package com.example.j2ee.service;
 
+import com.example.j2ee.annotation.Auditable;
 import com.example.j2ee.dto.donhang.DonHangDetailResponse;
 import com.example.j2ee.dto.donhang.DonHangResponse;
 import com.example.j2ee.dto.donhang.HuyDonHangRequest;
@@ -177,6 +178,8 @@ public class DonHangService {
     /**
      * Cập nhật trạng thái đơn hàng
      */
+    @Auditable(action = "CẬP_NHẬT_TRẠNG_THÁI", table = "donhang", paramName = "id",
+               description = "Cập nhật trạng thái đơn hàng")
     @CacheEvict(value = { "thongKeTongQuan", "doanhThuTheoNgay", "thongKeNgay" }, allEntries = true)
     @Transactional
     public DonHangResponse updateTrangThai(int id, UpdateTrangThaiDonHangRequest request) {
@@ -261,6 +264,8 @@ public class DonHangService {
      * - Không thể hủy đơn hàng đã ở trạng thái ĐÃ HỦY
      * - Cập nhật tất cả DatCho sang trạng thái CANCELLED
      */
+    @Auditable(action = "HỦY_ĐƠN_HÀNG", table = "donhang", paramName = "id",
+               description = "Hủy đơn hàng và tạo yêu cầu hoàn tiền")
     @CacheEvict(value = { "thongKeTongQuan", "doanhThuTheoNgay", "thongKeNgay" }, allEntries = true)
     @Transactional
     public DonHangResponse huyDonHang(int id, HuyDonHangRequest request) {
@@ -485,6 +490,8 @@ public class DonHangService {
      * @param maDonHangs Danh sách mã đơn hàng cần duyệt
      * @return Map chứa kết quả (successCount, failedCount, errors)
      */
+    @Auditable(action = "DUYỆT_THANH_TOÁN_HÀNG_LOẠT", table = "donhang",
+               description = "Duyệt thanh toán hàng loạt cho nhiều đơn hàng")
     @CacheEvict(value = { "thongKeTongQuan", "doanhThuTheoNgay", "thongKeNgay" }, allEntries = true)
     @Transactional
     public java.util.Map<String, Object> batchApprovePayment(java.util.List<Integer> maDonHangs) {
@@ -563,6 +570,8 @@ public class DonHangService {
      * @param lyDoHoanTien Lý do hoàn tiền
      * @return Map chứa kết quả (successCount, failedCount, errors)
      */
+    @Auditable(action = "HOÀN_TIỀN_HÀNG_LOẠT", table = "donhang",
+               description = "Hoàn tiền hàng loạt cho nhiều đơn hàng")
     @CacheEvict(value = { "thongKeTongQuan", "doanhThuTheoNgay", "thongKeNgay" }, allEntries = true)
     @Transactional
     public java.util.Map<String, Object> batchRefund(java.util.List<Integer> maDonHangs, String lyDoHoanTien) {

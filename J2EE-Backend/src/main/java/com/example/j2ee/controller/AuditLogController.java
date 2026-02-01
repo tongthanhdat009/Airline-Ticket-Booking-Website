@@ -13,10 +13,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -112,8 +115,21 @@ public class AuditLogController {
     @GetMapping("/statistics")
     @RequirePermission(feature = "AUDITLOG", action = "VIEW")
     @Operation(summary = "Lấy thống kê audit log", description = "Yêu cầu quyền AUDITLOG_VIEW")
-    public ResponseEntity<ApiResponse<AuditLogService.AuditLogStatistics>> getStatistics() {
-        AuditLogService.AuditLogStatistics stats = auditLogService.getStatistics();
+    public ResponseEntity<ApiResponse<AuditLogService.AuditLogStatistics>> getStatistics(
+            @Parameter(description = "Từ ngày (ISO DateTime)")
+            @RequestParam(required = false) 
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime tuNgay,
+            
+            @Parameter(description = "Đến ngày (ISO DateTime)")
+            @RequestParam(required = false) 
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime denNgay) {
+        
+        AuditLogService.AuditLogStatistics stats;
+        if (tuNgay != null || denNgay != null) {
+            stats = auditLogService.getStatistics(tuNgay, denNgay);
+        } else {
+            stats = auditLogService.getStatistics();
+        }
         return ResponseEntity.ok(ApiResponse.success("Lấy thống kê thành công", stats));
     }
 
@@ -140,5 +156,91 @@ public class AuditLogController {
             @PathVariable Long id) {
         auditLogService.deleteAuditLog(id);
         return ResponseEntity.ok(ApiResponse.success("Xóa audit log thành công", null));
+    }
+
+    /**
+     * Export audit log ra PDF
+     */
+    @GetMapping("/export-pdf")
+    @RequirePermission(feature = "AUDITLOG", action = "VIEW")
+    @Operation(summary = "Export audit log ra PDF", description = "Yêu cầu quyền AUDITLOG_VIEW")
+    public ResponseEntity<byte[]> exportToPdf(
+            @Parameter(description = "Loại thao tác")
+            @RequestParam(required = false) String loaiThaoTac,
+            
+            @Parameter(description = "Bảng ảnh hưởng")
+            @RequestParam(required = false) String bangAnhHuong,
+            
+            @Parameter(description = "Loại tài khoản (ADMIN, CUSTOMER)")
+            @RequestParam(required = false) String loaiTaiKhoan,
+            
+            @Parameter(description = "Từ ngày (ISO DateTime)")
+            @RequestParam(required = false) 
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime tuNgay,
+            
+            @Parameter(description = "Đến ngày (ISO DateTime)")
+            @RequestParam(required = false) 
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime denNgay,
+            
+            @Parameter(description = "Từ khóa tìm kiếm")
+            @RequestParam(required = false) String search) {
+        
+        try {
+            byte[] pdfBytes = auditLogService.exportToPdf(loaiThaoTac, bangAnhHuong, loaiTaiKhoan, 
+                    tuNgay, denNgay, search);
+            
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+            String filename = String.format("audit_log_report_%s.pdf", timestamp);
+            
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .body(pdfBytes);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    /**
+     * Export audit log ra Excel
+     */
+    @GetMapping("/export-excel")
+    @RequirePermission(feature = "AUDITLOG", action = "VIEW")
+    @Operation(summary = "Export audit log ra Excel", description = "Yêu cầu quyền AUDITLOG_VIEW")
+    public ResponseEntity<byte[]> exportToExcel(
+            @Parameter(description = "Loại thao tác")
+            @RequestParam(required = false) String loaiThaoTac,
+            
+            @Parameter(description = "Bảng ảnh hưởng")
+            @RequestParam(required = false) String bangAnhHuong,
+            
+            @Parameter(description = "Loại tài khoản (ADMIN, CUSTOMER)")
+            @RequestParam(required = false) String loaiTaiKhoan,
+            
+            @Parameter(description = "Từ ngày (ISO DateTime)")
+            @RequestParam(required = false) 
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime tuNgay,
+            
+            @Parameter(description = "Đến ngày (ISO DateTime)")
+            @RequestParam(required = false) 
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime denNgay,
+            
+            @Parameter(description = "Từ khóa tìm kiếm")
+            @RequestParam(required = false) String search) {
+        
+        try {
+            byte[] excelBytes = auditLogService.exportToExcel(loaiThaoTac, bangAnhHuong, loaiTaiKhoan, 
+                    tuNgay, denNgay, search);
+            
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+            String filename = String.format("audit_log_report_%s.xlsx", timestamp);
+            
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(excelBytes);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.j2ee.service;
 
+import com.example.j2ee.annotation.Auditable;
 import com.example.j2ee.dto.datcho.DatChoDetailResponse;
 import com.example.j2ee.dto.datcho.ThanhToanInfo;
 import com.example.j2ee.model.DatCho;
@@ -40,6 +41,8 @@ public class DatChoService {
     /**
      * Hủy giao dịch (giải phóng ghế trong chuyến bay và cập nhật trạng thái thanh toán thành Đã hủy)
      */
+    @Auditable(action = "HỦY_VÉ", table = "datcho", paramName = "maDatCho", 
+               description = "Hủy đặt chỗ và giải phóng ghế")
     @Transactional
     public void huyDatCho(int maDatCho) {
         DatCho datCho = datChoRepository.findById(maDatCho)

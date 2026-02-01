@@ -88,4 +88,36 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
      */
     @Query("SELECT COUNT(a) FROM AuditLog a WHERE DATE(a.thoiGian) = CURRENT_DATE")
     long countTodayLogs();
+
+    /**
+     * Tìm audit log có thờ gian trước một thờ điểm (dùng cho cleanup)
+     */
+    List<AuditLog> findByThoiGianBefore(LocalDateTime thoiGian);
+
+    /**
+     * Tìm audit log có thờ gian trong khoảng thờ gian
+     */
+    List<AuditLog> findByThoiGianBetweenOrderByThoiGianDesc(LocalDateTime tuNgay, LocalDateTime denNgay);
+
+    /**
+     * Đếm số lượng audit log theo loại thao tác trong khoảng thờ gian (cho statistics)
+     */
+    @Query("SELECT a.loaiThaoTac, COUNT(a) FROM AuditLog a WHERE " +
+           "(:tuNgay IS NULL OR a.thoiGian >= :tuNgay) AND " +
+           "(:denNgay IS NULL OR a.thoiGian <= :denNgay) " +
+           "GROUP BY a.loaiThaoTac")
+    List<Object[]> countByLoaiThaoTacAndDateRange(
+            @Param("tuNgay") LocalDateTime tuNgay,
+            @Param("denNgay") LocalDateTime denNgay);
+
+    /**
+     * Đếm số lượng audit log theo ngày trong khoảng thờ gian
+     */
+    @Query("SELECT DATE(a.thoiGian), COUNT(a) FROM AuditLog a WHERE " +
+           "(:tuNgay IS NULL OR a.thoiGian >= :tuNgay) AND " +
+           "(:denNgay IS NULL OR a.thoiGian <= :denNgay) " +
+           "GROUP BY DATE(a.thoiGian) ORDER BY DATE(a.thoiGian)")
+    List<Object[]> countByDateInRange(
+            @Param("tuNgay") LocalDateTime tuNgay,
+            @Param("denNgay") LocalDateTime denNgay);
 }

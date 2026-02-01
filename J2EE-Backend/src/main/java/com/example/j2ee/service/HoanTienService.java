@@ -1,5 +1,6 @@
 package com.example.j2ee.service;
 
+import com.example.j2ee.annotation.Auditable;
 import com.example.j2ee.dto.ApiResponse;
 import com.example.j2ee.dto.hoantien.*;
 import com.example.j2ee.model.*;
@@ -84,6 +85,8 @@ public class HoanTienService {
      * Xử lý hoàn tiền thành công
      * Giải phóng ghế và cập nhật trạng thái
      */
+    @Auditable(action = "XỬ_LÝ_HOÀN_TIỀN", table = "hoantien", paramName = "maDatCho",
+               description = "Xử lý hoàn tiền và giải phóng ghế")
     @CacheEvict(value = { "thongKeTongQuan", "doanhThuTheoNgay", "thongKeNgay" }, allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void processRefund(int maDatCho) {
@@ -446,6 +449,8 @@ public class HoanTienService {
     /**
      * Duyệt hoàn tiền
      */
+    @Auditable(action = "DUYỆT_HOÀN_TIỀN", table = "hoantien", paramName = "maHoanTien",
+               description = "Duyệt yêu cầu hoàn tiền")
     @CacheEvict(value = { "thongKeTongQuan", "doanhThuTheoNgay", "thongKeNgay" }, allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public HoanTienResponse duyetHoanTien(Integer maHoanTien, String nguoiXuLy, String ghiChu) {
@@ -476,6 +481,8 @@ public class HoanTienService {
     /**
      * Từ chối hoàn tiền
      */
+    @Auditable(action = "TỪ_CHỐI_HOÀN_TIỀN", table = "hoantien", paramName = "maHoanTien",
+               description = "Từ chối yêu cầu hoàn tiền")
     @Transactional(rollbackFor = Exception.class)
     public HoanTienResponse tuChoiHoanTien(Integer maHoanTien, String nguoiXuLy, String lyDoTuChoi, String ghiChu) {
         HoanTien hoanTien = hoanTienRepository.findById(maHoanTien)

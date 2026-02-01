@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaSearch, FaEye, FaHistory, FaFilter, FaSpinner } from 'react-icons/fa';
+import { FaSearch, FaEye, FaHistory, FaFilter, FaSpinner, FaFilePdf, FaFileExcel } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
 import AuditLogService from '../../services/AuditLogService';
 import { useToast } from '../../hooks/useToast';
@@ -177,6 +177,70 @@ const QuanLyLichSuThaoTac = () => {
     const indexOfFirstItem = currentPage * itemsPerPage;
     const indexOfLastItem = Math.min(indexOfFirstItem + itemsPerPage, totalElements);
 
+    // Xử lý export PDF
+    const handleExportPdf = async () => {
+        try {
+            setLoading(true);
+            const filters = {
+                loaiThaoTac: filterLoaiThaoTac || undefined,
+                bangAnhHuong: filterBangAnhHuong || undefined,
+                search: search || undefined
+            };
+            const response = await AuditLogService.exportPdf(filters);
+            
+            // Tạo blob và download
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+            link.setAttribute('download', `audit_log_report_${timestamp}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+            
+            showToast('Export PDF thành công', 'success');
+        } catch (error) {
+            console.error('Error exporting PDF:', error);
+            showToast('Có lỗi xảy ra khi export PDF', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Xử lý export Excel
+    const handleExportExcel = async () => {
+        try {
+            setLoading(true);
+            const filters = {
+                loaiThaoTac: filterLoaiThaoTac || undefined,
+                bangAnhHuong: filterBangAnhHuong || undefined,
+                search: search || undefined
+            };
+            const response = await AuditLogService.exportExcel(filters);
+            
+            // Tạo blob và download
+            const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+            link.setAttribute('download', `audit_log_report_${timestamp}.xlsx`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+            
+            showToast('Export Excel thành công', 'success');
+        } catch (error) {
+            console.error('Error exporting Excel:', error);
+            showToast('Có lỗi xảy ra khi export Excel', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <Card title="Lịch sử thao tác">
             {/* Thống kê tổng quan */}
@@ -271,6 +335,26 @@ const QuanLyLichSuThaoTac = () => {
                 >
                     {loading ? <FaSpinner className="animate-spin" /> : <FaFilter />}
                     <span>Tìm kiếm</span>
+                </button>
+            </div>
+
+            {/* Nút Export */}
+            <div className="flex flex-wrap gap-3 mb-4">
+                <button
+                    onClick={handleExportPdf}
+                    disabled={loading}
+                    className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all shadow-md disabled:opacity-50"
+                >
+                    {loading ? <FaSpinner className="animate-spin" /> : <FaFilePdf />}
+                    <span>Export PDF</span>
+                </button>
+                <button
+                    onClick={handleExportExcel}
+                    disabled={loading}
+                    className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all shadow-md disabled:opacity-50"
+                >
+                    {loading ? <FaSpinner className="animate-spin" /> : <FaFileExcel />}
+                    <span>Export Excel</span>
                 </button>
             </div>
 

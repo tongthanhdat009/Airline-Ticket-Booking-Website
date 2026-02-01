@@ -1,5 +1,6 @@
 package com.example.j2ee.service;
 
+import com.example.j2ee.annotation.Auditable;
 import com.example.j2ee.config.VNPayConfig;
 import com.example.j2ee.model.DatCho;
 import com.example.j2ee.model.TrangThaiThanhToan;
@@ -121,6 +122,8 @@ public class VNPayService {
     /**
      * Xử lý kết quả trả về từ VNPay (BỎ QUA VERIFY CHỮ KÝ)
      */
+    @Auditable(action = "THANH_TOÁN_VNPAY", table = "trangthaithanhtoan",
+               description = "Xử lý kết quả thanh toán VNPay", accountType = "CUSTOMER")
     @CacheEvict(value = { "thongKeTongQuan", "doanhThuTheoNgay", "thongKeNgay" }, allEntries = true)
     @Transactional
     public Map<String, Object> handlePaymentReturn(Map<String, String> params) {

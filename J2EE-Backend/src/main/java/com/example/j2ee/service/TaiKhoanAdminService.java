@@ -1,5 +1,6 @@
 package com.example.j2ee.service;
 
+import com.example.j2ee.annotation.Auditable;
 import com.example.j2ee.dto.TaiKhoanAdminDTO;
 import com.example.j2ee.model.AdminVaiTro;
 import com.example.j2ee.model.AdminVaiTroId;
@@ -79,6 +80,8 @@ public class TaiKhoanAdminService {
     }
 
     private static final String PASSWORD_PATTERN = "^[A-Z](?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{5,}$";
+    @Auditable(action = "TẠO_TÀI_KHOẢN_ADMIN", table = "taikhoanadmin",
+               description = "Tạo mới tài khoản admin")
     public TaiKhoanAdmin createTaiKhoan(TaiKhoanAdmin taiKhoanAdmin) {
         // Trim dữ liệu đầu vào
         if (taiKhoanAdmin.getTenDangNhap() != null) {
@@ -137,6 +140,8 @@ public class TaiKhoanAdminService {
         }
     }
 
+    @Auditable(action = "XÓA_TÀI_KHOẢN_ADMIN", table = "taikhoanadmin", paramName = "id",
+               description = "Xóa tài khoản admin")
     @Transactional
     public void deleteTaiKhoan(int id) {
         TaiKhoanAdmin taiKhoanAdmin = taiKhoanAdminRepository.findById(id).orElse(null);
@@ -167,6 +172,8 @@ public class TaiKhoanAdminService {
     // Email regex pattern
     private static final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
 
+    @Auditable(action = "CẬP_NHẬT_TÀI_KHOẢN_ADMIN", table = "taikhoanadmin", paramName = "id",
+               description = "Cập nhật thông tin tài khoản admin")
     public TaiKhoanAdmin updateTaiKhoan(int id, TaiKhoanAdmin taiKhoanAdmin) {
         TaiKhoanAdmin existingTaiKhoan = taiKhoanAdminRepository.findById(id).orElse(null);
         if (existingTaiKhoan == null) {
@@ -233,6 +240,8 @@ public class TaiKhoanAdminService {
      * @param maTaiKhoan Mã tài khoản admin
      * @param vaiTroIds Danh sách mã vai trò cần gán
      */
+    @Auditable(action = "GÁN_VAI_TRÒ", table = "taikhoanadmin", paramName = "maTaiKhoan",
+               description = "Gán vai trò cho tài khoản admin")
     @Transactional
     public void assignRolesToAccount(int maTaiKhoan, List<Integer> vaiTroIds) {
         // Kiểm tra tài khoản tồn tại

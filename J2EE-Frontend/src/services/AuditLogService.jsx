@@ -86,6 +86,32 @@ const AuditLogService = {
     searchAuditLogs: async (filters = {}) => {
         const response = await apiClient.get(BASE_URL, { params: filters });
         return response.data;
+    },
+
+    /**
+     * Export audit log ra PDF
+     * @param {Object} filters - Các điều kiện lọc
+     * @returns {Promise} - Promise chứa file PDF
+     */
+    exportPdf: async (filters = {}) => {
+        const response = await apiClient.get(`${BASE_URL}/export-pdf`, { 
+            params: filters,
+            responseType: 'blob'
+        });
+        return response;
+    },
+
+    /**
+     * Export audit log ra Excel
+     * @param {Object} filters - Các điều kiện lọc
+     * @returns {Promise} - Promise chứa file Excel
+     */
+    exportExcel: async (filters = {}) => {
+        const response = await apiClient.get(`${BASE_URL}/export-excel`, { 
+            params: filters,
+            responseType: 'blob'
+        });
+        return response;
     }
 };
 
