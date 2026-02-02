@@ -80,83 +80,83 @@ const SeatGridDisplay = ({
         const isExitRow = COMMON_EXIT_ROWS.includes(seat.hang);
         const isSelected = selectedSeats.some(s => s.maGhe === seat.maGhe);
 
-        // Selected state - Glowing gold
+        // Selected state - Elegant blue highlight
         if (isSelected) {
             return {
-                bg: 'bg-linear-to-br from-yellow-400 to-amber-500',
-                border: 'border-amber-500',
+                bg: 'bg-sky-500',
+                border: 'border-sky-600 ring-2 ring-sky-300',
                 text: 'text-white',
-                shadow: 'shadow-xl shadow-amber-400/60',
-                scale: 'scale-110',
-                glow: 'before:content-[""] before:absolute before:inset-0 before:bg-linear-to-br before:from-yellow-400/50 before:to-amber-500/50 before:blur-xl before:rounded-xl before:-z-10'
+                shadow: 'shadow-md',
+                scale: 'scale-105',
+                glow: ''
             };
         }
 
-        // Exit row - Rose gradient
+        // Exit row - Subtle orange indicator
         if (isExitRow) {
             return {
-                bg: 'bg-linear-to-br from-rose-400 to-pink-500',
-                border: 'border-rose-500',
-                text: 'text-white',
-                shadow: 'shadow-lg shadow-rose-400/50',
+                bg: 'bg-orange-50',
+                border: 'border-orange-300',
+                text: 'text-orange-700',
+                shadow: 'shadow-sm',
                 scale: '',
                 glow: ''
             };
         }
 
-        // First class (maHangVe = 5) - Amber/Gold
+        // First class (maHangVe = 5) - Premium gold/amber
         if (maHangVe === 5) {
             return {
-                bg: 'bg-linear-to-br from-amber-500 to-orange-500',
-                border: 'border-orange-500',
-                text: 'text-white',
-                shadow: 'shadow-lg shadow-orange-400/40',
+                bg: 'bg-amber-50',
+                border: 'border-amber-400',
+                text: 'text-amber-700',
+                shadow: 'shadow-sm',
                 scale: '',
                 glow: ''
             };
         }
 
-        // Business class (maHangVe = 4) - Blue/Indigo
+        // Business class (maHangVe = 4) - Professional slate blue
         if (maHangVe === 4) {
             return {
-                bg: 'bg-linear-to-br from-blue-500 to-indigo-600',
-                border: 'border-indigo-600',
+                bg: 'bg-slate-700',
+                border: 'border-slate-800',
                 text: 'text-white',
-                shadow: 'shadow-lg shadow-indigo-400/40',
+                shadow: 'shadow-sm',
                 scale: '',
                 glow: ''
             };
         }
 
-        // Deluxe/Premium (maHangVe = 3) - Teal/Emerald
+        // Deluxe/Premium (maHangVe = 3) - Subtle teal
         if (maHangVe === 3) {
             return {
-                bg: 'bg-linear-to-br from-teal-500 to-emerald-600',
-                border: 'border-teal-600',
-                text: 'text-white',
-                shadow: 'shadow-lg shadow-teal-400/40',
+                bg: 'bg-emerald-50',
+                border: 'border-emerald-400',
+                text: 'text-emerald-700',
+                shadow: 'shadow-sm',
                 scale: '',
                 glow: ''
             };
         }
 
-        // Economy Saver (maHangVe = 2) - Cyan/Blue
+        // Economy Saver (maHangVe = 2) - Light blue
         if (maHangVe === 2) {
             return {
-                bg: 'bg-linear-to-br from-cyan-500 to-blue-600',
-                border: 'border-blue-600',
-                text: 'text-white',
-                shadow: 'shadow-md shadow-blue-400/40',
+                bg: 'bg-sky-50',
+                border: 'border-sky-300',
+                text: 'text-sky-700',
+                shadow: 'shadow-sm',
                 scale: '',
                 glow: ''
             };
         }
 
-        // Economy (maHangVe = 1) - Light gray
+        // Economy (maHangVe = 1) - Clean neutral gray
         return {
-            bg: 'bg-linear-to-br from-slate-100 to-slate-200',
-            border: 'border-slate-300',
-            text: 'text-slate-700',
+            bg: 'bg-gray-50',
+            border: 'border-gray-200',
+            text: 'text-gray-600',
             shadow: 'shadow-sm',
             scale: '',
             glow: ''
@@ -165,11 +165,11 @@ const SeatGridDisplay = ({
 
     const getCabinColor = (cabinName) => {
         const name = cabinName.toLowerCase();
-        if (name.includes('business') || name.includes('thương gia')) return 'from-blue-500 to-indigo-600';
-        if (name.includes('deluxe') || name.includes('premium') || name.includes('cao cấp')) return 'from-teal-500 to-emerald-600';
-        if (name.includes('first') || name.includes('hạng nhất')) return 'from-amber-500 to-orange-500';
-        if (name.includes('saver') || name.includes('tiết kiệm')) return 'from-cyan-500 to-blue-600';
-        return 'from-slate-300 to-slate-400';
+        if (name.includes('business') || name.includes('thương gia')) return 'bg-slate-700';
+        if (name.includes('deluxe') || name.includes('premium') || name.includes('cao cấp')) return 'bg-emerald-600';
+        if (name.includes('first') || name.includes('hạng nhất')) return 'bg-amber-500';
+        if (name.includes('saver') || name.includes('tiết kiệm')) return 'bg-sky-500';
+        return 'bg-gray-500';
     };
 
     const renderAisle = (columnIndex, aislePositions) => {
@@ -189,216 +189,173 @@ const SeatGridDisplay = ({
         : cabinGroups.filter(c => c.tenHangVe === selectedCabin);
 
     return (
-        <div className="space-y-6">
-            {/* Animated Cabin Filter Tabs */}
+        <div className="space-y-4">
+            {/* Clean Cabin Filter Tabs */}
             {cabinGroups.length > 1 && (
-                <div className="relative">
-                    {/* Glow effect behind tabs */}
-                    <div className="absolute inset-0 bg-linear-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 blur-3xl rounded-3xl"></div>
-
-                    <div className="relative flex items-center gap-3 flex-wrap bg-white/80 backdrop-blur-xl rounded-3xl p-3 border border-white/50 shadow-2xl">
+                <div className="flex items-center gap-2 flex-wrap bg-white rounded-xl p-2 border border-gray-200 shadow-sm">
+                    <button
+                        onClick={() => setSelectedCabin('all')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                            selectedCabin === 'all'
+                                ? 'bg-slate-800 text-white'
+                                : 'bg-transparent text-gray-600 hover:bg-gray-100'
+                        }`}
+                    >
+                        <span className="flex items-center gap-2">
+                            <FaPlane className="text-xs" />
+                            Tất cả
+                        </span>
+                    </button>
+                    {cabinGroups.map((cabin) => (
                         <button
-                            onClick={() => setSelectedCabin('all')}
-                            className={`px-6 py-3 rounded-2xl text-sm font-bold transition-all duration-300 relative overflow-hidden group ${
-                                selectedCabin === 'all'
-                                    ? 'bg-linear-to-r from-violet-600 to-indigo-600 text-white shadow-xl shadow-indigo-500/50 scale-105'
-                                    : 'bg-white text-slate-600 hover:bg-slate-50 hover:shadow-lg'
+                            key={cabin.tenHangVe}
+                            onClick={() => setSelectedCabin(cabin.tenHangVe)}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                selectedCabin === cabin.tenHangVe
+                                    ? `${getCabinColor(cabin.tenHangVe)} text-white`
+                                    : 'bg-transparent text-gray-600 hover:bg-gray-100'
                             }`}
                         >
-                            <span className="relative z-10 flex items-center gap-2">
-                                <span className="text-lg">✈️</span>
-                                All Cabins
-                            </span>
-                            {selectedCabin === 'all' && (
-                                <div className="absolute inset-0 bg-linear-to-r from-violet-600/50 to-indigo-600/50 animate-pulse"></div>
-                            )}
+                            {cabin.tenHangVe}
                         </button>
-                        {cabinGroups.map((cabin) => (
-                            <button
-                                key={cabin.tenHangVe}
-                                onClick={() => setSelectedCabin(cabin.tenHangVe)}
-                                className={`px-6 py-3 rounded-2xl text-sm font-bold transition-all duration-300 relative overflow-hidden ${
-                                    selectedCabin === cabin.tenHangVe
-                                        ? `bg-linear-to-r ${getCabinColor(cabin.tenHangVe)} text-white shadow-xl scale-105`
-                                        : 'bg-white text-slate-600 hover:bg-slate-50 hover:shadow-lg'
-                                }`}
-                            >
-                                <span className="relative z-10">{cabin.tenHangVe}</span>
-                            </button>
-                        ))}
-                    </div>
+                    ))}
                 </div>
             )}
 
-            {/* Stunning Seat Grid with 3D Effects */}
-            <div className="relative">
-                {/* Animated gradient background */}
-                <div className="absolute inset-0 bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-3xl animate-gradient-xy"></div>
-                <div className="absolute inset-0 bg-linear-to-br from-blue-100/50 via-purple-100/50 to-pink-100/50 rounded-3xl blur-3xl opacity-40"></div>
+            {/* Clean Seat Grid */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                {filteredCabins.length === 0 ? (
+                    <div className="p-16 text-center">
+                        <FaPlane className="text-gray-300 text-5xl mx-auto mb-4" />
+                        <div className="text-gray-500 font-medium text-lg mb-1">Chưa có ghế</div>
+                        <div className="text-gray-400 text-sm">Tạo cấu hình ghế đầu tiên của bạn</div>
+                    </div>
+                ) : (
+                    filteredCabins.map((cabin, cabinIdx) => {
+                        const aislePositions = getAislePositions(cabin.columns);
 
-                <div className="relative bg-white/80 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/60 overflow-hidden">
-                    {filteredCabins.length === 0 ? (
-                        <div className="p-20 text-center">
-                            <div className="relative inline-block">
-                                <div className="absolute inset-0 bg-linear-to-r from-blue-500 to-purple-500 blur-2xl opacity-50 animate-pulse"></div>
-                                <div className="relative text-8xl mb-6">✈️</div>
-                            </div>
-                            <div className="text-slate-600 font-bold text-xl mb-2">No seats available</div>
-                            <div className="text-slate-400">Create your first seat configuration</div>
-                        </div>
-                    ) : (
-                        filteredCabins.map((cabin, cabinIdx) => {
-                            const aislePositions = getAislePositions(cabin.columns);
-
-                            return (
-                                <div key={cabinIdx} className={`border-b border-slate-100/50 last:border-b-0 relative overflow-hidden`}>
-                                    {/* Animated background pattern for cabin */}
-                                    <div className="absolute inset-0 opacity-5">
-                                        <div className="absolute inset-0" style={{
-                                            backgroundImage: 'radial-gradient(circle at 2px 2px, slate-900 1px, transparent 0)',
-                                            backgroundSize: '24px 24px'
-                                        }}></div>
-                                    </div>
-
-                                    {/* Stunning Cabin Header */}
-                                    <div className={`relative bg-linear-to-r ${getCabinColor(cabin.tenHangVe)} px-8 py-5 overflow-hidden`}>
-                                        {/* Animated wave overlay */}
-                                        <div className="absolute inset-0 opacity-20">
-                                            <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent translate-x-[-100%] animate-shimmer"></div>
-                                        </div>
-
-                                        <div className="relative flex items-center justify-between">
-                                            <div className="flex items-center gap-4">
-                                                {/* Animated icon container */}
-                                                <div className="relative">
-                                                    <div className="absolute inset-0 bg-white/20 rounded-2xl blur-xl animate-pulse"></div>
-                                                    <div className="relative w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-3xl border-2 border-white/30">
-                                                        {cabin.tenHangVe.toLowerCase().includes('first') ? '👑' :
-                                                         cabin.tenHangVe.toLowerCase().includes('business') ? '💎' :
-                                                         cabin.tenHangVe.toLowerCase().includes('deluxe') ? '⭐' : '✈️'}
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <h3 className="text-xl font-black text-white tracking-tight drop-shadow-lg">
-                                                        {cabin.tenHangVe}
-                                                    </h3>
-                                                    <span className="text-sm text-white/90 font-semibold flex items-center gap-3">
-                                                        <span>Rows {cabin.startRow}-{cabin.endRow}</span>
-                                                        <span className="w-1 h-1 bg-white/60 rounded-full"></span>
-                                                        <span>{cabin.columns.length} columns</span>
-                                                        <span className="w-1 h-1 bg-white/60 rounded-full"></span>
-                                                        <span className="px-2 py-0.5 bg-white/20 rounded-full text-xs">
-                                                            {(cabin.endRow - cabin.startRow + 1) * cabin.columns.length} seats
-                                                        </span>
-                                                    </span>
-                                                </div>
+                        return (
+                            <div key={cabinIdx} className="border-b border-gray-100 last:border-b-0">
+                                {/* Clean Cabin Header */}
+                                <div className={`${getCabinColor(cabin.tenHangVe)} px-6 py-4`}>
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                                                <FaPlane className="text-white text-sm" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-base font-semibold text-white">
+                                                    {cabin.tenHangVe}
+                                                </h3>
+                                                <span className="text-xs text-white/80 flex items-center gap-2">
+                                                    <span>Hàng {cabin.startRow}-{cabin.endRow}</span>
+                                                    <span>•</span>
+                                                    <span>{cabin.columns.length} cột</span>
+                                                    <span>•</span>
+                                                    <span>{(cabin.endRow - cabin.startRow + 1) * cabin.columns.length} ghế</span>
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
-
-                                    {/* Premium Seat Table */}
-                                    <div className="p-6 overflow-auto max-h-[calc(100vh-350px)] bg-linear-to-br from-slate-50/50 to-white/50">
-                                        <table className="border-collapse mx-auto">
-                                            <thead className="sticky top-0 z-20">
-                                                <tr>
-                                                    <th className="px-3 py-3">
-                                                        <div className="w-10 h-10 flex items-center justify-center bg-linear-to-br from-slate-700 to-slate-900 rounded-xl text-[10px] font-black text-white shadow-lg">
-                                                            ROW
-                                                        </div>
-                                                    </th>
-                                                    {cabin.columns.map((col, idx) => (
-                                                        <React.Fragment key={col}>
-                                                            <th className="px-2 py-3">
-                                                                <div className="w-12 h-9 flex items-center justify-center bg-linear-to-br from-indigo-500 to-purple-600 rounded-xl text-xs font-black text-white shadow-lg border-2 border-white/30">
-                                                                    {col}
-                                                                </div>
-                                                            </th>
-                                                            {renderAisle(idx, aislePositions)}
-                                                        </React.Fragment>
-                                                    ))}
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {Array.from({ length: cabin.endRow - cabin.startRow + 1 }, (_, i) => cabin.startRow + i).map(row => {
-                                                    const rowSeats = seats.filter(s => s.hang === row);
-                                                    const isExitRow = COMMON_EXIT_ROWS.includes(row);
-
-                                                    return (
-                                                        <tr key={row} className={`${isExitRow ? 'bg-rose-500/10' : ''} hover:bg-slate-100/50 transition-all duration-200`}>
-                                                            <td className="px-3 py-2">
-                                                                <div className={`flex items-center justify-center w-10 h-10 rounded-xl text-xs font-black transition-all duration-200 ${
-                                                                    isExitRow
-                                                                        ? 'bg-linear-to-br from-rose-400 to-pink-500 text-white shadow-lg shadow-rose-400/40'
-                                                                        : 'bg-linear-to-br from-slate-200 to-slate-300 text-slate-700 shadow-md'
-                                                                }`}>
-                                                                    {row}
-                                                                </div>
-                                                            </td>
-                                                            {cabin.columns.map((col, colIdx) => {
-                                                                const seat = rowSeats.find(s => s.cot === col);
-
-                                                                return (
-                                                                    <React.Fragment key={col}>
-                                                                        <td className="px-1.5 py-2">
-                                                                            {seat ? (
-                                                                                <div
-                                                                                    className={`
-                                                                                        relative w-12 h-12
-                                                                                        ${getSeatStyle(seat).bg}
-                                                                                        border-2 ${getSeatStyle(seat).border}
-                                                                                        ${getSeatStyle(seat).shadow}
-                                                                                        ${getSeatStyle(seat).scale}
-                                                                                        ${getSeatStyle(seat).glow}
-                                                                                        rounded-2xl
-                                                                                        flex flex-col items-center justify-center
-                                                                                        cursor-pointer
-                                                                                        hover:shadow-2xl hover:scale-110 hover:-translate-y-1
-                                                                                        active:scale-95
-                                                                                        transition-all duration-300
-                                                                                        group
-                                                                                        overflow-visible
-                                                                                    `}
-                                                                                    onClick={(e) => onSeatClick(seat, e)}
-                                                                                    onContextMenu={(e) => onSeatRightClick(seat, e)}
-                                                                                    title={`${seat.soGhe} - ${seat.hangVe?.tenHangVe || 'N/A'}`}
-                                                                                >
-                                                                                    {/* Inner glow effect */}
-                                                                                    <div className="absolute inset-1 bg-linear-to-br from-white/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
-                                                                                    <span className={`relative z-10 ${getSeatStyle(seat).text} text-sm transition-transform duration-300 drop-shadow-md group-hover:scale-110`}>
-                                                                                        {getSeatIcon(seat)}
-                                                                                    </span>
-                                                                                    <span className={`relative z-10 text-[9px] font-black ${getSeatStyle(seat).text} mt-0.5 drop-shadow-md`}>
-                                                                                        {seat.soGhe}
-                                                                                    </span>
-
-                                                                                    {/* Premium tooltip */}
-                                                                                    <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-linear-to-r from-slate-900 to-slate-800 text-white text-xs px-4 py-2 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-30 shadow-2xl font-semibold border border-white/10">
-                                                                                        {seat.hangVe?.tenHangVe || 'N/A'}
-                                                                                        <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-6 border-transparent border-t-slate-800"></div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            ) : (
-                                                                                <div className="w-12 h-12 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-100/50 flex items-center justify-center">
-                                                                                    <span className="text-slate-300 text-sm font-light">—</span>
-                                                                                </div>
-                                                                            )}
-                                                                        </td>
-                                                                        {renderAisle(colIdx, aislePositions)}
-                                                                    </React.Fragment>
-                                                                );
-                                                            })}
-                                                        </tr>
-                                                    );
-                                                })}
-                                            </tbody>
-                                        </table>
-                                    </div>
                                 </div>
-                            );
-                        })
-                    )}
-                </div>
+
+                                {/* Clean Seat Table */}
+                                <div className="p-4 overflow-auto max-h-[calc(100vh-350px)] bg-gray-50/50">
+                                    <table className="border-collapse mx-auto">
+                                        <thead className="sticky top-0 z-20">
+                                            <tr>
+                                                <th className="px-2 py-2">
+                                                    <div className="w-9 h-9 flex items-center justify-center bg-slate-600 rounded-lg text-[10px] font-semibold text-white">
+                                                        ROW
+                                                    </div>
+                                                </th>
+                                                {cabin.columns.map((col, idx) => (
+                                                    <React.Fragment key={col}>
+                                                        <th className="px-1 py-2">
+                                                            <div className="w-11 h-8 flex items-center justify-center bg-slate-500 rounded-lg text-xs font-semibold text-white">
+                                                                {col}
+                                                            </div>
+                                                        </th>
+                                                        {renderAisle(idx, aislePositions)}
+                                                    </React.Fragment>
+                                                ))}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {Array.from({ length: cabin.endRow - cabin.startRow + 1 }, (_, i) => cabin.startRow + i).map(row => {
+                                                const rowSeats = seats.filter(s => s.hang === row);
+                                                const isExitRow = COMMON_EXIT_ROWS.includes(row);
+
+                                                return (
+                                                    <tr key={row} className={`${isExitRow ? 'bg-orange-50/50' : ''} hover:bg-gray-100/70 transition-colors duration-150`}>
+                                                        <td className="px-2 py-1.5">
+                                                            <div className={`flex items-center justify-center w-9 h-9 rounded-lg text-xs font-semibold transition-colors ${
+                                                                isExitRow
+                                                                    ? 'bg-orange-100 text-orange-700 border border-orange-200'
+                                                                    : 'bg-gray-200 text-gray-600'
+                                                            }`}>
+                                                                {row}
+                                                            </div>
+                                                        </td>
+                                                        {cabin.columns.map((col, colIdx) => {
+                                                            const seat = rowSeats.find(s => s.cot === col);
+
+                                                            return (
+                                                                <React.Fragment key={col}>
+                                                                    <td className="px-1 py-1.5">
+                                                                        {seat ? (
+                                                                            <div
+                                                                                className={`
+                                                                                    relative w-11 h-11
+                                                                                    ${getSeatStyle(seat).bg}
+                                                                                    border ${getSeatStyle(seat).border}
+                                                                                    ${getSeatStyle(seat).shadow}
+                                                                                    ${getSeatStyle(seat).scale}
+                                                                                    rounded-lg
+                                                                                    flex flex-col items-center justify-center
+                                                                                    cursor-pointer
+                                                                                    hover:shadow-md hover:scale-105
+                                                                                    active:scale-95
+                                                                                    transition-all duration-200
+                                                                                    group
+                                                                                `}
+                                                                                onClick={(e) => onSeatClick(seat, e)}
+                                                                                onContextMenu={(e) => onSeatRightClick(seat, e)}
+                                                                                title={`${seat.soGhe} - ${seat.hangVe?.tenHangVe || 'N/A'}`}
+                                                                            >
+                                                                                <span className={`${getSeatStyle(seat).text} text-sm`}>
+                                                                                    {getSeatIcon(seat)}
+                                                                                </span>
+                                                                                <span className={`text-[9px] font-semibold ${getSeatStyle(seat).text} mt-0.5`}>
+                                                                                    {seat.soGhe}
+                                                                                </span>
+
+                                                                                {/* Clean tooltip */}
+                                                                                <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-30 shadow-lg">
+                                                                                    {seat.hangVe?.tenHangVe || 'N/A'}
+                                                                                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+                                                                                </div>
+                                                                            </div>
+                                                                        ) : (
+                                                                            <div className="w-11 h-11 rounded-lg border border-dashed border-gray-300 bg-gray-50 flex items-center justify-center">
+                                                                                <span className="text-gray-300 text-xs">—</span>
+                                                                            </div>
+                                                                        )}
+                                                                    </td>
+                                                                    {renderAisle(colIdx, aislePositions)}
+                                                                </React.Fragment>
+                                                            );
+                                                        })}
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        );
+                    })
+                )}
             </div>
         </div>
     );

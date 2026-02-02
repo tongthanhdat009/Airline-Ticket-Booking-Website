@@ -125,6 +125,27 @@ public interface ChiTietChuyenBayRepository extends JpaRepository<ChiTietChuyenB
     void hardDeleteById(@Param("id") int id);
 
     /**
+     * Lấy danh sách chuyến bay phù hợp để đổi chuyến
+     * - Từ thờ gian hiện tại trở đi
+     * - Không bao gồm chuyến bay đã hủy
+     * - Cùng tuyến bay (sân bay đi và đến)
+     */
+    @Query("SELECT c FROM ChiTietChuyenBay c " +
+           "JOIN c.tuyenBay t " +
+           "WHERE t.sanBayDi.maSanBay = :maSanBayDi " +
+           "AND t.sanBayDen.maSanBay = :maSanBayDen " +
+           "AND (c.ngayDi > :ngayHienTai OR (c.ngayDi = :ngayHienTai AND c.gioDi >= :gioHienTai)) " +
+           "AND c.trangThai NOT IN ('Hủy', 'Đã hủy', 'Đã bay') " +
+           "AND c.maChuyenBay != :excludeMaChuyenBay " +
+           "ORDER BY c.ngayDi, c.gioDi")
+    List<ChiTietChuyenBay> findAvailableFlightsForChange(
+            @Param("maSanBayDi") int maSanBayDi,
+            @Param("maSanBayDen") int maSanBayDen,
+            @Param("ngayHienTai") java.time.LocalDate ngayHienTai,
+            @Param("gioHienTai") java.time.LocalTime gioHienTai,
+            @Param("excludeMaChuyenBay") int excludeMaChuyenBay);
+
+    /**
      * Kiểm tra máy bay có trùng lịch bay không (với buffer 30 phút)
      *
      * @param maMayBay Mã máy bay cần kiểm tra

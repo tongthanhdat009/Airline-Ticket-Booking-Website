@@ -370,17 +370,17 @@ const ChinhSuaSoDoGhe = () => {
 
     if (loading) {
         return (
-            <div className="min-h-[calc(100vh-64px)] bg-gray-100 flex items-center justify-center">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600"></div>
-                    <p className="text-gray-600">Đang tải sơ đồ ghế...</p>
+            <div className="min-h-[calc(100vh-64px)] bg-gray-50 flex items-center justify-center">
+                <div className="flex flex-col items-center gap-3">
+                    <div className="animate-spin rounded-full h-10 w-10 border-2 border-gray-200 border-t-slate-600"></div>
+                    <p className="text-gray-500 text-sm">Đang tải sơ đồ ghế...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-full bg-gray-100 flex flex-col">
+        <div className="min-h-full bg-gray-50 flex flex-col">
             {/* Toast */}
             <Toast
                 message={toast.message}
@@ -392,15 +392,15 @@ const ChinhSuaSoDoGhe = () => {
             {/* Main Content */}
             <div className="flex flex-1 overflow-hidden">
                 {/* Left - Seat Grid & Legend */}
-                <div className="flex-1 flex flex-col bg-gray-50 min-w-0 overflow-hidden">
+                <div className="flex-1 flex flex-col bg-white min-w-0 overflow-hidden">
                     {/* Seat Grid Scrollable Area */}
-                    <div className="flex-1 overflow-auto p-6">
+                    <div className="flex-1 overflow-auto p-4">
                         {seats.length === 0 ? (
                             <div className="flex items-center justify-center min-h-full p-6">
                                 <div className="text-center">
-                                    <FaPlane className="text-gray-300 text-7xl mx-auto mb-4" />
-                                    <p className="text-gray-500 font-semibold text-lg mb-2">Chưa có sơ đồ ghế</p>
-                                    <p className="text-gray-400 text-sm mb-6">Sử dụng các chức năng ở bên phải để bắt đầu</p>
+                                    <FaPlane className="text-gray-300 text-5xl mx-auto mb-4" />
+                                    <p className="text-gray-500 font-medium text-lg mb-1">Chưa có sơ đồ ghế</p>
+                                    <p className="text-gray-400 text-sm">Sử dụng các chức năng ở bên phải để bắt đầu</p>
                                 </div>
                             </div>
                         ) : (
@@ -424,16 +424,16 @@ const ChinhSuaSoDoGhe = () => {
                 </div>
 
                 {/* Right - Controls & Statistics */}
-                <div className="w-96 bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50 border-l border-blue-100 flex flex-col overflow-hidden shrink-0 shadow-2xl">
+                <div className="w-80 bg-white border-l border-gray-200 flex flex-col overflow-hidden shrink-0">
                     {/* Aircraft Info */}
-                    <div className="p-5 border-b border-blue-200 bg-linear-to-r from-blue-600 to-indigo-600 shadow-md">
+                    <div className="p-4 border-b border-gray-100 bg-slate-700">
                         <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg border border-white/30">
-                                <FaPlane className="text-white text-xl" />
+                            <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
+                                <FaPlane className="text-white text-sm" />
                             </div>
                             <div>
-                                <h2 className="font-bold text-white text-lg">{aircraft?.tenMayBay || `Máy bay #${maMayBay}`}</h2>
-                                <p className="text-xs text-blue-100">{aircraft?.hangMayBay} | Số hiệu: {aircraft?.soHieu}</p>
+                                <h2 className="font-semibold text-white text-base">{aircraft?.tenMayBay || `Máy bay #${maMayBay}`}</h2>
+                                <p className="text-xs text-gray-300">{aircraft?.hangMayBay} | Số hiệu: {aircraft?.soHieu}</p>
                             </div>
                         </div>
                     </div>
@@ -441,18 +441,18 @@ const ChinhSuaSoDoGhe = () => {
                     {/* Actions & Statistics - Scrollable */}
                     <div className="flex-1 overflow-auto p-4 space-y-4">
                         {/* Legend */}
-                        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-sm border border-blue-100">
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
                             <SeatLegend />
                         </div>
                         {/* Main Actions */}
-                        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-sm border border-blue-100">
-                            <h3 className="text-xs font-bold text-blue-900 uppercase mb-3 tracking-wider">Chức năng chính</h3>
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                            <h3 className="text-xs font-semibold text-gray-500 uppercase mb-3 tracking-wide">Chức năng chính</h3>
                             <div className="space-y-2">
                                 <button
                                     onClick={() => setShowAutoGenerate(true)}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 font-medium transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-700 text-white rounded-lg hover:bg-slate-800 font-medium transition-colors text-sm"
                                 >
-                                    <FaMagic className="text-sm" />
+                                    <FaMagic className="text-xs" />
                                     Tự động tạo
                                 </button>
                                 <button
@@ -460,16 +460,16 @@ const ChinhSuaSoDoGhe = () => {
                                         setEditingSeat(null);
                                         setShowAddSeat(true);
                                     }}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-linear-to-r from-emerald-500 to-teal-600 text-white rounded-lg hover:from-emerald-600 hover:to-teal-700 font-medium transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors text-sm"
                                 >
-                                    <FaPlus className="text-sm" />
+                                    <FaPlus className="text-xs" />
                                     Thêm ghế
                                 </button>
                                 <button
                                     onClick={handleDeleteAllSeats}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-linear-to-r from-rose-500 to-red-600 text-white rounded-lg hover:from-rose-600 hover:to-red-700 font-medium transition-all shadow-md hover:shadow-lg border border-rose-300"
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-red-600 border border-red-200 rounded-lg hover:bg-red-50 font-medium transition-colors text-sm"
                                 >
-                                    <FaTrash className="text-sm" />
+                                    <FaTrash className="text-xs" />
                                     Xóa tất cả
                                 </button>
                             </div>
@@ -477,35 +477,35 @@ const ChinhSuaSoDoGhe = () => {
 
                         {/* Selection Actions */}
                         {selectedSeats.length > 0 && (
-                            <div className="bg-linear-to-br from-amber-50 to-orange-50 rounded-xl p-4 border-2 border-amber-300 shadow-lg animate-pulse-slow">
+                            <div className="bg-sky-50 rounded-lg p-4 border border-sky-200">
                                 <div className="flex items-center justify-between mb-3">
                                     <div className="flex items-center gap-2">
-                                        <div className="w-7 h-7 bg-linear-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                        <div className="w-6 h-6 bg-sky-500 rounded-md flex items-center justify-center text-white font-semibold text-xs">
                                             {selectedSeats.length}
                                         </div>
-                                        <span className="text-amber-900 text-sm font-bold">ghế đã chọn</span>
+                                        <span className="text-sky-800 text-sm font-medium">ghế đã chọn</span>
                                     </div>
                                     <button
                                         onClick={clearSelection}
-                                        className="p-1.5 text-amber-700 hover:bg-amber-200 rounded-lg transition-colors"
+                                        className="p-1.5 text-sky-600 hover:bg-sky-100 rounded-md transition-colors"
                                         title="Bỏ chọn tất cả"
                                     >
-                                        <FaTimes className="text-sm" />
+                                        <FaTimes className="text-xs" />
                                     </button>
                                 </div>
                                 <div className="space-y-2">
                                     <button
                                         onClick={() => setShowBulkEdit(true)}
-                                        className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 text-sm font-medium transition-all shadow-md"
+                                        className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 text-sm font-medium transition-colors"
                                     >
-                                        <FaEdit size={12} />
+                                        <FaEdit size={11} />
                                         Sửa hàng loạt
                                     </button>
                                     <button
                                         onClick={handleDeleteSelectedSeats}
-                                        className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-linear-to-r from-rose-500 to-red-600 text-white rounded-lg hover:from-rose-600 hover:to-red-700 text-sm font-medium transition-all shadow-md"
+                                        className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-white text-red-600 border border-red-200 rounded-lg hover:bg-red-50 text-sm font-medium transition-colors"
                                     >
-                                        <FaTrash size={12} />
+                                        <FaTrash size={11} />
                                         Xóa đã chọn
                                     </button>
                                 </div>
@@ -513,23 +513,23 @@ const ChinhSuaSoDoGhe = () => {
                         )}
 
                         {/* Zoom Controls */}
-                        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-sm border border-blue-100">
-                            <h3 className="text-xs font-bold text-blue-900 uppercase mb-3 tracking-wider">Thu phóng</h3>
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                            <h3 className="text-xs font-semibold text-gray-500 uppercase mb-3 tracking-wide">Thu phóng</h3>
                             <div className="flex items-center justify-center gap-3">
                                 <button
                                     onClick={() => setZoomLevel(Math.max(50, zoomLevel - 10))}
-                                    className="p-2.5 text-blue-700 hover:bg-blue-100 rounded-lg transition-all hover:shadow-md"
+                                    className="p-2 text-gray-600 hover:bg-gray-200 rounded-lg transition-colors"
                                     title="Thu nhỏ"
                                 >
-                                    <FaCompress />
+                                    <FaCompress className="text-sm" />
                                 </button>
-                                <span className="text-lg font-bold text-blue-900 min-w-[60px] text-center">{zoomLevel}%</span>
+                                <span className="text-base font-semibold text-gray-700 min-w-[50px] text-center">{zoomLevel}%</span>
                                 <button
                                     onClick={() => setZoomLevel(Math.min(150, zoomLevel + 10))}
-                                    className="p-2.5 text-blue-700 hover:bg-blue-100 rounded-lg transition-all hover:shadow-md"
+                                    className="p-2 text-gray-600 hover:bg-gray-200 rounded-lg transition-colors"
                                     title="Phóng to"
                                 >
-                                    <FaExpand />
+                                    <FaExpand className="text-sm" />
                                 </button>
                             </div>
                         </div>

@@ -1,43 +1,43 @@
 ﻿import React from 'react';
-import { FaWindowMaximize, FaDoorOpen, FaCrown, FaStar, FaChair } from 'react-icons/fa';
-import { MdAirlineSeatReclineExtra, MdAirlineSeatReclineNormal, MdEventSeat } from 'react-icons/md';
+import { FaCrown, FaStar, FaDoorOpen } from 'react-icons/fa';
+import { MdAirlineSeatReclineNormal, MdEventSeat } from 'react-icons/md';
 
 const SeatLegend = () => {
     const legendItems = [
         {
-            icon: <FaCrown className="text-white text-xs" />,
+            icon: <FaCrown className="text-amber-700 text-xs" />,
             label: 'First Class',
-            bgClass: 'bg-linear-to-br from-amber-500 to-orange-500 border-orange-500'
+            bgClass: 'bg-amber-50 border-amber-400'
         },
         {
             icon: <MdAirlineSeatReclineNormal className="text-white text-xs" />,
             label: 'Business',
-            bgClass: 'bg-linear-to-br from-blue-500 to-indigo-600 border-indigo-600'
+            bgClass: 'bg-slate-700 border-slate-800'
         },
         {
-            icon: <FaStar className="text-white text-xs" />,
+            icon: <FaStar className="text-emerald-700 text-xs" />,
             label: 'Deluxe',
-            bgClass: 'bg-linear-to-br from-teal-500 to-emerald-600 border-teal-600'
+            bgClass: 'bg-emerald-50 border-emerald-400'
         },
         {
-            icon: <MdEventSeat className="text-white text-xs" />,
+            icon: <MdEventSeat className="text-sky-700 text-xs" />,
             label: 'Economy Saver',
-            bgClass: 'bg-linear-to-br from-cyan-500 to-blue-600 border-blue-600'
+            bgClass: 'bg-sky-50 border-sky-300'
         },
         {
-            icon: <MdEventSeat className="text-slate-700 text-xs" />,
+            icon: <MdEventSeat className="text-gray-600 text-xs" />,
             label: 'Economy',
-            bgClass: 'bg-linear-to-br from-slate-100 to-slate-200 border-slate-300'
+            bgClass: 'bg-gray-50 border-gray-200'
         },
         {
             icon: <MdEventSeat className="text-white text-xs" />,
-            label: 'Selected',
-            bgClass: 'bg-linear-to-br from-yellow-400 to-amber-500 border-amber-500'
+            label: 'Đã chọn',
+            bgClass: 'bg-sky-500 border-sky-600'
         },
         {
-            icon: <FaDoorOpen className="text-white text-[10px]" />,
-            label: 'Exit Row',
-            bgClass: 'bg-linear-to-br from-rose-400 to-pink-500 border-rose-500'
+            icon: <FaDoorOpen className="text-orange-700 text-[10px]" />,
+            label: 'Hàng thoát hiểm',
+            bgClass: 'bg-orange-50 border-orange-300'
         },
     ];
 
@@ -45,15 +45,15 @@ const SeatLegend = () => {
         <div className="space-y-3">
             {/* Header */}
             <div className="flex items-center gap-2">
-                <MdEventSeat className="text-indigo-600 text-lg" />
-                <h3 className="text-sm font-bold text-gray-800">Chú thích</h3>
+                <MdEventSeat className="text-slate-600 text-base" />
+                <h3 className="text-sm font-semibold text-gray-700">Chú thích</h3>
             </div>
 
             {/* Legend Items - Grid Layout */}
             <div className="grid grid-cols-2 gap-2">
                 {legendItems.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-2 group">
-                        <div className={`w-8 h-8 ${item.bgClass} border rounded-lg flex items-center justify-center shrink-0 transition-all duration-200 group-hover:scale-105`}>
+                    <div key={idx} className="flex items-center gap-2">
+                        <div className={`w-7 h-7 ${item.bgClass} border rounded-md flex items-center justify-center shrink-0`}>
                             {item.icon}
                         </div>
                         <span className="text-[10px] text-gray-600 font-medium leading-tight">{item.label}</span>
@@ -62,24 +62,24 @@ const SeatLegend = () => {
             </div>
 
             {/* Keyboard Shortcuts - Compact */}
-            <div className="pt-3 border-t border-gray-200">
-                <p className="text-[10px] font-bold text-gray-500 uppercase mb-2">Phím tắt</p>
-                <div className="space-y-1.5 text-[10px] text-gray-600">
+            <div className="pt-3 border-t border-gray-100">
+                <p className="text-[10px] font-semibold text-gray-500 uppercase mb-2 tracking-wide">Phím tắt</p>
+                <div className="space-y-1.5 text-[10px] text-gray-500">
                     <div className="flex items-center gap-1.5">
-                        <kbd className="px-1.5 py-0.5 bg-gray-100 rounded border border-gray-300 font-mono">Click</kbd>
+                        <kbd className="px-1.5 py-0.5 bg-gray-50 rounded border border-gray-200 font-mono text-gray-600">Click</kbd>
                         <span>Chọn</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                        <kbd className="px-1.5 py-0.5 bg-gray-100 rounded border border-gray-300 font-mono">Double</kbd>
+                        <kbd className="px-1.5 py-0.5 bg-gray-50 rounded border border-gray-200 font-mono text-gray-600">Double</kbd>
                         <span>Sửa</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                        <kbd className="px-1.5 py-0.5 bg-gray-100 rounded border border-gray-300 font-mono">Ctrl+</kbd>
-                        <kbd className="px-1.5 py-0.5 bg-gray-100 rounded border border-gray-300 font-mono">Click</kbd>
+                        <kbd className="px-1.5 py-0.5 bg-gray-50 rounded border border-gray-200 font-mono text-gray-600">Ctrl+</kbd>
+                        <kbd className="px-1.5 py-0.5 bg-gray-50 rounded border border-gray-200 font-mono text-gray-600">Click</kbd>
                         <span>Chọn nhiều</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                        <kbd className="px-1.5 py-0.5 bg-gray-100 rounded border border-gray-300 font-mono">Right</kbd>
+                        <kbd className="px-1.5 py-0.5 bg-gray-50 rounded border border-gray-200 font-mono text-gray-600">Right</kbd>
                         <span>Menu</span>
                     </div>
                 </div>

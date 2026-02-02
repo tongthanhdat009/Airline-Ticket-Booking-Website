@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   FaSearch,
   FaUserCheck,
@@ -11,384 +11,41 @@ import {
   FaCheckCircle,
   FaCalendar,
   FaMapMarkerAlt,
-  FaIdCard,
-  FaPhone,
-  FaEnvelope,
   FaEye,
-  FaEdit,
   FaClock,
-  FaMoneyBill
+  FaSpinner,
 } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
-
-// Dữ liệu hardcode cho danh sách đặt chỗ
-const MOCK_DAT_CHO = [
-  {
-    maDatCho: 'DC001',
-    maVe: 'VN123456',
-    hanhKhach: {
-      hoVaTen: 'Nguyễn Văn An',
-      cccd: '001234567890',
-      gioiTinh: 'Nam',
-      ngaySinh: '1990-05-15',
-      soDienThoai: '0901234567',
-      email: 'nguyenvan.a@gmail.com'
-    },
-    chuyenBay: {
-      maChuyenBay: 'VN001',
-      sanBayDi: { maSanBay: 'SGN', tenSanBay: 'Tân Sơn Nhất', thanhPho: 'TP. Hồ Chí Minh' },
-      sanBayDen: { maSanBay: 'HAN', tenSanBay: 'Nội Bài', thanhPho: 'Hà Nội' },
-      ngayGio: '2025-02-10T08:00:00',
-      trangThai: 'Chưa bay'
-    },
-    ghe: { maGhe: 'A1', loaiGhe: 'Thuong', hang: 'Phổ thông' },
-    hangVe: 'Phổ thông',
-    giaTien: 1750000,
-    trangThaiCheckIn: 'Chưa check-in',
-    trangThai: 'Đã đặt chỗ',
-    loaiVe: 'Một chiều'
-  },
-  {
-    maDatCho: 'DC002',
-    maVe: 'VN123457',
-    hanhKhach: {
-      hoVaTen: 'Trần Thị Bình',
-      cccd: '001234567891',
-      gioiTinh: 'Nữ',
-      ngaySinh: '1992-08-20',
-      soDienThoai: '0912345678',
-      email: 'tranthi.b@gmail.com'
-    },
-    chuyenBay: {
-      maChuyenBay: 'VN001',
-      sanBayDi: { maSanBay: 'SGN', tenSanBay: 'Tân Sơn Nhất', thanhPho: 'TP. Hồ Chí Minh' },
-      sanBayDen: { maSanBay: 'HAN', tenSanBay: 'Nội Bài', thanhPho: 'Hà Nội' },
-      ngayGio: '2025-02-10T08:00:00',
-      trangThai: 'Chưa bay'
-    },
-    ghe: { maGhe: 'A2', loaiGhe: 'Thuong', hang: 'Phổ thông' },
-    hangVe: 'Phổ thông',
-    giaTien: 1750000,
-    trangThaiCheckIn: 'Đã check-in',
-    trangThai: 'Đã đặt chỗ',
-    loaiVe: 'Một chiều'
-  },
-  {
-    maDatCho: 'DC003',
-    maVe: 'VN123458',
-    hanhKhach: {
-      hoVaTen: 'Lê Văn Cường',
-      cccd: '001234567892',
-      gioiTinh: 'Nam',
-      ngaySinh: '1988-03-10',
-      soDienThoai: '0923456789',
-      email: 'levan.c@yahoo.com'
-    },
-    chuyenBay: {
-      maChuyenBay: 'VN001',
-      sanBayDi: { maSanBay: 'SGN', tenSanBay: 'Tân Sơn Nhất', thanhPho: 'TP. Hồ Chí Minh' },
-      sanBayDen: { maSanBay: 'HAN', tenSanBay: 'Nội Bài', thanhPho: 'Hà Nội' },
-      ngayGio: '2025-02-10T08:00:00',
-      trangThai: 'Chưa bay'
-    },
-    ghe: { maGhe: 'B1', loaiGhe: 'Thuong', hang: 'Phổ thông' },
-    hangVe: 'Phổ thông',
-    giaTien: 1750000,
-    trangThaiCheckIn: 'Chưa check-in',
-    trangThai: 'Đã đặt chỗ',
-    loaiVe: 'Một chiều'
-  },
-  {
-    maDatCho: 'DC004',
-    maVe: 'VN123459',
-    hanhKhach: {
-      hoVaTen: 'Phạm Thị Dung',
-      cccd: '001234567893',
-      gioiTinh: 'Nữ',
-      ngaySinh: '1995-12-25',
-      soDienThoai: '0934567890',
-      email: 'phamthi.d@gmail.com'
-    },
-    chuyenBay: {
-      maChuyenBay: 'VN002',
-      sanBayDi: { maSanBay: 'HAN', tenSanBay: 'Nội Bài', thanhPho: 'Hà Nội' },
-      sanBayDen: { maSanBay: 'DAD', tenSanBay: 'Đà Nẵng', thanhPho: 'Đà Nẵng' },
-      ngayGio: '2025-02-12T10:30:00',
-      trangThai: 'Chưa bay'
-    },
-    ghe: { maGhe: 'C1', loaiGhe: 'ThuongGia', hang: 'Thương gia' },
-    hangVe: 'Thương gia',
-    giaTien: 5200000,
-    trangThaiCheckIn: 'Đã check-in',
-    trangThai: 'Đã đặt chỗ',
-    loaiVe: 'Khứ hồi'
-  },
-  {
-    maDatCho: 'DC005',
-    maVe: 'VN123460',
-    hanhKhach: {
-      hoVaTen: 'Hoàng Văn Em',
-      cccd: '001234567894',
-      gioiTinh: 'Nam',
-      ngaySinh: '1985-07-08',
-      soDienThoai: '0945678901',
-      email: 'hoangvan.e@company.vn'
-    },
-    chuyenBay: {
-      maChuyenBay: 'VN002',
-      sanBayDi: { maSanBay: 'HAN', tenSanBay: 'Nội Bài', thanhPho: 'Hà Nội' },
-      sanBayDen: { maSanBay: 'DAD', tenSanBay: 'Đà Nẵng', thanhPho: 'Đà Nẵng' },
-      ngayGio: '2025-02-12T10:30:00',
-      trangThai: 'Chưa bay'
-    },
-    ghe: { maGhe: 'C2', loaiGhe: 'ThuongGia', hang: 'Thương gia' },
-    hangVe: 'Thương gia',
-    giaTien: 5200000,
-    trangThaiCheckIn: 'Chưa check-in',
-    trangThai: 'Đã đặt chỗ',
-    loaiVe: 'Khứ hồi'
-  },
-  {
-    maDatCho: 'DC006',
-    maVe: 'VN123461',
-    hanhKhach: {
-      hoVaTen: 'Nguyễn Thị Flower',
-      cccd: '001234567895',
-      gioiTinh: 'Nữ',
-      ngaySinh: '1998-04-30',
-      soDienThoai: '0956789012',
-      email: 'nguyenthi.f@gmail.com'
-    },
-    chuyenBay: {
-      maChuyenBay: 'VN003',
-      sanBayDi: { maSanBay: 'SGN', tenSanBay: 'Tân Sơn Nhất', thanhPho: 'TP. Hồ Chí Minh' },
-      sanBayDen: { maSanBay: 'CXR', tenSanBay: 'Cam Ranh', thanhPho: 'Nha Trang' },
-      ngayGio: '2025-02-15T14:00:00',
-      trangThai: 'Chưa bay'
-    },
-    ghe: { maGhe: 'F1', loaiGhe: 'PhoThongDacBiet', hang: 'Phổ thông đặc biệt' },
-    hangVe: 'Phổ thông đặc biệt',
-    giaTien: 2800000,
-    trangThaiCheckIn: 'Chưa check-in',
-    trangThai: 'Đã đặt chỗ',
-    loaiVe: 'Một chiều'
-  },
-  {
-    maDatCho: 'DC007',
-    maVe: 'VN123462',
-    hanhKhach: {
-      hoVaTen: 'Đỗ Văn Giang',
-      cccd: '001234567896',
-      gioiTinh: 'Nam',
-      ngaySinh: '1991-09-12',
-      soDienThoai: '0967890123',
-      email: 'dovan.g@outlook.com'
-    },
-    chuyenBay: {
-      maChuyenBay: 'VN003',
-      sanBayDi: { maSanBay: 'SGN', tenSanBay: 'Tân Sơn Nhất', thanhPho: 'TP. Hồ Chí Minh' },
-      sanBayDen: { maSanBay: 'CXR', tenSanBay: 'Cam Ranh', thanhPho: 'Nha Trang' },
-      ngayGio: '2025-02-15T14:00:00',
-      trangThai: 'Chưa bay'
-    },
-    ghe: { maGhe: 'F2', loaiGhe: 'PhoThongDacBiet', hang: 'Phổ thông đặc biệt' },
-    hangVe: 'Phổ thông đặc biệt',
-    giaTien: 2800000,
-    trangThaiCheckIn: 'Đã check-in',
-    trangThai: 'Đã đặt chỗ',
-    loaiVe: 'Một chiều'
-  },
-  {
-    maDatCho: 'DC008',
-    maVe: 'VN123463',
-    hanhKhach: {
-      hoVaTen: 'Bùi Thị Hương',
-      cccd: '001234567897',
-      gioiTinh: 'Nữ',
-      ngaySinh: '1993-11-22',
-      soDienThoai: '0978901234',
-      email: 'buithi.h@gmail.com'
-    },
-    chuyenBay: {
-      maChuyenBay: 'VN004',
-      sanBayDi: { maSanBay: 'DAD', tenSanBay: 'Đà Nẵng', thanhPho: 'Đà Nẵng' },
-      sanBayDen: { maSanBay: 'PQC', tenSanBay: 'Phú Quốc', thanhPho: 'Phú Quốc' },
-      ngayGio: '2025-02-18T09:00:00',
-      trangThai: 'Chưa bay'
-    },
-    ghe: { maGhe: 'A1', loaiGhe: 'ThuongGia', hang: 'Thương gia' },
-    hangVe: 'Thương gia',
-    giaTien: 6200000,
-    trangThaiCheckIn: 'Chưa check-in',
-    trangThai: 'Đã đặt chỗ',
-    loaiVe: 'Khứ hồi'
-  },
-  {
-    maDatCho: 'DC009',
-    maVe: 'VN123464',
-    hanhKhach: {
-      hoVaTen: 'Văn Tiến',
-      cccd: '001234567898',
-      gioiTinh: 'Nam',
-      ngaySinh: '1987-02-14',
-      soDienThoai: '0989012345',
-      email: 'vanti@company.com'
-    },
-    chuyenBay: {
-      maChuyenBay: 'VN005',
-      sanBayDi: { maSanBay: 'SGN', tenSanBay: 'Tân Sơn Nhất', thanhPho: 'TP. Hồ Chí Minh' },
-      sanBayDen: { maSanBay: 'VCA', tenSanBay: 'Cần Thơ', thanhPho: 'Cần Thơ' },
-      ngayGio: '2025-02-20T16:00:00',
-      trangThai: 'Chưa bay'
-    },
-    ghe: { maGhe: 'B5', loaiGhe: 'Thuong', hang: 'Phổ thông' },
-    hangVe: 'Phổ thông',
-    giaTien: 1850000,
-    trangThaiCheckIn: 'Chưa check-in',
-    trangThai: 'Đã đặt chỗ',
-    loaiVe: 'Một chiều'
-  },
-  {
-    maDatCho: 'DC010',
-    maVe: 'VN123465',
-    hanhKhach: {
-      hoVaTen: 'Lê Thị Kim',
-      cccd: '001234567899',
-      gioiTinh: 'Nữ',
-      ngaySinh: '1996-06-18',
-      soDienThoai: '0990123456',
-      email: 'lienthi.k@gmail.com'
-    },
-    chuyenBay: {
-      maChuyenBay: 'VN006',
-      sanBayDi: { maSanBay: 'HAN', tenSanBay: 'Nội Bài', thanhPho: 'Hà Nội' },
-      sanBayDen: { maSanBay: 'SGN', tenSanBay: 'Tân Sơn Nhất', thanhPho: 'TP. Hồ Chí Minh' },
-      ngayGio: '2025-02-22T07:30:00',
-      trangThai: 'Chưa bay'
-    },
-    ghe: { maGhe: 'E1', loaiGhe: 'PhoThongDacBiet', hang: 'Phổ thông đặc biệt' },
-    hangVe: 'Phổ thông đặc biệt',
-    giaTien: 2950000,
-    trangThaiCheckIn: 'Đã check-in',
-    trangThai: 'Đã đặt chỗ',
-    loaiVe: 'Một chiều'
-  },
-  {
-    maDatCho: 'DC011',
-    maVe: 'VN123466',
-    hanhKhach: {
-      hoVaTen: 'Phạm Minh Long',
-      cccd: '001234567900',
-      gioiTinh: 'Nam',
-      ngaySinh: '1989-08-08',
-      soDienThoai: '0912345671',
-      email: 'phamminh.l@yahoo.com'
-    },
-    chuyenBay: {
-      maChuyenBay: 'VN007',
-      sanBayDi: { maSanBay: 'SGN', tenSanBay: 'Tân Sơn Nhất', thanhPho: 'TP. Hồ Chí Minh' },
-      sanBayDen: { maSanBay: 'HAN', tenSanBay: 'Nội Bài', thanhPho: 'Hà Nội' },
-      ngayGio: '2025-02-25T08:00:00',
-      trangThai: 'Chưa bay'
-    },
-    ghe: { maGhe: 'A10', loaiGhe: 'Thuong', hang: 'Phổ thông' },
-    hangVe: 'Phổ thông',
-    giaTien: 3000000,
-    trangThaiCheckIn: 'Chưa check-in',
-    trangThai: 'Đã đặt chỗ',
-    loaiVe: 'Khứ hồi'
-  },
-  {
-    maDatCho: 'DC012',
-    maVe: 'VN123467',
-    hanhKhach: {
-      hoVaTen: 'Ngô Quyết Mạnh',
-      cccd: '001234567901',
-      gioiTinh: 'Nam',
-      ngaySinh: '1994-01-25',
-      soDienThoai: '0923456790',
-      email: 'ngoquyen.m@fpt.vn'
-    },
-    chuyenBay: {
-      maChuyenBay: 'VN008',
-      sanBayDi: { maSanBay: 'DAD', tenSanBay: 'Đà Nẵng', thanhPho: 'Đà Nẵng' },
-      sanBayDen: { maSanBay: 'HAN', tenSanBay: 'Nội Bài', thanhPho: 'Hà Nội' },
-      ngayGio: '2025-02-28T11:00:00',
-      trangThai: 'Chưa bay'
-    },
-    ghe: { maGhe: 'C5', loaiGhe: 'Thuong', hang: 'Phổ thông' },
-    hangVe: 'Phổ thông',
-    giaTien: 2100000,
-    trangThaiCheckIn: 'Chưa check-in',
-    trangThai: 'Đã đặt chỗ',
-    loaiVe: 'Một chiều'
-  }
-];
-
-// Dữ liệu hardcode cho danh sách chuyến bay
-const MOCK_CHUYEN_BAY = [
-  {
-    maChuyenBay: 'VN001',
-    sanBayDi: { maSanBay: 'SGN', tenSanBay: 'Tân Sơn Nhất', thanhPho: 'TP. Hồ Chí Minh' },
-    sanBayDen: { maSanBay: 'HAN', tenSanBay: 'Nội Bài', thanhPho: 'Hà Nội' },
-    ngayGio: '2025-02-10T08:00:00',
-    trangThai: 'Chưa bay',
-    soGheTrong: 156,
-    tongSoGhe: 180
-  },
-  {
-    maChuyenBay: 'VN002',
-    sanBayDi: { maSanBay: 'HAN', tenSanBay: 'Nội Bài', thanhPho: 'Hà Nội' },
-    sanBayDen: { maSanBay: 'DAD', tenSanBay: 'Đà Nẵng', thanhPho: 'Đà Nẵng' },
-    ngayGio: '2025-02-12T10:30:00',
-    trangThai: 'Chưa bay',
-    soGheTrong: 45,
-    tongSoGhe: 180
-  },
-  {
-    maChuyenBay: 'VN003',
-    sanBayDi: { maSanBay: 'SGN', tenSanBay: 'Tân Sơn Nhất', thanhPho: 'TP. Hồ Chí Minh' },
-    sanBayDen: { maSanBay: 'CXR', tenSanBay: 'Cam Ranh', thanhPho: 'Nha Trang' },
-    ngayGio: '2025-02-15T14:00:00',
-    trangThai: 'Chưa bay',
-    soGheTrong: 98,
-    tongSoGhe: 180
-  },
-  {
-    maChuyenBay: 'VN004',
-    sanBayDi: { maSanBay: 'DAD', tenSanBay: 'Đà Nẵng', thanhPho: 'Đà Nẵng' },
-    sanBayDen: { maSanBay: 'PQC', tenSanBay: 'Phú Quốc', thanhPho: 'Phú Quốc' },
-    ngayGio: '2025-02-18T09:00:00',
-    trangThai: 'Chưa bay',
-    soGheTrong: 120,
-    tongSoGhe: 180
-  },
-  {
-    maChuyenBay: 'VN005',
-    sanBayDi: { maSanBay: 'SGN', tenSanBay: 'Tân Sơn Nhất', thanhPho: 'TP. Hồ Chí Minh' },
-    sanBayDen: { maSanBay: 'VCA', tenSanBay: 'Cần Thơ', thanhPho: 'Cần Thơ' },
-    ngayGio: '2025-02-20T16:00:00',
-    trangThai: 'Chưa bay',
-    soGheTrong: 165,
-    tongSoGhe: 180
-  }
-];
+import QLDatChoService from '../../services/QLDatChoService';
+import { getAllChuyenBay } from '../../services/QLChuyenBayService';
+import useCheckInWebSocket from '../../hooks/useCheckInWebSocket';
+import {
+  ChiTietDatChoModal,
+  CheckInModal,
+  DoiGheModal,
+  DoiChuyenModal,
+  HuyVeModal,
+  DoiHangVeModal,
+} from '../../components/QuanLy/QuanLyDatCho';
 
 const QuanLyDatCho = () => {
   // Tab active
   const [activeTab, setActiveTab] = useState('quan-ly-dat-cho');
 
   // States cho dữ liệu
-  const [datChoList, setDatChoList] = useState(MOCK_DAT_CHO);
-  const [filteredDatCho, setFilteredDatCho] = useState(MOCK_DAT_CHO);
-  const [chuyenBayList] = useState(MOCK_CHUYEN_BAY);
+  const [datChoList, setDatChoList] = useState([]);
+  const [filteredDatCho, setFilteredDatCho] = useState([]);
+  const [chuyenBayList, setChuyenBayList] = useState([]);
   const [selectedChuyenBay, setSelectedChuyenBay] = useState(null);
   const [passengersOnFlight, setPassengersOnFlight] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // States cho search
   const [search, setSearch] = useState('');
+  const [flightSearch, setFlightSearch] = useState('');
+  const [showAllFlights, setShowAllFlights] = useState(false);
 
   // States cho modal
   const [selectedDatCho, setSelectedDatCho] = useState(null);
@@ -397,6 +54,13 @@ const QuanLyDatCho = () => {
   const [isDoiGheModalOpen, setIsDoiGheModalOpen] = useState(false);
   const [isDoiChuyenModalOpen, setIsDoiChuyenModalOpen] = useState(false);
   const [isHuyVeModalOpen, setIsHuyVeModalOpen] = useState(false);
+  const [isDoiHangVeModalOpen, setIsDoiHangVeModalOpen] = useState(false);
+
+  // States cho đổi ghế và đổi chuyến
+  const [availableFlights, setAvailableFlights] = useState([]);
+  const [seatMap, setSeatMap] = useState(null);
+  const [selectedNewSeat, setSelectedNewSeat] = useState(null);
+  const [loadingModal, setLoadingModal] = useState(false);
 
   // States cho Toast
   const [toast, setToast] = useState({
@@ -416,7 +80,9 @@ const QuanLyDatCho = () => {
   });
 
   // States cho pagination
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
   const itemsPerPage = 8;
 
   // Toast handler
@@ -444,29 +110,152 @@ const QuanLyDatCho = () => {
     setConfirmDialog(prev => ({ ...prev, isVisible: false }));
   };
 
-  // Filter theo search text
+  // WebSocket handler for check-in updates
+  const handleCheckInUpdate = useCallback((event) => {
+    console.log('Received check-in update:', event);
+    // Update the booking in the list
+    setDatChoList(prev => prev.map(dc => 
+      dc.maDatCho === event.maDatCho 
+        ? { ...dc, checkInStatus: true }
+        : dc
+    ));
+    setFilteredDatCho(prev => prev.map(dc => 
+      dc.maDatCho === event.maDatCho 
+        ? { ...dc, checkInStatus: true }
+        : dc
+    ));
+    // Show toast notification
+    showToast(`Hành khách vừa check-in (Mã đặt chỗ: #${event.maDatCho})`, 'info');
+  }, []);
+
+  // Initialize WebSocket
+  useCheckInWebSocket(handleCheckInUpdate);
+
+  // Load dữ liệu đặt chỗ
+  useEffect(() => {
+    loadDatChoData();
+  }, [currentPage, search]);
+  
+  // Load tất cả chuyến bay (chỉ một lần khi mount)
+  useEffect(() => {
+    loadAllFlights();
+  }, []);
+
+  const loadDatChoData = async () => {
+    setLoading(true);
+    try {
+      const response = await QLDatChoService.getAllDatCho({
+        page: currentPage,
+        size: itemsPerPage,
+        search: search || undefined
+      });
+      
+      if (response.success) {
+        const data = response.data;
+        setDatChoList(data.content || []);
+        setFilteredDatCho(data.content || []);
+        setTotalPages(data.totalPages || 0);
+        setTotalElements(data.totalElements || 0);
+        
+        // Extract unique flights from bookings (backup)
+      // Chỉ dùng khi chưa load được từ API chuyến bay
+      if (chuyenBayList.length === 0) {
+        const flights = extractFlights(data.content || []);
+        setChuyenBayList(flights);
+      }
+      } else {
+        showToast(response.message || 'Không thể tải dữ liệu', 'error');
+      }
+    } catch (error) {
+      console.error('Error loading dat cho:', error);
+      showToast('Có lỗi xảy ra khi tải dữ liệu', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load tất cả chuyến bay từ API
+  const loadAllFlights = async () => {
+    try {
+      const response = await getAllChuyenBay();
+      if (response.data) {
+        // Transform dữ liệu từ API để khớp với format hiện tại
+        const flights = response.data.map(cb => ({
+          maChuyenBayId: cb.maChuyenBay,
+          maChuyenBay: cb.soHieuChuyenBay || cb.maChuyenBay,
+          sanBayDi: {
+            maSanBay: cb.sanBayDi?.maSanBay || '',
+            tenSanBay: cb.sanBayDi?.tenSanBay || '',
+            thanhPho: cb.sanBayDi?.thanhPho || cb.sanBayDi?.tenSanBay || ''
+          },
+          sanBayDen: {
+            maSanBay: cb.sanBayDen?.maSanBay || '',
+            tenSanBay: cb.sanBayDen?.tenSanBay || '',
+            thanhPho: cb.sanBayDen?.thanhPho || cb.sanBayDen?.tenSanBay || ''
+          },
+          ngayGio: cb.ngayGioDi || cb.ngayGio,
+          trangThai: cb.trangThai || 'Chưa bay'
+        }));
+        setChuyenBayList(flights);
+      }
+    } catch (error) {
+      console.error('Error loading all flights:', error);
+      // Fallback: sử dụng extractFlights từ đặt chỗ nếu API lỗi
+      const flights = extractFlights(datChoList);
+      setChuyenBayList(flights);
+    }
+  };
+
+  // Extract unique flights from bookings (fallback)
+  const extractFlights = (bookings) => {
+    const flightMap = new Map();
+    bookings.forEach(booking => {
+      if (booking.maChuyenBay && !flightMap.has(booking.maChuyenBay)) {
+        flightMap.set(booking.maChuyenBay, {
+          maChuyenBayId: booking.maChuyenBay, // Integer ID for API
+          maChuyenBay: booking.soHieuChuyenBay || booking.maChuyenBay, // String display
+          sanBayDi: { 
+            maSanBay: booking.maSanBayDi || '', 
+            tenSanBay: booking.sanBayDi || '', 
+            thanhPho: booking.sanBayDi || '' 
+          },
+          sanBayDen: { 
+            maSanBay: booking.maSanBayDen || '', 
+            tenSanBay: booking.sanBayDen || '', 
+            thanhPho: booking.sanBayDen || '' 
+          },
+          ngayGio: booking.ngayGioDi,
+          trangThai: booking.trangThaiChuyenBay || 'Chưa bay'
+        });
+      }
+    });
+    return Array.from(flightMap.values());
+  };
+
+  // Filter theo search text (client-side filtering)
   useEffect(() => {
     if (search.trim() === '') {
       setFilteredDatCho(datChoList);
     } else {
       const filtered = datChoList.filter(
         (dc) =>
-          dc.maDatCho.toLowerCase().includes(search.toLowerCase()) ||
-          dc.maVe.toLowerCase().includes(search.toLowerCase()) ||
-          dc.hanhKhach.hoVaTen.toLowerCase().includes(search.toLowerCase()) ||
-          dc.hanhKhach.cccd.includes(search) ||
-          dc.chuyenBay.maChuyenBay.toLowerCase().includes(search.toLowerCase())
+          String(dc.maDatCho).toLowerCase().includes(search.toLowerCase()) ||
+          (dc.hoVaTen && dc.hoVaTen.toLowerCase().includes(search.toLowerCase())) ||
+          (dc.cccd && dc.cccd.includes(search)) ||
+          (dc.soHieuChuyenBay && dc.soHieuChuyenBay.toLowerCase().includes(search.toLowerCase()))
       );
       setFilteredDatCho(filtered);
     }
-    setCurrentPage(1);
-  }, [search, datChoList]);
+  }, [datChoList]);
+
+  // Reset page về 0 khi search thay đổi
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [search]);
 
   // Pagination logic
-  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfLastItem = (currentPage + 1) * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredDatCho.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredDatCho.length / itemsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -500,14 +289,54 @@ const QuanLyDatCho = () => {
     setIsCheckInModalOpen(true);
   };
 
-  const handleDoiGhe = (datCho) => {
+  const handleDoiGhe = async (datCho) => {
     setSelectedDatCho(datCho);
+    setSelectedNewSeat(null);
+    setSeatMap(null);
     setIsDoiGheModalOpen(true);
+    
+    // Fetch seat map từ API
+    setLoadingModal(true);
+    try {
+      const response = await QLDatChoService.getSeatMap(datCho.maDatCho);
+      if (response.success) {
+        setSeatMap(response.data);
+      } else {
+        showToast(response.message || 'Không thể tải sơ đồ ghế', 'error');
+      }
+    } catch (error) {
+      console.error('Error loading seat map:', error);
+      showToast('Có lỗi xảy ra khi tải sơ đồ ghế', 'error');
+    } finally {
+      setLoadingModal(false);
+    }
   };
 
-  const handleDoiChuyen = (datCho) => {
+  const handleDoiChuyen = async (datCho) => {
+    // Kiểm tra đã check-in chưa
+    if (datCho.checkInStatus) {
+      showToast('Không thể đổi chuyến bay khi đã check-in', 'error');
+      return;
+    }
     setSelectedDatCho(datCho);
+    setAvailableFlights([]);
     setIsDoiChuyenModalOpen(true);
+    
+    // Fetch available flights từ API
+    setLoadingModal(true);
+    try {
+      const response = await QLDatChoService.getAvailableFlights(datCho.maDatCho);
+      if (response.success) {
+        setAvailableFlights(response.data || []);
+      } else {
+        showToast(response.message || 'Không thể tải danh sách chuyến bay', 'error');
+      }
+    } catch (error) {
+      console.error('Error loading available flights:', error);
+      showToast('Có lỗi xảy ra khi tải danh sách chuyến bay', 'error');
+    } finally {
+      setLoadingModal(false);
+    }
   };
 
   const handleHuyVe = (datCho) => {
@@ -515,94 +344,157 @@ const QuanLyDatCho = () => {
     setIsHuyVeModalOpen(true);
   };
 
-  const confirmCheckIn = () => {
-    showConfirm(
-      'Xác nhận Check-in',
-      `Bạn có chắc chắn muốn check-in cho hành khách ${selectedDatCho?.hanhKhach.hoVaTen}?`,
-      'warning',
-      'Check-in',
-      () => {
-        const updatedList = datChoList.map(dc =>
-          dc.maDatCho === selectedDatCho.maDatCho
-            ? { ...dc, trangThaiCheckIn: 'Đã check-in' }
-            : dc
-        );
-        setDatChoList(updatedList);
+  const handleDoiHangVe = (datCho) => {
+    setSelectedDatCho(datCho);
+    setIsDoiHangVeModalOpen(true);
+  };
+
+  const confirmDoiHangVe = async (hangVeMoi, phiDoiInfo) => {
+    try {
+      setLoading(true);
+      const response = await QLDatChoService.doiHangVe(
+        selectedDatCho.maDatCho,
+        hangVeMoi.maHangVe,
+        null, // Chưa chọn ghế mới
+        'Đổi hạng vé theo yêu cầu'
+      );
+      if (response.success) {
+        await loadDatChoData();
+        setIsDoiHangVeModalOpen(false);
+        const message = phiDoiInfo?.loaiGiaoDich === 'HOAN_TIEN' 
+          ? `Đổi hạng vé thành công! Hoàn tiền: ${formatCurrency(phiDoiInfo.tongThanhToan)}`
+          : `Đổi hạng vé thành công! ${phiDoiInfo?.tongThanhToan > 0 ? `Thanh toán thêm: ${formatCurrency(phiDoiInfo.tongThanhToan)}` : ''}`;
+        showToast(message);
+      } else {
+        showToast(response.message || 'Đổi hạng vé thất bại', 'error');
+      }
+    } catch (error) {
+      console.error('Error doi hang ve:', error);
+      showToast('Có lỗi xảy ra khi đổi hạng vé', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const confirmCheckIn = async () => {
+    try {
+      setLoading(true);
+      const response = await QLDatChoService.checkIn(selectedDatCho.maDatCho);
+      if (response.success) {
+        await loadDatChoData();
         setIsCheckInModalOpen(false);
         hideConfirm();
         showToast('Check-in thành công!');
+      } else {
+        showToast(response.message || 'Check-in thất bại', 'error');
       }
-    );
+    } catch (error) {
+      console.error('Error check-in:', error);
+      showToast('Có lỗi xảy ra khi check-in', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const confirmDoiGhe = (newGhe) => {
-    showConfirm(
-      'Xác nhận đổi ghế',
-      `Đổi ghế từ ${selectedDatCho?.ghe.maGhe} sang ${newGhe}?`,
-      'warning',
-      'Xác nhận',
-      () => {
-        const updatedList = datChoList.map(dc =>
-          dc.maDatCho === selectedDatCho.maDatCho
-            ? { ...dc, ghe: { ...dc.ghe, maGhe: newGhe } }
-            : dc
-        );
-        setDatChoList(updatedList);
+  const confirmDoiGhe = async () => {
+    if (!selectedNewSeat) {
+      showToast('Vui lòng chọn ghế mới', 'error');
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      const response = await QLDatChoService.doiGhe(
+        selectedDatCho.maDatCho, 
+        selectedNewSeat.maGhe, 
+        'Đổi ghế theo yêu cầu'
+      );
+      if (response.success) {
+        await loadDatChoData();
         setIsDoiGheModalOpen(false);
-        hideConfirm();
-        showToast(`Đổi ghế sang ${newGhe} thành công!`);
+        setSelectedNewSeat(null);
+        showToast(`Đổi ghế thành công! Ghế mới: ${selectedNewSeat.soGhe}`);
+      } else {
+        showToast(response.message || 'Đổi ghế thất bại', 'error');
       }
-    );
+    } catch (error) {
+      console.error('Error doi ghe:', error);
+      const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi đổi ghế';
+      showToast(errorMessage, 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const confirmDoiChuyen = (newChuyenBay) => {
-    showConfirm(
-      'Xác nhận đổi chuyến',
-      `Đổi từ chuyến ${selectedDatCho?.chuyenBay.maChuyenBay} sang ${newChuyenBay.maChuyenBay}?`,
-      'warning',
-      'Xác nhận',
-      () => {
-        const updatedList = datChoList.map(dc =>
-          dc.maDatCho === selectedDatCho.maDatCho
-            ? { ...dc, chuyenBay: newChuyenBay, trangThaiCheckIn: 'Chưa check-in' }
-            : dc
-        );
-        setDatChoList(updatedList);
+  const confirmDoiChuyen = async (newChuyenBay) => {
+    try {
+      setLoading(true);
+      // Kiểm tra trạng thái chuyến bay
+      if (newChuyenBay.trangThai === 'Đã bay' || newChuyenBay.trangThai === 'Đang bay' || newChuyenBay.trangThai === 'Hủy') {
+        showToast(`Không thể đổi sang chuyến bay đã ${newChuyenBay.trangThai.toLowerCase()}`, 'error');
+        return;
+      }
+      // Sử dụng maChuyenBayId (Integer) thay vì maChuyenBay (String)
+      const response = await QLDatChoService.doiChuyenBay(
+        selectedDatCho.maDatCho, 
+        newChuyenBay.maChuyenBayId, 
+        selectedDatCho.maGhe,
+        'Đổi chuyến theo yêu cầu'
+      );
+      
+      if (response.success) {
+        await loadDatChoData();
         setIsDoiChuyenModalOpen(false);
         hideConfirm();
         showToast(`Đổi sang chuyến ${newChuyenBay.maChuyenBay} thành công!`);
+      } else {
+        showToast(response.message || 'Đổi chuyến bay thất bại', 'error');
       }
-    );
+    } catch (error) {
+      console.error('Error doi chuyen:', error);
+      // Hiển thị error message từ backend
+      const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi đổi chuyến bay';
+      showToast(errorMessage, 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const confirmHuyVe = (lyDo) => {
-    showConfirm(
-      'Xác nhận hủy vé',
-      `Bạn có chắc chắn muốn hủy vé của hành khách ${selectedDatCho?.hanhKhach.hoVaTen}? Lý do: ${lyDo}`,
-      'danger',
-      'Hủy vé',
-      () => {
-        const updatedList = datChoList.filter(dc => dc.maDatCho !== selectedDatCho.maDatCho);
-        setDatChoList(updatedList);
+  const confirmHuyVe = async (lyDo) => {
+    try {
+      setLoading(true);
+      const response = await QLDatChoService.huyDatCho(selectedDatCho.maDatCho, lyDo);
+      if (response.success) {
+        await loadDatChoData();
         setIsHuyVeModalOpen(false);
         hideConfirm();
         showToast('Hủy vé thành công!');
+      } else {
+        showToast(response.message || 'Hủy vé thất bại', 'error');
       }
-    );
+    } catch (error) {
+      console.error('Error huy ve:', error);
+      const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi hủy vé';
+      showToast(errorMessage, 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Xem danh sách khách trên chuyến bay
   const handleViewPassengers = (chuyenBay) => {
     setSelectedChuyenBay(chuyenBay);
-    const passengers = datChoList.filter(dc => dc.chuyenBay.maChuyenBay === chuyenBay.maChuyenBay);
+    const passengers = datChoList.filter(dc => dc.soHieuChuyenBay === chuyenBay.maChuyenBay);
     setPassengersOnFlight(passengers);
   };
 
   // Get status info
   const getCheckInStatus = (status) => {
     switch (status) {
+      case true:
       case 'Đã check-in':
         return { text: 'Đã check-in', color: 'bg-green-100 text-green-700', icon: <FaCheckCircle /> };
+      case false:
       case 'Chưa check-in':
         return { text: 'Chưa check-in', color: 'bg-yellow-100 text-yellow-700', icon: <FaClock /> };
       default:
@@ -612,8 +504,10 @@ const QuanLyDatCho = () => {
 
   const getTrangThaiDatCho = (status) => {
     switch (status) {
+      case 'ACTIVE':
       case 'Đã đặt chỗ':
         return { text: 'Đã đặt chỗ', color: 'bg-blue-100 text-blue-700' };
+      case 'CANCELLED':
       case 'Đã hủy':
         return { text: 'Đã hủy', color: 'bg-red-100 text-red-700' };
       default:
@@ -658,7 +552,7 @@ const QuanLyDatCho = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium opacity-90">Tổng đặt chỗ</p>
-              <p className="text-3xl font-bold mt-2">{datChoList.length}</p>
+              <p className="text-3xl font-bold mt-2">{totalElements}</p>
             </div>
             <FaTicketAlt size={40} className="opacity-80" />
           </div>
@@ -668,7 +562,7 @@ const QuanLyDatCho = () => {
             <div>
               <p className="text-sm font-medium opacity-90">Đã check-in</p>
               <p className="text-3xl font-bold mt-2">
-                {datChoList.filter(dc => dc.trangThaiCheckIn === 'Đã check-in').length}
+                {datChoList.filter(dc => dc.checkInStatus).length}
               </p>
             </div>
             <FaUserCheck size={40} className="opacity-80" />
@@ -679,7 +573,7 @@ const QuanLyDatCho = () => {
             <div>
               <p className="text-sm font-medium opacity-90">Chưa check-in</p>
               <p className="text-3xl font-bold mt-2">
-                {datChoList.filter(dc => dc.trangThaiCheckIn === 'Chưa check-in').length}
+                {datChoList.filter(dc => !dc.checkInStatus).length}
               </p>
             </div>
             <FaClock size={40} className="opacity-80" />
@@ -701,13 +595,20 @@ const QuanLyDatCho = () => {
         <div className="relative w-full md:w-96">
           <input
             type="text"
-            placeholder="Tìm kiếm theo mã đặt chỗ, mã vé, tên, CCCD..."
+            placeholder="Tìm kiếm theo mã đặt chỗ, tên, CCCD..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent shadow-sm"
           />
           <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
         </div>
+        <button
+          onClick={loadDatChoData}
+          disabled={loading}
+          className="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors disabled:opacity-50"
+        >
+          {loading ? <FaSpinner className="animate-spin" /> : 'Tải lại'}
+        </button>
       </div>
 
       {/* Bảng dữ liệu */}
@@ -726,9 +627,18 @@ const QuanLyDatCho = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {currentItems.length > 0 ? (
-                currentItems.map((dc, index) => {
-                  const checkInStatus = getCheckInStatus(dc.trangThaiCheckIn);
+              {loading ? (
+                <tr>
+                  <td colSpan={7} className="text-center py-12">
+                    <div className="flex flex-col items-center gap-3">
+                      <FaSpinner className="text-violet-600 text-3xl animate-spin" />
+                      <p className="text-gray-500 font-medium">Đang tải dữ liệu...</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : filteredDatCho.length > 0 ? (
+                filteredDatCho.map((dc, index) => {
+                  const checkInStatus = getCheckInStatus(dc.checkInStatus);
                   return (
                     <tr
                       key={dc.maDatCho}
@@ -739,31 +649,31 @@ const QuanLyDatCho = () => {
                       <td className="px-4 py-4">
                         <div>
                           <p className="font-bold text-violet-600">#{dc.maDatCho}</p>
-                          <p className="text-xs text-gray-500">{dc.maVe}</p>
+                          <p className="text-xs text-gray-500">PNR: {dc.pnr}</p>
                         </div>
                       </td>
                       <td className="px-4 py-4">
                         <div>
-                          <p className="font-medium text-gray-900">{dc.hanhKhach.hoVaTen}</p>
-                          <p className="text-xs text-gray-500">CCCD: {dc.hanhKhach.cccd}</p>
+                          <p className="font-medium text-gray-900">{dc.hoVaTen}</p>
+                          <p className="text-xs text-gray-500">CCCD: {dc.cccd}</p>
                         </div>
                       </td>
                       <td className="px-4 py-4">
                         <div>
-                          <p className="font-medium text-gray-900">{dc.chuyenBay.maChuyenBay}</p>
+                          <p className="font-medium text-gray-900">{dc.soHieuChuyenBay}</p>
                           <p className="text-xs text-gray-500">
-                            {dc.chuyenBay.sanBayDi.thanhPho} → {dc.chuyenBay.sanBayDen.thanhPho}
+                            {dc.sanBayDi} → {dc.sanBayDen}
                           </p>
-                          <p className="text-xs text-gray-500">{formatDate(dc.chuyenBay.ngayGio)}</p>
+                          <p className="text-xs text-gray-500">{formatDate(dc.ngayGioDi)}</p>
                         </div>
                       </td>
                       <td className="px-4 py-4">
                         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          dc.ghe.loaiGhe === 'ThuongGia' ? 'bg-purple-100 text-purple-700' :
-                          dc.ghe.loaiGhe === 'PhoThongDacBiet' ? 'bg-blue-100 text-blue-700' :
+                          dc.tenHangVe?.includes('Thương gia') ? 'bg-purple-100 text-purple-700' :
+                          dc.tenHangVe?.includes('Phổ thông đặc biệt') ? 'bg-blue-100 text-blue-700' :
                           'bg-gray-100 text-gray-700'
                         }`}>
-                          {dc.ghe.maGhe}
+                          {dc.soGhe}
                         </span>
                       </td>
                       <td className="px-4 py-4 text-center">
@@ -772,19 +682,19 @@ const QuanLyDatCho = () => {
                         </span>
                       </td>
                       <td className="px-4 py-4 text-right font-bold text-gray-900">
-                        {formatCurrency(dc.giaTien)}
+                        {formatCurrency(dc.giaVe)}
                       </td>
                       <td className="px-4 py-4">
                         <div className="flex justify-center items-center gap-2 flex-wrap">
                           <button
                             onClick={() => handleCheckIn(dc)}
                             className={`p-2 rounded-lg transition-colors ${
-                              dc.trangThaiCheckIn === 'Đã check-in'
+                              dc.checkInStatus
                                 ? 'bg-green-100 text-green-400 cursor-not-allowed'
                                 : 'bg-green-100 text-green-600 hover:bg-green-200'
                             }`}
                             title="Check-in"
-                            disabled={dc.trangThaiCheckIn === 'Đã check-in'}
+                            disabled={dc.checkInStatus}
                           >
                             <FaUserCheck />
                           </button>
@@ -794,6 +704,13 @@ const QuanLyDatCho = () => {
                             title="Đổi ghế"
                           >
                             <FaChair />
+                          </button>
+                          <button
+                            onClick={() => handleDoiHangVe(dc)}
+                            className="p-2 bg-pink-100 text-pink-600 rounded-lg hover:bg-pink-200 transition-colors"
+                            title="Đổi hạng vé"
+                          >
+                            <FaTicketAlt />
                           </button>
                           <button
                             onClick={() => handleDoiChuyen(dc)}
@@ -839,23 +756,23 @@ const QuanLyDatCho = () => {
       </div>
 
       {/* Pagination */}
-      {filteredDatCho.length > itemsPerPage && (
+      {totalPages > 1 && (
         <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
           <span className="text-sm text-gray-600 font-medium">
             Hiển thị{' '}
             <span className="font-bold text-violet-600">{indexOfFirstItem + 1}</span> đến{' '}
             <span className="font-bold text-violet-600">
-              {Math.min(indexOfLastItem, filteredDatCho.length)}
+              {Math.min(indexOfLastItem, totalElements)}
             </span>{' '}
             của{' '}
-            <span className="font-bold text-violet-600">{filteredDatCho.length}</span> kết quả
+            <span className="font-bold text-violet-600">{totalElements}</span> kết quả
           </span>
           <nav>
             <ul className="flex gap-2">
               <li>
                 <button
                   onClick={() => paginate(currentPage - 1)}
-                  disabled={currentPage === 1}
+                  disabled={currentPage === 0}
                   className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm"
                 >
                   ← Trước
@@ -864,9 +781,9 @@ const QuanLyDatCho = () => {
               {[...Array(totalPages)].map((_, index) => (
                 <li key={index}>
                   <button
-                    onClick={() => paginate(index + 1)}
+                    onClick={() => paginate(index)}
                     className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                      currentPage === index + 1
+                      currentPage === index
                         ? 'bg-violet-600 text-white shadow-lg'
                         : 'bg-white border border-gray-300 hover:bg-gray-100'
                     }`}
@@ -878,7 +795,7 @@ const QuanLyDatCho = () => {
               <li>
                 <button
                   onClick={() => paginate(currentPage + 1)}
-                  disabled={currentPage === totalPages}
+                  disabled={currentPage === totalPages - 1}
                   className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm"
                 >
                   Sau →
@@ -892,6 +809,39 @@ const QuanLyDatCho = () => {
   );
 
   // Render Danh sách hành khách theo chuyến tab
+  // Filter chuyến bay: theo tùy chọn hiển thị + từ khóa tìm kiếm
+  const filteredChuyenBay = useMemo(() => {
+    // Sử dụng timestamp để so sánh chính xác hơn
+    const now = Date.now();
+    
+    let result = [...chuyenBayList];
+    
+    // Lọc chỉ chuyến bay trong tương lai nếu không chon hien thi tat ca
+    if (!showAllFlights) {
+      result = result.filter(cb => {
+        if (!cb.ngayGio) return false;
+        const flightTime = new Date(cb.ngayGio).getTime();
+        return flightTime > now;
+      });
+    }
+    
+    // Lọc theo từ khóa tìm kiếm
+    if (flightSearch.trim()) {
+      const keyword = flightSearch.toLowerCase();
+      result = result.filter(cb =>
+        cb.maChuyenBay?.toLowerCase().includes(keyword) ||
+        cb.sanBayDi?.thanhPho?.toLowerCase().includes(keyword) ||
+        cb.sanBayDen?.thanhPho?.toLowerCase().includes(keyword) ||
+        formatDateTime(cb.ngayGio)?.toLowerCase().includes(keyword)
+      );
+    }
+    
+    // Sắp xếp theo thờ gian khởi hành gần nhất
+    result.sort((a, b) => new Date(a.ngayGio) - new Date(b.ngayGio));
+    
+    return result;
+  }, [chuyenBayList, flightSearch, showAllFlights]);
+
   const renderDanhSachHanhKhach = () => (
     <div>
       {/* Danh sách chuyến bay */}
@@ -900,8 +850,52 @@ const QuanLyDatCho = () => {
           <FaPlane className="inline mr-2 text-violet-600" />
           Chọn chuyến bay
         </h3>
+        
+        {/* Thanh tìm kiếm va toggle chuyến bay */}
+        <div className="mb-4 flex flex-col lg:flex-row lg:items-center gap-4">
+          <div className="relative w-full md:w-96">
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo mã chuyến bay, sân bay..."
+              value={flightSearch}
+              onChange={(e) => setFlightSearch(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent shadow-sm"
+            />
+            <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
+          </div>
+          
+          {/* Toggle Hien thi tat ca */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowAllFlights(!showAllFlights)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
+                showAllFlights ? 'bg-violet-600' : 'bg-gray-200'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  showAllFlights ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+            <span className="text-sm text-gray-600">
+              {showAllFlights ? (
+                <span className="flex items-center gap-1">
+                  <FaPlane className="text-violet-500" />
+                  Hiển thị tất cả chuyến bay
+                </span>
+              ) : (
+                <span className="flex items-center gap-1">
+                  <FaClock className="text-green-500" />
+                  Chỉ chuyến bay trong tương lai
+                </span>
+              )}
+            </span>
+          </div>
+        </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {chuyenBayList.map((cb) => (
+          {filteredChuyenBay.map((cb) => (
             <div
               key={cb.maChuyenBay}
               onClick={() => handleViewPassengers(cb)}
@@ -929,14 +923,21 @@ const QuanLyDatCho = () => {
                 <FaCalendar className="text-orange-500" />
                 <span>{formatDateTime(cb.ngayGio)}</span>
               </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">
-                  <FaUsers className="inline mr-1 text-violet-500" />
-                  Ghế trống: <span className="font-bold text-violet-600">{cb.soGheTrong}/{cb.tongSoGhe}</span>
-                </span>
-              </div>
             </div>
           ))}
+          {filteredChuyenBay.length === 0 && (
+            <div className="col-span-full text-center py-8 bg-gray-50 rounded-lg">
+              <FaPlane className="text-gray-300 text-4xl mx-auto mb-3" />
+              <p className="text-gray-500 font-medium">Không tìm thấy chuyến bay nào</p>
+              <p className="text-sm text-gray-400 mt-1">
+                {flightSearch 
+                  ? 'Không có chuyến bay nào khớp với từ khóa tìm kiếm'
+                  : showAllFlights 
+                    ? 'Không có chuyến bay nào trong danh sách'
+                    : 'Không có chuyến bay nào trong tương lai'}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -962,13 +963,13 @@ const QuanLyDatCho = () => {
               </div>
               <div className="bg-green-50 rounded-lg p-4 text-center">
                 <p className="text-2xl font-bold text-green-600">
-                  {passengersOnFlight.filter(p => p.trangThaiCheckIn === 'Đã check-in').length}
+                  {passengersOnFlight.filter(p => p.checkInStatus).length}
                 </p>
                 <p className="text-sm text-green-600">Đã check-in</p>
               </div>
               <div className="bg-yellow-50 rounded-lg p-4 text-center">
                 <p className="text-2xl font-bold text-yellow-600">
-                  {passengersOnFlight.filter(p => p.trangThaiCheckIn === 'Chưa check-in').length}
+                  {passengersOnFlight.filter(p => !p.checkInStatus).length}
                 </p>
                 <p className="text-sm text-yellow-600">Chưa check-in</p>
               </div>
@@ -982,7 +983,7 @@ const QuanLyDatCho = () => {
                     <th className="px-4 py-3 text-left font-semibold">STT</th>
                     <th className="px-4 py-3 text-left font-semibold">Họ tên</th>
                     <th className="px-4 py-3 text-left font-semibold">CCCD</th>
-                    <th className="px-4 py-3 text-left font-semibold">Mã vé</th>
+                    <th className="px-4 py-3 text-left font-semibold">Mã đặt chỗ</th>
                     <th className="px-4 py-3 text-left font-semibold">Ghế</th>
                     <th className="px-4 py-3 text-left font-semibold">Hạng vé</th>
                     <th className="px-4 py-3 text-center font-semibold">Check-in</th>
@@ -992,7 +993,7 @@ const QuanLyDatCho = () => {
                 <tbody className="divide-y divide-gray-200">
                   {passengersOnFlight.length > 0 ? (
                     passengersOnFlight.map((passenger, index) => {
-                      const checkInStatus = getCheckInStatus(passenger.trangThaiCheckIn);
+                      const checkInStatus = getCheckInStatus(passenger.checkInStatus);
                       return (
                         <tr
                           key={passenger.maDatCho}
@@ -1000,20 +1001,20 @@ const QuanLyDatCho = () => {
                         >
                           <td className="px-4 py-3 font-medium">{index + 1}</td>
                           <td className="px-4 py-3">
-                            <p className="font-medium text-gray-900">{passenger.hanhKhach.hoVaTen}</p>
+                            <p className="font-medium text-gray-900">{passenger.hoVaTen}</p>
                           </td>
-                          <td className="px-4 py-3 text-gray-600">{passenger.hanhKhach.cccd}</td>
-                          <td className="px-4 py-3 font-mono text-violet-600">{passenger.maVe}</td>
+                          <td className="px-4 py-3 text-gray-600">{passenger.cccd}</td>
+                          <td className="px-4 py-3 font-mono text-violet-600">#{passenger.maDatCho}</td>
                           <td className="px-4 py-3">
                             <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                              passenger.ghe.loaiGhe === 'ThuongGia' ? 'bg-purple-100 text-purple-700' :
-                              passenger.ghe.loaiGhe === 'PhoThongDacBiet' ? 'bg-blue-100 text-blue-700' :
+                              passenger.tenHangVe?.includes('Thương gia') ? 'bg-purple-100 text-purple-700' :
+                              passenger.tenHangVe?.includes('Phổ thông đặc biệt') ? 'bg-blue-100 text-blue-700' :
                               'bg-gray-100 text-gray-700'
                             }`}>
-                              {passenger.ghe.maGhe}
+                              {passenger.soGhe}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-gray-600">{passenger.hangVe}</td>
+                          <td className="px-4 py-3 text-gray-600">{passenger.tenHangVe}</td>
                           <td className="px-4 py-3 text-center">
                             <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${checkInStatus.color}`}>
                               {checkInStatus.icon} {checkInStatus.text}
@@ -1024,12 +1025,12 @@ const QuanLyDatCho = () => {
                               <button
                                 onClick={() => handleCheckIn(passenger)}
                                 className={`p-1.5 rounded-lg transition-colors ${
-                                  passenger.trangThaiCheckIn === 'Đã check-in'
+                                  passenger.checkInStatus
                                     ? 'bg-green-100 text-green-400 cursor-not-allowed'
                                     : 'bg-green-100 text-green-600 hover:bg-green-200'
                                 }`}
                                 title="Check-in"
-                                disabled={passenger.trangThaiCheckIn === 'Đã check-in'}
+                                disabled={passenger.checkInStatus}
                               >
                                 <FaUserCheck size={14} />
                               </button>
@@ -1061,396 +1062,6 @@ const QuanLyDatCho = () => {
     </div>
   );
 
-  // Modal chi tiết đặt chỗ
-  const renderDetailModal = () => {
-    if (!isDetailModalOpen || !selectedDatCho) return null;
-
-    const dc = selectedDatCho;
-    const checkInStatus = getCheckInStatus(dc.trangThaiCheckIn);
-    const trangThaiDatCho = getTrangThaiDatCho(dc.trangThai);
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-          {/* Header */}
-          <div className="bg-linear-to-r from-violet-600 to-purple-600 px-6 py-4 sticky top-0 z-10">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold text-white">Chi tiết đặt chỗ</h2>
-              <button
-                onClick={() => setIsDetailModalOpen(false)}
-                className="text-white hover:text-gray-200 transition-colors"
-              >
-                <FaTimesCircle size={24} />
-              </button>
-            </div>
-          </div>
-
-          {/* Body */}
-          <div className="p-6">
-            {/* Thông tin đặt chỗ */}
-            <div className="mb-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <FaTicketAlt className="text-violet-600" />
-                Thông tin đặt chỗ
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-sm text-gray-500">Mã đặt chỗ</p>
-                  <p className="font-bold text-violet-600">#{dc.maDatCho}</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-sm text-gray-500">Mã vé</p>
-                  <p className="font-bold text-violet-600">{dc.maVe}</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-sm text-gray-500">Trạng thái</p>
-                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${trangThaiDatCho.color}`}>
-                    {trangThaiDatCho.text}
-                  </span>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-sm text-gray-500">Check-in</p>
-                  <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${checkInStatus.color}`}>
-                    {checkInStatus.icon} {checkInStatus.text}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Thông tin hành khách */}
-            <div className="mb-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <FaUserCheck className="text-violet-600" />
-                Thông tin hành khách
-              </h3>
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-500">Họ và tên</p>
-                    <p className="font-semibold">{dc.hanhKhach.hoVaTen}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Giới tính</p>
-                    <p className="font-semibold">{dc.hanhKhach.gioiTinh}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">CCCD</p>
-                    <p className="font-semibold">{dc.hanhKhach.cccd}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Ngày sinh</p>
-                    <p className="font-semibold">{formatDate(dc.hanhKhach.ngaySinh)}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FaPhone className="text-gray-400" />
-                    <p className="font-semibold">{dc.hanhKhach.soDienThoai}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FaEnvelope className="text-gray-400" />
-                    <p className="font-semibold">{dc.hanhKhach.email}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Thông tin chuyến bay */}
-            <div className="mb-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <FaPlane className="text-violet-600" />
-                Thông tin chuyến bay
-              </h3>
-              <div className="bg-linear-to-r from-violet-50 to-purple-50 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div className="text-center flex-1">
-                    <p className="text-sm text-gray-500">Mã chuyến bay</p>
-                    <p className="font-bold text-violet-600">{dc.chuyenBay.maChuyenBay}</p>
-                  </div>
-                  <div className="text-center flex-1">
-                    <p className="text-sm text-gray-500">Đi</p>
-                    <p className="font-bold text-gray-800">{dc.chuyenBay.sanBayDi.thanhPho}</p>
-                    <p className="text-xs text-gray-500">{dc.chuyenBay.sanBayDi.tenSanBay}</p>
-                  </div>
-                  <div className="text-violet-600 text-2xl">→</div>
-                  <div className="text-center flex-1">
-                    <p className="text-sm text-gray-500">Đến</p>
-                    <p className="font-bold text-gray-800">{dc.chuyenBay.sanBayDen.thanhPho}</p>
-                        <p className="text-xs text-gray-500">{dc.chuyenBay.sanBayDen.tenSanBay}</p>
-                  </div>
-                  <div className="text-center flex-1">
-                    <p className="text-sm text-gray-500">Giờ bay</p>
-                    <p className="font-bold text-gray-800">{formatDateTime(dc.chuyenBay.ngayGio)}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Thông tin ghế */}
-            <div className="mb-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <FaChair className="text-violet-600" />
-                Thông tin ghế
-              </h3>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-500">Số ghế</p>
-                  <p className="text-2xl font-bold text-violet-600">{dc.ghe.maGhe}</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-500">Hạng ghế</p>
-                  <p className="font-semibold">{dc.ghe.loaiGhe}</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-500">Hạng vé</p>
-                  <p className="font-semibold">{dc.hangVe}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Thông tin giá */}
-            <div className="mb-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <FaMoneyBill className="text-violet-600" />
-                Thông tin giá
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-green-50 rounded-lg p-4">
-                  <p className="text-sm text-gray-500">Giá vé</p>
-                  <p className="text-xl font-bold text-green-600">{formatCurrency(dc.giaTien)}</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-sm text-gray-500">Loại vé</p>
-                  <p className="font-semibold">{dc.loaiVe}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="border-t border-gray-200 px-6 py-4 bg-gray-50 sticky bottom-0">
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setIsDetailModalOpen(false)}
-                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold transition-colors"
-              >
-                Đóng
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Modal Check-in
-  const renderCheckInModal = () => {
-    if (!isCheckInModalOpen || !selectedDatCho) return null;
-
-    const dc = selectedDatCho;
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-          <div className="bg-linear-to-r from-green-500 to-emerald-600 px-6 py-4 rounded-t-2xl">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <FaUserCheck />
-              Check-in hành khách
-            </h2>
-          </div>
-          <div className="p-6">
-            <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <p className="text-sm text-gray-500">Hành khách</p>
-              <p className="font-bold text-lg">{dc.hanhKhach.hoVaTen}</p>
-              <p className="text-sm text-gray-500">Mã đặt chỗ</p>
-              <p className="font-semibold text-violet-600">#{dc.maDatCho}</p>
-              <p className="text-sm text-gray-500">Chuyến bay</p>
-              <p className="font-semibold">{dc.chuyenBay.maChuyenBay} - {dc.chuyenBay.sanBayDi.thanhPho} → {dc.chuyenBay.sanBayDen.thanhPho}</p>
-              <p className="text-sm text-gray-500">Ghế</p>
-              <p className="font-semibold">{dc.ghe.maGhe} ({dc.hangVe})</p>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setIsCheckInModalOpen(false)}
-                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold transition-colors"
-              >
-                Hủy
-              </button>
-              <button
-                onClick={confirmCheckIn}
-                className="flex-1 px-4 py-2 bg-linear-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 font-semibold transition-all"
-              >
-                Xác nhận Check-in
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Modal Đổi ghế
-  const renderDoiGheModal = () => {
-    if (!isDoiGheModalOpen || !selectedDatCho) return null;
-
-    const dc = selectedDatCho;
-    const availableSeats = ['A3', 'A4', 'A5', 'B3', 'B4', 'B5', 'C3', 'C4', 'D1', 'D2', 'E1', 'E2', 'F1', 'F2'];
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
-          <div className="bg-linear-to-r from-blue-500 to-cyan-600 px-6 py-4 rounded-t-2xl">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <FaChair />
-              Đổi ghế
-            </h2>
-          </div>
-          <div className="p-6">
-            <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <p className="text-sm text-gray-500">Hành khách</p>
-              <p className="font-bold">{dc.hanhKhach.hoVaTen}</p>
-              <p className="text-sm text-gray-500 mt-2">Ghế hiện tại</p>
-              <p className="font-bold text-violet-600 text-lg">{dc.ghe.maGhe} ({dc.hangVe})</p>
-            </div>
-            <p className="font-semibold mb-3">Chọn ghế mới:</p>
-            <div className="grid grid-cols-7 gap-2 mb-4">
-              {availableSeats.map((seat) => (
-                <button
-                  key={seat}
-                  onClick={() => confirmDoiGhe(seat)}
-                  className="p-3 bg-white border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all font-semibold"
-                >
-                  {seat}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => setIsDoiGheModalOpen(false)}
-              className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold transition-colors"
-            >
-              Hủy
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Modal Đổi chuyến
-  const renderDoiChuyenModal = () => {
-    if (!isDoiChuyenModalOpen || !selectedDatCho) return null;
-
-    const dc = selectedDatCho;
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-          <div className="bg-linear-to-r from-orange-500 to-amber-600 px-6 py-4 rounded-t-2xl">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <FaExchangeAlt />
-              Đổi chuyến bay
-            </h2>
-          </div>
-          <div className="p-6">
-            <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <p className="text-sm text-gray-500">Hành khách</p>
-              <p className="font-bold">{dc.hanhKhach.hoVaTen}</p>
-              <p className="text-sm text-gray-500 mt-2">Chuyến bay hiện tại</p>
-              <p className="font-semibold text-violet-600">{dc.chuyenBay.maChuyenBay} - {dc.chuyenBay.sanBayDi.thanhPho} → {dc.chuyenBay.sanBayDen.thanhPho}</p>
-              <p className="text-sm text-gray-500">{formatDateTime(dc.chuyenBay.ngayGio)}</p>
-            </div>
-            <p className="font-semibold mb-3">Chọn chuyến bay mới:</p>
-            <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
-              {chuyenBayList.filter(cb => cb.maChuyenBay !== dc.chuyenBay.maChuyenBay).map((cb) => (
-                <button
-                  key={cb.maChuyenBay}
-                  onClick={() => confirmDoiChuyen(cb)}
-                  className="w-full bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-orange-500 hover:bg-orange-50 transition-all text-left"
-                >
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="font-bold text-violet-600">{cb.maChuyenBay}</p>
-                      <p className="text-sm text-gray-600">{cb.sanBayDi.thanhPho} → {cb.sanBayDen.thanhPho}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm text-gray-600">{formatDateTime(cb.ngayGio)}</p>
-                      <p className="text-xs text-green-600">{cb.soGheTrong} ghế trống</p>
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => setIsDoiChuyenModalOpen(false)}
-              className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold transition-colors"
-            >
-              Hủy
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Modal Hủy vé
-  const renderHuyVeModal = () => {
-    if (!isHuyVeModalOpen || !selectedDatCho) return null;
-
-    const dc = selectedDatCho;
-    const [lyDo, setLyDo] = useState('');
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-          <div className="bg-linear-to-r from-red-500 to-rose-600 px-6 py-4 rounded-t-2xl">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <FaTimesCircle />
-              Hủy vé
-            </h2>
-          </div>
-          <div className="p-6">
-            <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <p className="text-sm text-gray-500">Hành khách</p>
-              <p className="font-bold">{dc.hanhKhach.hoVaTen}</p>
-              <p className="text-sm text-gray-500 mt-2">Mã đặt chỗ</p>
-              <p className="font-semibold text-violet-600">#{dc.maDatCho}</p>
-              <p className="text-sm text-gray-500">Chuyến bay</p>
-              <p className="font-semibold">{dc.chuyenBay.maChuyenBay}</p>
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Lý do hủy:</label>
-              <select
-                value={lyDo}
-                onChange={(e) => setLyDo(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              >
-                <option value="">-- Chọn lý do --</option>
-                <option value="Khách hàng yêu cầu hủy">Khách hàng yêu cầu hủy</option>
-                <option value="Thay đổi lịch trình">Thay đổi lịch trình</option>
-                <option value="Chuyến bay bị hủy">Chuyến bay bị hủy</option>
-                <option value="Trùng chuyến bay">Trùng chuyến bay</option>
-                <option value="Lý do khác">Lý do khác</option>
-              </select>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setIsHuyVeModalOpen(false)}
-                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold transition-colors"
-              >
-                Hủy
-              </button>
-              <button
-                onClick={() => lyDo && confirmHuyVe(lyDo)}
-                disabled={!lyDo}
-                className="flex-1 px-4 py-2 bg-linear-to-r from-red-500 to-rose-600 text-white rounded-lg hover:from-red-600 hover:to-rose-700 font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Xác nhận hủy
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <Card title="Quản lý đặt chỗ">
       {/* Toast Component */}
@@ -1480,11 +1091,66 @@ const QuanLyDatCho = () => {
       {activeTab === 'danh-sach-hanh-khach' && renderDanhSachHanhKhach()}
 
       {/* Modals */}
-      {renderDetailModal()}
-      {renderCheckInModal()}
-      {renderDoiGheModal()}
-      {renderDoiChuyenModal()}
-      {renderHuyVeModal()}
+      <ChiTietDatChoModal
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        datCho={selectedDatCho}
+        getCheckInStatus={getCheckInStatus}
+        getTrangThaiDatCho={getTrangThaiDatCho}
+        formatDate={formatDate}
+        formatDateTime={formatDateTime}
+        formatCurrency={formatCurrency}
+      />
+
+      <CheckInModal
+        isOpen={isCheckInModalOpen}
+        onClose={() => setIsCheckInModalOpen(false)}
+        onConfirm={confirmCheckIn}
+        datCho={selectedDatCho}
+        loading={loading}
+      />
+
+      <DoiGheModal
+        isOpen={isDoiGheModalOpen}
+        onClose={() => {
+          setIsDoiGheModalOpen(false);
+          setSelectedNewSeat(null);
+        }}
+        onConfirm={confirmDoiGhe}
+        datCho={selectedDatCho}
+        seatMap={seatMap}
+        selectedNewSeat={selectedNewSeat}
+        onSelectSeat={setSelectedNewSeat}
+        loading={loading}
+        loadingModal={loadingModal}
+      />
+
+      <DoiChuyenModal
+        isOpen={isDoiChuyenModalOpen}
+        onClose={() => setIsDoiChuyenModalOpen(false)}
+        onSelectFlight={confirmDoiChuyen}
+        datCho={selectedDatCho}
+        availableFlights={availableFlights}
+        loading={loading}
+        loadingModal={loadingModal}
+        formatDateTime={formatDateTime}
+      />
+
+      <HuyVeModal
+        isOpen={isHuyVeModalOpen}
+        onClose={() => setIsHuyVeModalOpen(false)}
+        onConfirm={confirmHuyVe}
+        datCho={selectedDatCho}
+        loading={loading}
+      />
+
+      <DoiHangVeModal
+        isOpen={isDoiHangVeModalOpen}
+        onClose={() => setIsDoiHangVeModalOpen(false)}
+        onConfirm={confirmDoiHangVe}
+        datCho={selectedDatCho}
+        loading={loading}
+      />
     </Card>
   );
 };

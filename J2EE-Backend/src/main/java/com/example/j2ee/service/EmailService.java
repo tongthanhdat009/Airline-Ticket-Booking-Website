@@ -579,4 +579,240 @@ public class EmailService {
             throw new RuntimeException("Không thể gửi email vé máy bay: " + e.getMessage());
         }
     }
+
+    /**
+     * Gửi email thông báo đổi ghế
+     */
+    public void sendDoiGheNotification(String toEmail, String tenHanhKhach, String pnr, 
+                                       String gheCu, String gheMoi, String chuyenBay, String lyDo) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            
+            helper.setFrom("noreply@sguairline.com");
+            helper.setTo(toEmail);
+            helper.setSubject("Thông báo thay đổi ghế - SGU Airline ✈️");
+            
+            String lyDoText = lyDo != null && !lyDo.isEmpty() ? 
+                String.format("<p><strong>Lý do:</strong> %s</p>", lyDo) : "";
+            
+            String htmlContent = String.format("""
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background: linear-gradient(135deg, #3b82f6 0%%, #1d4ed8 100%%); 
+                                 color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                        .content { background: white; padding: 30px; }
+                        .info-box { background: #dbeafe; border-left: 4px solid #3b82f6; 
+                                   padding: 15px; margin: 15px 0; }
+                        .change-box { background: #fef3c7; border: 2px solid #f59e0b; 
+                                     padding: 20px; margin: 20px 0; border-radius: 8px; text-align: center; }
+                        .arrow { font-size: 24px; color: #f59e0b; margin: 10px 0; }
+                        .seat-old { text-decoration: line-through; color: #ef4444; font-size: 20px; }
+                        .seat-new { color: #10b981; font-size: 24px; font-weight: bold; }
+                        .footer { text-align: center; margin-top: 20px; color: #666; 
+                                 font-size: 12px; padding: 20px; background: #f9f9f9; 
+                                 border-radius: 0 0 10px 10px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <div style="font-size: 48px; margin-bottom: 10px;">✈️</div>
+                            <h1 style="margin: 0;">Thông báo thay đổi ghế</h1>
+                        </div>
+                        <div class="content">
+                            <p>Xin chào <strong>%s</strong>,</p>
+                            
+                            <p>Đặt chỗ của bạn đã được cập nhật ghế mới.</p>
+                            
+                            <div class="info-box">
+                                <p style="margin: 5px 0;"><strong>Mã đặt chỗ (PNR):</strong> %s</p>
+                                <p style="margin: 5px 0;"><strong>Chuyến bay:</strong> %s</p>
+                            </div>
+                            
+                            <div class="change-box">
+                                <p style="margin: 0; color: #666;">Thay đổi ghế</p>
+                                <p class="seat-old">Ghế cũ: %s</p>
+                                <div class="arrow">⬇️</div>
+                                <p class="seat-new">Ghế mới: %s</p>
+                            </div>
+                            
+                            %s
+                            
+                            <div style="background: #fee2e2; padding: 15px; border-radius: 8px; 
+                                        border-left: 4px solid #dc2626; margin: 20px 0;">
+                                <p style="margin: 0;"><strong>⚠️ Lưu ý:</strong></p>
+                                <ul style="margin: 10px 0; padding-left: 20px;">
+                                    <li>Vui lòng kiểm tra lại thông tin trên vé điện tử</li>
+                                    <li>Có mặt tại sân bay trước giờ bay ít nhất 2 giờ</li>
+                                    <li>Mang theo giấy tờ tùy thân hợp lệ</li>
+                                </ul>
+                            </div>
+                            
+                            <p style="margin-top: 30px;">
+                                Trân trọng,<br>
+                                <strong>Đội ngũ SGU Airline</strong>
+                            </p>
+                        </div>
+                        <div class="footer">
+                            <p>© 2025 SGU Airline. All rights reserved.</p>
+                            <p style="color: #999; margin-top: 10px;">
+                                🌐 www.sguairline.edu.vn | ☎️ Hotline: 1900-xxxx | 📧 support@sguairline.edu.vn
+                            </p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """, tenHanhKhach, pnr, chuyenBay, gheCu, gheMoi, lyDoText);
+            
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+            
+        } catch (MessagingException e) {
+            throw new RuntimeException("Không thể gửi email thông báo đổi ghế: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Gửi email thông báo đổi chuyến bay
+     */
+    public void sendDoiChuyenBayNotification(String toEmail, String tenHanhKhach, String pnr, 
+                                              com.example.j2ee.model.ChiTietChuyenBay chuyenBayCu,
+                                              com.example.j2ee.model.ChiTietChuyenBay chuyenBayMoi, 
+                                              String lyDo) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            
+            helper.setFrom("noreply@sguairline.com");
+            helper.setTo(toEmail);
+            helper.setSubject("Thông báo thay đổi chuyến bay - SGU Airline ✈️");
+            
+            String lyDoText = lyDo != null && !lyDo.isEmpty() ? 
+                String.format("<p><strong>Lý do thay đổi:</strong> %s</p>", lyDo) : "";
+            
+            String tuyenBayCu = chuyenBayCu.getTuyenBay() != null ? 
+                String.format("%s → %s", 
+                    chuyenBayCu.getTuyenBay().getSanBayDi() != null ? chuyenBayCu.getTuyenBay().getSanBayDi().getTenSanBay() : "",
+                    chuyenBayCu.getTuyenBay().getSanBayDen() != null ? chuyenBayCu.getTuyenBay().getSanBayDen().getTenSanBay() : ""
+                ) : "N/A";
+            
+            String tuyenBayMoi = chuyenBayMoi.getTuyenBay() != null ? 
+                String.format("%s → %s", 
+                    chuyenBayMoi.getTuyenBay().getSanBayDi() != null ? chuyenBayMoi.getTuyenBay().getSanBayDi().getTenSanBay() : "",
+                    chuyenBayMoi.getTuyenBay().getSanBayDen() != null ? chuyenBayMoi.getTuyenBay().getSanBayDen().getTenSanBay() : ""
+                ) : "N/A";
+            
+            String thoiGianCu = chuyenBayCu.getNgayDi() != null && chuyenBayCu.getGioDi() != null ?
+                chuyenBayCu.getNgayDi().atTime(chuyenBayCu.getGioDi()).toString() : "N/A";
+            
+            String thoiGianMoi = chuyenBayMoi.getNgayDi() != null && chuyenBayMoi.getGioDi() != null ?
+                chuyenBayMoi.getNgayDi().atTime(chuyenBayMoi.getGioDi()).toString() : "N/A";
+            
+            String htmlContent = String.format("""
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background: linear-gradient(135deg, #f59e0b 0%%, #d97706 100%%); 
+                                 color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                        .content { background: white; padding: 30px; }
+                        .info-box { background: #dbeafe; border-left: 4px solid #3b82f6; 
+                                   padding: 15px; margin: 15px 0; }
+                        .flight-box { background: #fef3c7; border: 2px solid #f59e0b; 
+                                     padding: 20px; margin: 15px 0; border-radius: 8px; }
+                        .flight-old { background: #fee2e2; border-left: 4px solid #ef4444; }
+                        .flight-new { background: #d1fae5; border-left: 4px solid #10b981; }
+                        .arrow { font-size: 24px; color: #f59e0b; text-align: center; margin: 15px 0; }
+                        .footer { text-align: center; margin-top: 20px; color: #666; 
+                                 font-size: 12px; padding: 20px; background: #f9f9f9; 
+                                 border-radius: 0 0 10px 10px; }
+                        .highlight { font-size: 18px; font-weight: bold; color: #dc2626; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <div style="font-size: 48px; margin-bottom: 10px;">✈️</div>
+                            <h1 style="margin: 0;">Thông báo thay đổi chuyến bay</h1>
+                        </div>
+                        <div class="content">
+                            <p>Xin chào <strong>%s</strong>,</p>
+                            
+                            <p>Đặt chỗ của bạn đã được cập nhật chuyến bay mới.</p>
+                            
+                            <div class="info-box">
+                                <p style="margin: 5px 0;"><strong>Mã đặt chỗ (PNR):</strong> %s</p>
+                            </div>
+                            
+                            <div class="flight-box flight-old">
+                                <p style="margin: 0; color: #666;">Chuyến bay cũ</p>
+                                <p class="highlight" style="text-decoration: line-through; color: #ef4444;">%s</p>
+                                <p style="margin: 5px 0;"><strong>Hành trình:</strong> %s</p>
+                                <p style="margin: 5px 0;"><strong>Thờ gian:</strong> %s</p>
+                            </div>
+                            
+                            <div class="arrow">⬇️</div>
+                            
+                            <div class="flight-box flight-new">
+                                <p style="margin: 0; color: #666;">Chuyến bay mới</p>
+                                <p class="highlight" style="color: #10b981;">%s</p>
+                                <p style="margin: 5px 0;"><strong>Hành trình:</strong> %s</p>
+                                <p style="margin: 5px 0;"><strong>Thờ gian:</strong> %s</p>
+                            </div>
+                            
+                            %s
+                            
+                            <div style="background: #fee2e2; padding: 15px; border-radius: 8px; 
+                                        border-left: 4px solid #dc2626; margin: 20px 0;">
+                                <p style="margin: 0;"><strong>⚠️ Lưu ý quan trọng:</strong></p>
+                                <ul style="margin: 10px 0; padding-left: 20px;">
+                                    <li>Vui lòng kiểm tra lại thông tin chuyến bay mới</li>
+                                    <li>Cập nhật lịch trình của bạn</li>
+                                    <li>Có mặt tại sân bay trước giờ bay ít nhất 2 giờ</li>
+                                    <li>Mang theo giấy tờ tùy thân hợp lệ</li>
+                                </ul>
+                            </div>
+                            
+                            <p style="margin-top: 30px;">
+                                Trân trọng,<br>
+                                <strong>Đội ngũ SGU Airline</strong>
+                            </p>
+                        </div>
+                        <div class="footer">
+                            <p>© 2025 SGU Airline. All rights reserved.</p>
+                            <p style="color: #999; margin-top: 10px;">
+                                🌐 www.sguairline.edu.vn | ☎️ Hotline: 1900-xxxx | 📧 support@sguairline.edu.vn
+                            </p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """, 
+                tenHanhKhach, 
+                pnr, 
+                chuyenBayCu.getSoHieuChuyenBay(),
+                tuyenBayCu,
+                thoiGianCu,
+                chuyenBayMoi.getSoHieuChuyenBay(),
+                tuyenBayMoi,
+                thoiGianMoi,
+                lyDoText
+            );
+            
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+            
+        } catch (MessagingException e) {
+            throw new RuntimeException("Không thể gửi email thông báo đổi chuyến bay: " + e.getMessage());
+        }
+    }
 }
