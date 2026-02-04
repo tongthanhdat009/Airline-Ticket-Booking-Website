@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useState } from 'react';
 import { FaCheckCircle, FaMoneyBillWave, FaUser, FaEnvelope, FaCalendarAlt, FaPlane, FaConciergeBell, FaBox, FaFilePdf } from 'react-icons/fa';
-import { getDichVuByMaDatCho, fetchServiceImageByName, fetchOptionImageByName } from '../../../services/QLDichVuService';
-import { getThanhToanChiTiet, downloadInvoicePdf } from '../../../services/QLThanhToanService';
+import { getDichVuByMaDatCho, fetchServiceImageByName, fetchOptionImageByName } from '../../../services/ServiceService';
+import { getThanhToanChiTiet, downloadInvoicePdf } from '../../../services/PaymentService';
 
 const ViewPaymentDetailModal = ({ 
     payment, 
@@ -33,8 +33,8 @@ const ViewPaymentDetailModal = ({
 
     const fetchPaymentDetails = async (maThanhToan) => {
         try {
-            const response = await getThanhToanChiTiet(maThanhToan);
-            setPaymentDetails(response.data);
+            const data = await getThanhToanChiTiet(maThanhToan);
+            setPaymentDetails(data.data);
         } catch (error) {
             console.error('Error fetching payment details:', error);
         }
@@ -43,8 +43,8 @@ const ViewPaymentDetailModal = ({
     const fetchBookedServices = async (maDatCho) => {
         try {
             setLoadingServices(true);
-            const response = await getDichVuByMaDatCho(maDatCho);
-            const services = response.data || [];
+            const data = await getDichVuByMaDatCho(maDatCho);
+            const services = data.data || [];
             setBookedServices(services);
             
             // Tải ảnh cho từng dịch vụ
@@ -73,13 +73,11 @@ const ViewPaymentDetailModal = ({
                 
                 // Nếu có ảnh lựa chọn, dùng API fetchOptionImageByName
                 if (luaChon?.anh) {
-                    const response = await fetchOptionImageByName(imageName);
-                    imageBlob = response.data;
+                    imageBlob = await fetchOptionImageByName(imageName);
                 } 
                 // Nếu không, dùng ảnh dịch vụ
                 else if (dichVu?.anh) {
-                    const response = await fetchServiceImageByName(imageName);
-                    imageBlob = response.data;
+                    imageBlob = await fetchServiceImageByName(imageName);
                 }
                 
                 if (imageBlob) {

@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { FaPlus, FaSearch, FaToggleOn, FaToggleOff, FaPlane, FaTimes } from 'react-icons/fa';
-import { getAllSanBay, addSanBay, updateTrangThaiSanBay, thongTinSanBay } from '../../services/QLSanBayServices';
+import { getAllSanBay, addSanBay, updateTrangThaiSanBay, thongTinSanBay } from '../../services/AirportService';
 import Card from '../../components/QuanLy/CardChucNang';
 import { MdLocalAirport } from 'react-icons/md';
 

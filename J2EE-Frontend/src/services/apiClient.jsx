@@ -18,8 +18,8 @@ let pendingQueue = [];
  * Xác định loại người dùng dựa trên URL hoặc cookie
  */
 const getUserType = (url) => {
-  // Nếu URL chứa /admin/ thì chắc chắn là admin request
-  if (url && url.includes('/admin/')) {
+  // Nếu URL chứa /admin/ hoặc /internal/ thì chắc chắn là admin request
+  if (url && (url.includes('/admin/') || url.includes('/internal/'))) {
     return 'admin';
   }
 

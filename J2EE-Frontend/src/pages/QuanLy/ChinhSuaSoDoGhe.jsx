@@ -1,9 +1,9 @@
 ﻿import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { FaPlane, FaMagic, FaTrash, FaPlus, FaExpand, FaCompress, FaEdit, FaTimes } from 'react-icons/fa';
-import * as SoDoGheService from '../../services/SoDoGheService';
-import * as QLHangVeService from '../../services/QLHangVeService';
-import * as QLMayBayService from '../../services/QLMayBayService';
+import * as AircraftService from '../../services/AircraftService';
+import { getAllHangVeAdmin } from '../../services/TicketClassService';
+import { getAircraftById } from '../../services/AircraftService';
 import Toast from '../../components/common/Toast';
 
 // Import separated components
@@ -52,9 +52,9 @@ const ChinhSuaSoDoGhe = () => {
         try {
             setLoading(true);
             const [seatsRes, hangVeRes, aircraftRes] = await Promise.all([
-                SoDoGheService.getSeatsByAircraft(maMayBay),
-                QLHangVeService.getAllHangVeAdmin(),
-                QLMayBayService.getMayBayById(maMayBay)
+                AircraftService.getAircraftSeats(maMayBay),
+                getAllHangVeAdmin(),
+                getAircraftById(maMayBay)
             ]);
             setSeats(seatsRes.data || []);
             setHangVeList(hangVeRes.data || []);
@@ -187,7 +187,7 @@ const ChinhSuaSoDoGhe = () => {
     // Seat operations
     const handleAddSeat = async (seatData) => {
         try {
-            await SoDoGheService.addSeatToAircraft(maMayBay, seatData);
+            await AircraftService.addSeat(maMayBay, seatData);
             await loadData();
             setShowAddSeat(false);
             showToast('Đã thêm ghế thành công');
@@ -199,7 +199,7 @@ const ChinhSuaSoDoGhe = () => {
 
     const handleUpdateSeat = async (maGhe, seatData) => {
         try {
-            await SoDoGheService.updateSeat(maGhe, seatData);
+            await AircraftService.updateSeat(maGhe, seatData);
             await loadData();
             setShowEditSeat(false);
             setEditingSeat(null);
@@ -212,7 +212,7 @@ const ChinhSuaSoDoGhe = () => {
     };
     const handleDeleteSeat = async (maGhe) => {
         try {
-            await SoDoGheService.deleteSeat(maGhe);
+            await AircraftService.deleteSeat(maGhe);
             await loadData();
             setSelectedSeats(prev => prev.filter(s => s.maGhe !== maGhe));
             showToast('Đã xóa ghế thành công');
@@ -228,7 +228,7 @@ const ChinhSuaSoDoGhe = () => {
 
         try {
             for (const seat of selectedSeats) {
-                await SoDoGheService.deleteSeat(seat.maGhe);
+                await AircraftService.deleteSeat(seat.maGhe);
             }
             await loadData();
             setSelectedSeats([]);
@@ -243,7 +243,7 @@ const ChinhSuaSoDoGhe = () => {
         if (!window.confirm('Bạn có chắc chắn muốn xóa TẤT CẢ ghế? Hành động này không thể hoàn tác!')) return;
 
         try {
-            await SoDoGheService.deleteAllSeatsByAircraft(maMayBay);
+            await AircraftService.deleteAllSeats(maMayBay);
             await loadData();
             setSelectedSeats([]);
             showToast('Đã xóa tất cả ghế thành công');
@@ -261,7 +261,7 @@ const ChinhSuaSoDoGhe = () => {
                 const updateData = { ...seat };
                 if (bulkEditData.maHangVe) updateData.maHangVe = bulkEditData.maHangVe;
                 if (bulkEditData.viTriGhe) updateData.viTriGhe = bulkEditData.viTriGhe;
-                await SoDoGheService.updateSeat(seat.maGhe, updateData);
+                await AircraftService.updateSeat(seat.maGhe, updateData);
             }
             await loadData();
             setSelectedSeats([]);
@@ -342,7 +342,7 @@ const ChinhSuaSoDoGhe = () => {
                 return seats;
             });
 
-            const response = await SoDoGheService.autoGenerateSeats(maMayBay, apiConfigs);
+            const response = await AircraftService.autoGenerateSeats(maMayBay, apiConfigs);
             await loadData();
             setShowAutoGenerate(false);
             showToast(`Đã tạo ${response.data?.length || 0} ghế thành công!`);

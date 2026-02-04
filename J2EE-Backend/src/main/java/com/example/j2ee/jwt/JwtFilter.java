@@ -50,9 +50,8 @@ public class JwtFilter extends OncePerRequestFilter {
             "/admin/dangnhap/refresh",
             "/ai/",
             "/AnhDichVuCungCap/",
-            "/static/",
-            "/admin/dashboard/dichvu/anh/",
-            "/admin/dashboard/dichvu/luachon/anh/"
+            "/AnhLuaChonDichVu/",
+            "/static/"
     );
     // // Bỏ qua filter cho login/refresh và preflight
     // private static final List<String> SKIP_PATHS = List.of("/dangnhap", "/dangnhap/refresh", "/dangky",

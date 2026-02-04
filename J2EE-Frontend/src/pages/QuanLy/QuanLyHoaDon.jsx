@@ -9,7 +9,7 @@ import {
   FaPrint
 } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
-import hoaDonApi from '../../services/hoaDonApi';
+import hoaDonApi from '../../services/InvoiceService';
 import Toast from '../../components/common/Toast';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import { HoaDonDetailModal } from '../../components/QuanLy/QuanLyHoaDon';

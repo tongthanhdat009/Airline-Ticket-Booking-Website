@@ -9,8 +9,8 @@ const SeatMapCompactPreview = ({ maMayBay }) => {
         const loadSeats = async () => {
             try {
                 setLoading(true);
-                const { getSeatsByAircraft } = await import('../../../services/SoDoGheService');
-                const response = await getSeatsByAircraft(maMayBay);
+                const { getAircraftSeats } = await import('../../../services/AircraftService');
+                const response = await getAircraftSeats(maMayBay);
                 // Service đã return response.data
                 const seatsData = Array.isArray(response) ? response : (response?.data || []);
                 setSeats(seatsData);

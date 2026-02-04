@@ -5,7 +5,7 @@ import {
 } from 'recharts';
 import Card from '../../components/QuanLy/CardChucNang';
 import { FaCalendarAlt, FaDollarSign, FaTicketAlt, FaConciergeBell, FaUsers, FaFilePdf, FaChartLine, FaSync, FaFileInvoice, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
-import ThongKeService from '../../services/ThongKeService';
+import { getThongKeNgay, getThongKeTongQuan, getDoanhThuTheoNgay, getDoanhThuTheoDichVu, getDoanhThuTheoHangVe, exportPdf } from '../../services/ReportService';
 import Toast from '../../components/common/Toast';
 import StatCard from '../../components/QuanLy/ThongKe/StatCard';
 import CustomTooltip from '../../components/QuanLy/ThongKe/CustomTooltip';
@@ -132,7 +132,7 @@ const ThongKeDoanhThu = () => {
             setLoading(true);
             setError(null);
 
-            const response = await ThongKeService.getThongKeNgay();
+            const response = await getThongKeNgay();
             if (response.success) {
                 setTodayData(response.data);
                 // Clear các dữ liệu khác khi chọn "Hôm nay"
@@ -179,10 +179,10 @@ const ThongKeDoanhThu = () => {
             const { startDate: start, endDate: end } = dateRange;
 
             // Fetch từng API riêng biệt để tránh block lẫn nhau
-            const overviewPromise = ThongKeService.getThongKeTongQuan(start, end);
-            const dailyPromise = ThongKeService.getDoanhThuTheoNgay(start, end);
-            const servicePromise = ThongKeService.getDoanhThuTheoDichVu(start, end);
-            const ticketClassPromise = ThongKeService.getDoanhThuTheoHangVe(start, end);
+            const overviewPromise = getThongKeTongQuan(start, end);
+            const dailyPromise = getDoanhThuTheoNgay(start, end);
+            const servicePromise = getDoanhThuTheoDichVu(start, end);
+            const ticketClassPromise = getDoanhThuTheoHangVe(start, end);
 
             // Đợi tất cả promises hoàn thành
             const [overviewRes, dailyRes, serviceRes, ticketClassRes] = await Promise.allSettled([
@@ -274,7 +274,7 @@ const ThongKeDoanhThu = () => {
             const { startDate: start, endDate: end } = dateRange;
 
             // Gọi API backend để tạo PDF
-            const pdfBlob = await ThongKeService.exportPdf(start, end);
+            const pdfBlob = await exportPdf(start, end);
 
             // Tạo URL từ blob và tải xuống
             const url = window.URL.createObjectURL(new Blob([pdfBlob]));

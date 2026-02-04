@@ -18,8 +18,8 @@ import {
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
-import QLDatChoService from '../../services/QLDatChoService';
-import { getAllChuyenBay } from '../../services/QLChuyenBayService';
+import { getAllDatCho, getSeatMap, getAvailableFlights, doiHangVe, adminCheckIn, doiGhe, doiChuyenBay, huyDatCho } from '../../services/BookingService';
+import { getAllChuyenBay } from '../../services/FlightService';
 import useCheckInWebSocket from '../../hooks/useCheckInWebSocket';
 import {
   ChiTietDatChoModal,
@@ -144,7 +144,7 @@ const QuanLyDatCho = () => {
   const loadDatChoData = async () => {
     setLoading(true);
     try {
-      const response = await QLDatChoService.getAllDatCho({
+      const response = await getAllDatCho({
         page: currentPage,
         size: itemsPerPage,
         search: search || undefined
@@ -298,7 +298,7 @@ const QuanLyDatCho = () => {
     // Fetch seat map từ API
     setLoadingModal(true);
     try {
-      const response = await QLDatChoService.getSeatMap(datCho.maDatCho);
+      const response = await getSeatMap(datCho.maDatCho);
       if (response.success) {
         setSeatMap(response.data);
       } else {
@@ -325,7 +325,7 @@ const QuanLyDatCho = () => {
     // Fetch available flights từ API
     setLoadingModal(true);
     try {
-      const response = await QLDatChoService.getAvailableFlights(datCho.maDatCho);
+      const response = await getAvailableFlights(datCho.maDatCho);
       if (response.success) {
         setAvailableFlights(response.data || []);
       } else {
@@ -352,7 +352,7 @@ const QuanLyDatCho = () => {
   const confirmDoiHangVe = async (hangVeMoi, phiDoiInfo) => {
     try {
       setLoading(true);
-      const response = await QLDatChoService.doiHangVe(
+      const response = await doiHangVe(
         selectedDatCho.maDatCho,
         hangVeMoi.maHangVe,
         null, // Chưa chọn ghế mới
@@ -379,7 +379,7 @@ const QuanLyDatCho = () => {
   const confirmCheckIn = async () => {
     try {
       setLoading(true);
-      const response = await QLDatChoService.checkIn(selectedDatCho.maDatCho);
+      const response = await adminCheckIn(selectedDatCho.maDatCho);
       if (response.success) {
         await loadDatChoData();
         setIsCheckInModalOpen(false);
@@ -404,7 +404,7 @@ const QuanLyDatCho = () => {
     
     try {
       setLoading(true);
-      const response = await QLDatChoService.doiGhe(
+      const response = await doiGhe(
         selectedDatCho.maDatCho, 
         selectedNewSeat.maGhe, 
         'Đổi ghế theo yêu cầu'
@@ -435,7 +435,7 @@ const QuanLyDatCho = () => {
         return;
       }
       // Sử dụng maChuyenBayId (Integer) thay vì maChuyenBay (String)
-      const response = await QLDatChoService.doiChuyenBay(
+      const response = await doiChuyenBay(
         selectedDatCho.maDatCho, 
         newChuyenBay.maChuyenBayId, 
         selectedDatCho.maGhe,
@@ -463,7 +463,7 @@ const QuanLyDatCho = () => {
   const confirmHuyVe = async (lyDo) => {
     try {
       setLoading(true);
-      const response = await QLDatChoService.huyDatCho(selectedDatCho.maDatCho, lyDo);
+      const response = await huyDatCho(selectedDatCho.maDatCho, lyDo);
       if (response.success) {
         await loadDatChoData();
         setIsHuyVeModalOpen(false);

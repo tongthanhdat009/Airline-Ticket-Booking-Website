@@ -5,7 +5,7 @@ import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
 import MayBayModal from '../../components/QuanLy/QuanLyMayBay/MayBayModal';
 import SeatLayoutViewer from '../../components/QuanLy/QuanLyMayBay/SeatLayoutViewer';
-import * as QLMayBayService from '../../services/QLMayBayService';
+import { getAllAircrafts, deleteAircraft, updateAircraft, createAircraft } from '../../services/AircraftService';
 
 const QuanLyMayBay = () => {
     const navigate = useNavigate();
@@ -34,7 +34,7 @@ const QuanLyMayBay = () => {
     const loadAircrafts = async () => {
         try {
             setLoading(true);
-            const response = await QLMayBayService.getAllMayBay();
+            const response = await getAllAircrafts();
             setAircrafts(response.data || []);
         } catch (error) {
             console.error('Lỗi khi tải danh sách máy bay:', error);
@@ -88,7 +88,7 @@ const QuanLyMayBay = () => {
         if (!aircraftToDelete) return;
 
         try {
-            await QLMayBayService.deleteMayBay(aircraftToDelete);
+            await deleteAircraft(aircraftToDelete);
             showToast('Xóa máy bay thành công');
             loadAircrafts();
         } catch (error) {
@@ -110,11 +110,11 @@ const QuanLyMayBay = () => {
         try {
             if (selectedAircraft) {
                 // Update existing aircraft
-                await QLMayBayService.updateMayBay(selectedAircraft.maMayBay, data);
+                await updateAircraft(selectedAircraft.maMayBay, data);
                 showToast('Cập nhật máy bay thành công');
             } else {
                 // Create new aircraft
-                await QLMayBayService.addMayBay(data);
+                await createAircraft(data);
                 showToast('Thêm máy bay thành công');
             }
             loadAircrafts();

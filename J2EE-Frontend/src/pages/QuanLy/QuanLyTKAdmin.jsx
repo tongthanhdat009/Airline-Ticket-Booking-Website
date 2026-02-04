@@ -3,7 +3,7 @@ import { FaPlus, FaSearch, FaEdit, FaTrash, FaUser, FaTimes, FaUserShield, FaKey
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
-import { getAllTKadmin, updateTKadmin, addTKadmin, deleteTKadmin, getAllVaiTro, assignRolesToAccount } from '../../services/QLTaiKhoanAdminServices';
+import { getAllTKadmin, updateTKadmin, addTKadmin, deleteTKadmin, getAllVaiTro, assignRolesToAccount } from '../../services/AdminUserService';
 
 const QuanLyTKAdmin = () => {
   const [accounts, setAccounts] = useState([]);

@@ -4,7 +4,7 @@ import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import KhuyenMaiModal from '../../components/QuanLy/QuanLyKhuyenMai/KhuyenMaiModal';
-import QLKhuyenMaiService from '../../services/QLKhuyenMaiService';
+import { getAllPromotions, deletePromotionById, updatePromotionStatus } from '../../services/PromotionService';
 
 const QuanLyKhuyenMai = () => {
     const [search, setSearch] = useState('');
@@ -31,7 +31,7 @@ const QuanLyKhuyenMai = () => {
     const loadPromotions = async () => {
         try {
             setLoading(true);
-            const data = await QLKhuyenMaiService.getAll();
+            const data = await getAllPromotions();
             setPromotions(data);
         } catch (error) {
             console.error('Lỗi khi tải danh sách khuyến mãi:', error);
@@ -84,7 +84,7 @@ const QuanLyKhuyenMai = () => {
         if (!promotionToDelete) return;
 
         try {
-            await QLKhuyenMaiService.delete(promotionToDelete);
+            await deletePromotionById(promotionToDelete);
             showToast('Xóa khuyến mãi thành công');
             loadPromotions();
         } catch (error) {
@@ -104,7 +104,7 @@ const QuanLyKhuyenMai = () => {
     const handleToggleStatus = async (maKhuyenMai, currentStatus) => {
         const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
         try {
-            await QLKhuyenMaiService.updateStatus(maKhuyenMai, newStatus);
+            await updatePromotionStatus(maKhuyenMai, newStatus);
             showToast(`Đã ${newStatus === 'ACTIVE' ? 'kích hoạt' : 'vô hiệu hóa'} khuyến mãi`);
             loadPromotions();
         } catch (error) {

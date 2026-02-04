@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FaSearch, FaEye, FaUndo, FaCheck, FaTimes, FaCalendar } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
-import hoanTienApi from '../../services/hoanTienApi';
+import { getHoanTienList, getThongKeHoanTien, duyetHoanTien, tuChoiHoanTien } from '../../services/RefundService';
 import Toast from '../../components/common/Toast';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import RefundDetailModal from '../../components/QuanLy/QuanLyHoanTien/RefundDetailModal';
@@ -75,7 +75,7 @@ const QuanLyHoanTien = () => {
         setError(null);
         try {
             // Load danh sách hoàn tiền
-            const response = await hoanTienApi.getHoanTienList({ search });
+            const response = await getHoanTienList({ search });
             if (response.success && response.data) {
                 setRefunds(response.data);
             } else {
@@ -84,7 +84,7 @@ const QuanLyHoanTien = () => {
             }
 
             // Load thống kê
-            const thongKeResponse = await hoanTienApi.getThongKeHoanTien();
+            const thongKeResponse = await getThongKeHoanTien();
             if (thongKeResponse.success && thongKeResponse.data) {
                 setThongKe(thongKeResponse.data);
             }
@@ -128,7 +128,7 @@ const QuanLyHoanTien = () => {
         setActionLoading(true);
         try {
             const nguoiXuLy = 'admin';
-            const response = await hoanTienApi.duyetHoanTien(maHoanTien, nguoiXuLy);
+            const response = await duyetHoanTien(maHoanTien, nguoiXuLy);
             
             if (response.success) {
                 showToast('Duyệt hoàn tiền thành công!', 'success');
@@ -167,7 +167,7 @@ const QuanLyHoanTien = () => {
         setActionLoading(true);
         try {
             const nguoiXuLy = 'admin';
-            const response = await hoanTienApi.tuChoiHoanTien(maHoanTien, nguoiXuLy, lyDoTuChoi);
+            const response = await tuChoiHoanTien(maHoanTien, nguoiXuLy, lyDoTuChoi);
             
             if (response.success) {
                 showToast('Từ chối hoàn tiền thành công!', 'success');

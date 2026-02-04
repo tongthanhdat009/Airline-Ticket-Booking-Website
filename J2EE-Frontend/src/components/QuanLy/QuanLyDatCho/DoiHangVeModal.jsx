@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaTicketAlt, FaSpinner, FaExchangeAlt, FaArrowUp, FaArrowDown, FaMoneyBillWave } from 'react-icons/fa';
-import QLDatChoService from '../../../services/QLDatChoService';
+import { tinhPhiDoiHangVe } from '../../../services/BookingService';
+import { getAllTicketClasses } from '../../../services/TicketClassService';
 
 const DoiHangVeModal = ({
   isOpen,
@@ -29,7 +30,7 @@ const DoiHangVeModal = ({
     setLoadingHangVe(true);
     try {
       // Lấy danh sách hạng vé từ API
-      const response = await QLDatChoService.getAvailableHangVe(datCho.maDatCho);
+      const response = await getAllTicketClasses();
       if (response.success) {
         // Lọc bỏ hạng vé hiện tại
         const filtered = response.data.filter(hv => hv.tenHangVe !== datCho.tenHangVe);
@@ -47,7 +48,7 @@ const DoiHangVeModal = ({
     setSelectedHangVe(hangVe);
     setLoadingPhi(true);
     try {
-      const response = await QLDatChoService.tinhPhiDoiHangVe(datCho.maDatCho, hangVe.maHangVe);
+      const response = await tinhPhiDoiHangVe(datCho.maDatCho, hangVe.maHangVe);
       if (response.success) {
         setPhiDoiInfo(response.data);
       }

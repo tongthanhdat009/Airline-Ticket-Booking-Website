@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { FaPlus, FaEdit, FaTrash, FaSearch, FaConciergeBell, FaEye } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
-import { getAllServices, fetchImageByName, getServiceOptions, createServiceOption, createService, updateServiceImage, updateService, deleteService, updateOption, deleteOption, updateOptionImage } from '../../services/QLDichVuService';
+import { getAllServices, fetchImageByName, getServiceOptions, createServiceOption, createService, updateServiceImage, updateService, deleteService, updateOption, deleteOption, updateOptionImage } from '../../services/ServiceService';
 import ServiceModal from '../../components/QuanLy/QuanLyDichVu/ServiceModal';
 import DeleteConfirmationModal from '../../components/QuanLy/QuanLyDichVu/DeleteConfirmationModal';
 import ServiceDetailModal from '../../components/QuanLy/QuanLyDichVu/ServiceDetailModal';

@@ -3,7 +3,7 @@ import { FaSearch, FaUserPlus, FaFileExport, FaEdit, FaTrash, FaBan, FaEye } fro
 import * as XLSX from 'xlsx';
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
-import { getAllKhachHang, createKhachHang, updateKhachHang, deleteKhachHang } from '../../services/QLKhachHangService';
+import { getAllKhachHang, createKhachHang, updateKhachHang, deleteKhachHang } from '../../services/CustomerService';
 import { getAllCountries } from '../../services/CountryService';
 import ViewKhachHangModal from '../../components/QuanLy/ViewKhachHangModal';
 
@@ -31,8 +31,8 @@ const QuanLyKhachHang = () => {
     const fetchCustomers = async () => {
         try {
             setLoading(true);
-            const response = await getAllKhachHang();
-            setCustomers(response.data || []);
+            const data = await getAllKhachHang();
+            setCustomers(data.data || []);
         } catch (err) {
             setError('Không thể tải dữ liệu khách hàng. Vui lòng thử lại.');
             console.error('Error fetching customers:', err);
@@ -52,9 +52,9 @@ const QuanLyKhachHang = () => {
 
     const filteredCustomers = useMemo(() => {
         return customers.filter(customer =>
-            customer.hoVaTen?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            customer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            customer.soDienThoai?.includes(searchTerm)
+            customer.hanhKhach?.hoVaTen?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            customer.hanhKhach?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            customer.hanhKhach?.soDienThoai?.includes(searchTerm)
         );
     }, [searchTerm, customers]);
 
@@ -75,16 +75,31 @@ const QuanLyKhachHang = () => {
 
     const handleOpenModal = (customer = null) => {
         setCurrentCustomer(customer);
-        setFormData(customer || {
-            hoVaTen: '',
-            email: '',
-            soDienThoai: '',
-            gioiTinh: '',
-            ngaySinh: '',
-            quocGia: '',
-            maDinhDanh: '',
-            diaChi: ''
-        });
+        if (customer) {
+            // Khi chỉnh sửa, lấy dữ liệu từ hanhKhach object
+            setFormData({
+                hoVaTen: customer.hanhKhach?.hoVaTen || '',
+                email: customer.hanhKhach?.email || customer.email || '',
+                soDienThoai: customer.hanhKhach?.soDienThoai || customer.soDienThoai || '',
+                gioiTinh: customer.hanhKhach?.gioiTinh || '',
+                ngaySinh: customer.hanhKhach?.ngaySinh ? customer.hanhKhach.ngaySinh.split('T')[0] : '',
+                quocGia: customer.hanhKhach?.quocGia || '',
+                maDinhDanh: customer.hanhKhach?.maDinhDanh || '',
+                diaChi: customer.hanhKhach?.diaChi || ''
+            });
+        } else {
+            // Khi thêm mới
+            setFormData({
+                hoVaTen: '',
+                email: '',
+                soDienThoai: '',
+                gioiTinh: '',
+                ngaySinh: '',
+                quocGia: '',
+                maDinhDanh: '',
+                diaChi: ''
+            });
+        }
         setIsModalOpen(true);
     };
 
@@ -100,11 +115,27 @@ const QuanLyKhachHang = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            // Đóng gói dữ liệu theo đúng cấu trúc TaiKhoan với hanhKhach
+            const payload = {
+                ...currentCustomer, // Giữ các trường khác nếu đang update
+                email: formData.email,
+                hanhKhach: {
+                    hoVaTen: formData.hoVaTen,
+                    email: formData.email,
+                    soDienThoai: formData.soDienThoai,
+                    gioiTinh: formData.gioiTinh,
+                    ngaySinh: formData.ngaySinh,
+                    quocGia: formData.quocGia,
+                    maDinhDanh: formData.maDinhDanh,
+                    diaChi: formData.diaChi
+                }
+            };
+            
             if (currentCustomer) {
-                await updateKhachHang(currentCustomer.maHanhKhach, formData);
+                await updateKhachHang(currentCustomer.maHanhKhach, payload);
                 showToast('Cập nhật khách hàng thành công!', 'success');
             } else {
-                await createKhachHang(formData);
+                await createKhachHang(payload);
                 showToast('Thêm mới khách hàng thành công!', 'success');
             }
             await fetchCustomers();
@@ -291,30 +322,23 @@ const QuanLyKhachHang = () => {
                                 currentItems.map((customer, index) => (
                                     <tr key={customer.maHanhKhach} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
                                         <td className="px-6 py-4 font-semibold text-blue-600">#{customer.maHanhKhach}</td>
-                                        <td className="px-6 py-4 font-medium text-gray-900">{customer.hoVaTen}</td>
+                                        <td className="px-6 py-4 font-medium text-gray-900">{customer.hanhKhach?.hoVaTen || '-'}</td>
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col gap-1">
                                                 <span className="text-sm text-gray-700">{customer.email}</span>
                                                 <span className="text-xs text-gray-500 font-medium">{customer.soDienThoai}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-gray-600">{customer.gioiTinh || '-'}</td>
-                                        <td className="px-6 py-4 text-gray-600">{customer.quocGia || '-'}</td>
+                                        <td className="px-6 py-4 text-gray-600">{customer.hanhKhach?.gioiTinh || '-'}</td>
+                                        <td className="px-6 py-4 text-gray-600">{customer.hanhKhach?.quocGia || '-'}</td>
                                         <td className="px-6 py-4">
                                             <div className="flex justify-center gap-2">
                                                 <button 
                                                     onClick={() => handleViewCustomer(customer)}
                                                     className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" 
-                                                    title="Xem thông tin"
+                                                    title="Xem chi tiết"
                                                 >
                                                     <FaEye size={16} />
-                                                </button>
-                                                <button 
-                                                    onClick={() => handleOpenModal(customer)}
-                                                    className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors" 
-                                                    title="Chỉnh sửa"
-                                                >
-                                                    <FaEdit size={16} />
                                                 </button>
                                                 <button 
                                                     onClick={() => handleDelete(customer.maHanhKhach)}
@@ -526,7 +550,8 @@ const QuanLyKhachHang = () => {
                 <ViewKhachHangModal 
                     isOpen={isViewModalOpen}
                     customer={viewCustomer} 
-                    onClose={handleCloseViewModal} 
+                    onClose={handleCloseViewModal}
+                    onCustomerUpdated={fetchCustomers}
                 />
             )}
         </Card>
