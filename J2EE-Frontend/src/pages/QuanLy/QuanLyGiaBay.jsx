@@ -3,9 +3,9 @@ import { FaSearch, FaMoneyBillWave, FaEye, FaPlane } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
 import ViewPriceDetailModal from '../../components/QuanLy/QuanLyGiaBay/ViewPriceDetailModal';
-import { getAllGiaChuyenBay, createGiaChuyenBay, updateGiaChuyenBay, deleteGiaChuyenBay } from '../../services/PriceService';
-import { getAllTuyenBay } from '../../services/RouteService';
-import { getAllHangVe } from '../../services/TicketClassService';
+import { getAllGiaChuyenBay, createGiaChuyenBay, updateGiaChuyenBay, deleteGiaChuyenBay } from '../../services/QLGiaChuyenBayService';
+import { getAllTuyenBay } from '../../services/QLTuyenBayServices';
+import { getAllHangVe } from '../../services/QLHangVeService';
 
 const QuanLyGiaBay = () => {
     const [prices, setPrices] = useState([]);

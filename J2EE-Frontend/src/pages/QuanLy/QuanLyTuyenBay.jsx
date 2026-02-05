@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Card from '../../components/QuanLy/CardChucNang';
 import { FaPlus, FaSearch, FaEdit, FaTrash, FaPlane, FaTimes } from 'react-icons/fa';
-import { getAllTuyenBay, addTuyenBay, updateTuyenBay, deleteTuyenBay } from '../../services/RouteService';
-import { getSanBayActive } from '../../services/AirportService';
+import { getAllTuyenBay, addTuyenBay, updateTuyenBay, deleteTuyenBay } from '../../services/QLTuyenBayServices';
+import {getSanBayActive } from '../../services/QLSanBayServices';
 
 const QuanLyTuyenBay = () => {
     const [routes, setRoutes] = useState([]);

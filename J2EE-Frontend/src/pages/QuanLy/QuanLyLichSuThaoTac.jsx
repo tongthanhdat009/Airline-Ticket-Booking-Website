@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaSearch, FaEye, FaHistory, FaFilter, FaSpinner, FaFilePdf, FaFileExcel } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
-import AuditLogService from '../../services/NewAuditLogService';
+import AuditLogService from '../../services/AuditLogService';
 import { useToast } from '../../hooks/useToast';
 
 const QuanLyLichSuThaoTac = () => {

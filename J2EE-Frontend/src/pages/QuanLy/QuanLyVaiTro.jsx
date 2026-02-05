@@ -6,7 +6,7 @@ import {
     createVaiTro,
     updateVaiTro,
     deleteVaiTro
-} from '../../services/RoleService';
+} from '../../services/VaiTroService';
 
 const QuanLyVaiTro = () => {
     const [roles, setRoles] = useState([]);

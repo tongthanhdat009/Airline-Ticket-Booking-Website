@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaTimes } from 'react-icons/fa';
-import { createPromotion, updatePromotion } from '../../../services/PromotionService';
+import QLKhuyenMaiService from '../../../services/QLKhuyenMaiService';
 
 /**
  * KhuyenMaiModal Component
@@ -143,10 +143,10 @@ const KhuyenMaiModal = ({ isOpen, onClose, onSave, promotion, showToast }) => {
             };
 
             if (promotion) {
-                await updatePromotion(promotion.maKhuyenMai, payload);
+                await QLKhuyenMaiService.update(promotion.maKhuyenMai, payload);
                 showToast('Cập nhật khuyến mãi thành công');
             } else {
-                await createPromotion(payload);
+                await QLKhuyenMaiService.create(payload);
                 showToast('Tạo khuyến mãi thành công');
             }
             onSave();

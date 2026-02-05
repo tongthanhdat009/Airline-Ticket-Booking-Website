@@ -8,7 +8,7 @@ import {
     getPermissionMatrix,
     updatePhanQuyen,
     copyPermissions
-} from '../../services/PermissionService';
+} from '../../services/PhanQuyenService';
 
 const QuanLyPhanQuyen = () => {
     // State cho dữ liệu từ API

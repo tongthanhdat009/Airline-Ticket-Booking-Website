@@ -35,10 +35,10 @@ function RequireCompleteProfile({ children }) {
         }
 
         // Lấy thông tin tài khoản
-        const data = await TaiKhoanService.getTaiKhoanByEmail(email);
+        const response = await TaiKhoanService.getTaiKhoanByEmail(email);
         // Kiểm tra xem đã có đủ thông tin chưa
-        const hasPhone = data.data?.hanhKhach?.soDienThoai && data.data.hanhKhach.soDienThoai.trim() !== '';
-        const hasDob = data.data?.hanhKhach?.ngaySinh;
+        const hasPhone = response.data.hanhKhach?.soDienThoai && response.data.hanhKhach.soDienThoai.trim() !== '';
+        const hasDob = response.data.hanhKhach?.ngaySinh;
         if (!hasPhone || !hasDob) {
           // Thiếu thông tin -> redirect sang trang hoàn thiện
           navigate('/hoan-thien-thong-tin', { 

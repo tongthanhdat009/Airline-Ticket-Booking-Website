@@ -12,8 +12,8 @@ const SeatLayoutViewer = ({ maMayBay, onClose }) => {
         try {
             setLoading(true);
             // Import service dynamically to avoid circular dependency
-            const { getAircraftSeats } = await import('../../../services/AircraftService');
-            const response = await getAircraftSeats(maMayBay);
+            const { getSeatsByAircraft } = await import('../../../services/SoDoGheService');
+            const response = await getSeatsByAircraft(maMayBay);
 
             // Service đã return response.data, nên response chính là data
             const seatsData = Array.isArray(response) ? response : (response?.data || []);

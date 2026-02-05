@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaCog, FaTimes, FaPlus, FaTrash } from 'react-icons/fa';
-import { getDichVuByChuyenBay, addDichVuToChuyenBay, removeDichVuFromChuyenBay } from '../../../services/FlightService';
-import { getAllServices, fetchImageByName } from '../../../services/ServiceService';
+import { getDichVuByChuyenBay, addDichVuToChuyenBay, removeDichVuFromChuyenBay } from '../../../services/QLDichVuChuyenBayService';
+import { getAllServices, fetchImageByName } from '../../../services/QLDichVuService';
 
 const ManageServiceModal = ({ isOpen, onClose, flight, showToast }) => {
     const [services, setServices] = useState([]);

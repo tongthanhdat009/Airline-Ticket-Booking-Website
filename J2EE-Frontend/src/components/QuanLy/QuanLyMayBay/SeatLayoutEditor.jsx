@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { FaChair, FaTimes, FaPlus, FaTrash, FaSave, FaMagic } from 'react-icons/fa';
-import * as AircraftService from '../../../services/AircraftService';
-import { getAllHangVeAdmin } from '../../../services/TicketClassService';
+import * as SoDoGheService from '../../../services/SoDoGheService';
+import * as QLHangVeService from '../../../services/QLHangVeService';
 
 const SeatLayoutEditor = ({ maMayBay, onClose }) => {
     const [seats, setSeats] = useState([]);
@@ -28,8 +28,8 @@ const SeatLayoutEditor = ({ maMayBay, onClose }) => {
         try {
             setLoading(true);
             const [seatsRes, hangVeRes] = await Promise.all([
-                AircraftService.getAircraftSeats(maMayBay),
-                getAllHangVeAdmin()
+                SoDoGheService.getSeatsByAircraft(maMayBay),
+                QLHangVeService.getAllHangVeAdmin()
             ]);
             setSeats(seatsRes.data || []);
             setHangVeList(hangVeRes.data || []);
@@ -42,7 +42,7 @@ const SeatLayoutEditor = ({ maMayBay, onClose }) => {
 
     const handleAddSeat = async (seatData) => {
         try {
-            await AircraftService.addSeat(maMayBay, seatData);
+            await SoDoGheService.addSeatToAircraft(maMayBay, seatData);
             await loadData();
             return true;
         } catch (error) {
@@ -54,7 +54,7 @@ const SeatLayoutEditor = ({ maMayBay, onClose }) => {
 
     const handleUpdateSeat = async (maGhe, seatData) => {
         try {
-            await AircraftService.updateSeat(maGhe, seatData);
+            await SoDoGheService.updateSeat(maGhe, seatData);
             await loadData();
             return true;
         } catch (error) {
@@ -68,7 +68,7 @@ const SeatLayoutEditor = ({ maMayBay, onClose }) => {
         if (!window.confirm('Bạn có chắc chắn muốn xóa ghế này?')) return;
 
         try {
-            await AircraftService.deleteSeat(maGhe);
+            await SoDoGheService.deleteSeat(maGhe);
             await loadData();
         } catch (error) {
             console.error('Lỗi khi xóa ghế:', error);
@@ -80,7 +80,7 @@ const SeatLayoutEditor = ({ maMayBay, onClose }) => {
         if (!window.confirm('Bạn có chắc chắn muốn xóa TẤT CẢ ghế của máy bay này? Hành động này không thể hoàn tác!')) return;
 
         try {
-            await AircraftService.deleteAllSeats(maMayBay);
+            await SoDoGheService.deleteAllSeatsByAircraft(maMayBay);
             await loadData();
             alert('Đã xóa tất cả ghế thành công');
         } catch (error) {
@@ -91,7 +91,7 @@ const SeatLayoutEditor = ({ maMayBay, onClose }) => {
 
     const handleAutoGenerate = async () => {
         try {
-            const response = await AircraftService.autoGenerateSeats(maMayBay, [autoGenConfig]);
+            const response = await SoDoGheService.autoGenerateSeats(maMayBay, [autoGenConfig]);
 
             // Kiểm tra xem có ghế nào bị bỏ qua không
             const createdCount = response.data?.length || 0;

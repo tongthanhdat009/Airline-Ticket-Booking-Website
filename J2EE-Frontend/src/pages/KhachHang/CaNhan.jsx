@@ -38,16 +38,16 @@ function CaNhan() {
           return;
         }
 
-        const data = await TaiKhoanService.getTaiKhoanByEmail(email);
-        setAccountInfo(data.data);
+        const response = await TaiKhoanService.getTaiKhoanByEmail(email);
+        setAccountInfo(response.data);
         
-        if (data.data?.hanhKhach) {
+        if (response.data.hanhKhach) {
           setFormData({
-            hoVaTen: data.data.hanhKhach.hoVaTen || '',
-            gioiTinh: data.data.hanhKhach.gioiTinh || '',
-            ngaySinh: data.data.hanhKhach.ngaySinh ? data.data.hanhKhach.ngaySinh.split('T')[0] : '',
-            email: data.data.email || '',
-            soDienThoai: data.data.hanhKhach.soDienThoai || '',
+            hoVaTen: response.data.hanhKhach.hoVaTen || '',
+            gioiTinh: response.data.hanhKhach.gioiTinh || '',
+            ngaySinh: response.data.hanhKhach.ngaySinh ? response.data.hanhKhach.ngaySinh.split('T')[0] : '',
+            email: response.data.email || '',
+            soDienThoai: response.data.hanhKhach.soDienThoai || '',
           });
         }
         

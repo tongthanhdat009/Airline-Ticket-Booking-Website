@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { FaPlus, FaSearch, FaEdit, FaTrash, FaTicketAlt, FaRecycle, FaEyeSlash, FaEye } from 'react-icons/fa';
-import { getAllHangVeAdmin, getAllDeleted, createHangVe, updateHangVe, deleteHangVe, restoreHangVe } from '../../services/TicketClassService';
+import { getAllHangVeAdmin, getAllDeleted, createHangVe, updateHangVe, deleteHangVe, restoreHangVe } from '../../services/QLHangVeService';
 import Card from '../../components/QuanLy/CardChucNang';
 import HangVeModal from '../../components/QuanLy/HangVeModal';
 import Toast from '../../components/common/Toast';

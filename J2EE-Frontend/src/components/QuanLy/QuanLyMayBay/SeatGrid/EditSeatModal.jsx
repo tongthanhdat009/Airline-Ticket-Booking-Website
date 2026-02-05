@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaEdit, FaSave, FaWindowMaximize, FaArrowsAltH, FaDotCircle } from 'react-icons/fa';
 import { SEAT_POSITIONS } from '../../../../constants/aircraftConfig';
-import { getAllHangVeAdmin } from '../../../../services/TicketClassService';
+import * as QLHangVeService from '../../../../services/QLHangVeService';
 import Toast from '../../../common/Toast';
 
 const EditSeatModal = ({ seat, seats, onSave, onClose }) => {
@@ -22,7 +22,7 @@ const EditSeatModal = ({ seat, seats, onSave, onClose }) => {
         const loadHangVe = async () => {
             try {
                 setLoadingHangVe(true);
-                const response = await getAllHangVeAdmin();
+                const response = await QLHangVeService.getAllHangVeAdmin();
                 setHangVeList(response.data || []);
             } catch (error) {
                 console.error('Lỗi khi tải danh sách hạng vé:', error);

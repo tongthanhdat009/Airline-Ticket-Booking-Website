@@ -11,7 +11,7 @@ import {
   FaCheck,
 } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
-import donHangApi from '../../services/OrderService';
+import donHangApi from '../../services/donHangApi';
 import Toast from '../../components/common/Toast';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import DonHangDetailModal from '../../components/QuanLy/QuanLyDonHang/DonHangDetailModal';

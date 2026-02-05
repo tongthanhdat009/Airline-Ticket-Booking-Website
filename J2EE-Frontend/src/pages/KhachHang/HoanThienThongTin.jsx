@@ -34,24 +34,24 @@ function HoanThienThongTin() {
           return;
         }
 
-        const data = await TaiKhoanService.getTaiKhoanByEmail(email);
+        const response = await TaiKhoanService.getTaiKhoanByEmail(email);
         // Nếu đã có đủ thông tin, redirect về trang chủ
-        if (data.data?.hanhKhach?.soDienThoai && data.data?.hanhKhach?.ngaySinh) {
+        if (response.data.hanhKhach?.soDienThoai && response.data.hanhKhach?.ngaySinh) {
             navigate('/');
         }
-        console.log("Account info for profile completion:", data);
+        console.log("Account info for profile completion:", response);
         
-        setAccountInfo(data.data);
+        setAccountInfo(response.data);
         
         // Pre-fill tất cả thông tin từ database nếu có
-        if (data.data?.hanhKhach) {
+        if (response.data.hanhKhach) {
           setFormData(prev => ({
             ...prev,
-            hoVaTen: data.data.hanhKhach.hoVaTen || '',
-            soDienThoai: data.data.hanhKhach.soDienThoai || '',
-            ngaySinh: data.data.hanhKhach.ngaySinh ? data.data.hanhKhach.ngaySinh.split('T')[0] : '',
-            gioiTinh: data.data.hanhKhach.gioiTinh || 'Nam',
-            quocGia: data.data.hanhKhach.quocGia || 'Vietnam'
+            hoVaTen: response.data.hanhKhach.hoVaTen || '',
+            soDienThoai: response.data.hanhKhach.soDienThoai || '',
+            ngaySinh: response.data.hanhKhach.ngaySinh ? response.data.hanhKhach.ngaySinh.split('T')[0] : '',
+            gioiTinh: response.data.hanhKhach.gioiTinh || 'Nam',
+            quocGia: response.data.hanhKhach.quocGia || 'Vietnam'
           }));
         }
       } catch (error) {

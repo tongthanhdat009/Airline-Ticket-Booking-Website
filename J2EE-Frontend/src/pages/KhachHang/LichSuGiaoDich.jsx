@@ -34,8 +34,8 @@ function LichSuGiaoDich() {
           return;
         }
 
-        const data = await TaiKhoanService.getTaiKhoanByEmail(email);
-        setAccountInfo(data.data);
+        const response = await TaiKhoanService.getTaiKhoanByEmail(email);
+        setAccountInfo(response.data);
         setLoading(false);
       } catch (error) {
         console.error('Lỗi khi lấy thông tin tài khoản:', error);
@@ -52,8 +52,8 @@ function LichSuGiaoDich() {
       
       try {
         setHistoryLoading(true);
-        const data = await DatChoService.getLichSuThanhToan(accountInfo.hanhKhach.maHanhKhach);
-        setPaymentHistory(data.data || []);
+        const response = await DatChoService.getLichSuThanhToan(accountInfo.hanhKhach.maHanhKhach);
+        setPaymentHistory(response.data || []);
       } catch (error) {
         console.error('Lỗi khi lấy lịch sử thanh toán:', error);
         setPaymentHistory([]);
@@ -70,8 +70,8 @@ function LichSuGiaoDich() {
   const handleViewDetail = async (payment) => {
     try {
       // Lấy chi tiết đặt chỗ để xem dịch vụ đã đặt
-      const data = await DatChoService.getDatChoById(payment.datCho.maDatCho);
-      setBookingDetails(data.data);
+      const response = await DatChoService.getDatChoById(payment.datCho.maDatCho);
+      setBookingDetails(response.data);
       setSelectedPayment(payment);
       setShowDetailModal(true);
     } catch (error) {
@@ -118,9 +118,9 @@ function LichSuGiaoDich() {
       await DatChoService.huyDatCho(maDatCho);
       alert('Hủy giao dịch thành công!');
       // Refresh danh sách
-      const data = await DatChoService.getLichSuThanhToan(accountInfo.hanhKhach.maHanhKhach);
-      console.log('Updated payment history:', data.data);
-      setPaymentHistory(data.data || []);
+      const response = await DatChoService.getLichSuThanhToan(accountInfo.hanhKhach.maHanhKhach);
+      console.log('Updated payment history:', response.data);
+      setPaymentHistory(response.data || []);
     } catch (error) {
       console.error('Lỗi khi hủy giao dịch:', error);
       alert('Có lỗi xảy ra khi hủy giao dịch');

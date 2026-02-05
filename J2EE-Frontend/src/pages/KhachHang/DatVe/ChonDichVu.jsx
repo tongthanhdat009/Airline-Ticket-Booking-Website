@@ -6,7 +6,7 @@ import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 
 import { formatCurrencyWithCommas } from "../../../services/utils";
 
-import { getDichVuByChuyenBay } from "../../../services/FlightService";
+import { getDichVuByChuyenBay } from "../../../services/QLDichVuChuyenBayService";
 import SlidePanel from "../../../components/KhachHang/SlidePanel";
 import ThongTinThanhToan from "../../../components/KhachHang/ThongTinThanhToan";
 import HeaderTimKiemChuyen from "../../../components/KhachHang/HeaderTimKiemChuyen";
