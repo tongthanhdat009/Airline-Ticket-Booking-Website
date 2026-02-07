@@ -1,14 +1,18 @@
 package com.example.j2ee.service; // Hoặc package service của bạn
 
-import com.example.j2ee.dto.ChuyenBayKhachHangDTO;
-import com.example.j2ee.dto.DichVuDaDatDTO;
+import com.example.j2ee.dto.*;
 import com.example.j2ee.model.HanhKhach;
+import com.example.j2ee.model.TaiKhoan;
 import com.example.j2ee.repository.HanhKhachRepository;
+import com.example.j2ee.repository.TaiKhoanRepository;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -18,14 +22,17 @@ import java.util.stream.Collectors;
 public class HanhKhachService {
 
     private final HanhKhachRepository hanhKhachRepository;
+    private final TaiKhoanRepository taiKhoanRepository;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     // Regex chuẩn cho Việt Nam: bắt đầu bằng 0 hoặc +84, theo sau là đầu số 3/5/7/8/9 và 8 chữ số
     private static final Pattern PHONE_PATTERN = Pattern.compile("^(0|\\+84)(3|5|7|8|9)\\d{8}$");
     // Regex email thông dụng (đơn giản, thân thiện)
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
-    public HanhKhachService(HanhKhachRepository hanhKhachRepository) {
+    public HanhKhachService(HanhKhachRepository hanhKhachRepository, TaiKhoanRepository taiKhoanRepository) {
         this.hanhKhachRepository = hanhKhachRepository;
+        this.taiKhoanRepository = taiKhoanRepository;
     }
 
     /**
@@ -173,7 +180,7 @@ public class HanhKhachService {
      */
     private List<DichVuDaDatDTO> getDichVuByDatCho(int maDatCho) {
         List<Object[]> results = hanhKhachRepository.findDichVuByDatCho(maDatCho);
-        
+
         return results.stream().map(row -> {
             DichVuDaDatDTO dto = new DichVuDaDatDTO();
             dto.setTenLuaChon((String) row[0]);
@@ -181,5 +188,114 @@ public class HanhKhachService {
             dto.setDonGia((BigDecimal) row[2]);
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    // ==================== NEW METHODS FOR VIEW CUSTOMER MODAL ====================
+
+    /**
+     * Lấy thông tin tài khoản của khách hàng
+     * @param maHanhKhach Mã hành khách
+     * @return TaiKhoanKhachHangDTO nếu tìm thấy, Optional.empty nếu không có
+     */
+    public Optional<TaiKhoanKhachHangDTO> getTaiKhoanKhachHang(Integer maHanhKhach) {
+        Optional<TaiKhoan> taiKhoanOpt = taiKhoanRepository.findByHanhKhach_MaHanhKhach(maHanhKhach);
+        if (taiKhoanOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        TaiKhoan taiKhoan = taiKhoanOpt.get();
+        TaiKhoanKhachHangDTO dto = new TaiKhoanKhachHangDTO();
+        dto.setEmail(taiKhoan.getEmail());
+        dto.setTrangThai(taiKhoan.getTrangThai());
+
+        // Convert ngayTao from Date to LocalDateTime
+        if (taiKhoan.getNgayTao() != null) {
+            dto.setNgayTao(LocalDateTime.ofInstant(
+                new java.util.Date(taiKhoan.getNgayTao().getTime()).toInstant(),
+                ZoneId.systemDefault()
+            ));
+        }
+
+        // Xác định phương thức đăng nhập
+        if (taiKhoan.getOauth2Provider() != null) {
+            dto.setPhuongThucDangNhap(taiKhoan.getOauth2Provider()); // "GOOGLE", "FACEBOOK"
+        } else {
+            dto.setPhuongThucDangNhap("EMAIL");
+        }
+
+        dto.setDaXacThucEmail(taiKhoan.isEmailVerified());
+
+        return Optional.of(dto);
+    }
+
+    /**
+     * Cập nhật thông tin khách hàng (partial update)
+     * @param maHanhKhach Mã hành khách
+     * @param request Request chứa các trường cần cập nhật
+     * @return HanhKhach đã cập nhật
+     */
+    public Optional<HanhKhach> updateKhachHangPartial(Integer maHanhKhach, UpdateKhachHangRequest request) {
+        return hanhKhachRepository.findById(maHanhKhach).map(existing -> {
+            // Chỉ cập nhật các trường có trong request (không cập nhật email và maDinhDanh)
+            if (request.getHoVaTen() != null) {
+                existing.setHoVaTen(request.getHoVaTen());
+            }
+            if (request.getNgaySinh() != null) {
+                existing.setNgaySinh(Date.valueOf(request.getNgaySinh()));
+            }
+            if (request.getGioiTinh() != null) {
+                existing.setGioiTinh(request.getGioiTinh());
+            }
+            if (request.getDiaChi() != null) {
+                existing.setDiaChi(request.getDiaChi());
+            }
+            if (request.getSoDienThoai() != null) {
+                // Validate số điện thoại
+                if (!PHONE_PATTERN.matcher(request.getSoDienThoai()).matches()) {
+                    throw new IllegalArgumentException("Định dạng số điện thoại không hợp lệ: " + request.getSoDienThoai());
+                }
+                // Kiểm tra unique nếu thay đổi
+                if (!request.getSoDienThoai().equals(existing.getSoDienThoai())) {
+                    hanhKhachRepository.findBySoDienThoai(request.getSoDienThoai())
+                        .filter(other -> other.getMaHanhKhach() != maHanhKhach)
+                        .ifPresent(other -> {
+                            throw new DataIntegrityViolationException("Số điện thoại đã tồn tại: " + request.getSoDienThoai());
+                        });
+                }
+                existing.setSoDienThoai(request.getSoDienThoai());
+            }
+            if (request.getQuocGia() != null) {
+                existing.setQuocGia(request.getQuocGia());
+            }
+
+            return hanhKhachRepository.save(existing);
+        });
+    }
+
+    /**
+     * Đổi mật khẩu cho khách hàng (thực hiện bởi admin)
+     * @param maHanhKhach Mã hành khách
+     * @param matKhauMoi Mật khẩu mới
+     * @return true nếu thành công, false nếu không tìm thấy tài khoản
+     */
+    public boolean doiMatKhauKhachHang(Integer maHanhKhach, String matKhauMoi) {
+        Optional<TaiKhoan> taiKhoanOpt = taiKhoanRepository.findByHanhKhach_MaHanhKhach(maHanhKhach);
+        if (taiKhoanOpt.isEmpty()) {
+            return false;
+        }
+
+        TaiKhoan taiKhoan = taiKhoanOpt.get();
+
+        // Kiểm tra nếu tài khoản là OAuth (Google, Facebook) thì không đổi được mật khẩu
+        if (taiKhoan.getOauth2Provider() != null && !taiKhoan.getOauth2Provider().isEmpty()) {
+            throw new IllegalArgumentException("Tài khoản đăng nhập bằng " + taiKhoan.getOauth2Provider() + " không thể đổi mật khẩu.");
+        }
+
+        // Hash mật khẩu mới và cập nhật
+        String hashedPassword = passwordEncoder.encode(matKhauMoi);
+        taiKhoan.setMatKhauBam(hashedPassword);
+        taiKhoanRepository.save(taiKhoan);
+
+        return true;
     }
 }

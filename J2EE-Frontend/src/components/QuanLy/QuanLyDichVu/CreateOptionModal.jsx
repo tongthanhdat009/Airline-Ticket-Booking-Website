@@ -78,7 +78,8 @@ const CreateOptionModal = ({ onClose, onSave, options }) => {
 
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md relative">
         <div className="bg-linear-to-r from-green-600 to-green-700 text-white p-6 rounded-t-xl">
           <h2 className="text-2xl font-bold">Tạo lựa chọn mới</h2>
         </div>

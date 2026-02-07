@@ -162,8 +162,9 @@ const KhuyenMaiModal = ({ isOpen, onClose, onSave, promotion, showToast }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
+            <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
                 <div className="bg-linear-to-r from-pink-600 to-rose-600 text-white p-6 rounded-t-xl sticky top-0">
                     <div className="flex justify-between items-center">
                         <h2 className="text-2xl font-bold">{promotion ? 'Cập nhật khuyến mãi' : 'Thêm khuyến mãi mới'}</h2>

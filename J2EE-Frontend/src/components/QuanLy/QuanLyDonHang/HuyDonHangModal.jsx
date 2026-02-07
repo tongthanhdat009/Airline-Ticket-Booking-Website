@@ -21,7 +21,8 @@ const HuyDonHangModal = ({ isVisible, maDonHang, onCancel, onConfirm }) => {
 
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
+      <div className="absolute inset-0 bg-black/50" onClick={handleClose}></div>
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md relative">
         {/* Header */}
         <div className="bg-linear-to-r from-red-500 to-orange-600 text-white p-6 rounded-t-xl">
           <div className="flex justify-between items-center">

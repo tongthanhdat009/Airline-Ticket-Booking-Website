@@ -20,7 +20,8 @@ const RefundDetailModal = ({
 
     return (
         <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto relative">
                 {/* Header */}
                 <div className="bg-linear-to-r from-amber-600 to-yellow-600 text-white p-6 rounded-t-xl sticky top-0">
                     <div className="flex justify-between items-center">

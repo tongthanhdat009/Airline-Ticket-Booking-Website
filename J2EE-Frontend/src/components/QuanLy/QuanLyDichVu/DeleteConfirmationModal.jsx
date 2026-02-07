@@ -4,7 +4,8 @@ import { FaTrash } from 'react-icons/fa';
 const DeleteConfirmationModal = ({ onClose, onConfirm, serviceName }) => {
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md relative">
         <div className="p-6">
           <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
             <FaTrash className="text-red-600 text-2xl" />

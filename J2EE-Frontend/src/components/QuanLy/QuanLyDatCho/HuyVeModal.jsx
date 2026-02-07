@@ -30,7 +30,7 @@ const HuyVeModal = ({ isOpen, onClose, onConfirm, datCho, loading }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Overlay */}
       <div
-        className="fixed inset-0 transition-opacity"
+        className="absolute inset-0 bg-black/50 transition-opacity"
         onClick={handleClose}
       />
 

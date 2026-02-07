@@ -457,7 +457,7 @@ function LichSuGiaoDich() {
       {/* Detail Modal */}
       {showDetailModal && selectedPayment && bookingDetails && (
         <div className="fixed inset-0 flex items-center justify-center z-[1100] p-2 sm:p-4">
-          <div className="absolute inset-0 " onClick={() => setShowDetailModal(false)}></div>
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowDetailModal(false)}></div>
           <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[95vh] overflow-auto flex flex-col relative z-10">
             <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center shrink-0">
               <h2 className="text-lg sm:text-2xl font-bold text-gray-900">Chi tiết hóa đơn</h2>

@@ -60,7 +60,7 @@ public interface TaiKhoanRepository extends JpaRepository<TaiKhoan, Integer> {
 
     // Truy xuất thông tin cá nhân
     @Query(value = """
-    SELECT 
+    SELECT
         tk.email    AS email,
         hk.hovaten  AS hovaten,
         hk.ngaysinh AS ngaysinh,
@@ -75,4 +75,9 @@ public interface TaiKhoanRepository extends JpaRepository<TaiKhoan, Integer> {
     LIMIT 1
     """, nativeQuery = true)
     java.util.List<Object[]> findEmailAndNameByEmail(@Param("email") String email);
+
+    /**
+     * Tìm tài khoản theo mã hành khách
+     */
+    Optional<TaiKhoan> findByHanhKhach_MaHanhKhach(Integer maHanhKhach);
 }

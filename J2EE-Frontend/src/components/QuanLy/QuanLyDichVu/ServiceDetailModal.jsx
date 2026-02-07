@@ -42,7 +42,8 @@ const ServiceDetailModal = ({ service, options, onClose, onCreateOption, onEditO
   return (
     <>
       <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
-        <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col">
+        <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
+        <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col relative">
           <div className="bg-linear-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl shrink-0">
             <h2 className="text-2xl font-bold">Chi tiết dịch vụ: {service.tenDichVu}</h2>
           </div>

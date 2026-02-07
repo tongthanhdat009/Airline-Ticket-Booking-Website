@@ -31,7 +31,8 @@ const HoanTienModal = ({
 
   return (
     <div className="fixed inset-0 flex justify-center items-center z-60 p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg relative">
         {/* Header */}
         <div className="bg-linear-to-r from-orange-500 to-amber-600 text-white p-5 rounded-t-xl">
           <div className="flex justify-between items-center">

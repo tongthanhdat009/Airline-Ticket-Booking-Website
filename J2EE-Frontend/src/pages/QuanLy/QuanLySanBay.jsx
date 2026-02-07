@@ -350,7 +350,8 @@ const SanBayModal = ({ isOpen, onClose, onSave }) => {
 
     return (
         <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg">
+            <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg relative">
                 <div className="bg-linear-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl">
                     <div className="flex justify-between items-center">
                         <h2 className="text-2xl font-bold">Thêm sân bay mới</h2>

@@ -40,7 +40,8 @@ const DoiChuyenModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="relative w-full max-w-2xl max-h-[90vh] mx-4 bg-white rounded-lg shadow-xl overflow-hidden">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
+      <div className="relative z-10 w-full max-w-2xl max-h-[90vh] mx-4 bg-white rounded-lg shadow-xl overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-orange-500 to-amber-600 px-6 py-4">
           <div className="flex items-center gap-2">

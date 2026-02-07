@@ -551,7 +551,8 @@ const QuanLyPhanQuyen = () => {
             {/* Copy Permissions Modal */}
             {showCopyModal && (
                 <div className="fixed inset-0 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
+                    <div className="absolute inset-0 bg-black/50" onClick={() => setShowCopyModal(false)}></div>
+                    <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 relative">
                         <h2 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-3">
                             <FaCopy className="text-blue-500" />
                             Sao chép phân quyền

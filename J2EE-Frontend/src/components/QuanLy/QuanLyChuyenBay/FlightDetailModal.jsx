@@ -110,7 +110,8 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+            <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-y-auto relative">
                 {/* Header */}
                 <div className="sticky top-0 bg-linear-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex justify-between items-center z-10">
                     <h3 className="text-xl font-bold">Chi tiết chuyến bay</h3>

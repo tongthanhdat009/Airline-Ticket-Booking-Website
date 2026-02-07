@@ -3,9 +3,9 @@ import { FaSearch, FaUserPlus, FaFileExport, FaEdit, FaTrash, FaBan, FaEye } fro
 import * as XLSX from 'xlsx';
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
-import { getAllKhachHang, createKhachHang, updateKhachHang, deleteKhachHang } from '../../services/QLKhachHangService';
+import { getAllKhachHang, createKhachHang, deleteKhachHang } from '../../services/QLKhachHangService';
 import { getAllCountries } from '../../services/CountryService';
-import ViewKhachHangModal from '../../components/QuanLy/ViewKhachHangModal';
+import ViewKhachHangModal from '../../components/QuanLy/QuanLyKhachHang/ViewKhachHangModal';
 
 const QuanLyKhachHang = () => {
     const [customers, setCustomers] = useState([]);
@@ -14,13 +14,13 @@ const QuanLyKhachHang = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [currentCustomer, setCurrentCustomer] = useState(null);
     const [formData, setFormData] = useState({});
     const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
     const [countries, setCountries] = useState([]);
     const itemsPerPage = 5;
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [viewCustomer, setViewCustomer] = useState(null);
+    const [viewModalMode, setViewModalMode] = useState('view'); // 'view' or 'edit'
 
     // Fetch data from API
     useEffect(() => {
@@ -73,9 +73,8 @@ const QuanLyKhachHang = () => {
         setToast({ ...toast, isVisible: false });
     };
 
-    const handleOpenModal = (customer = null) => {
-        setCurrentCustomer(customer);
-        setFormData(customer || {
+    const handleOpenModal = () => {
+        setFormData({
             hoVaTen: '',
             email: '',
             soDienThoai: '',
@@ -90,7 +89,6 @@ const QuanLyKhachHang = () => {
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
-        setCurrentCustomer(null);
     };
 
     const handleFormChange = (e) => {
@@ -100,18 +98,13 @@ const QuanLyKhachHang = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            if (currentCustomer) {
-                await updateKhachHang(currentCustomer.maHanhKhach, formData);
-                showToast('Cập nhật khách hàng thành công!', 'success');
-            } else {
-                await createKhachHang(formData);
-                showToast('Thêm mới khách hàng thành công!', 'success');
-            }
+            await createKhachHang(formData);
+            showToast('Thêm mới khách hàng thành công!', 'success');
             await fetchCustomers();
             handleCloseModal();
         } catch (err) {
             console.error('Error saving customer:', err);
-            
+
             // Xử lý lỗi từ backend
             if (err.response && err.response.data) {
                 // Lấy message từ response.data.message (format ApiResponse)
@@ -217,14 +210,16 @@ const QuanLyKhachHang = () => {
         }
     };
 
-    const handleViewCustomer = (customer) => {
+    const handleViewCustomer = (customer, mode = 'view') => {
         setViewCustomer(customer);
+        setViewModalMode(mode);
         setIsViewModalOpen(true);
     };
 
     const handleCloseViewModal = () => {
         setIsViewModalOpen(false);
         setViewCustomer(null);
+        setViewModalMode('view');
     };
 
     if (loading) return <div className="flex justify-center items-center h-64"><div className="text-lg">Đang tải...</div></div>;
@@ -309,9 +304,9 @@ const QuanLyKhachHang = () => {
                                                 >
                                                     <FaEye size={16} />
                                                 </button>
-                                                <button 
-                                                    onClick={() => handleOpenModal(customer)}
-                                                    className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors" 
+                                                <button
+                                                    onClick={() => handleViewCustomer(customer, 'edit')}
+                                                    className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
                                                     title="Chỉnh sửa"
                                                 >
                                                     <FaEdit size={16} />
@@ -387,14 +382,13 @@ const QuanLyKhachHang = () => {
                 </div>
             )}
 
-            {/* Modal Form */}
+            {/* Modal Form - Chỉ dùng cho thêm mới */}
             {isModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                        <div className="sticky top-0 bg-linear-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex justify-between items-center">
-                            <h3 className="text-xl font-bold">
-                                {currentCustomer ? 'Chỉnh sửa khách hàng' : 'Thêm khách hàng mới'}
-                            </h3>
+                    <div className="absolute inset-0 bg-black/50" onClick={handleCloseModal}></div>
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
+                        <div className="[background:linear-gradient(to_right,rgb(37,99,235),rgb(29,78,216))] text-white px-6 py-4 flex justify-between items-center sticky top-0">
+                            <h3 className="text-xl font-bold">Thêm khách hàng mới</h3>
                             <button onClick={handleCloseModal} className="text-white hover:text-gray-200">
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -513,7 +507,7 @@ const QuanLyKhachHang = () => {
                                     type="submit"
                                     className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                                 >
-                                    {currentCustomer ? 'Cập nhật' : 'Thêm mới'}
+                                    Thêm mới
                                 </button>
                             </div>
                         </form>
@@ -523,10 +517,13 @@ const QuanLyKhachHang = () => {
 
             {/* View Modal */}
             {isViewModalOpen && (
-                <ViewKhachHangModal 
+                <ViewKhachHangModal
                     isOpen={isViewModalOpen}
-                    customer={viewCustomer} 
-                    onClose={handleCloseViewModal} 
+                    customer={viewCustomer}
+                    onClose={handleCloseViewModal}
+                    onCustomerUpdate={fetchCustomers}
+                    defaultTab="thong-tin"
+                    initialEditMode={viewModalMode === 'edit'}
                 />
             )}
         </Card>

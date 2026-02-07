@@ -167,7 +167,8 @@ const QuanLyMayBay = () => {
             {/* Delete confirmation dialog */}
             {showDeleteConfirm && (
                 <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
+                    <div className="absolute inset-0 bg-black/50" onClick={cancelDelete}></div>
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative">
                         <h3 className="text-xl font-bold text-gray-800 mb-4">Xác nhận xóa</h3>
                         <p className="text-gray-600 mb-6">
                             Bạn có chắc chắn muốn xóa máy bay này không? Hành động này không thể hoàn tác.

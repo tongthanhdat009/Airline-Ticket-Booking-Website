@@ -31,7 +31,7 @@ const ChiTietDatChoModal = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Overlay */}
       <div
-        className="fixed inset-0"
+        className="absolute inset-0 bg-black/50"
         onClick={onClose}
       />
 

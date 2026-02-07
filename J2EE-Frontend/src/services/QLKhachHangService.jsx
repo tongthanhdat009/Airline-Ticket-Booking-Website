@@ -82,3 +82,46 @@ export const getChuyenBayByKhachHangId = async (id) => {
         throw error;
     }
 };
+
+// ==================== NEW METHODS FOR VIEW CUSTOMER MODAL ====================
+
+// Lấy thông tin tài khoản của khách hàng
+export const getTaiKhoanKhachHang = async (id) => {
+    try {
+        const response = await apiClient.get(`${API_BASE_URL}/${id}/tai-khoan`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching account info:", error);
+        throw error;
+    }
+};
+
+// Cập nhật một phần thông tin khách hàng
+export const updateKhachHangPartial = async (id, data) => {
+    try {
+        const response = await apiClient.put(`${API_BASE_URL}/${id}/partial`, data);
+        return response;
+    } catch (error) {
+        console.error("Error updating customer:", error);
+        if (error.response && error.response.data) {
+            throw error;
+        } else {
+            throw new Error('Không thể cập nhật khách hàng. Vui lòng kiểm tra kết nối.');
+        }
+    }
+};
+
+// Đổi mật khẩu cho khách hàng (admin)
+export const doiMatKhauKhachHang = async (id, matKhauMoi) => {
+    try {
+        const response = await apiClient.put(`${API_BASE_URL}/${id}/doi-mat-khau`, { matKhauMoi });
+        return response;
+    } catch (error) {
+        console.error("Error changing password:", error);
+        if (error.response && error.response.data) {
+            throw error;
+        } else {
+            throw new Error('Không thể đổi mật khẩu. Vui lòng kiểm tra kết nối.');
+        }
+    }
+};
