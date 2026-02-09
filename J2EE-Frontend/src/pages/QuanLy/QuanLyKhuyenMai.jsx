@@ -3,7 +3,12 @@ import { FaPlus, FaSearch, FaEdit, FaTrash, FaToggleOn, FaToggleOff, FaTags } fr
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
+import ViewToggleButton from '../../components/common/ViewToggleButton';
+import CardView from '../../components/common/CardView';
+import ResponsiveTable from '../../components/common/ResponsiveTable';
+import { useViewToggle } from '../../hooks/useViewToggle';
 import KhuyenMaiModal from '../../components/QuanLy/QuanLyKhuyenMai/KhuyenMaiModal';
+import KhuyenMaiCard from '../../components/QuanLy/QuanLyKhuyenMai/KhuyenMaiCard';
 import QLKhuyenMaiService from '../../services/QLKhuyenMaiService';
 
 const QuanLyKhuyenMai = () => {
@@ -17,6 +22,7 @@ const QuanLyKhuyenMai = () => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [promotionToDelete, setPromotionToDelete] = useState(null);
     const itemsPerPage = 5;
+    const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-khuyen-mai-view', 'table');
 
     // Toast functions
     const showToast = (message, type = 'success') => {
@@ -68,6 +74,14 @@ const QuanLyKhuyenMai = () => {
     const handleOpenModalForEdit = (promotion) => {
         setSelectedPromotion(promotion);
         setIsModalOpen(true);
+    };
+
+    const handleView = (promotion) => {
+        handleOpenModalForEdit(promotion);
+    };
+
+    const handleEdit = (promotion) => {
+        handleOpenModalForEdit(promotion);
     };
 
     const handleCloseModal = () => {
@@ -155,6 +169,11 @@ const QuanLyKhuyenMai = () => {
                     />
                     <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
                 </div>
+                <ViewToggleButton
+                    currentView={viewMode}
+                    onViewChange={handleViewChange}
+                    className="shrink-0"
+                />
                 <button
                     onClick={handleOpenModalForAdd}
                     className="flex items-center gap-2 bg-linear-to-r from-pink-500 to-rose-500 text-white px-5 py-3 rounded-lg hover:from-pink-600 hover:to-rose-600 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
@@ -164,9 +183,25 @@ const QuanLyKhuyenMai = () => {
                 </button>
             </div>
 
-            {/* Bảng dữ liệu */}
-            <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
-                <div className="overflow-x-auto">
+            {/* View Mode: Card or Table */}
+            {viewMode === 'grid' ? (
+                /* Card View */
+                <CardView
+                    items={currentItems}
+                    renderCard={(km, index) => (
+                        <KhuyenMaiCard
+                            key={km.maKhuyenMai || index}
+                            data={km}
+                            onView={handleView}
+                            onEdit={handleEdit}
+                            onDelete={() => handleDelete(km.maKhuyenMai)}
+                        />
+                    )}
+                    emptyMessage="Không tìm thấy khuyến mãi nào."
+                />
+            ) : (
+                /* Table View */
+                <ResponsiveTable>
                     <table className="w-full text-sm">
                         <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
                             <tr>
@@ -271,8 +306,8 @@ const QuanLyKhuyenMai = () => {
                             )}
                         </tbody>
                     </table>
-                </div>
-            </div>
+                </ResponsiveTable>
+            )}
 
             {/* Thanh phân trang */}
             {filteredPromotions.length > itemsPerPage && (
