@@ -432,7 +432,7 @@ const ThongKeDoanhThu = () => {
                     {timeRange === 'today' && todayData ? (
                         <div className="space-y-6">
                             {/* Tiêu đề thống kê trong ngày */}
-                            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 rounded-2xl shadow-lg text-white">
+                            <div className="bg-blue-600 p-6 rounded-2xl shadow-lg text-white">
                                 <h3 className="text-2xl font-bold mb-2">📊 Thống kê hôm nay</h3>
                                 <p className="text-blue-100">{new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
                             </div>
@@ -623,7 +623,7 @@ const ThongKeDoanhThu = () => {
                                 <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
                                     <div className="mb-6">
                                         <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                                            <div className="w-1 h-6 bg-purple-600 rounded-full"></div>
+                                            <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
                                             Cơ cấu doanh thu dịch vụ
                                         </h4>
                                         <p className="text-sm text-gray-500 mt-1">So sánh các dịch vụ</p>

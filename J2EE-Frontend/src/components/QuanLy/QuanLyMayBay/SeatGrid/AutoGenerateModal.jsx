@@ -188,7 +188,7 @@ const AutoGenerateModal = ({
                             onClick={() => setShowCustomMode(false)}
                             className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
                                 !showCustomMode
-                                    ? 'bg-purple-600 text-white shadow-md'
+                                    ? 'bg-blue-600 text-white shadow-md'
                                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                             }`}
                         >
@@ -198,7 +198,7 @@ const AutoGenerateModal = ({
                             onClick={switchToCustomMode}
                             className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
                                 showCustomMode
-                                    ? 'bg-purple-600 text-white shadow-md'
+                                    ? 'bg-blue-600 text-white shadow-md'
                                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                             }`}
                         >
@@ -209,14 +209,14 @@ const AutoGenerateModal = ({
 
                     {/* Template quick select - Only show in template mode */}
                     {!showCustomMode && (
-                        <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                        <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
                             <p className="font-bold text-gray-700 mb-2">Mẫu máy bay có sẵn:</p>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                                 {Object.keys(AIRCRAFT_TEMPLATES).map(key => (
                                     <button
                                         key={key}
                                         onClick={() => applyTemplate(key)}
-                                        className="px-4 py-2 bg-white border border-purple-300 rounded-lg hover:bg-purple-100 text-sm font-medium"
+                                        className="px-4 py-2 bg-white border border-indigo-300 rounded-lg hover:bg-indigo-100 text-sm font-medium"
                                     >
                                         {AIRCRAFT_TEMPLATES[key].name}
                                     </button>
@@ -316,7 +316,7 @@ const AutoGenerateModal = ({
                                                     key={idx}
                                                     type="button"
                                                     onClick={() => applyPresetLayout(config.id, preset)}
-                                                    className="px-3 py-2 text-xs bg-white border-2 border-purple-200 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-all text-left"
+                                                    className="px-3 py-2 text-xs bg-white border-2 border-indigo-200 rounded-lg hover:border-purple-400 hover:bg-indigo-50 transition-all text-left"
                                                 >
                                                     <div className="font-bold text-purple-700">{preset.name}</div>
                                                     <div className="text-gray-500 mt-0.5">Tổng: {preset.total} cột</div>
@@ -376,7 +376,7 @@ const AutoGenerateModal = ({
 
                                     {/* Preview */}
                                     <div className="mt-2 space-y-2">
-                                        <div className="flex items-center gap-2 text-xs text-gray-500 bg-purple-50 p-2 rounded-lg">
+                                        <div className="flex items-center gap-2 text-xs text-gray-500 bg-indigo-50 p-2 rounded-lg">
                                             <span>📊 Preview:</span>
                                             <div className="flex items-center gap-1 flex-wrap">
                                                 {config.columnsLeft?.map((col, idx) => (
@@ -472,7 +472,7 @@ const AutoGenerateModal = ({
                     </button>
                     <button
                         onClick={onGenerate}
-                        className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium"
+                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
                     >
                         Tạo {cabinConfigs.reduce((sum, c) => {
                             const totalCols = (c.columnsLeft?.length || 0) + (c.columnsMiddle?.length || 0) + (c.columnsRight?.length || 0);

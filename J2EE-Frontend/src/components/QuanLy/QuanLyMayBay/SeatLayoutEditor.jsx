@@ -167,7 +167,7 @@ const SeatLayoutEditor = ({ maMayBay, onClose }) => {
                         </button>
                         <button
                             onClick={() => setShowAutoGenerate(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
                         >
                             <FaMagic />
                             Tự động tạo
@@ -308,7 +308,7 @@ const SeatLayoutEditor = ({ maMayBay, onClose }) => {
                                     <button
                                         onClick={handleAutoGenerate}
                                         disabled={!autoGenConfig.maHangVe}
-                                        className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium disabled:opacity-50"
+                                        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
                                     >
                                         Tạo ngay
                                     </button>
@@ -535,7 +535,7 @@ const SeatForm = ({ seat, hangVeList, onSave, onCancel }) => {
                     </button>
                     <button
                         type="submit"
-                        className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium"
+                        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
                     >
                         {seat?.maGhe ? 'Cập nhật' : 'Thêm'}
                     </button>

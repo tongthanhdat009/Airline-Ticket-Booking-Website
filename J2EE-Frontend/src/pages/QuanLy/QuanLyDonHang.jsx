@@ -470,14 +470,14 @@ const QuanLyDonHang = () => {
         <div className="flex gap-3 w-full md:w-auto">
           <button
             onClick={() => setIsFilterModalOpen(true)}
-            className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-cyan-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-cyan-700 transition-all shadow-lg hover:shadow-xl font-semibold"
+            className="flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold"
           >
             <FaFilter />
             <span className="hidden sm:inline">Bộ lọc</span>
           </button>
           <button
             onClick={() => loadDonHang()}
-            className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold"
+            className="flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold"
           >
             <FaCalendar />
             <span className="hidden sm:inline">Làm mới</span>
@@ -553,7 +553,7 @@ const QuanLyDonHang = () => {
             /* Table View */
             <ResponsiveTable>
               <table className="w-full text-sm">
-                <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
+                <thead className="bg-blue-600 text-white">
                   <tr>
                     <th className="px-4 py-4 text-center font-semibold w-12">
                       <button

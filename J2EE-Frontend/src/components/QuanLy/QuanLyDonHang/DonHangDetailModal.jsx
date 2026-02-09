@@ -55,7 +55,7 @@ const DonHangDetailModal = ({
           {/* Thông tin khách hàng */}
           <div className="mb-6">
             <h3 className="text-base md:text-lg font-bold text-gray-800 mb-3 md:mb-4 flex items-center gap-2">
-              <div className="w-1 h-5 md:h-6 bg-violet-600 rounded-full"></div>
+              <div className="w-1 h-5 md:h-6 bg-indigo-600 rounded-full"></div>
               Thông tin khách hàng
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 bg-gray-50 p-3 md:p-4 rounded-lg">
@@ -89,7 +89,7 @@ const DonHangDetailModal = ({
           {/* Danh sách đặt chỗ */}
           <div className="mb-6">
             <h3 className="text-base md:text-lg font-bold text-gray-800 mb-3 md:mb-4 flex items-center gap-2">
-              <div className="w-1 h-5 md:h-6 bg-violet-600 rounded-full"></div>
+              <div className="w-1 h-5 md:h-6 bg-indigo-600 rounded-full"></div>
               Danh sách đặt chỗ ({donHang.danhSachDatCho?.length || 0})
             </h3>
             <div className="bg-gray-50 rounded-lg overflow-hidden">
@@ -154,7 +154,7 @@ const DonHangDetailModal = ({
           {donHang.ghiChu && (
             <div className="mb-6">
               <h3 className="text-base md:text-lg font-bold text-gray-800 mb-3 md:mb-4 flex items-center gap-2">
-                <div className="w-1 h-5 md:h-6 bg-violet-600 rounded-full"></div>
+                <div className="w-1 h-5 md:h-6 bg-indigo-600 rounded-full"></div>
                 Ghi chú
               </h3>
               <div className="bg-yellow-50 p-3 md:p-4 rounded-lg border border-yellow-200">

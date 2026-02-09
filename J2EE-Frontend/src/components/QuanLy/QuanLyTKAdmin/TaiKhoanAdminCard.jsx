@@ -33,12 +33,12 @@ const TaiKhoanAdminCard = memo(({
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
           {/* Avatar icon */}
-          <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-            <FaUser className="text-purple-600" size={18} />
+          <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+            <FaUser className="text-indigo-600" size={18} />
           </div>
           <div className="min-w-0 flex-1">
             <h3 className="font-semibold text-gray-900 truncate">{hoVaTen || 'Không có tên'}</h3>
-            <p className="text-sm text-purple-600 font-medium">#{maTaiKhoan}</p>
+            <p className="text-sm text-indigo-600 font-medium">#{maTaiKhoan}</p>
           </div>
         </div>
       </div>
@@ -71,7 +71,7 @@ const TaiKhoanAdminCard = memo(({
               tenVaiTro.map((role, idx) => (
                 <span
                   key={idx}
-                  className="px-2 py-0.5 bg-violet-100 text-violet-700 rounded-full text-xs font-semibold"
+                  className="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold"
                 >
                   {role}
                 </span>
@@ -108,7 +108,7 @@ const TaiKhoanAdminCard = memo(({
         {onAssignRoles && (
           <button
             onClick={() => onAssignRoles?.(data)}
-            className="px-3 py-1.5 text-sm text-purple-600 hover:bg-purple-50 rounded-lg transition-colors flex items-center gap-1.5"
+            className="px-3 py-1.5 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors flex items-center gap-1.5"
             title="Gán vai trò"
           >
             <FaUserShield size={14} />

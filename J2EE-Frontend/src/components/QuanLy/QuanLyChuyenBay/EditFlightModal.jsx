@@ -321,22 +321,22 @@ const EditFlightModal = ({ isOpen, onClose, onSubmit, formData, onFormChange, ro
                     {/* Phần gán dịch vụ cho chuyến bay */}
                     <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-200">
                         <h3 className="text-base md:text-lg font-bold text-gray-800 mb-3 md:mb-4 pb-2 border-b border-gray-200 flex items-center gap-2">
-                            <FaConciergeBell className="text-purple-600 text-sm md:text-base" />
+                            <FaConciergeBell className="text-indigo-600 text-sm md:text-base" />
                             <span>Dịch vụ chuyến bay</span>
                         </h3>
-                        <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 md:p-4">
+                        <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3 md:p-4">
                             <p className="text-xs md:text-sm text-gray-700 mb-2 md:mb-3">
                                 Chọn các dịch vụ sẽ được cung cấp trên chuyến bay này:
                             </p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 max-h-48 md:max-h-60 overflow-y-auto">
                                 {services.length > 0 ? (
                                     services.map(service => (
-                                        <label key={service.maDichVu} className="flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-white border border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 cursor-pointer transition-all">
+                                        <label key={service.maDichVu} className="flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-white border border-gray-200 rounded-lg hover:bg-indigo-50 hover:border-purple-300 cursor-pointer transition-all">
                                             <input
                                                 type="checkbox"
                                                 checked={selectedServices.includes(service.maDichVu)}
                                                 onChange={() => onServiceChange(service.maDichVu)}
-                                                className="w-4 h-4 text-purple-600 focus:ring-purple-500 shrink-0"
+                                                className="w-4 h-4 text-indigo-600 focus:ring-purple-500 shrink-0"
                                             />
                                             <div className="flex-1 min-w-0">
                                                 <div className="font-medium text-gray-900 text-xs md:text-sm truncate">{service.tenDichVu}</div>

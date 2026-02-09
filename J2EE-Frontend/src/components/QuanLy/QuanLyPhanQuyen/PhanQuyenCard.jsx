@@ -91,7 +91,7 @@ const PhanQuyenCard = memo(({
         {/* Super Admin Badge */}
         {isSuperAdmin && (
           <div className="flex items-center gap-2">
-            <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold flex items-center gap-1">
+            <span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold flex items-center gap-1">
               <FaShieldAlt size={10} />
               Super Admin
             </span>

@@ -603,7 +603,7 @@ const QuanLyChuyenBay = () => {
                 {!showDeleted && (
                     <button
                         onClick={() => navigate('/admin/dashboard/ChuyenBay/them')}
-                        className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
+                        className="flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
                     >
                         <FaPlus />
                         <span>Thêm chuyến bay</span>
@@ -632,7 +632,7 @@ const QuanLyChuyenBay = () => {
                 <ResponsiveTable>
                     <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
                         <table className="w-full text-sm">
-                            <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
+                            <thead className="bg-blue-600 text-white">
                                 <tr>
                                     <th scope="col" className="px-6 py-4 text-left font-semibold">Số hiệu</th>
                                     <th scope="col" className="px-6 py-4 text-left font-semibold">Tuyến bay</th>

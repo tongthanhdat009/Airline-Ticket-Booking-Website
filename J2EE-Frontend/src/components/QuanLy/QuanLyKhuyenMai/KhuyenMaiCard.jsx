@@ -90,12 +90,12 @@ const KhuyenMaiCard = memo(({
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
           {/* Avatar icon */}
-          <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center flex-shrink-0">
-            <FaTags className="text-pink-600" size={18} />
+          <div className="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center flex-shrink-0">
+            <FaTags className="text-rose-600" size={18} />
           </div>
           <div className="min-w-0 flex-1">
             <h3 className="font-semibold text-gray-900 truncate">{tenKhuyenMai || 'Không có tên'}</h3>
-            <p className="text-sm text-pink-600 font-medium">#{maKhuyenMai}</p>
+            <p className="text-sm text-rose-600 font-medium">#{maKhuyenMai}</p>
           </div>
         </div>
         {/* Status Badge */}
@@ -111,7 +111,7 @@ const KhuyenMaiCard = memo(({
         {maKM && (
           <div className="flex items-center gap-2 text-gray-600">
             <FaTags className="text-gray-400 flex-shrink-0" size={12} />
-            <span className="px-2 py-0.5 bg-pink-100 text-pink-700 rounded text-xs font-semibold">
+            <span className="px-2 py-0.5 bg-rose-100 text-rose-700 rounded text-xs font-semibold">
               {maKM}
             </span>
           </div>
@@ -130,9 +130,9 @@ const KhuyenMaiCard = memo(({
         {/* Discount Value */}
         <div className="flex items-center gap-2 text-gray-900 font-semibold">
           {loaiKhuyenMai === 'PERCENT' ? (
-            <FaPercent className="text-pink-500 flex-shrink-0" size={12} />
+            <FaPercent className="text-rose-500 flex-shrink-0" size={12} />
           ) : (
-            <FaMoneyBill className="text-pink-500 flex-shrink-0" size={12} />
+            <FaMoneyBill className="text-rose-500 flex-shrink-0" size={12} />
           )}
           <span>Giảm: {formatDiscountValue()}</span>
         </div>

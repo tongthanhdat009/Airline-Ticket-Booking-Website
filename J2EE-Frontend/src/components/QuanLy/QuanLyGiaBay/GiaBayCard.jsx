@@ -101,7 +101,7 @@ const GiaBayCard = memo(({
             {uniqueTicketClasses.slice(0, 3).map((className, index) => (
               <span
                 key={index}
-                className="inline-block px-2 py-0.5 rounded text-xs bg-purple-50 text-purple-700"
+                className="inline-block px-2 py-0.5 rounded text-xs bg-indigo-50 text-indigo-700"
               >
                 {className}
               </span>

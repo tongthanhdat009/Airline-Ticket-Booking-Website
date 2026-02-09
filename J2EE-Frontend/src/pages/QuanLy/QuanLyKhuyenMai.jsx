@@ -332,7 +332,7 @@ const QuanLyKhuyenMai = () => {
                                         onClick={() => paginate(index + 1)}
                                         className={`px-4 py-2 rounded-lg font-medium transition-all ${
                                             currentPage === index + 1
-                                                ? 'bg-pink-600 text-white shadow-lg'
+                                                ? 'bg-blue-600 text-white shadow-lg'
                                                 : 'bg-white border border-gray-300 hover:bg-gray-100'
                                         }`}
                                     >
