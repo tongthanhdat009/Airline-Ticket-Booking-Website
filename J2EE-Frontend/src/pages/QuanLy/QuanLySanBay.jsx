@@ -3,6 +3,11 @@ import { FaPlus, FaSearch, FaToggleOn, FaToggleOff, FaPlane, FaTimes } from 'rea
 import { getAllSanBay, addSanBay, updateTrangThaiSanBay, thongTinSanBay } from '../../services/QLSanBayServices';
 import Card from '../../components/QuanLy/CardChucNang';
 import { MdLocalAirport } from 'react-icons/md';
+import ViewToggleButton from '../../components/common/ViewToggleButton';
+import CardView from '../../components/common/CardView';
+import ResponsiveTable from '../../components/common/ResponsiveTable';
+import { useViewToggle } from '../../hooks/useViewToggle';
+import SanBayCard from '../../components/QuanLy/QuanLySanBay/SanBayCard';
 
 const QuanLySanBay = () => {
     const [sanBayList, setSanBayList] = useState([]);
@@ -12,16 +17,15 @@ const QuanLySanBay = () => {
     const [search, setSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
+    const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-san-bay-view', 'table');
 
     const fetchSanBay = async () => {
         try {
             setLoading(true);
             const res = await getAllSanBay();
             setSanBayList(Array.isArray(res.data) ? res.data : []);
-            console.log(res.data);
         } catch (err) {
             setError('Không thể tải dữ liệu sân bay.');
-            console.error(err);
             setSanBayList([]);
         } finally {
             setLoading(false);
@@ -68,7 +72,7 @@ const QuanLySanBay = () => {
     const handleToggleStatus = async (maSanBay, currentStatus) => {
         const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
         const statusText = newStatus === 'ACTIVE' ? 'kích hoạt' : 'vô hiệu hóa';
-        
+
         if (window.confirm(`Bạn có chắc chắn muốn ${statusText} sân bay này?`)) {
             try {
                 await updateTrangThaiSanBay(maSanBay, newStatus);
@@ -78,6 +82,19 @@ const QuanLySanBay = () => {
                 alert(`Lỗi: Không thể cập nhật trạng thái sân bay. ${err.message}`);
             }
         }
+    };
+
+    const handleViewSanBay = (sanBay) => {
+        const statusText = sanBay.trangThaiHoatDong === 'ACTIVE' ? 'Hoạt động' : 'Vô hiệu';
+        alert(`Chi tiết sân bay:\n\nMã: ${sanBay.maSanBay}\nIATA: ${sanBay.maIATA}\nICAO: ${sanBay.maICAO}\nTên: ${sanBay.tenSanBay}\nThành phố: ${sanBay.thanhPhoSanBay}\nQuốc gia: ${sanBay.quocGiaSanBay}\nTrạng thái: ${statusText}`);
+    };
+
+    const handleEditSanBay = (sanBay) => {
+        alert(`Tính năng chỉnh sửa sân bay đang được phát triển.\n\nMã sân bay: ${sanBay.maSanBay}`);
+    };
+
+    const handleDeleteSanBay = (sanBay) => {
+        handleToggleStatus(sanBay.maSanBay, sanBay.trangThaiHoatDong);
     };
 
     return (
@@ -94,6 +111,11 @@ const QuanLySanBay = () => {
                     />
                     <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
                 </div>
+                <ViewToggleButton
+                    currentView={viewMode}
+                    onViewChange={handleViewChange}
+                    className="shrink-0"
+                />
                 <button
                     onClick={handleOpenModalForAdd}
                     className="flex items-center gap-2 bg-linear-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
@@ -117,88 +139,106 @@ const QuanLySanBay = () => {
                 </div>
             )}
 
-            {/* Bảng dữ liệu */}
+            {/* View Mode: Card or Table */}
             {!loading && !error && (
-                <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                            <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
-                                <tr>
-                                    <th className="px-6 py-4 text-left font-semibold">Mã sân bay</th>
-                                    <th className="px-6 py-4 text-left font-semibold">Mã IATA</th>
-                                    <th className="px-6 py-4 text-left font-semibold">Mã ICAO</th>
-                                    <th className="px-6 py-4 text-left font-semibold">Tên sân bay</th>
-                                    <th className="px-6 py-4 text-left font-semibold">Thành phố</th>
-                                    <th className="px-6 py-4 text-left font-semibold">Quốc gia</th>
-                                    <th className="px-6 py-4 text-center font-semibold">Trạng thái</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200">
-                                {currentItems.length > 0 ? (
-                                    currentItems.map((sb, index) => (
-                                        <tr key={sb.maSanBay} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
-                                            <td className="px-6 py-4 font-bold text-blue-600">#{sb.maSanBay}</td>
-                                            <td className="px-6 py-4">
-                                                <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
-                                                    {sb.maIATA}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">
-                                                    {sb.maICAO}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                                                        <MdLocalAirport className="text-blue-600 text-xl" />
+                <>
+                    {viewMode === 'grid' ? (
+                        /* Card View */
+                        <CardView
+                            items={currentItems}
+                            renderCard={(sanBay, index) => (
+                                <SanBayCard
+                                    key={sanBay.maSanBay || index}
+                                    data={sanBay}
+                                    onView={handleViewSanBay}
+                                    onEdit={handleEditSanBay}
+                                    onDelete={handleDeleteSanBay}
+                                />
+                            )}
+                            emptyMessage="Không tìm thấy sân bay nào."
+                        />
+                    ) : (
+                        /* Table View */
+                        <ResponsiveTable>
+                            <table className="w-full text-sm">
+                                <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
+                                    <tr>
+                                        <th className="px-6 py-4 text-left font-semibold">Mã sân bay</th>
+                                        <th className="px-6 py-4 text-left font-semibold">Mã IATA</th>
+                                        <th className="px-6 py-4 text-left font-semibold">Mã ICAO</th>
+                                        <th className="px-6 py-4 text-left font-semibold">Tên sân bay</th>
+                                        <th className="px-6 py-4 text-left font-semibold">Thành phố</th>
+                                        <th className="px-6 py-4 text-left font-semibold">Quốc gia</th>
+                                        <th className="px-6 py-4 text-center font-semibold">Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200">
+                                    {currentItems.length > 0 ? (
+                                        currentItems.map((sb, index) => (
+                                            <tr key={sb.maSanBay} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
+                                                <td className="px-6 py-4 font-bold text-blue-600">#{sb.maSanBay}</td>
+                                                <td className="px-6 py-4">
+                                                    <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                                                        {sb.maIATA}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold">
+                                                        {sb.maICAO}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                                                            <MdLocalAirport className="text-blue-600 text-xl" />
+                                                        </div>
+                                                        <span className="font-medium text-gray-900">{sb.tenSanBay}</span>
                                                     </div>
-                                                    <span className="font-medium text-gray-900">{sb.tenSanBay}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-gray-700">{sb.thanhPhoSanBay}</td>
-                                            <td className="px-6 py-4 text-gray-700">{sb.quocGiaSanBay}</td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex justify-center items-center gap-2">
-                                                    <button
-                                                        onClick={() => handleToggleStatus(sb.maSanBay, sb.trangThaiHoatDong)}
-                                                        className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
-                                                            sb.trangThaiHoatDong === 'ACTIVE'
-                                                                ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                                                                : 'bg-red-100 text-red-700 hover:bg-red-200'
-                                                        }`}
-                                                        title={sb.trangThaiHoatDong === 'ACTIVE' ? 'Click để vô hiệu hóa' : 'Click để kích hoạt'}
-                                                    >
-                                                        {sb.trangThaiHoatDong === 'ACTIVE' ? (
-                                                            <>
-                                                                <FaToggleOn size={20} />
-                                                                <span>Hoạt động</span>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <FaToggleOff size={20} />
-                                                                <span>Vô hiệu</span>
-                                                            </>
-                                                        )}
-                                                    </button>
+                                                </td>
+                                                <td className="px-6 py-4 text-gray-700">{sb.thanhPhoSanBay}</td>
+                                                <td className="px-6 py-4 text-gray-700">{sb.quocGiaSanBay}</td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex justify-center items-center gap-2">
+                                                        <button
+                                                            onClick={() => handleToggleStatus(sb.maSanBay, sb.trangThaiHoatDong)}
+                                                            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
+                                                                sb.trangThaiHoatDong === 'ACTIVE'
+                                                                    ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                                                                    : 'bg-red-100 text-red-700 hover:bg-red-200'
+                                                            }`}
+                                                            title={sb.trangThaiHoatDong === 'ACTIVE' ? 'Click để vô hiệu hóa' : 'Click để kích hoạt'}
+                                                        >
+                                                            {sb.trangThaiHoatDong === 'ACTIVE' ? (
+                                                                <>
+                                                                    <FaToggleOn size={20} />
+                                                                    <span>Hoạt động</span>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <FaToggleOff size={20} />
+                                                                    <span>Vô hiệu</span>
+                                                                </>
+                                                            )}
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="7" className="text-center py-12">
+                                                <div className="flex flex-col items-center gap-3">
+                                                    <MdLocalAirport className="text-gray-300 text-5xl" />
+                                                    <p className="text-gray-500 font-medium">Không tìm thấy sân bay nào.</p>
                                                 </div>
                                             </td>
                                         </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="7" className="text-center py-12">
-                                            <div className="flex flex-col items-center gap-3">
-                                                <MdLocalAirport className="text-gray-300 text-5xl" />
-                                                <p className="text-gray-500 font-medium">Không tìm thấy sân bay nào.</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                                    )}
+                                </tbody>
+                            </table>
+                        </ResponsiveTable>
+                    )}
+                </>
             )}
 
             {/* Thanh phân trang */}
@@ -331,7 +371,6 @@ const SanBayModal = ({ isOpen, onClose, onSave }) => {
                 quocGiaSanBay: data.country?.name || ''
             });
         } catch (error) {
-            console.log(error);
             setSearchError('Không tìm thấy thông tin cho mã ICAO này.');
             setFormData(prev => ({ ...prev, maIATA: '', tenSanBay: '', thanhPhoSanBay: '', quocGiaSanBay: '' }));
         } finally {
