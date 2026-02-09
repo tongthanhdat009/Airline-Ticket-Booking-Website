@@ -3,6 +3,7 @@ import { FaSearch, FaUserPlus, FaFileExport, FaEdit, FaTrash, FaBan, FaEye } fro
 import * as XLSX from 'xlsx';
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
+import ViewToggleButton from '../../components/common/ViewToggleButton';
 import { getAllKhachHang, createKhachHang, deleteKhachHang } from '../../services/QLKhachHangService';
 import { getAllCountries } from '../../services/CountryService';
 import ViewKhachHangModal from '../../components/QuanLy/QuanLyKhachHang/ViewKhachHangModal';
@@ -21,6 +22,7 @@ const QuanLyKhachHang = () => {
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [viewCustomer, setViewCustomer] = useState(null);
     const [viewModalMode, setViewModalMode] = useState('view'); // 'view' or 'edit'
+    const [viewMode, setViewMode] = useState('table'); // 'table' or 'grid'
 
     // Fetch data from API
     useEffect(() => {
@@ -249,6 +251,11 @@ const QuanLyKhachHang = () => {
                     />
                     <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
                 </div>
+                <ViewToggleButton
+                    currentView={viewMode}
+                    onViewChange={setViewMode}
+                    className="shrink-0"
+                />
                 <div className="flex gap-2">
                     <button 
                         onClick={handleExportExcel}
