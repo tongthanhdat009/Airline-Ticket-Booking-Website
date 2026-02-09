@@ -406,7 +406,7 @@ const QuanLyDonHang = () => {
 
       {/* Thống kê tổng quan */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-linear-to-br from-violet-500 to-purple-600 rounded-xl p-5 text-white shadow-lg">
+        <div className="bg-linear-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium opacity-90">Tổng đơn hàng</p>
@@ -458,7 +458,7 @@ const QuanLyDonHang = () => {
             placeholder="Tìm kiếm theo mã đơn, PNR, tên, email, SĐT..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent shadow-sm"
+            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
           />
           <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
         </div>
@@ -477,7 +477,7 @@ const QuanLyDonHang = () => {
           </button>
           <button
             onClick={() => loadDonHang()}
-            className="flex items-center gap-2 bg-linear-to-r from-violet-500 to-purple-600 text-white px-5 py-3 rounded-lg hover:from-violet-600 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl font-semibold"
+            className="flex items-center gap-2 bg-linear-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold"
           >
             <FaCalendar />
             <span className="hidden sm:inline">Làm mới</span>
@@ -487,9 +487,9 @@ const QuanLyDonHang = () => {
 
       {/* Batch action buttons */}
       {selectedDonHangs.length > 0 && (
-        <div className="bg-linear-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-4 mb-6 flex flex-col sm:flex-row justify-between items-center gap-3">
+        <div className="bg-linear-to-r from-blue-50 to-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex flex-col sm:flex-row justify-between items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-indigo-700 font-semibold">
+            <span className="text-blue-700 font-semibold">
               Đã chọn {selectedDonHangs.length} đơn hàng
             </span>
           </div>
@@ -519,7 +519,7 @@ const QuanLyDonHang = () => {
       {/* Loading state */}
       {loading && (
         <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
       )}
 
@@ -583,22 +583,22 @@ const QuanLyDonHang = () => {
                           key={dh.maDonHang}
                           className={`${
                             index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                          } ${isSelected ? 'bg-violet-100' : ''} hover:bg-violet-50 transition-colors`}
+                          } ${isSelected ? 'bg-blue-100' : ''} hover:bg-blue-50 transition-colors`}
                         >
                           <td className="px-4 py-4 text-center">
                             <button
                               onClick={() => handleSelectDonHang(dh)}
-                              className="text-violet-600 hover:text-violet-800 transition-colors"
+                              className="text-blue-600 hover:text-blue-800 transition-colors"
                               title={isSelected ? 'Bỏ chọn' : 'Chọn'}
                             >
                               {isSelected ? <FaCheckSquare size={18} /> : <FaSquare size={18} />}
                             </button>
                           </td>
-                          <td className="px-6 py-4 font-bold text-violet-600">
+                          <td className="px-6 py-4 font-bold text-blue-600">
                             #{dh.maDonHang}
                           </td>
                           <td className="px-6 py-4">
-                            <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">
+                            <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
                               {dh.pnr || 'N/A'}
                             </span>
                           </td>
@@ -661,12 +661,12 @@ const QuanLyDonHang = () => {
         <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
           <span className="text-sm text-gray-600 font-medium">
             Hiển thị{' '}
-            <span className="font-bold text-violet-600">{indexOfFirstItem + 1}</span> đến{' '}
-            <span className="font-bold text-violet-600">
+            <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến{' '}
+            <span className="font-bold text-blue-600">
               {Math.min(indexOfLastItem, filteredDonHang.length)}
             </span>{' '}
             của{' '}
-            <span className="font-bold text-violet-600">{filteredDonHang.length}</span> kết
+            <span className="font-bold text-blue-600">{filteredDonHang.length}</span> kết
             quả
           </span>
           <nav>
@@ -686,7 +686,7 @@ const QuanLyDonHang = () => {
                     onClick={() => paginate(index + 1)}
                     className={`px-4 py-2 rounded-lg font-medium transition-all ${
                       currentPage === index + 1
-                        ? 'bg-violet-600 text-white shadow-lg'
+                        ? 'bg-blue-600 text-white shadow-lg'
                         : 'bg-white border border-gray-300 hover:bg-gray-100'
                     }`}
                   >

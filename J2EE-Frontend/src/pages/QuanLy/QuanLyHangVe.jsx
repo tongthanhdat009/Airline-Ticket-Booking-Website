@@ -273,8 +273,8 @@ const QuanLyHangVe = () => {
                                             <td className="px-6 py-4 font-bold text-blue-600">#{hv.maHangVe}</td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
-                                                        <FaTicketAlt className="text-purple-600 text-xl" />
+                                                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                                                        <FaTicketAlt className="text-blue-600 text-xl" />
                                                     </div>
                                                     <span className="font-medium text-gray-900">{hv.tenHangVe}</span>
                                                     {showDeleted && hv.tenHangVe?.includes('_deleted_') && (

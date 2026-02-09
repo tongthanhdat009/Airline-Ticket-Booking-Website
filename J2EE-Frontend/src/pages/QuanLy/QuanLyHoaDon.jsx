@@ -305,7 +305,7 @@ const QuanLyHoaDon = () => {
             <FaTimes size={40} className="opacity-80" />
           </div>
         </div>
-        <div className="bg-linear-to-br from-purple-500 to-violet-600 rounded-xl p-5 text-white shadow-lg">
+        <div className="bg-linear-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium opacity-90">Tổng doanh thu</p>

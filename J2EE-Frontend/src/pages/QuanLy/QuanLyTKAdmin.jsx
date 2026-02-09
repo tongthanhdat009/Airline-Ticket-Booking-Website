@@ -240,8 +240,8 @@ const QuanLyTKAdmin = () => {
                           <td className="px-6 py-4 font-bold text-blue-600">#{acc.maTaiKhoan}</td>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
-                              <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
-                                <FaUser className="text-purple-600" />
+                              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                                <FaUser className="text-blue-600" />
                               </div>
                               <span className="font-medium text-gray-900">{acc.hoVaTen}</span>
                             </div>
@@ -258,7 +258,7 @@ const QuanLyTKAdmin = () => {
                                 acc.tenVaiTro.map((role, idx) => (
                                   <span
                                     key={idx}
-                                    className="px-2 py-1 bg-violet-100 text-violet-700 rounded-full text-xs font-semibold flex items-center gap-1"
+                                    className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold flex items-center gap-1"
                                   >
                                     <FaUserShield size={10} />
                                     {role}
@@ -282,7 +282,7 @@ const QuanLyTKAdmin = () => {
                               </button>
                               <button
                                 onClick={() => handleAssignRoles(acc)}
-                                className="p-2 text-purple-600 hover:bg-purple-100 rounded-lg transition-colors"
+                                className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
                                 title="Gán vai trò"
                               >
                                 <FaKey size={16} />
@@ -639,7 +639,7 @@ const AccountForm = ({ account, roles = [], onClose, onSave }) => {
                           className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
                         <div className="flex items-center gap-2">
-                          <FaUserShield className="text-violet-600" />
+                          <FaUserShield className="text-blue-600" />
                           <span className="font-medium text-gray-700">{role.tenVaiTro}</span>
                         </div>
                       </label>
@@ -727,11 +727,11 @@ const RoleAssignmentModal = ({ account, roles = [], onClose, onSave }) => {
     <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
       <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
-        <div className="bg-linear-to-r from-purple-600 to-purple-700 text-white p-6 rounded-t-xl sticky top-0 z-10">
+        <div className="bg-linear-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl sticky top-0 z-10">
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-2xl font-bold">Gán vai trò</h2>
-              <p className="text-purple-100 mt-1">
+              <p className="text-blue-100 mt-1">
                 Tài khoản: <span className="font-semibold">{account?.hoVaTen}</span> ({account?.tenDangNhap})
               </p>
             </div>
@@ -757,7 +757,7 @@ const RoleAssignmentModal = ({ account, roles = [], onClose, onSave }) => {
                         key={role.maVaiTro}
                         className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${
                           selectedRoles.includes(role.maVaiTro)
-                            ? 'bg-purple-100 border-2 border-purple-500'
+                            ? 'bg-blue-100 border-2 border-blue-500'
                             : 'hover:bg-white border-2 border-transparent'
                         }`}
                       >
@@ -765,11 +765,11 @@ const RoleAssignmentModal = ({ account, roles = [], onClose, onSave }) => {
                           type="checkbox"
                           checked={selectedRoles.includes(role.maVaiTro)}
                           onChange={() => handleRoleToggle(role.maVaiTro)}
-                          className="w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-500"
+                          className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
                         <div className="flex items-center gap-2">
-                          <FaUserShield className={`${selectedRoles.includes(role.maVaiTro) ? 'text-purple-600' : 'text-gray-500'}`} />
-                          <span className={`font-medium ${selectedRoles.includes(role.maVaiTro) ? 'text-purple-900' : 'text-gray-700'}`}>
+                          <FaUserShield className={`${selectedRoles.includes(role.maVaiTro) ? 'text-blue-600' : 'text-gray-500'}`} />
+                          <span className={`font-medium ${selectedRoles.includes(role.maVaiTro) ? 'text-blue-900' : 'text-gray-700'}`}>
                             {role.tenVaiTro}
                           </span>
                         </div>
@@ -805,7 +805,7 @@ const RoleAssignmentModal = ({ account, roles = [], onClose, onSave }) => {
             </button>
             <button
               type="submit"
-              className="px-6 py-3 bg-linear-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 font-semibold transition-all shadow-lg"
+              className="px-6 py-3 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg"
             >
               Lưu vai trò
             </button>

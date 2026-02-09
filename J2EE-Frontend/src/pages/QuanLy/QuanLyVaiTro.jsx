@@ -215,15 +215,15 @@ const QuanLyVaiTro = () => {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-linear-to-r from-violet-600 to-purple-600 flex items-center gap-3">
-                            <FaUserShield className="text-violet-600" />
+                        <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-blue-600 flex items-center gap-3">
+                            <FaUserShield className="text-blue-600" />
                             Quản lý Vai trò
                         </h1>
                         <p className="text-slate-600 mt-2">Danh sách vai trò trong hệ thống RBAC</p>
                     </div>
                     <button
                         onClick={openAddModal}
-                        className="px-6 py-3 bg-linear-to-r from-violet-600 to-purple-600 text-white rounded-xl hover:from-violet-700 hover:to-purple-700 transition-all shadow-lg shadow-violet-600/50 flex items-center gap-2 font-semibold"
+                        className="px-6 py-3 bg-linear-to-r from-blue-600 to-blue-600 text-white rounded-xl hover:from-blue-700 hover:to-blue-700 transition-all shadow-lg shadow-blue-600/50 flex items-center gap-2 font-semibold"
                     >
                         <FaPlus /> Thêm vai trò
                     </button>
@@ -231,13 +231,13 @@ const QuanLyVaiTro = () => {
 
                 {/* Statistics Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <div className="bg-white rounded-2xl p-5 shadow-lg border border-violet-100">
+                    <div className="bg-white rounded-2xl p-5 shadow-lg border border-blue-100">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-slate-500 text-sm font-medium">Tổng vai trò</p>
                                 <p className="text-3xl font-bold text-slate-800 mt-1">{stats.total}</p>
                             </div>
-                            <div className="w-12 h-12 bg-linear-to-br from-violet-500 to-purple-500 rounded-xl flex items-center justify-center">
+                            <div className="w-12 h-12 bg-linear-to-br from-blue-500 to-blue-500 rounded-xl flex items-center justify-center">
                                 <FaUserShield className="text-white text-xl" />
                             </div>
                         </div>
@@ -290,7 +290,7 @@ const QuanLyVaiTro = () => {
                                 placeholder="Tìm kiếm vai trò..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-12 pr-4 py-3 border-2 border-slate-200 rounded-xl focus:border-violet-500 focus:outline-none transition-colors"
+                                className="w-full pl-12 pr-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
                             />
                         </div>
                         <ViewToggleButton
@@ -304,7 +304,7 @@ const QuanLyVaiTro = () => {
                 {/* Roles Display */}
                 {loading ? (
                     <div className="bg-white rounded-2xl shadow-lg p-12 flex items-center justify-center">
-                        <FaSpinner className="animate-spin text-violet-600 text-4xl" />
+                        <FaSpinner className="animate-spin text-blue-600 text-4xl" />
                         <span className="ml-3 text-slate-600">Đang tải...</span>
                     </div>
                 ) : viewMode === 'grid' ? (
@@ -346,8 +346,8 @@ const QuanLyVaiTro = () => {
                                         </tr>
                                     ) : (
                                         filteredRoles.map((role, index) => (
-                                            <tr key={role.maVaiTro} className={`border-b border-slate-200 hover:bg-violet-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-slate-50'}`}>
-                                                <td className="px-6 py-4 font-semibold text-violet-600">#{role.maVaiTro}</td>
+                                            <tr key={role.maVaiTro} className={`border-b border-slate-200 hover:bg-blue-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-slate-50'}`}>
+                                                <td className="px-6 py-4 font-semibold text-blue-600">#{role.maVaiTro}</td>
                                                 <td className="px-6 py-4 font-semibold text-slate-800">{role.tenVaiTro}</td>
                                                 <td className="px-6 py-4 text-slate-600">{role.moTa || '-'}</td>
                                                 <td className="px-6 py-4 text-center">
@@ -400,7 +400,7 @@ const QuanLyVaiTro = () => {
                 {showModal && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
-                            <div className="bg-linear-to-r from-violet-600 to-purple-600 px-6 py-4 rounded-t-2xl">
+                            <div className="bg-linear-to-r from-blue-600 to-blue-600 px-6 py-4 rounded-t-2xl">
                                 <h2 className="text-2xl font-bold text-white">
                                     {editingRole ? 'Cập nhật vai trò' : 'Thêm vai trò mới'}
                                 </h2>
@@ -417,7 +417,7 @@ const QuanLyVaiTro = () => {
                                             required
                                             value={formData.tenVaiTro}
                                             onChange={(e) => setFormData({...formData, tenVaiTro: e.target.value})}
-                                            className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-violet-500 focus:outline-none transition-colors"
+                                            className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
                                             placeholder="VD: Super Admin"
                                         />
                                     </div>
@@ -429,7 +429,7 @@ const QuanLyVaiTro = () => {
                                         <textarea
                                             value={formData.moTa}
                                             onChange={(e) => setFormData({...formData, moTa: e.target.value})}
-                                            className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-violet-500 focus:outline-none transition-colors resize-none"
+                                            className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors resize-none"
                                             rows="3"
                                             placeholder="Mô tả về vai trò này..."
                                         />
@@ -442,7 +442,7 @@ const QuanLyVaiTro = () => {
                                         <select
                                             value={formData.trangThai.toString()}
                                             onChange={(e) => setFormData({...formData, trangThai: e.target.value === 'true'})}
-                                            className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-violet-500 focus:outline-none transition-colors"
+                                            className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
                                         >
                                             <option value="true">Hoạt động</option>
                                             <option value="false">Ngừng hoạt động</option>
@@ -454,7 +454,7 @@ const QuanLyVaiTro = () => {
                                     <button
                                         type="submit"
                                         disabled={submitting}
-                                        className="flex-1 px-6 py-3 bg-linear-to-r from-violet-600 to-purple-600 text-white rounded-xl hover:from-violet-700 hover:to-purple-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        className="flex-1 px-6 py-3 bg-linear-to-r from-blue-600 to-blue-600 text-white rounded-xl hover:from-blue-700 hover:to-blue-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                     >
                                         {submitting ? (
                                             <>

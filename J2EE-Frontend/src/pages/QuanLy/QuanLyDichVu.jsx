@@ -376,8 +376,8 @@ const QuanLyDichVu = () => {
                   <tr key={service.maDichVu} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
-                          <FaConciergeBell className="text-purple-600" />
+                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                          <FaConciergeBell className="text-blue-600" />
                         </div>
                         <span className="font-medium text-gray-900">{service.tenDichVu}</span>
                       </div>

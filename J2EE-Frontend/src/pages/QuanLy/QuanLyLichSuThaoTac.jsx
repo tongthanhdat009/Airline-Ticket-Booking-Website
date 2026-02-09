@@ -144,7 +144,7 @@ const QuanLyLichSuThaoTac = () => {
             'DELETE': { text: 'Xóa', color: 'bg-red-100 text-red-700' },
             'HUY_VE': { text: 'Hủy vé', color: 'bg-orange-100 text-orange-700' },
             'DOI_GIO_BAY': { text: 'Đổi giờ bay', color: 'bg-yellow-100 text-yellow-700' },
-            'DOI_CHUYEN_BAY': { text: 'Đổi chuyến bay', color: 'bg-purple-100 text-purple-700' },
+            'DOI_CHUYEN_BAY': { text: 'Đổi chuyến bay', color: 'bg-blue-100 text-blue-700' },
             'CHECK_IN': { text: 'Check-in', color: 'bg-teal-100 text-teal-700' },
             'HOAN_TIEN': { text: 'Hoàn tiền', color: 'bg-pink-100 text-pink-700' },
             'REFUND': { text: 'Hoàn tiền', color: 'bg-pink-100 text-pink-700' }
@@ -155,7 +155,7 @@ const QuanLyLichSuThaoTac = () => {
     // Get text và color cho loại tài khoản
     const getLoaiTaiKhoanText = (loai) => {
         switch (loai) {
-            case 'ADMIN': return { text: 'Admin', color: 'bg-indigo-100 text-indigo-700' };
+            case 'ADMIN': return { text: 'Admin', color: 'bg-blue-100 text-blue-700' };
             case 'CUSTOMER': return { text: 'Khách hàng', color: 'bg-cyan-100 text-cyan-700' };
             default: return { text: loai, color: 'bg-gray-100 text-gray-700' };
         }
@@ -270,7 +270,7 @@ const QuanLyLichSuThaoTac = () => {
                         <FaHistory size={40} className="opacity-80" />
                     </div>
                 </div>
-                <div className="bg-linear-to-br from-purple-500 to-violet-600 rounded-xl p-5 text-white shadow-lg">
+                <div className="bg-linear-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Thao tác KH</p>

@@ -530,8 +530,8 @@ const QuanLyDatCho = () => {
         onClick={() => setActiveTab('quan-ly-dat-cho')}
         className={`px-6 py-3 font-semibold transition-all ${
           activeTab === 'quan-ly-dat-cho'
-            ? 'bg-violet-600 text-white border-t-2 border-violet-600'
-            : 'text-gray-600 hover:text-violet-600 hover:bg-violet-50'
+            ? 'bg-blue-600 text-white border-t-2 border-blue-600'
+            : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
         }`}
       >
         <FaTicketAlt className="inline mr-2" />
@@ -541,8 +541,8 @@ const QuanLyDatCho = () => {
         onClick={() => setActiveTab('danh-sach-hanh-khach')}
         className={`px-6 py-3 font-semibold transition-all ${
           activeTab === 'danh-sach-hanh-khach'
-            ? 'bg-violet-600 text-white border-t-2 border-violet-600'
-            : 'text-gray-600 hover:text-violet-600 hover:bg-violet-50'
+            ? 'bg-blue-600 text-white border-t-2 border-blue-600'
+            : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
         }`}
       >
         <FaUsers className="inline mr-2" />
@@ -556,7 +556,7 @@ const QuanLyDatCho = () => {
     <div>
       {/* Thống kê tổng quan */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-linear-to-br from-violet-500 to-purple-600 rounded-xl p-5 text-white shadow-lg">
+        <div className="bg-linear-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium opacity-90">Tổng đặt chỗ</p>
@@ -606,7 +606,7 @@ const QuanLyDatCho = () => {
             placeholder="Tìm kiếm theo mã đặt chỗ, tên, CCCD..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent shadow-sm"
+            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
           />
           <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
         </div>
@@ -618,7 +618,7 @@ const QuanLyDatCho = () => {
         <button
           onClick={loadDatChoData}
           disabled={loading}
-          className="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors disabled:opacity-50"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
         >
           {loading ? <FaSpinner className="animate-spin" /> : 'Tải lại'}
         </button>
@@ -663,7 +663,7 @@ const QuanLyDatCho = () => {
                 <tr>
                   <td colSpan={7} className="text-center py-12">
                     <div className="flex flex-col items-center gap-3">
-                      <FaSpinner className="text-violet-600 text-3xl animate-spin" />
+                      <FaSpinner className="text-blue-600 text-3xl animate-spin" />
                       <p className="text-gray-500 font-medium">Đang tải dữ liệu...</p>
                     </div>
                   </td>
@@ -676,11 +676,11 @@ const QuanLyDatCho = () => {
                       key={dc.maDatCho}
                       className={`${
                         index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                      } hover:bg-violet-50 transition-colors`}
+                      } hover:bg-blue-50 transition-colors`}
                     >
                       <td className="px-4 py-4">
                         <div>
-                          <p className="font-bold text-violet-600">#{dc.maDatCho}</p>
+                          <p className="font-bold text-blue-600">#{dc.maDatCho}</p>
                           <p className="text-xs text-gray-500">PNR: {dc.pnr}</p>
                         </div>
                       </td>
@@ -701,7 +701,7 @@ const QuanLyDatCho = () => {
                       </td>
                       <td className="px-4 py-4">
                         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          dc.tenHangVe?.includes('Thương gia') ? 'bg-purple-100 text-purple-700' :
+                          dc.tenHangVe?.includes('Thương gia') ? 'bg-blue-100 text-blue-700' :
                           dc.tenHangVe?.includes('Phổ thông đặc biệt') ? 'bg-blue-100 text-blue-700' :
                           'bg-gray-100 text-gray-700'
                         }`}>
@@ -792,12 +792,12 @@ const QuanLyDatCho = () => {
         <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
           <span className="text-sm text-gray-600 font-medium">
             Hiển thị{' '}
-            <span className="font-bold text-violet-600">{indexOfFirstItem + 1}</span> đến{' '}
-            <span className="font-bold text-violet-600">
+            <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến{' '}
+            <span className="font-bold text-blue-600">
               {Math.min(indexOfLastItem, totalElements)}
             </span>{' '}
             của{' '}
-            <span className="font-bold text-violet-600">{totalElements}</span> kết quả
+            <span className="font-bold text-blue-600">{totalElements}</span> kết quả
           </span>
           <nav>
             <ul className="flex gap-2">
@@ -816,7 +816,7 @@ const QuanLyDatCho = () => {
                     onClick={() => paginate(index)}
                     className={`px-4 py-2 rounded-lg font-medium transition-all ${
                       currentPage === index
-                        ? 'bg-violet-600 text-white shadow-lg'
+                        ? 'bg-blue-600 text-white shadow-lg'
                         : 'bg-white border border-gray-300 hover:bg-gray-100'
                     }`}
                   >
@@ -879,7 +879,7 @@ const QuanLyDatCho = () => {
       {/* Danh sách chuyến bay */}
       <div className="mb-6">
         <h3 className="text-lg font-bold text-gray-800 mb-4">
-          <FaPlane className="inline mr-2 text-violet-600" />
+          <FaPlane className="inline mr-2 text-blue-600" />
           Chọn chuyến bay
         </h3>
         
@@ -891,7 +891,7 @@ const QuanLyDatCho = () => {
               placeholder="Tìm kiếm theo mã chuyến bay, sân bay..."
               value={flightSearch}
               onChange={(e) => setFlightSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent shadow-sm"
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
             />
             <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
           </div>
@@ -900,8 +900,8 @@ const QuanLyDatCho = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowAllFlights(!showAllFlights)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
-                showAllFlights ? 'bg-violet-600' : 'bg-gray-200'
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                showAllFlights ? 'bg-blue-600' : 'bg-gray-200'
               }`}
             >
               <span
@@ -913,7 +913,7 @@ const QuanLyDatCho = () => {
             <span className="text-sm text-gray-600">
               {showAllFlights ? (
                 <span className="flex items-center gap-1">
-                  <FaPlane className="text-violet-500" />
+                  <FaPlane className="text-blue-500" />
                   Hiển thị tất cả chuyến bay
                 </span>
               ) : (
@@ -933,12 +933,12 @@ const QuanLyDatCho = () => {
               onClick={() => handleViewPassengers(cb)}
               className={`bg-white rounded-xl shadow-md border-2 p-4 cursor-pointer transition-all hover:shadow-xl ${
                 selectedChuyenBay?.maChuyenBay === cb.maChuyenBay
-                  ? 'border-violet-500 ring-2 ring-violet-200'
-                  : 'border-gray-200 hover:border-violet-300'
+                  ? 'border-blue-500 ring-2 ring-blue-200'
+                  : 'border-gray-200 hover:border-blue-300'
               }`}
             >
               <div className="flex items-center justify-between mb-3">
-                <span className="font-bold text-violet-600">{cb.maChuyenBay}</span>
+                <span className="font-bold text-blue-600">{cb.maChuyenBay}</span>
                 <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                   cb.trangThai === 'Chưa bay' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
                 }`}>
@@ -976,12 +976,12 @@ const QuanLyDatCho = () => {
       {/* Danh sách hành khách của chuyến bay đã chọn */}
       {selectedChuyenBay && (
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-          <div className="bg-linear-to-r from-violet-600 to-purple-600 px-6 py-4">
+          <div className="bg-linear-to-r from-blue-600 to-blue-600 px-6 py-4">
             <h3 className="text-lg font-bold text-white">
               <FaUsers className="inline mr-2" />
               Danh sách hành khách - {selectedChuyenBay.maChuyenBay}
             </h3>
-            <p className="text-violet-100 text-sm mt-1">
+            <p className="text-blue-100 text-sm mt-1">
               {selectedChuyenBay.sanBayDi.thanhPho} → {selectedChuyenBay.sanBayDen.thanhPho} | {formatDateTime(selectedChuyenBay.ngayGio)}
             </p>
           </div>
@@ -1029,17 +1029,17 @@ const QuanLyDatCho = () => {
                       return (
                         <tr
                           key={passenger.maDatCho}
-                          className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-violet-50 transition-colors`}
+                          className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}
                         >
                           <td className="px-4 py-3 font-medium">{index + 1}</td>
                           <td className="px-4 py-3">
                             <p className="font-medium text-gray-900">{passenger.hoVaTen}</p>
                           </td>
                           <td className="px-4 py-3 text-gray-600">{passenger.cccd}</td>
-                          <td className="px-4 py-3 font-mono text-violet-600">#{passenger.maDatCho}</td>
+                          <td className="px-4 py-3 font-mono text-blue-600">#{passenger.maDatCho}</td>
                           <td className="px-4 py-3">
                             <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                              passenger.tenHangVe?.includes('Thương gia') ? 'bg-purple-100 text-purple-700' :
+                              passenger.tenHangVe?.includes('Thương gia') ? 'bg-blue-100 text-blue-700' :
                               passenger.tenHangVe?.includes('Phổ thông đặc biệt') ? 'bg-blue-100 text-blue-700' :
                               'bg-gray-100 text-gray-700'
                             }`}>

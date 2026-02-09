@@ -252,7 +252,7 @@ const QuanLyMayBay = () => {
                         <FaFighterJet size={40} className="opacity-80" />
                     </div>
                 </div>
-                <div className="bg-linear-to-br from-purple-500 to-violet-600 rounded-xl p-5 text-white shadow-lg">
+                <div className="bg-linear-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Tổng số ghế</p>
@@ -339,7 +339,7 @@ const QuanLyMayBay = () => {
                                                     </button>
                                                     <button
                                                         onClick={() => handleEditSeatLayout(mb)}
-                                                        className="p-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors"
+                                                        className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
                                                         title="Chỉnh sửa sơ đồ ghế"
                                                     >
                                                         <FaWrench />
