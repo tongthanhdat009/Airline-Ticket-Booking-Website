@@ -82,61 +82,73 @@ const ViewKhachHangModal = ({
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
+        <div className="fixed inset-0 z-50">
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/50"
                 onClick={onClose}
             ></div>
 
-            {/* Modal */}
-            <div className="relative z-10 bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col mx-4">
+            {/* Modal - Full screen on mobile, centered modal on desktop */}
+            <div className="relative z-10 h-full w-full md:h-[85vh] md:max-w-5xl md:mx-auto md:my-8 md:rounded-xl bg-white md:shadow-2xl flex flex-col overflow-hidden">
                 {/* Header */}
-                <div className="[background:linear-gradient(to_right,rgb(37,99,235),rgb(29,78,216))] text-white px-6 py-4 flex justify-between items-center shrink-0">
-                    <div>
-                        <h3 className="text-xl font-bold">Thông tin chi tiết khách hàng</h3>
-                        <p className="text-sm text-blue-100 mt-1">#{localCustomer.maHanhKhach} - {localCustomer.hoVaTen}</p>
+                <div className="[background:linear-gradient(to_right,rgb(37,99,235),rgb(29,78,216))] text-white px-4 md:px-6 py-3 md:py-4 flex justify-between items-center shrink-0">
+                    <div className="min-w-0 flex-1">
+                        <h3 className="text-lg md:text-xl font-bold truncate">Thông tin chi tiết khách hàng</h3>
+                        <p className="text-xs md:text-sm text-blue-100 mt-1 truncate">#{localCustomer.maHanhKhach} - {localCustomer.hoVaTen}</p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="text-white hover:text-gray-200 transition-colors p-1 hover:bg-white/10 rounded-lg"
+                        className="text-white hover:text-gray-200 transition-colors p-1 hover:bg-white/10 rounded-lg ml-2 shrink-0"
                     >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
 
                 {/* Main Content */}
-                <div className="flex flex-1 overflow-hidden">
-                    {/* Sidebar */}
-                    <div className="w-64 bg-gray-50 border-r border-gray-200 shrink-0">
-                        <nav className="p-4 space-y-1">
+                <div className="flex flex-1 overflow-hidden flex-col md:flex-row">
+                    {/* Sidebar - Bottom tabs on mobile, left sidebar on desktop */}
+                    <nav className={`
+                        flex flex-row md:flex-col
+                        overflow-x-auto md:overflow-x-visible
+                        border-b md:border-b-0 md:border-r border-gray-200
+                        w-full md:w-64
+                        bg-gray-50
+                        shrink-0
+                        order-2 md:order-1
+                    `}>
+                        <div className="p-2 md:p-4 flex md:space-y-1 md:block space-x-1">
                             {tabs.map((tab) => (
                                 <button
                                     key={tab.id}
                                     onClick={() => handleTabChange(tab.id)}
-                                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                                        activeTab === tab.id
-                                            ? 'bg-blue-50 text-blue-600 border-l-4 border-blue-600 font-medium'
-                                            : 'text-gray-700 hover:bg-gray-100 border-l-4 border-transparent'
-                                    }`}
+                                    className={`
+                                        flex items-center space-x-2 md:space-x-3 px-3 md:px-4 py-2 md:py-3 rounded-lg transition-all duration-200
+                                        shrink-0
+                                        ${
+                                            activeTab === tab.id
+                                                ? 'bg-blue-50 text-blue-600 border-l-4 border-blue-600 font-medium'
+                                                : 'text-gray-700 hover:bg-gray-100 border-l-4 border-transparent'
+                                        }
+                                    `}
                                 >
-                                    {tab.icon}
-                                    <span>{tab.label}</span>
+                                    <span className="shrink-0">{tab.icon}</span>
+                                    <span className="hidden md:inline whitespace-nowrap">{tab.label}</span>
                                 </button>
                             ))}
-                        </nav>
-                    </div>
+                        </div>
+                    </nav>
 
                     {/* Content Area */}
-                    <div className="flex-1 overflow-y-auto bg-white">
+                    <div className="flex-1 overflow-y-auto bg-white order-1 md:order-2">
                         {renderContent()}
                     </div>
                 </div>
 
-                {/* Footer */}
-                <div className="flex justify-end p-4 border-t bg-gray-50 shrink-0">
+                {/* Footer - Hidden on mobile, shown on desktop */}
+                <div className="hidden md:flex justify-end p-4 border-t bg-gray-50 shrink-0">
                     <button
                         onClick={onClose}
                         className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
