@@ -4,9 +4,13 @@ import * as XLSX from 'xlsx';
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
 import ViewToggleButton from '../../components/common/ViewToggleButton';
+import CardView from '../../components/common/CardView';
+import ResponsiveTable from '../../components/common/ResponsiveTable';
+import { useViewToggle } from '../../hooks/useViewToggle';
 import { getAllKhachHang, createKhachHang, deleteKhachHang } from '../../services/QLKhachHangService';
 import { getAllCountries } from '../../services/CountryService';
 import ViewKhachHangModal from '../../components/QuanLy/QuanLyKhachHang/ViewKhachHangModal';
+import KhachHangCard from '../../components/QuanLy/KhachHang/KhachHangCard';
 
 const QuanLyKhachHang = () => {
     const [customers, setCustomers] = useState([]);
@@ -22,7 +26,7 @@ const QuanLyKhachHang = () => {
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [viewCustomer, setViewCustomer] = useState(null);
     const [viewModalMode, setViewModalMode] = useState('view'); // 'view' or 'edit'
-    const [viewMode, setViewMode] = useState('table'); // 'table' or 'grid'
+    const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-khach-hang-view', 'table');
 
     // Fetch data from API
     useEffect(() => {
@@ -253,7 +257,7 @@ const QuanLyKhachHang = () => {
                 </div>
                 <ViewToggleButton
                     currentView={viewMode}
-                    onViewChange={setViewMode}
+                    onViewChange={handleViewChange}
                     className="shrink-0"
                 />
                 <div className="flex gap-2">
@@ -274,9 +278,25 @@ const QuanLyKhachHang = () => {
                 </div>
             </div>
 
-            {/* Bảng dữ liệu */}
-            <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
-                <div className="overflow-x-auto">
+            {/* View Mode: Card or Table */}
+            {viewMode === 'grid' ? (
+                /* Card View */
+                <CardView
+                    items={currentItems}
+                    renderCard={(customer, index) => (
+                        <KhachHangCard
+                            key={customer.maHanhKhach || index}
+                            data={customer}
+                            onView={handleViewCustomer}
+                            onEdit={(customer) => handleViewCustomer(customer, 'edit')}
+                            onDelete={handleDelete}
+                        />
+                    )}
+                    emptyMessage="Không tìm thấy khách hàng nào."
+                />
+            ) : (
+                /* Table View */
+                <ResponsiveTable>
                     <table className="w-full text-sm">
                         <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
                             <tr>
@@ -304,9 +324,9 @@ const QuanLyKhachHang = () => {
                                         <td className="px-6 py-4 text-gray-600">{customer.quocGia || '-'}</td>
                                         <td className="px-6 py-4">
                                             <div className="flex justify-center gap-2">
-                                                <button 
+                                                <button
                                                     onClick={() => handleViewCustomer(customer)}
-                                                    className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" 
+                                                    className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
                                                     title="Xem thông tin"
                                                 >
                                                     <FaEye size={16} />
@@ -318,9 +338,9 @@ const QuanLyKhachHang = () => {
                                                 >
                                                     <FaEdit size={16} />
                                                 </button>
-                                                <button 
+                                                <button
                                                     onClick={() => handleDelete(customer.maHanhKhach)}
-                                                    className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors" 
+                                                    className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
                                                     title="Xóa"
                                                 >
                                                     <FaTrash size={16} />
@@ -341,8 +361,8 @@ const QuanLyKhachHang = () => {
                             )}
                         </tbody>
                     </table>
-                </div>
-            </div>
+                </ResponsiveTable>
+            )}
 
             {/* Thanh phân trang */}
             {filteredCustomers.length > itemsPerPage && (
