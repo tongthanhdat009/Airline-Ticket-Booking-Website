@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import { FaUserShield, FaPlus, FaEdit, FaTrash, FaSearch, FaCheck, FaTimes, FaSpinner } from 'react-icons/fa';
 import Toast from '../../components/common/Toast';
+import ViewToggleButton from '../../components/common/ViewToggleButton';
+import CardView from '../../components/common/CardView';
+import ResponsiveTable from '../../components/common/ResponsiveTable';
+import { useViewToggle } from '../../hooks/useViewToggle';
+import VaiTroCard from '../../components/QuanLy/QuanLyVaiTro/VaiTroCard';
 import {
     getAllVaiTro,
     createVaiTro,
@@ -21,6 +26,7 @@ const QuanLyVaiTro = () => {
         moTa: '',
         trangThai: true
     });
+    const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-vai-tro-view', 'table');
 
     // Fetch roles from API
     const fetchRoles = async () => {
@@ -276,25 +282,48 @@ const QuanLyVaiTro = () => {
 
                 {/* Search Bar */}
                 <div className="bg-white rounded-2xl p-4 shadow-lg mb-6">
-                    <div className="relative">
-                        <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400" />
-                        <input
-                            type="text"
-                            placeholder="Tìm kiếm vai trò..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-12 pr-4 py-3 border-2 border-slate-200 rounded-xl focus:border-violet-500 focus:outline-none transition-colors"
+                    <div className="flex items-center gap-4">
+                        <div className="relative flex-1">
+                            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400" />
+                            <input
+                                type="text"
+                                placeholder="Tìm kiếm vai trò..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-12 pr-4 py-3 border-2 border-slate-200 rounded-xl focus:border-violet-500 focus:outline-none transition-colors"
+                            />
+                        </div>
+                        <ViewToggleButton
+                            currentView={viewMode}
+                            onViewChange={handleViewChange}
+                            className="shrink-0"
                         />
                     </div>
                 </div>
 
-                {/* Roles Table */}
+                {/* Roles Display */}
                 {loading ? (
                     <div className="bg-white rounded-2xl shadow-lg p-12 flex items-center justify-center">
                         <FaSpinner className="animate-spin text-violet-600 text-4xl" />
                         <span className="ml-3 text-slate-600">Đang tải...</span>
                     </div>
+                ) : viewMode === 'grid' ? (
+                    /* Card View */
+                    <CardView
+                        items={filteredRoles}
+                        renderCard={(role, index) => (
+                            <VaiTroCard
+                                key={role.maVaiTro || index}
+                                data={role}
+                                onView={openEditModal}
+                                onEdit={openEditModal}
+                                onDelete={handleDelete}
+                            />
+                        )}
+                        emptyMessage="Không tìm thấy vai trò nào."
+                    />
                 ) : (
+                    /* Table View */
                     <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full">
