@@ -3,12 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { FaPlus, FaSearch, FaEdit, FaTrash, FaFighterJet, FaChair, FaWrench } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
+import ViewToggleButton from '../../components/common/ViewToggleButton';
+import CardView from '../../components/common/CardView';
+import ResponsiveTable from '../../components/common/ResponsiveTable';
+import { useViewToggle } from '../../hooks/useViewToggle';
 import MayBayModal from '../../components/QuanLy/QuanLyMayBay/MayBayModal';
+import MayBayCard from '../../components/QuanLy/QuanLyMayBay/MayBayCard';
 import SeatLayoutViewer from '../../components/QuanLy/QuanLyMayBay/SeatLayoutViewer';
 import * as QLMayBayService from '../../services/QLMayBayService';
 
 const QuanLyMayBay = () => {
     const navigate = useNavigate();
+    const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-may-bay-view', 'table');
     const [search, setSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -203,6 +209,11 @@ const QuanLyMayBay = () => {
                     />
                     <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
                 </div>
+                <ViewToggleButton
+                    currentView={viewMode}
+                    onViewChange={handleViewChange}
+                    className="shrink-0"
+                />
                 <button
                     onClick={handleOpenModalForAdd}
                     className="flex items-center gap-2 bg-linear-to-r from-sky-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-sky-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
@@ -252,9 +263,24 @@ const QuanLyMayBay = () => {
                 </div>
             </div>
 
-            {/* Bảng dữ liệu */}
-            <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
-                <div className="overflow-x-auto">
+            {/* View Mode: Card or Table */}
+            {viewMode === 'grid' ? (
+                /* Card View */
+                <CardView
+                    items={currentItems}
+                    renderCard={(mb, index) => (
+                        <MayBayCard
+                            key={mb.maMayBay || index}
+                            data={mb}
+                            onEdit={handleOpenModalForEdit}
+                            onDelete={() => handleDelete(mb.maMayBay)}
+                        />
+                    )}
+                    emptyMessage="Không tìm thấy máy bay nào."
+                />
+            ) : (
+                /* Table View */
+                <ResponsiveTable>
                     <table className="w-full text-sm">
                         <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
                             <tr>
@@ -342,8 +368,8 @@ const QuanLyMayBay = () => {
                             )}
                         </tbody>
                     </table>
-                </div>
-            </div>
+                </ResponsiveTable>
+            )}
 
             {/* Thanh phân trang */}
             {filteredAircrafts.length > itemsPerPage && (
