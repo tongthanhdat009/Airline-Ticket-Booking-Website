@@ -57,111 +57,116 @@ const HoaDonDetailModal = ({
   };
 
   return (
-    <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto relative">
+    <div className="fixed inset-0 z-50">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/50"
+        onClick={onClose}
+      ></div>
+
+      {/* Modal - Full screen on mobile, centered modal on desktop */}
+      <div className="relative z-10 h-full w-full md:h-[85vh] md:max-w-4xl md:mx-auto md:my-8 md:rounded-xl bg-white md:shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="bg-linear-to-r from-blue-600 to-cyan-600 text-white p-6 rounded-t-xl">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-2xl font-bold">Chi tiết hóa đơn</h2>
-              <p className="text-sm opacity-90 mt-1">{hoaDon.soHoaDon}</p>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-white hover:text-gray-200 transition-colors"
-            >
-              <FaTimes size={24} />
-            </button>
+        <div className="[background:linear-gradient(to_right,rgb(37,99,235),rgb(29,78,216))] text-white px-4 md:px-6 py-3 md:py-4 flex justify-between items-center shrink-0">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-lg md:text-xl font-bold truncate">Chi tiết hóa đơn</h2>
+            <p className="text-xs md:text-sm text-blue-100 mt-1 truncate">{hoaDon.soHoaDon}</p>
           </div>
+          <button
+            onClick={onClose}
+            className="text-white hover:text-gray-200 transition-colors p-1 hover:bg-white/10 rounded-lg ml-2 shrink-0"
+          >
+            <FaTimes className="w-5 h-5 md:w-6 md:h-6" />
+          </button>
         </div>
 
-        <div className="p-6">
+        {/* Main Content */}
+        <div className="flex-1 overflow-y-auto bg-white p-4 md:p-6">
           {/* Thông tin cơ bản */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div className="bg-gray-50 p-4 rounded-lg">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-4 md:mb-6">
+            <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
               <p className="text-xs text-gray-500 font-semibold">Số hóa đơn</p>
-              <p className="font-bold text-lg text-blue-600">{hoaDon.soHoaDon}</p>
+              <p className="font-bold text-base md:text-lg text-blue-600 truncate">{hoaDon.soHoaDon}</p>
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
               <p className="text-xs text-gray-500 font-semibold">Mã đơn hàng</p>
-              <p className="font-medium text-gray-900">#{hoaDon.maDonHang}</p>
+              <p className="font-medium text-sm md:text-base text-gray-900 truncate">#{hoaDon.maDonHang}</p>
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
               <p className="text-xs text-gray-500 font-semibold">PNR</p>
-              <p className="font-medium text-gray-900">{hoaDon.pnr || 'N/A'}</p>
+              <p className="font-medium text-sm md:text-base text-gray-900 truncate">{hoaDon.pnr || 'N/A'}</p>
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
               <p className="text-xs text-gray-500 font-semibold">Ngày lập</p>
-              <p className="font-medium text-gray-900">{formatDateTime(hoaDon.ngayLap)}</p>
+              <p className="font-medium text-sm md:text-base text-gray-900">{formatDateTime(hoaDon.ngayLap)}</p>
             </div>
           </div>
 
           {/* Thông tin khách hàng */}
-          <div className="mb-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
+          <div className="mb-4 md:mb-6">
+            <h3 className="text-base md:text-lg font-bold text-gray-800 mb-3 md:mb-4 flex items-center gap-2">
+              <div className="w-1 h-5 md:h-6 bg-blue-600 rounded-full"></div>
               Thông tin khách hàng
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 bg-gray-50 p-3 md:p-4 rounded-lg">
               <div>
                 <p className="text-xs text-gray-500 font-semibold">Họ tên</p>
-                <p className="font-medium text-gray-900">{hoaDon.hoTenNguoiDat || 'N/A'}</p>
+                <p className="font-medium text-sm md:text-base text-gray-900 break-words">{hoaDon.hoTenNguoiDat || 'N/A'}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 font-semibold">Email</p>
-                <p className="font-medium text-gray-900">{hoaDon.emailNguoiDat || 'N/A'}</p>
+                <p className="font-medium text-sm md:text-base text-gray-900 break-words">{hoaDon.emailNguoiDat || 'N/A'}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 font-semibold">Số điện thoại</p>
-                <p className="font-medium text-gray-900">{hoaDon.soDienThoaiNguoiDat || 'N/A'}</p>
+                <p className="font-medium text-sm md:text-base text-gray-900 break-words">{hoaDon.soDienThoaiNguoiDat || 'N/A'}</p>
               </div>
             </div>
           </div>
 
           {/* Thông tin tài chính */}
-          <div className="mb-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
+          <div className="mb-4 md:mb-6">
+            <h3 className="text-base md:text-lg font-bold text-gray-800 mb-3 md:mb-4 flex items-center gap-2">
+              <div className="w-1 h-5 md:h-6 bg-blue-600 rounded-full"></div>
               Thông tin tài chính
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-lg">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 bg-gray-50 p-3 md:p-4 rounded-lg">
               <div>
                 <p className="text-xs text-gray-500 font-semibold">Tổng tiền</p>
-                <p className="font-bold text-lg text-gray-900">{formatCurrency(hoaDon.tongTien)}</p>
+                <p className="font-bold text-base md:text-lg text-gray-900">{formatCurrency(hoaDon.tongTien)}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 font-semibold">Thuế VAT</p>
-                <p className="font-medium text-gray-900">{formatCurrency(hoaDon.thueVAT)}</p>
+                <p className="font-medium text-sm md:text-base text-gray-900">{formatCurrency(hoaDon.thueVAT)}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 font-semibold">Tổng thanh toán</p>
-                <p className="font-bold text-lg text-blue-600">{formatCurrency(hoaDon.tongThanhToan)}</p>
+                <p className="font-bold text-base md:text-lg text-blue-600">{formatCurrency(hoaDon.tongThanhToan)}</p>
               </div>
             </div>
           </div>
 
           {/* Thông tin trạng thái */}
-          <div className="mb-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
+          <div className="mb-4 md:mb-6">
+            <h3 className="text-base md:text-lg font-bold text-gray-800 mb-3 md:mb-4 flex items-center gap-2">
+              <div className="w-1 h-5 md:h-6 bg-blue-600 rounded-full"></div>
               Trạng thái hóa đơn
             </h3>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="flex items-center gap-3">
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status.color}`}>
+            <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
+              <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status.color} w-fit`}>
                   {status.text}
                 </span>
                 {hoaDon.nguoiLap && (
-                  <span className="text-sm text-gray-600">
+                  <span className="text-xs md:text-sm text-gray-600">
                     Người lập: <span className="font-medium">{hoaDon.nguoiLap}</span>
                   </span>
                 )}
               </div>
               {hoaDon.ghiChu && (
-                <div className="mt-3">
+                <div className="mt-2 md:mt-3">
                   <p className="text-xs text-gray-500 font-semibold">Ghi chú:</p>
-                  <p className="text-sm text-gray-700 mt-1">{hoaDon.ghiChu}</p>
+                  <p className="text-xs md:text-sm text-gray-700 mt-1 break-words">{hoaDon.ghiChu}</p>
                 </div>
               )}
             </div>
@@ -169,47 +174,67 @@ const HoaDonDetailModal = ({
 
           {/* Thông tin đơn hàng liên quan */}
           {hoaDon.trangThaiDonHang && (
-            <div className="mb-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
+            <div className="mb-4 md:mb-6">
+              <h3 className="text-base md:text-lg font-bold text-gray-800 mb-3 md:mb-4 flex items-center gap-2">
+                <div className="w-1 h-5 md:h-6 bg-blue-600 rounded-full"></div>
                 Thông tin đơn hàng
               </h3>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                   <div>
                     <p className="text-xs text-gray-500 font-semibold">Trạng thái đơn hàng</p>
-                    <p className="font-medium text-gray-900">{hoaDon.trangThaiDonHang}</p>
+                    <p className="font-medium text-sm md:text-base text-gray-900">{hoaDon.trangThaiDonHang}</p>
                   </div>
                   {hoaDon.tongGiaDonHang && (
                     <div>
                       <p className="text-xs text-gray-500 font-semibold">Tổng giá đơn hàng</p>
-                      <p className="font-medium text-gray-900">{formatCurrency(hoaDon.tongGiaDonHang)}</p>
+                      <p className="font-medium text-sm md:text-base text-gray-900">{formatCurrency(hoaDon.tongGiaDonHang)}</p>
                     </div>
                   )}
                 </div>
               </div>
             </div>
           )}
+        </div>
 
-          {/* Nút thao tác */}
-          <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
-            {hoaDon.trangThai === 'DA_PHAT_HANH' && (
-              <button
-                onClick={handleExportPdf}
-                disabled={exportLoading}
-                className="px-6 py-3 bg-linear-to-r from-red-500 to-rose-600 text-white rounded-lg hover:from-red-600 hover:to-rose-700 font-semibold transition-all shadow-lg flex items-center gap-2 disabled:opacity-50"
-              >
-                <FaFilePdf />
-                Xuất PDF
-              </button>
-            )}
+        {/* Footer - Hidden on mobile, shown on desktop */}
+        <div className="hidden md:flex justify-end gap-3 p-4 border-t bg-gray-50 shrink-0">
+          {hoaDon.trangThai === 'DA_PHAT_HANH' && (
             <button
-              onClick={onClose}
-              className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold transition-colors"
+              onClick={handleExportPdf}
+              disabled={exportLoading}
+              className="[background:linear-gradient(to_right,rgb(239,68,68),rgb(225,29,72))] text-white px-6 py-2 rounded-lg hover:opacity-90 font-medium shadow-sm flex items-center gap-2 disabled:opacity-50 transition-opacity"
             >
-              Đóng
+              <FaFilePdf />
+              Xuất PDF
             </button>
-          </div>
+          )}
+          <button
+            onClick={onClose}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
+          >
+            Đóng
+          </button>
+        </div>
+
+        {/* Mobile Footer - Shown only on mobile */}
+        <div className="flex md:hidden justify-end gap-2 p-3 border-t bg-gray-50 shrink-0">
+          {hoaDon.trangThai === 'DA_PHAT_HANH' && (
+            <button
+              onClick={handleExportPdf}
+              disabled={exportLoading}
+              className="[background:linear-gradient(to_right,rgb(239,68,68),rgb(225,29,72))] text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1 disabled:opacity-50"
+            >
+              <FaFilePdf className="text-sm" />
+              PDF
+            </button>
+          )}
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium"
+          >
+            Đóng
+          </button>
         </div>
       </div>
     </div>
