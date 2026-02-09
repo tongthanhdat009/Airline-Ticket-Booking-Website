@@ -3,7 +3,12 @@ import { FaPlus, FaSearch, FaEdit, FaTrash, FaUser, FaTimes, FaUserShield, FaKey
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
+import ViewToggleButton from '../../components/common/ViewToggleButton';
+import CardView from '../../components/common/CardView';
+import ResponsiveTable from '../../components/common/ResponsiveTable';
+import { useViewToggle } from '../../hooks/useViewToggle';
 import { getAllTKadmin, updateTKadmin, addTKadmin, deleteTKadmin, getAllVaiTro, assignRolesToAccount } from '../../services/QLTaiKhoanAdminServices';
+import TaiKhoanAdminCard from '../../components/QuanLy/QuanLyTKAdmin/TaiKhoanAdminCard';
 
 const QuanLyTKAdmin = () => {
   const [accounts, setAccounts] = useState([]);
@@ -19,6 +24,7 @@ const QuanLyTKAdmin = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
   const itemsPerPage = 5;
+  const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-tk-admin-view', 'table');
 
   useEffect(() => {
     fetchData();
@@ -120,25 +126,17 @@ const QuanLyTKAdmin = () => {
 
   const handleSave = async (accountData) => {
     try {
-      console.log('=== HANDLE SAVE CALLED ===');
-      console.log('editAccount:', editAccount);
-      console.log('accountData:', accountData);
-
       if (editAccount) {
-        console.log('>>> UPDATING EXISTING ACCOUNT');
-        console.log('Account ID:', editAccount.maTaiKhoan);
         await updateTKadmin(editAccount.maTaiKhoan, accountData);
         showToast('Cập nhật tài khoản thành công!', 'success');
       } else {
-        console.log('>>> CREATING NEW ACCOUNT');
         await addTKadmin(accountData);
         showToast('Thêm tài khoản thành công!', 'success');
       }
       fetchAccounts();
       handleFormClose();
     } catch (error) {
-      console.error('Lỗi khi lưu tài khoản:', error);
-      console.error('Error details:', error.response?.data);
+      showToast('Lỗi khi lưu tài khoản: ' + (error.response?.data?.message || error.message || 'Lỗi không xác định'), 'error');
       throw error;
     }
   };
@@ -180,6 +178,11 @@ const QuanLyTKAdmin = () => {
           />
           <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
         </div>
+        <ViewToggleButton
+          currentView={viewMode}
+          onViewChange={handleViewChange}
+          className="shrink-0"
+        />
         <button
           onClick={handleAdd}
           className="flex items-center gap-2 bg-linear-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
@@ -197,100 +200,120 @@ const QuanLyTKAdmin = () => {
         </div>
       )}
 
-      {/* Bảng dữ liệu */}
+      {/* View Mode: Card or Table */}
       {!loading && (
-        <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
-                <tr>
-                  <th className="px-6 py-4 text-left font-semibold">ID</th>
-                  <th className="px-6 py-4 text-left font-semibold">Họ và tên</th>
-                  <th className="px-6 py-4 text-left font-semibold">Tên đăng nhập</th>
-                  <th className="px-6 py-4 text-left font-semibold">Email</th>
-                  <th className="px-6 py-4 text-left font-semibold">Vai trò</th>
-                  <th className="px-6 py-4 text-center font-semibold">Hành động</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {currentItems.length > 0 ? (
-                  currentItems.map((acc, index) => (
-                    <tr key={acc.maTaiKhoan} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
-                      <td className="px-6 py-4 font-bold text-blue-600">#{acc.maTaiKhoan}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
-                            <FaUser className="text-purple-600" />
-                          </div>
-                          <span className="font-medium text-gray-900">{acc.hoVaTen}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
-                          {acc.tenDangNhap}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-gray-700">{acc.email}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex flex-wrap gap-1">
-                          {acc.tenVaiTro && acc.tenVaiTro.length > 0 ? (
-                            acc.tenVaiTro.map((role, idx) => (
-                              <span
-                                key={idx}
-                                className="px-2 py-1 bg-violet-100 text-violet-700 rounded-full text-xs font-semibold flex items-center gap-1"
-                              >
-                                <FaUserShield size={10} />
-                                {role}
-                              </span>
-                            ))
-                          ) : (
-                            <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full text-xs">
-                              Chưa gán
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex justify-center gap-2">
-                          <button
-                            onClick={() => handleEdit(acc)}
-                            className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
-                            title="Chỉnh sửa"
-                          >
-                            <FaEdit size={16} />
-                          </button>
-                          <button
-                            onClick={() => handleAssignRoles(acc)}
-                            className="p-2 text-purple-600 hover:bg-purple-100 rounded-lg transition-colors"
-                            title="Gán vai trò"
-                          >
-                            <FaKey size={16} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(acc)}
-                            className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
-                            title="Xóa"
-                          >
-                            <FaTrash size={16} />
-                          </button>
-                        </div>
-                      </td>
+        <>
+          {viewMode === 'grid' ? (
+            /* Card View */
+            <CardView
+              items={currentItems}
+              renderCard={(account, index) => (
+                <TaiKhoanAdminCard
+                  key={account.maTaiKhoan || index}
+                  data={account}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onAssignRoles={handleAssignRoles}
+                />
+              )}
+              emptyMessage="Không tìm thấy tài khoản nào."
+            />
+          ) : (
+            /* Table View */
+            <ResponsiveTable>
+              <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
+                <table className="w-full text-sm">
+                  <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
+                    <tr>
+                      <th className="px-6 py-4 text-left font-semibold">ID</th>
+                      <th className="px-6 py-4 text-left font-semibold">Họ và tên</th>
+                      <th className="px-6 py-4 text-left font-semibold">Tên đăng nhập</th>
+                      <th className="px-6 py-4 text-left font-semibold">Email</th>
+                      <th className="px-6 py-4 text-left font-semibold">Vai trò</th>
+                      <th className="px-6 py-4 text-center font-semibold">Hành động</th>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="6" className="text-center py-12">
-                      <div className="flex flex-col items-center gap-3">
-                        <FaUser className="text-gray-300 text-5xl" />
-                        <p className="text-gray-500 font-medium">Không tìm thấy tài khoản nào.</p>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {currentItems.length > 0 ? (
+                      currentItems.map((acc, index) => (
+                        <tr key={acc.maTaiKhoan} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
+                          <td className="px-6 py-4 font-bold text-blue-600">#{acc.maTaiKhoan}</td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
+                                <FaUser className="text-purple-600" />
+                              </div>
+                              <span className="font-medium text-gray-900">{acc.hoVaTen}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                              {acc.tenDangNhap}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-gray-700">{acc.email}</td>
+                          <td className="px-6 py-4">
+                            <div className="flex flex-wrap gap-1">
+                              {acc.tenVaiTro && acc.tenVaiTro.length > 0 ? (
+                                acc.tenVaiTro.map((role, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="px-2 py-1 bg-violet-100 text-violet-700 rounded-full text-xs font-semibold flex items-center gap-1"
+                                  >
+                                    <FaUserShield size={10} />
+                                    {role}
+                                  </span>
+                                ))
+                              ) : (
+                                <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full text-xs">
+                                  Chưa gán
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex justify-center gap-2">
+                              <button
+                                onClick={() => handleEdit(acc)}
+                                className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                                title="Chỉnh sửa"
+                              >
+                                <FaEdit size={16} />
+                              </button>
+                              <button
+                                onClick={() => handleAssignRoles(acc)}
+                                className="p-2 text-purple-600 hover:bg-purple-100 rounded-lg transition-colors"
+                                title="Gán vai trò"
+                              >
+                                <FaKey size={16} />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(acc)}
+                                className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                                title="Xóa"
+                              >
+                                <FaTrash size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="6" className="text-center py-12">
+                          <div className="flex flex-col items-center gap-3">
+                            <FaUser className="text-gray-300 text-5xl" />
+                            <p className="text-gray-500 font-medium">Không tìm thấy tài khoản nào.</p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </ResponsiveTable>
+          )}
+        </>
       )}
 
       {/* Thanh phân trang */}
