@@ -406,7 +406,7 @@ const QuanLyDonHang = () => {
 
       {/* Thống kê tổng quan */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-linear-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
+        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium opacity-90">Tổng đơn hàng</p>
@@ -415,7 +415,7 @@ const QuanLyDonHang = () => {
             <FaShoppingCart size={40} className="opacity-80" />
           </div>
         </div>
-        <div className="bg-linear-to-br from-green-500 to-emerald-600 rounded-xl p-5 text-white shadow-lg">
+        <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-5 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium opacity-90">Đã thanh toán</p>
@@ -426,7 +426,7 @@ const QuanLyDonHang = () => {
             <FaCheck size={40} className="opacity-80" />
           </div>
         </div>
-        <div className="bg-linear-to-br from-yellow-500 to-orange-600 rounded-xl p-5 text-white shadow-lg">
+        <div className="bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl p-5 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium opacity-90">Chờ thanh toán</p>
@@ -437,7 +437,7 @@ const QuanLyDonHang = () => {
             <FaCalendar size={40} className="opacity-80" />
           </div>
         </div>
-        <div className="bg-linear-to-br from-blue-500 to-cyan-600 rounded-xl p-5 text-white shadow-lg">
+        <div className="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl p-5 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium opacity-90">Tổng doanh thu</p>
@@ -470,14 +470,14 @@ const QuanLyDonHang = () => {
         <div className="flex gap-3 w-full md:w-auto">
           <button
             onClick={() => setIsFilterModalOpen(true)}
-            className="flex items-center gap-2 bg-linear-to-r from-blue-500 to-cyan-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-cyan-700 transition-all shadow-lg hover:shadow-xl font-semibold"
+            className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-cyan-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-cyan-700 transition-all shadow-lg hover:shadow-xl font-semibold"
           >
             <FaFilter />
             <span className="hidden sm:inline">Bộ lọc</span>
           </button>
           <button
             onClick={() => loadDonHang()}
-            className="flex items-center gap-2 bg-linear-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold"
+            className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold"
           >
             <FaCalendar />
             <span className="hidden sm:inline">Làm mới</span>
@@ -487,7 +487,7 @@ const QuanLyDonHang = () => {
 
       {/* Batch action buttons */}
       {selectedDonHangs.length > 0 && (
-        <div className="bg-linear-to-r from-blue-50 to-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex flex-col sm:flex-row justify-between items-center gap-3">
+        <div className="bg-gradient-to-r from-blue-50 to-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex flex-col sm:flex-row justify-between items-center gap-3">
           <div className="flex items-center gap-2">
             <span className="text-blue-700 font-semibold">
               Đã chọn {selectedDonHangs.length} đơn hàng
@@ -497,7 +497,7 @@ const QuanLyDonHang = () => {
             <button
               onClick={handleOpenBatchRefundModal}
               disabled={batchActionLoading}
-              className="flex items-center gap-2 bg-linear-to-r from-orange-500 to-amber-600 text-white px-4 py-2 rounded-lg hover:from-orange-600 hover:to-amber-700 font-semibold transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-amber-600 text-white px-4 py-2 rounded-lg hover:from-orange-600 hover:to-amber-700 font-semibold transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <FaUndo />
               {batchActionLoading ? 'Đang xử lý...' : 'Hoàn tiền'}
@@ -553,7 +553,7 @@ const QuanLyDonHang = () => {
             /* Table View */
             <ResponsiveTable>
               <table className="w-full text-sm">
-                <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
+                <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
                   <tr>
                     <th className="px-4 py-4 text-center font-semibold w-12">
                       <button

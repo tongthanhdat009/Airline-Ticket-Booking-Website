@@ -92,7 +92,7 @@ const ViewKhachHangModal = ({
             {/* Modal - Full screen on mobile, centered modal on desktop */}
             <div className="relative z-10 h-full w-full md:h-[85vh] md:max-w-5xl md:mx-auto md:my-8 md:rounded-xl bg-white md:shadow-2xl flex flex-col overflow-hidden">
                 {/* Header */}
-                <div className="[background:linear-gradient(to_right,rgb(37,99,235),rgb(29,78,216))] text-white px-4 md:px-6 py-3 md:py-4 flex justify-between items-center shrink-0">
+                <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 md:px-6 py-3 md:py-4 flex justify-between items-center shrink-0">
                     <div className="min-w-0 flex-1">
                         <h3 className="text-lg md:text-xl font-bold truncate">Thông tin chi tiết khách hàng</h3>
                         <p className="text-xs md:text-sm text-blue-100 mt-1 truncate">#{localCustomer.maHanhKhach} - {localCustomer.hoVaTen}</p>
