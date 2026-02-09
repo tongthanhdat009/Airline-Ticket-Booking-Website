@@ -5,6 +5,11 @@ import Card from '../../components/QuanLy/CardChucNang';
 import HangVeModal from '../../components/QuanLy/HangVeModal';
 import Toast from '../../components/common/Toast';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
+import ViewToggleButton from '../../components/common/ViewToggleButton';
+import CardView from '../../components/common/CardView';
+import ResponsiveTable from '../../components/common/ResponsiveTable';
+import { useViewToggle } from '../../hooks/useViewToggle';
+import HangVeCard from '../../components/QuanLy/QuanLyHangVe/HangVeCard';
 
 const QuanLyHangVe = () => {
     const [hangVeList, setHangVeList] = useState([]);
@@ -19,6 +24,7 @@ const QuanLyHangVe = () => {
     const [actionLoading, setActionLoading] = useState(false);
     const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
     const [confirmDialog, setConfirmDialog] = useState({ isVisible: false, onConfirm: null });
+    const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-hang-ve-view', 'table');
     const itemsPerPage = 5;
 
     // Toast functions
@@ -190,6 +196,11 @@ const QuanLyHangVe = () => {
                         {showDeleted ? <FaEye /> : <FaEyeSlash />}
                         <span>{showDeleted ? 'Đang xem đã xóa' : 'Xem đã xóa'}</span>
                     </button>
+                    <ViewToggleButton
+                        currentView={viewMode}
+                        onViewChange={handleViewChange}
+                        className="shrink-0"
+                    />
                 </div>
                 {!showDeleted && (
                     <button
@@ -224,10 +235,28 @@ const QuanLyHangVe = () => {
                 </div>
             )}
 
-            {/* Bảng dữ liệu */}
+            {/* View Mode: Card or Table */}
             {!loading && !error && (
-                <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
-                    <div className="overflow-x-auto">
+                viewMode === 'grid' ? (
+                    /* Card View */
+                    <CardView
+                        items={currentItems}
+                        renderCard={(hangVe, index) => (
+                            <HangVeCard
+                                key={hangVe.maHangVe || index}
+                                data={hangVe}
+                                onView={(data) => handleOpenModalForEdit(data)}
+                                onEdit={(data) => handleOpenModalForEdit(data)}
+                                onDelete={(data) => handleDelete(data.maHangVe, data.tenHangVe)}
+                                onRestore={(data) => handleRestore(data.maHangVe, data.tenHangVe)}
+                                showDeleted={showDeleted}
+                            />
+                        )}
+                        emptyMessage={showDeleted ? 'Không tìm thấy hạng vé đã xóa nào.' : 'Không tìm thấy hạng vé nào.'}
+                    />
+                ) : (
+                    /* Table View */
+                    <ResponsiveTable>
                         <table className="w-full text-sm">
                             <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
                                 <tr>
@@ -312,8 +341,8 @@ const QuanLyHangVe = () => {
                                 )}
                             </tbody>
                         </table>
-                    </div>
-                </div>
+                    </ResponsiveTable>
+                )
             )}
 
             {/* Thanh phân trang */}
