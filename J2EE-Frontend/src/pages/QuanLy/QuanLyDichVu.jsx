@@ -1,11 +1,16 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { FaPlus, FaEdit, FaTrash, FaSearch, FaConciergeBell, FaEye } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
+import Toast from '../../components/common/Toast';
+import ViewToggleButton from '../../components/common/ViewToggleButton';
+import CardView from '../../components/common/CardView';
+import ResponsiveTable from '../../components/common/ResponsiveTable';
+import { useViewToggle } from '../../hooks/useViewToggle';
 import { getAllServices, fetchImageByName, getServiceOptions, createServiceOption, createService, updateServiceImage, updateService, deleteService, updateOption, deleteOption, updateOptionImage } from '../../services/QLDichVuService';
 import ServiceModal from '../../components/QuanLy/QuanLyDichVu/ServiceModal';
 import DeleteConfirmationModal from '../../components/QuanLy/QuanLyDichVu/DeleteConfirmationModal';
 import ServiceDetailModal from '../../components/QuanLy/QuanLyDichVu/ServiceDetailModal';
-import Toast from '../../components/common/Toast';
+import DichVuCard from '../../components/QuanLy/QuanLyDichVu/DichVuCard';
 
 const QuanLyDichVu = () => {
   const [services, setServices] = useState([]);
@@ -20,6 +25,7 @@ const QuanLyDichVu = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
   const itemsPerPage = 5;
+  const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-dich-vu-view', 'table');
 
   useEffect(() => {
     fetchServices();
@@ -321,6 +327,11 @@ const QuanLyDichVu = () => {
           />
           <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
         </div>
+        <ViewToggleButton
+          currentView={viewMode}
+          onViewChange={handleViewChange}
+          className="shrink-0"
+        />
         <button
           onClick={handleAddNew}
           className="flex items-center justify-center gap-2 bg-linear-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-5 rounded-lg shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
@@ -330,9 +341,26 @@ const QuanLyDichVu = () => {
         </button>
       </div>
 
-      {/* Table */}
-      <div className="overflow-hidden bg-white shadow-lg rounded-xl border border-gray-200">
-        <div className="overflow-x-auto">
+      {/* View Mode: Card or Table */}
+      {viewMode === 'grid' ? (
+        /* Card View */
+        <CardView
+          items={currentItems}
+          renderCard={(service) => (
+            <DichVuCard
+              key={service.maDichVu}
+              data={service}
+              imageSrc={getImageUrl(service.anh)}
+              onView={handleViewDetail}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          )}
+          emptyMessage="Không tìm thấy dịch vụ nào."
+        />
+      ) : (
+        /* Table View */
+        <ResponsiveTable>
           <table className="w-full text-sm">
             <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
               <tr>
@@ -358,9 +386,9 @@ const QuanLyDichVu = () => {
                       <p className="line-clamp-2">{service.moTa}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <img 
-                        src={getImageUrl(service.anh)} 
-                        alt={service.tenDichVu} 
+                      <img
+                        src={getImageUrl(service.anh)}
+                        alt={service.tenDichVu}
                         className="w-12 h-12 object-contain"
                         onError={(e) => {
                           e.target.onerror = null;
@@ -407,8 +435,8 @@ const QuanLyDichVu = () => {
               )}
             </tbody>
           </table>
-        </div>
-      </div>
+        </ResponsiveTable>
+      )}
 
       {/* Thanh phân trang */}
       {filteredServices.length > itemsPerPage && (
