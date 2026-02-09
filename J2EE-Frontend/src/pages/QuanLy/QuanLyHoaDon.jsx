@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  FaSearch, 
-  FaEye, 
-  FaFilePdf, 
-  FaFileExcel, 
+import {
+  FaSearch,
+  FaEye,
+  FaFilePdf,
+  FaFileExcel,
   FaCalendar,
   FaTimes,
   FaPrint
@@ -12,9 +12,17 @@ import Card from '../../components/QuanLy/CardChucNang';
 import hoaDonApi from '../../services/hoaDonApi';
 import Toast from '../../components/common/Toast';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
+import ViewToggleButton from '../../components/common/ViewToggleButton';
+import CardView from '../../components/common/CardView';
+import ResponsiveTable from '../../components/common/ResponsiveTable';
+import { useViewToggle } from '../../hooks/useViewToggle';
 import { HoaDonDetailModal } from '../../components/QuanLy/QuanLyHoaDon';
+import HoaDonCard from '../../components/QuanLy/QuanLyHoaDon/HoaDonCard';
 
 const QuanLyHoaDon = () => {
+  // View toggle hook
+  const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-hoa-don-view', 'table');
+
   // States cho dữ liệu
   const [hoaDonList, setHoaDonList] = useState([]);
   const [, setLoading] = useState(true);
@@ -320,7 +328,13 @@ const QuanLyHoaDon = () => {
           />
           <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
         </div>
-        
+
+        <ViewToggleButton
+          currentView={viewMode}
+          onViewChange={handleViewChange}
+          className="shrink-0"
+        />
+
         <div className="flex gap-3 w-full lg:w-auto flex-wrap">
           <select
             value={filters.trangThai}
@@ -352,9 +366,24 @@ const QuanLyHoaDon = () => {
         </div>
       </div>
 
-      {/* Bảng dữ liệu */}
-      <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
-        <div className="overflow-x-auto">
+      {/* Bảng dữ liệu / Card View */}
+      {viewMode === 'grid' ? (
+        /* Card View */
+        <CardView
+          items={currentItems}
+          renderCard={(hd, index) => (
+            <HoaDonCard
+              key={hd.maHoaDon || index}
+              data={hd}
+              onView={handleViewDetail}
+              onExportPdf={handleExportPdf}
+            />
+          )}
+          emptyMessage="Không tìm thấy hóa đơn nào."
+        />
+      ) : (
+        /* Table View */
+        <ResponsiveTable>
           <table className="w-full text-sm">
             <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
               <tr>
@@ -432,8 +461,8 @@ const QuanLyHoaDon = () => {
               )}
             </tbody>
           </table>
-        </div>
-      </div>
+        </ResponsiveTable>
+      )}
 
       {/* Phân trang */}
       {filteredHoaDon.length > itemsPerPage && (
