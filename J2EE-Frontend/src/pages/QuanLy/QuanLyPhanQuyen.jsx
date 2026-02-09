@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { FaKey, FaSave, FaCheckSquare, FaSquare, FaSearch, FaChevronRight, FaCopy, FaLock, FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
+import React, { useState, useEffect, useMemo } from 'react';
+import { FaKey, FaSave, FaCheckSquare, FaSquare, FaSearch, FaChevronRight, FaCopy, FaLock, FaSpinner, FaExclamationTriangle, FaEye } from 'react-icons/fa';
 import Toast from '../../components/common/Toast';
+import ViewToggleButton from '../../components/common/ViewToggleButton';
+import CardView from '../../components/common/CardView';
+import { useViewToggle } from '../../hooks/useViewToggle';
+import PhanQuyenCard from '../../components/QuanLy/QuanLyPhanQuyen/PhanQuyenCard';
 import {
     getAllChucNang,
     getAllHanhDong,
@@ -37,6 +41,9 @@ const QuanLyPhanQuyen = () => {
     // Copy permissions modal
     const [showCopyModal, setShowCopyModal] = useState(false);
     const [copyFromRole, setCopyFromRole] = useState(null);
+
+    // View toggle hook
+    const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-phan-quyen-view', 'table');
 
     // Toast functions
     const showToast = (message, type = 'success') => {
@@ -125,6 +132,32 @@ const QuanLyPhanQuyen = () => {
         const matchGroup = filterGroup === 'ALL' || feature.nhom === filterGroup;
         return matchSearch && matchGroup;
     });
+
+    // Prepare role data for card view
+    const roleCardData = useMemo(() => {
+        return roles.map(role => {
+            // Calculate permission count for this role
+            const rolePermissions = Object.entries(permissions).filter(([key, value]) => value).length;
+
+            return {
+                ...role,
+                tongQuyen: role.maVaiTro === selectedRole ? rolePermissions : null,
+                trangThai: role.trangThai !== undefined ? role.trangThai : true
+            };
+        });
+    }, [roles, permissions, selectedRole]);
+
+    // Handle view role permissions
+    const handleViewRole = (role) => {
+        setSelectedRole(role.maVaiTro);
+        handleViewChange('table');
+    };
+
+    // Handle edit role permissions
+    const handleEditRole = (role) => {
+        setSelectedRole(role.maVaiTro);
+        handleViewChange('table');
+    };
 
     // Kiểm tra vai trò hiện tại có phải SUPER_ADMIN không
     const isSuperAdmin = selectedRoleInfo?.isSuperAdmin || false;
@@ -306,7 +339,7 @@ const QuanLyPhanQuyen = () => {
 
                 {/* Control Panel */}
                 <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                         {/* Role Selection */}
                         <div>
                             <label className="block text-slate-700 font-bold mb-2">
@@ -359,6 +392,15 @@ const QuanLyPhanQuyen = () => {
                                 />
                             </div>
                         </div>
+
+                        {/* View Toggle */}
+                        <div className="flex items-end">
+                            <ViewToggleButton
+                                currentView={viewMode}
+                                onViewChange={handleViewChange}
+                                className="shrink-0"
+                            />
+                        </div>
                     </div>
 
                     {/* Action Buttons */}
@@ -409,8 +451,25 @@ const QuanLyPhanQuyen = () => {
                     </div>
                 </div>
 
-                {/* Permission Dropdown List */}
-                <div className="space-y-3">
+                {/* View Mode: Card or Table */}
+                {viewMode === 'grid' ? (
+                    /* Card View - Show roles */
+                    <CardView
+                        items={roleCardData}
+                        renderCard={(role, index) => (
+                            <PhanQuyenCard
+                                key={role.maVaiTro || index}
+                                data={role}
+                                onView={handleViewRole}
+                                onEdit={handleEditRole}
+                            />
+                        )}
+                        emptyMessage="Không tìm thấy vai trò nào."
+                    />
+                ) : (
+                    <>
+                        {/* Permission Dropdown List */}
+                        <div className="space-y-3">
                     {filteredFeatures.map((feature) => {
                         const isExpanded = expandedFeature === feature.maChucNang;
                         const grantedCount = actions.filter(action =>
@@ -546,6 +605,8 @@ const QuanLyPhanQuyen = () => {
                         </div>
                     </div>
                 </div>
+                    </>
+                )}
             </div>
 
             {/* Copy Permissions Modal */}
