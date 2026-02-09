@@ -18,6 +18,10 @@ import {
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
+import ViewToggleButton from '../../components/common/ViewToggleButton';
+import CardView from '../../components/common/CardView';
+import ResponsiveTable from '../../components/common/ResponsiveTable';
+import { useViewToggle } from '../../hooks/useViewToggle';
 import QLDatChoService from '../../services/QLDatChoService';
 import { getAllChuyenBay } from '../../services/QLChuyenBayService';
 import useCheckInWebSocket from '../../hooks/useCheckInWebSocket';
@@ -29,6 +33,7 @@ import {
   HuyVeModal,
   DoiHangVeModal,
 } from '../../components/QuanLy/QuanLyDatCho';
+import DatChoCard from '../../components/QuanLy/QuanLyDatCho/DatChoCard';
 
 const QuanLyDatCho = () => {
   // Tab active
@@ -84,6 +89,9 @@ const QuanLyDatCho = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const itemsPerPage = 8;
+
+  // View toggle state
+  const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-dat-cho-view', 'table');
 
   // Toast handler
   const showToast = (message, type = 'success') => {
@@ -602,6 +610,11 @@ const QuanLyDatCho = () => {
           />
           <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
         </div>
+        <ViewToggleButton
+          currentView={viewMode}
+          onViewChange={handleViewChange}
+          className="shrink-0"
+        />
         <button
           onClick={loadDatChoData}
           disabled={loading}
@@ -611,9 +624,28 @@ const QuanLyDatCho = () => {
         </button>
       </div>
 
-      {/* Bảng dữ liệu */}
-      <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
-        <div className="overflow-x-auto">
+      {/* View Mode: Card or Table */}
+      {viewMode === 'grid' ? (
+        /* Card View */
+        <CardView
+          items={filteredDatCho}
+          renderCard={(dc, index) => (
+            <DatChoCard
+              key={dc.maDatCho || index}
+              data={dc}
+              onCheckIn={handleCheckIn}
+              onDoiGhe={handleDoiGhe}
+              onDoiHangVe={handleDoiHangVe}
+              onDoiChuyen={handleDoiChuyen}
+              onHuyVe={handleHuyVe}
+              onView={handleViewDetail}
+            />
+          )}
+          emptyMessage="Không tìm thấy đặt chỗ nào."
+        />
+      ) : (
+        /* Table View */
+        <ResponsiveTable>
           <table className="w-full text-sm">
             <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
               <tr>
@@ -752,8 +784,8 @@ const QuanLyDatCho = () => {
               )}
             </tbody>
           </table>
-        </div>
-      </div>
+        </ResponsiveTable>
+      )}
 
       {/* Pagination */}
       {totalPages > 1 && (
