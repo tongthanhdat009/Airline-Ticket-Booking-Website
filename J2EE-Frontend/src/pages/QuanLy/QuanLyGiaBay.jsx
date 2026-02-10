@@ -2,7 +2,12 @@ import { useState, useMemo, useEffect } from 'react';
 import { FaSearch, FaMoneyBillWave, FaEye, FaPlane } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
+import ViewToggleButton from '../../components/common/ViewToggleButton';
+import CardView from '../../components/common/CardView';
+import ResponsiveTable from '../../components/common/ResponsiveTable';
+import { useViewToggle } from '../../hooks/useViewToggle';
 import ViewPriceDetailModal from '../../components/QuanLy/QuanLyGiaBay/ViewPriceDetailModal';
+import GiaBayCard from '../../components/QuanLy/QuanLyGiaBay/GiaBayCard';
 import { getAllGiaChuyenBay, createGiaChuyenBay, updateGiaChuyenBay, deleteGiaChuyenBay } from '../../services/QLGiaChuyenBayService';
 import { getAllTuyenBay } from '../../services/QLTuyenBayServices';
 import { getAllHangVe } from '../../services/QLHangVeService';
@@ -21,7 +26,8 @@ const QuanLyGiaBay = () => {
     const [formData, setFormData] = useState({});
     const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
     const [priceFilter, setPriceFilter] = useState('all'); // Bộ lọc giá: all, low, medium, high
-    const itemsPerPage = 10;
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-gia-bay-view', 'table');
 
     useEffect(() => {
         fetchData();
@@ -177,6 +183,12 @@ const QuanLyGiaBay = () => {
     const totalPages = Math.ceil(filteredRoutes.length / itemsPerPage);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    const handleItemsPerPageChange = (e) => {
+        const newValue = parseInt(e.target.value);
+        setItemsPerPage(newValue);
+        setCurrentPage(1); // Reset to first page when changing items per page
+    };
 
     const showToast = (message, type = 'success') => {
         setToast({ isVisible: true, message, type });
@@ -385,81 +397,117 @@ const QuanLyGiaBay = () => {
                         <option value="medium">Giá trung bình</option>
                         <option value="high">Giá cao</option>
                     </select>
+                    <ViewToggleButton
+                        currentView={viewMode}
+                        onViewChange={handleViewChange}
+                        className="shrink-0"
+                    />
                 </div>
             </div>
 
-            <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                        <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
-                            <tr>
-                                <th scope="col" className="px-6 py-4 text-left font-semibold">STT</th>
-                                <th scope="col" className="px-6 py-4 text-left font-semibold">Tuyến bay</th>
-                                <th scope="col" className="px-6 py-4 text-left font-semibold">Số hạng vé đang áp dụng</th>
-                                <th scope="col" className="px-6 py-4 text-center font-semibold">Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {currentItems.length > 0 ? (
-                                currentItems.map((item, index) => (
-                                    <tr key={item.maTuyenBay} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
-                                        <td className="px-6 py-4 font-semibold text-blue-600">#{indexOfFirstItem + index + 1}</td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                                    <FaPlane className="text-blue-600" />
-                                                </div>
-                                                <div>
-                                                    <div className="font-medium text-gray-900">
-                                                        {item.tuyenBay?.sanBayDi?.tenSanBay} → {item.tuyenBay?.sanBayDen?.tenSanBay}
-                                                    </div>
-                                                    <div className="text-xs text-gray-500">
-                                                        {item.tuyenBay?.sanBayDi?.maIATA} - {item.tuyenBay?.sanBayDen?.maIATA}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="font-bold text-blue-600 text-lg">{item.prices.length > 0 ? new Set(item.prices.map(p => p.hangVe?.tenHangVe)).size : 0} hạng vé</div>
-                                            <div className="text-xs text-gray-500 mt-1">
-                                                {item.prices.length > 0
-                                                    ? Array.from(new Set(item.prices.map(p => p.hangVe?.tenHangVe))).join(', ')
-                                                    : 'Chưa có hạng vé'}
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex justify-center gap-2">
-                                                <button 
-                                                    onClick={() => handleViewDetail(item)}
-                                                    className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" 
-                                                    title="Xem chi tiết"
-                                                >
-                                                    <FaEye size={16} />
-                                                </button>
-                                            </div>
-                                        </td>
+            {/* View Mode: Card or Table */}
+            {viewMode === 'grid' ? (
+                /* Card View */
+                <CardView
+                    items={currentItems}
+                    renderCard={(item, index) => (
+                        <GiaBayCard
+                            key={item.maTuyenBay || index}
+                            data={item}
+                            onView={handleViewDetail}
+                        />
+                    )}
+                    emptyMessage="Không tìm thấy tuyến bay nào."
+                />
+            ) : (
+                /* Table View */
+                <ResponsiveTable>
+                    <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
+                                    <tr>
+                                        <th scope="col" className="px-6 py-4 text-left font-semibold">STT</th>
+                                        <th scope="col" className="px-6 py-4 text-left font-semibold">Tuyến bay</th>
+                                        <th scope="col" className="px-6 py-4 text-left font-semibold">Số hạng vé đang áp dụng</th>
+                                        <th scope="col" className="px-6 py-4 text-center font-semibold">Hành động</th>
                                     </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="4" className="text-center py-12">
-                                        <div className="flex flex-col items-center gap-3">
-                                            <FaMoneyBillWave className="text-gray-300 text-5xl" />
-                                            <p className="text-gray-500 font-medium">Không tìm thấy tuyến bay nào.</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200">
+                                    {currentItems.length > 0 ? (
+                                        currentItems.map((item, index) => (
+                                            <tr key={item.maTuyenBay} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
+                                                <td className="px-6 py-4 font-semibold text-blue-600">#{indexOfFirstItem + index + 1}</td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                                            <FaPlane className="text-blue-600" />
+                                                        </div>
+                                                        <div>
+                                                            <div className="font-medium text-gray-900">
+                                                                {item.tuyenBay?.sanBayDi?.tenSanBay} → {item.tuyenBay?.sanBayDen?.tenSanBay}
+                                                            </div>
+                                                            <div className="text-xs text-gray-500">
+                                                                {item.tuyenBay?.sanBayDi?.maIATA} - {item.tuyenBay?.sanBayDen?.maIATA}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="font-bold text-blue-600 text-lg">{item.prices.length > 0 ? new Set(item.prices.map(p => p.hangVe?.tenHangVe)).size : 0} hạng vé</div>
+                                                    <div className="text-xs text-gray-500 mt-1">
+                                                        {item.prices.length > 0
+                                                            ? Array.from(new Set(item.prices.map(p => p.hangVe?.tenHangVe))).join(', ')
+                                                            : 'Chưa có hạng vé'}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex justify-center gap-2">
+                                                        <button
+                                                            onClick={() => handleViewDetail(item)}
+                                                            className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                                                            title="Xem chi tiết"
+                                                        >
+                                                            <FaEye size={16} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="4" className="text-center py-12">
+                                                <div className="flex flex-col items-center gap-3">
+                                                    <FaMoneyBillWave className="text-gray-300 text-5xl" />
+                                                    <p className="text-gray-500 font-medium">Không tìm thấy tuyến bay nào.</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </ResponsiveTable>
+            )}
 
             {filteredRoutes.length > itemsPerPage && (
                 <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-                    <span className="text-sm text-gray-600 font-medium">
-                        Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredRoutes.length)}</span> của <span className="font-bold text-blue-600">{filteredRoutes.length}</span> kết quả
-                    </span>
+                    <div className="flex items-center gap-4">
+                        <span className="text-sm text-gray-600 font-medium">
+                            Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredRoutes.length)}</span> của <span className="font-bold text-blue-600">{filteredRoutes.length}</span> kết quả
+                        </span>
+                        <select
+                            value={itemsPerPage}
+                            onChange={handleItemsPerPageChange}
+                            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white"
+                        >
+                            <option value={5}>5 / trang</option>
+                            <option value={10}>10 / trang</option>
+                            <option value={20}>20 / trang</option>
+                            <option value={50}>50 / trang</option>
+                        </select>
+                    </div>
                     <nav>
                         <ul className="flex gap-2">
                             <li>
@@ -517,7 +565,7 @@ const QuanLyGiaBay = () => {
                 <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
                     <div className="absolute inset-0 bg-black/50" onClick={handleCloseModal}></div>
                     <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
-                        <div className="sticky top-0 bg-linear-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex justify-between items-center">
+                        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex justify-between items-center">
                             <h3 className="text-xl font-bold">
                                 {currentPrice ? 'Chỉnh sửa giá chuyến bay' : 'Thêm giá chuyến bay mới'}
                             </h3>

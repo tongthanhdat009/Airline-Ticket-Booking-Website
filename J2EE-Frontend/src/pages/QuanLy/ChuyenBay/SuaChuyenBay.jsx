@@ -260,7 +260,7 @@ const SuaChuyenBay = () => {
     const statusColors = {
         'Đang mở bán': 'bg-green-100 text-green-700',
         'Đang check-in': 'bg-blue-100 text-blue-700',
-        'Đang bay': 'bg-purple-100 text-purple-700',
+        'Đang bay': 'bg-blue-100 text-blue-700',
         'Delay': 'bg-yellow-100 text-yellow-700',
         'Đã bay': 'bg-gray-100 text-gray-700',
         'Đã hủy': 'bg-red-100 text-red-700',
@@ -507,7 +507,7 @@ const SuaChuyenBay = () => {
                                 )}
                             </div>
                             {selectedServices.length > 0 && (
-                                <div className="mt-3 p-2 bg-purple-100 rounded text-sm text-purple-800">
+                                <div className="mt-3 p-2 bg-blue-100 rounded text-sm text-blue-800">
                                     Đã chọn {selectedServices.length} dịch vụ
                                 </div>
                             )}
@@ -527,7 +527,7 @@ const SuaChuyenBay = () => {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="flex items-center gap-2 px-6 py-3 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <faSave />
                             <span>{isSubmitting ? 'Đang lưu...' : 'Lưu thay đổi'}</span>

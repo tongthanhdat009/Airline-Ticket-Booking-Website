@@ -24,7 +24,7 @@ const HuyDonHangModal = ({ isVisible, maDonHang, onCancel, onConfirm }) => {
       <div className="absolute inset-0 bg-black/50" onClick={handleClose}></div>
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-md relative">
         {/* Header */}
-        <div className="bg-linear-to-r from-red-500 to-orange-600 text-white p-6 rounded-t-xl">
+        <div className="bg-gradient-to-r from-red-500 to-orange-600 text-white p-6 rounded-t-xl">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
               <FaExclamationTriangle size={24} />
@@ -78,7 +78,7 @@ const HuyDonHangModal = ({ isVisible, maDonHang, onCancel, onConfirm }) => {
           <button
             onClick={handleSubmit}
             disabled={!lyDoHuy.trim()}
-            className="px-6 py-2 bg-linear-to-r from-red-500 to-orange-600 text-white rounded-lg hover:from-red-600 hover:to-orange-700 font-semibold transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2 bg-gradient-to-r from-red-500 to-orange-600 text-white rounded-lg hover:from-red-600 hover:to-orange-700 font-semibold transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Xác nhận hủy
           </button>

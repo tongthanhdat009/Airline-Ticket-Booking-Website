@@ -132,7 +132,7 @@ const SeatLayoutEditor = ({ maMayBay, onClose }) => {
         <div className="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-hidden flex flex-col">
                 {/* Header */}
-                <div className="bg-linear-to-r from-purple-600 to-indigo-700 text-white p-6 flex justify-between items-center">
+                <div className="bg-gradient-to-r from-purple-600 to-indigo-700 text-white p-6 flex justify-between items-center">
                     <div>
                         <h2 className="text-2xl font-bold">Chỉnh sửa sơ đồ ghế</h2>
                         <p className="text-purple-100 text-sm mt-1">Mã máy bay: #{maMayBay} | Số ghế hiện tại: {seats.length}</p>
@@ -167,7 +167,7 @@ const SeatLayoutEditor = ({ maMayBay, onClose }) => {
                         </button>
                         <button
                             onClick={() => setShowAutoGenerate(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
                         >
                             <FaMagic />
                             Tự động tạo
@@ -227,7 +227,7 @@ const SeatLayoutEditor = ({ maMayBay, onClose }) => {
                 {showAutoGenerate && (
                     <div className="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50 p-4">
                         <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
-                            <div className="bg-linear-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-t-xl">
+                            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-t-xl">
                                 <h3 className="text-xl font-bold">Tự động tạo sơ đồ ghế</h3>
                             </div>
                             <div className="p-6 space-y-4">
@@ -308,7 +308,7 @@ const SeatLayoutEditor = ({ maMayBay, onClose }) => {
                                     <button
                                         onClick={handleAutoGenerate}
                                         disabled={!autoGenConfig.maHangVe}
-                                        className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium disabled:opacity-50"
+                                        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
                                     >
                                         Tạo ngay
                                     </button>
@@ -340,14 +340,14 @@ const SeatGridView = ({ seats, hangVeList, onSeatClick, onDeleteSeat, getHangVeN
     // Tạo màu sắc cho từng hạng vé
     const getHangVeColor = (maHangVe) => {
         const colors = [
-            'bg-purple-100 border-purple-300',
-            'bg-pink-100 border-pink-300',
+            'bg-blue-600 border-blue-300',
+            'bg-blue-500 border-blue-300',
+            'bg-blue-400 border-blue-300',
+            'bg-blue-300 border-blue-300',
+            'bg-blue-200 border-blue-300',
+            'bg-blue-100 border-blue-300',
             'bg-indigo-100 border-indigo-300',
-            'bg-teal-100 border-teal-300',
-            'bg-orange-100 border-orange-300',
-            'bg-cyan-100 border-cyan-300',
-            'bg-rose-100 border-rose-300',
-            'bg-amber-100 border-amber-300'
+            'bg-cyan-100 border-cyan-300'
         ];
         const index = hangVeList.findIndex(h => h.maHangVe === maHangVe);
         return colors[index % colors.length] || 'bg-gray-100 border-gray-300';
@@ -535,7 +535,7 @@ const SeatForm = ({ seat, hangVeList, onSave, onCancel }) => {
                     </button>
                     <button
                         type="submit"
-                        className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium"
+                        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
                     >
                         {seat?.maGhe ? 'Cập nhật' : 'Thêm'}
                     </button>

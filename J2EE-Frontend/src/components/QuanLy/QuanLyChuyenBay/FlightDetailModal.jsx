@@ -18,34 +18,24 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
     const fetchAllData = async () => {
         setLoading(true);
         try {
-            console.log('Fetching all services...');
             // Lấy tất cả dịch vụ có sẵn
             const allServicesRes = await getAllServices();
-            console.log('Services response:', allServicesRes);
-            
             const allServices = Array.isArray(allServicesRes.data.data) ? allServicesRes.data.data : [];
-            console.log('All services:', allServices);
             setServices(allServices);
 
             // Lấy dịch vụ đã gán cho chuyến bay
             try {
-                console.log('Fetching assigned services for flight:', flight.maChuyenBay);
                 const assignedRes = await getDichVuByChuyenBay(flight.maChuyenBay);
-                console.log('Assigned services response:', assignedRes.data);
-                
                 const assignedData = assignedRes.data.data ? assignedRes.data.data : [];
                 const assignedList = Array.isArray(assignedData) ? assignedData : [];
-                console.log('Assigned services list:', assignedList);
                 setAssignedServices(assignedList);
             } catch (error) {
-                console.log("No services assigned yet or error fetching:", error);
                 setAssignedServices([]);
             }
 
             // Tải ảnh cho tất cả dịch vụ
             await loadServiceImages(allServices);
         } catch (error) {
-            console.error('Error fetching services:', error);
             showToast('Không thể tải danh sách dịch vụ', 'error');
             setServices([]);
             setAssignedServices([]);
@@ -56,11 +46,9 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
 
     const loadServiceImages = async (servicesList) => {
         if (!Array.isArray(servicesList) || servicesList.length === 0) {
-            console.log('No services to load images for');
             return;
         }
-        
-        console.log('Loading images for services:', servicesList.length);
+
         const images = {};
         for (const service of servicesList) {
             if (service.anh) {
@@ -69,7 +57,7 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
                     const imageUrl = URL.createObjectURL(imageRes.data);
                     images[service.maDichVu] = imageUrl;
                 } catch (error) {
-                    console.error(`Error loading image for service ${service.maDichVu}:`, error);
+                    // Silently handle image load errors
                 }
             }
         }
@@ -82,7 +70,6 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
             showToast('Thêm dịch vụ thành công', 'success');
             await fetchAllData();
         } catch (error) {
-            console.error('Error adding service:', error);
             const errorMessage = error.response?.data?.message || 'Có lỗi khi thêm dịch vụ';
             showToast(errorMessage, 'error');
         }
@@ -95,7 +82,6 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
                 showToast('Xóa dịch vụ thành công', 'success');
                 await fetchAllData();
             } catch (error) {
-                console.error('Error removing service:', error);
                 const errorMessage = error.response?.data?.message || 'Có lỗi khi xóa dịch vụ';
                 showToast(errorMessage, 'error');
             }
@@ -109,22 +95,32 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
     if (!isOpen || !flight) return null;
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 z-50">
+            {/* Backdrop */}
             <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-y-auto relative">
+
+            {/* Modal - Full screen on mobile, centered modal on desktop */}
+            <div className="relative z-10 h-full w-full md:h-[85vh] md:max-w-6xl md:mx-auto md:my-8 md:rounded-xl bg-white md:shadow-2xl flex flex-col overflow-hidden">
                 {/* Header */}
-                <div className="sticky top-0 bg-linear-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex justify-between items-center z-10">
-                    <h3 className="text-xl font-bold">Chi tiết chuyến bay</h3>
-                    <button onClick={onClose} className="text-white hover:text-gray-200 transition-colors">
-                        <FaTimes size={24} />
+                <div className="[background:linear-gradient(to_right,rgb(37,99,235),rgb(29,78,216))] text-white px-4 md:px-6 py-3 md:py-4 flex justify-between items-center shrink-0">
+                    <div className="min-w-0 flex-1">
+                        <h3 className="text-lg md:text-xl font-bold truncate">Chi tiết chuyến bay</h3>
+                        <p className="text-xs md:text-sm text-blue-100 mt-1 truncate">{flight.soHieuChuyenBay}</p>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="text-white hover:text-gray-200 transition-colors p-1 hover:bg-white/10 rounded-lg ml-2 shrink-0"
+                    >
+                        <FaTimes size={20} className="md:w-6 md:h-6" />
                     </button>
                 </div>
 
-                <div className="p-6">
+                {/* Main Content - Scrollable */}
+                <div className="flex-1 overflow-y-auto p-4 md:p-6">
                     {/* Thông tin chuyến bay */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                         {/* Cột trái - Thông tin cơ bản */}
-                        <div className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+                        <div className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-xl p-4 md:p-6 border border-blue-200">
                             <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                                 <FaPlane className="text-blue-600" />
                                 Thông tin chuyến bay
@@ -170,7 +166,7 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
                                     </div>
                                 </div>
 
-                                <div className="bg-linear-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
+                                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
                                     <div className="text-sm text-gray-600 mb-1">Trạng thái</div>
                                     <div className="text-xl font-bold text-green-600">{flight.trangThai}</div>
                                     {flight.lyDoDelay && (
@@ -208,7 +204,7 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
                         </div>
 
                         {/* Cột phải - Quản lý dịch vụ */}
-                        <div className="bg-linear-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200">
+                        <div className="bg-linear-to-br from-purple-50 to-pink-50 rounded-xl p-4 md:p-6 border border-purple-200">
                             <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                                 <FaCog className="text-purple-600" />
                                 Dịch vụ trên chuyến bay
@@ -229,7 +225,7 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
                                             Dịch vụ đã cung cấp
                                         </h5>
                                         {assignedServices.length > 0 ? (
-                                            <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
+                                            <div className="space-y-2 max-h-48 md:max-h-64 overflow-y-auto pr-2">
                                                 {assignedServices.map((service) => (
                                                     <div key={service.maDichVu} className="bg-white rounded-lg p-3 shadow-sm border border-gray-200 hover:shadow-md transition-shadow flex items-center gap-3">
                                                         {serviceImages[service.maDichVu] ? (
@@ -272,7 +268,7 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
                                             Thêm dịch vụ mới
                                         </h5>
                                         {services.filter(service => !isServiceAssigned(service.maDichVu)).length > 0 ? (
-                                            <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
+                                            <div className="space-y-2 max-h-48 md:max-h-64 overflow-y-auto pr-2">
                                                 {services
                                                     .filter(service => !isServiceAssigned(service.maDichVu))
                                                     .map((service) => (
@@ -312,6 +308,16 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
                             )}
                         </div>
                     </div>
+                </div>
+
+                {/* Footer - Hidden on mobile, shown on desktop */}
+                <div className="hidden md:flex justify-end p-4 border-t bg-gray-50 shrink-0">
+                    <button
+                        onClick={onClose}
+                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
+                    >
+                        Đóng
+                    </button>
                 </div>
             </div>
         </div>

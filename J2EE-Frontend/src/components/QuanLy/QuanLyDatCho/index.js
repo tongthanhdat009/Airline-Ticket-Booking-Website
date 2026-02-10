@@ -4,3 +4,4 @@ export { default as DoiGheModal } from './DoiGheModal';
 export { default as DoiChuyenModal } from './DoiChuyenModal';
 export { default as HuyVeModal } from './HuyVeModal';
 export { default as DoiHangVeModal } from './DoiHangVeModal';
+export { default as DatChoCard } from './DatChoCard';

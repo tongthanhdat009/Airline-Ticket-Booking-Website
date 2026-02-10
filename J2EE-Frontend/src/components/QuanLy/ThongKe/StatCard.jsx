@@ -9,9 +9,9 @@ const colorMap = {
         bg: 'bg-gradient-to-br from-white to-blue-50',
         icon: 'bg-gradient-to-br from-blue-500 to-blue-600'
     },
-    purple: {
-        bg: 'bg-gradient-to-br from-white to-purple-50',
-        icon: 'bg-gradient-to-br from-purple-500 to-purple-600'
+    indigo: {
+        bg: 'bg-gradient-to-br from-white to-indigo-50',
+        icon: 'bg-gradient-to-br from-indigo-500 to-indigo-600'
     },
     orange: {
         bg: 'bg-gradient-to-br from-white to-orange-50',

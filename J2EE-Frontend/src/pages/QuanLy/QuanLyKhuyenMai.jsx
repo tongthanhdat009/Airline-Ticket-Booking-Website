@@ -3,7 +3,12 @@ import { FaPlus, FaSearch, FaEdit, FaTrash, FaToggleOn, FaToggleOff, FaTags } fr
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
+import ViewToggleButton from '../../components/common/ViewToggleButton';
+import CardView from '../../components/common/CardView';
+import ResponsiveTable from '../../components/common/ResponsiveTable';
+import { useViewToggle } from '../../hooks/useViewToggle';
 import KhuyenMaiModal from '../../components/QuanLy/QuanLyKhuyenMai/KhuyenMaiModal';
+import KhuyenMaiCard from '../../components/QuanLy/QuanLyKhuyenMai/KhuyenMaiCard';
 import QLKhuyenMaiService from '../../services/QLKhuyenMaiService';
 
 const QuanLyKhuyenMai = () => {
@@ -16,7 +21,8 @@ const QuanLyKhuyenMai = () => {
     const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [promotionToDelete, setPromotionToDelete] = useState(null);
-    const itemsPerPage = 5;
+    const [itemsPerPage, setItemsPerPage] = useState(5);
+    const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-khuyen-mai-view', 'table');
 
     // Toast functions
     const showToast = (message, type = 'success') => {
@@ -60,6 +66,12 @@ const QuanLyKhuyenMai = () => {
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+    const handleItemsPerPageChange = (e) => {
+        const newValue = parseInt(e.target.value);
+        setItemsPerPage(newValue);
+        setCurrentPage(1); // Reset to first page when changing items per page
+    };
+
     const handleOpenModalForAdd = () => {
         setSelectedPromotion(null);
         setIsModalOpen(true);
@@ -68,6 +80,14 @@ const QuanLyKhuyenMai = () => {
     const handleOpenModalForEdit = (promotion) => {
         setSelectedPromotion(promotion);
         setIsModalOpen(true);
+    };
+
+    const handleView = (promotion) => {
+        handleOpenModalForEdit(promotion);
+    };
+
+    const handleEdit = (promotion) => {
+        handleOpenModalForEdit(promotion);
     };
 
     const handleCloseModal = () => {
@@ -155,20 +175,41 @@ const QuanLyKhuyenMai = () => {
                     />
                     <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
                 </div>
+                <ViewToggleButton
+                    currentView={viewMode}
+                    onViewChange={handleViewChange}
+                    className="shrink-0"
+                />
                 <button
                     onClick={handleOpenModalForAdd}
-                    className="flex items-center gap-2 bg-linear-to-r from-pink-500 to-rose-500 text-white px-5 py-3 rounded-lg hover:from-pink-600 hover:to-rose-600 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
+                    className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-5 py-3 rounded-lg hover:from-pink-600 hover:to-rose-600 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
                 >
                     <FaPlus />
                     <span>Thêm khuyến mãi</span>
                 </button>
             </div>
 
-            {/* Bảng dữ liệu */}
-            <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
-                <div className="overflow-x-auto">
+            {/* View Mode: Card or Table */}
+            {viewMode === 'grid' ? (
+                /* Card View */
+                <CardView
+                    items={currentItems}
+                    renderCard={(km, index) => (
+                        <KhuyenMaiCard
+                            key={km.maKhuyenMai || index}
+                            data={km}
+                            onView={handleView}
+                            onEdit={handleEdit}
+                            onDelete={() => handleDelete(km.maKhuyenMai)}
+                        />
+                    )}
+                    emptyMessage="Không tìm thấy khuyến mãi nào."
+                />
+            ) : (
+                /* Table View */
+                <ResponsiveTable>
                     <table className="w-full text-sm">
-                        <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
+                        <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
                             <tr>
                                 <th className="px-6 py-4 text-left font-semibold">ID</th>
                                 <th className="px-6 py-4 text-left font-semibold">Tên khuyến mãi</th>
@@ -189,14 +230,14 @@ const QuanLyKhuyenMai = () => {
                                         <td className="px-6 py-4 font-bold text-pink-600">#{km.maKhuyenMai}</td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
-                                                <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center shrink-0">
+                                                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
                                                     <FaTags className="text-pink-600" />
                                                 </div>
                                                 <span className="font-medium text-gray-900">{km.tenKhuyenMai}</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-semibold">
+                                            <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
                                                 {km.maKM}
                                             </span>
                                         </td>
@@ -271,15 +312,27 @@ const QuanLyKhuyenMai = () => {
                             )}
                         </tbody>
                     </table>
-                </div>
-            </div>
+                </ResponsiveTable>
+            )}
 
             {/* Thanh phân trang */}
             {filteredPromotions.length > itemsPerPage && (
                 <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-                    <span className="text-sm text-gray-600 font-medium">
-                        Hiển thị <span className="font-bold text-pink-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-pink-600">{Math.min(indexOfLastItem, filteredPromotions.length)}</span> của <span className="font-bold text-pink-600">{filteredPromotions.length}</span> kết quả
-                    </span>
+                    <div className="flex items-center gap-4">
+                        <span className="text-sm text-gray-600 font-medium">
+                            Hiển thị <span className="font-bold text-pink-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-pink-600">{Math.min(indexOfLastItem, filteredPromotions.length)}</span> của <span className="font-bold text-pink-600">{filteredPromotions.length}</span> kết quả
+                        </span>
+                        <select
+                            value={itemsPerPage}
+                            onChange={handleItemsPerPageChange}
+                            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-white"
+                        >
+                            <option value={5}>5 / trang</option>
+                            <option value={10}>10 / trang</option>
+                            <option value={20}>20 / trang</option>
+                            <option value={50}>50 / trang</option>
+                        </select>
+                    </div>
                     <nav>
                         <ul className="flex gap-2">
                             <li>
@@ -297,7 +350,7 @@ const QuanLyKhuyenMai = () => {
                                         onClick={() => paginate(index + 1)}
                                         className={`px-4 py-2 rounded-lg font-medium transition-all ${
                                             currentPage === index + 1
-                                                ? 'bg-pink-600 text-white shadow-lg'
+                                                ? 'bg-blue-600 text-white shadow-lg'
                                                 : 'bg-white border border-gray-300 hover:bg-gray-100'
                                         }`}
                                     >

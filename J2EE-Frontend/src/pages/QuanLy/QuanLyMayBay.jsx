@@ -3,14 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { FaPlus, FaSearch, FaEdit, FaTrash, FaFighterJet, FaChair, FaWrench } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
+import ViewToggleButton from '../../components/common/ViewToggleButton';
+import CardView from '../../components/common/CardView';
+import ResponsiveTable from '../../components/common/ResponsiveTable';
+import { useViewToggle } from '../../hooks/useViewToggle';
 import MayBayModal from '../../components/QuanLy/QuanLyMayBay/MayBayModal';
+import MayBayCard from '../../components/QuanLy/QuanLyMayBay/MayBayCard';
 import SeatLayoutViewer from '../../components/QuanLy/QuanLyMayBay/SeatLayoutViewer';
 import * as QLMayBayService from '../../services/QLMayBayService';
 
 const QuanLyMayBay = () => {
     const navigate = useNavigate();
+    const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-may-bay-view', 'table');
     const [search, setSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(5);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedAircraft, setSelectedAircraft] = useState(null);
     const [aircrafts, setAircrafts] = useState([]);
@@ -19,7 +26,6 @@ const QuanLyMayBay = () => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [aircraftToDelete, setAircraftToDelete] = useState(null);
     const [seatViewerAircraft, setSeatViewerAircraft] = useState(null);
-    const itemsPerPage = 5;
 
     // Toast functions
     const showToast = (message, type = 'success') => {
@@ -63,6 +69,12 @@ const QuanLyMayBay = () => {
     const totalPages = Math.ceil(filteredAircrafts.length / itemsPerPage);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    const handleItemsPerPageChange = (e) => {
+        const newValue = parseInt(e.target.value);
+        setItemsPerPage(newValue);
+        setCurrentPage(1); // Reset to first page when changing items per page
+    };
 
     const handleOpenModalForAdd = () => {
         setSelectedAircraft(null);
@@ -203,9 +215,14 @@ const QuanLyMayBay = () => {
                     />
                     <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
                 </div>
+                <ViewToggleButton
+                    currentView={viewMode}
+                    onViewChange={handleViewChange}
+                    className="shrink-0"
+                />
                 <button
                     onClick={handleOpenModalForAdd}
-                    className="flex items-center gap-2 bg-linear-to-r from-sky-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-sky-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
+                    className="flex items-center gap-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-sky-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
                 >
                     <FaPlus />
                     <span>Thêm máy bay</span>
@@ -241,7 +258,7 @@ const QuanLyMayBay = () => {
                         <FaFighterJet size={40} className="opacity-80" />
                     </div>
                 </div>
-                <div className="bg-linear-to-br from-purple-500 to-violet-600 rounded-xl p-5 text-white shadow-lg">
+                <div className="bg-linear-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Tổng số ghế</p>
@@ -252,11 +269,28 @@ const QuanLyMayBay = () => {
                 </div>
             </div>
 
-            {/* Bảng dữ liệu */}
-            <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
-                <div className="overflow-x-auto">
+            {/* View Mode: Card or Table */}
+            {viewMode === 'grid' ? (
+                /* Card View */
+                <CardView
+                    items={currentItems}
+                    renderCard={(mb, index) => (
+                        <MayBayCard
+                            key={mb.maMayBay || index}
+                            data={mb}
+                            onEdit={handleOpenModalForEdit}
+                            onDelete={() => handleDelete(mb.maMayBay)}
+                            onViewSeatMap={() => setSeatViewerAircraft(mb.maMayBay)}
+                            onEditSeatMap={() => handleEditSeatLayout(mb)}
+                        />
+                    )}
+                    emptyMessage="Không tìm thấy máy bay nào."
+                />
+            ) : (
+                /* Table View */
+                <ResponsiveTable>
                     <table className="w-full text-sm">
-                        <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
+                        <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
                             <tr>
                                 <th className="px-6 py-4 text-left font-semibold">Mã máy bay</th>
                                 <th className="px-6 py-4 text-left font-semibold">Tên máy bay</th>
@@ -273,12 +307,12 @@ const QuanLyMayBay = () => {
                                 currentItems.map((mb, index) => {
                                     const status = getTrangThaiText(mb.trangThai);
                                     return (
-                                        <tr key={mb.maMayBay} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-sky-50 transition-colors`}>
-                                            <td className="px-6 py-4 font-bold text-sky-600">#{mb.maMayBay}</td>
+                                        <tr key={mb.maMayBay} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
+                                            <td className="px-6 py-4 font-bold text-blue-600">#{mb.maMayBay}</td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center shrink-0">
-                                                        <FaFighterJet className="text-sky-600" />
+                                                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                                                        <FaFighterJet className="text-blue-600" />
                                                     </div>
                                                     <div>
                                                         <p className="font-medium text-gray-900">{mb.tenMayBay}</p>
@@ -289,7 +323,7 @@ const QuanLyMayBay = () => {
                                             <td className="px-6 py-4 text-gray-700">{mb.hangMayBay}</td>
                                             <td className="px-6 py-4 text-gray-700">{mb.soHieu}</td>
                                             <td className="px-6 py-4 text-gray-700">{mb.namKhaiThac || '-'}</td>
-                                            <td className="px-6 py-4 text-center font-bold text-sky-600">{mb.tongSoGhe}</td>
+                                            <td className="px-6 py-4 text-center font-bold text-blue-600">{mb.tongSoGhe}</td>
                                             <td className="px-6 py-4">
                                                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status.color}`}>
                                                     {status.text}
@@ -313,7 +347,7 @@ const QuanLyMayBay = () => {
                                                     </button>
                                                     <button
                                                         onClick={() => handleEditSeatLayout(mb)}
-                                                        className="p-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors"
+                                                        className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
                                                         title="Chỉnh sửa sơ đồ ghế"
                                                     >
                                                         <FaWrench />
@@ -342,15 +376,27 @@ const QuanLyMayBay = () => {
                             )}
                         </tbody>
                     </table>
-                </div>
-            </div>
+                </ResponsiveTable>
+            )}
 
             {/* Thanh phân trang */}
             {filteredAircrafts.length > itemsPerPage && (
                 <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-                    <span className="text-sm text-gray-600 font-medium">
-                        Hiển thị <span className="font-bold text-sky-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-sky-600">{Math.min(indexOfLastItem, filteredAircrafts.length)}</span> của <span className="font-bold text-sky-600">{filteredAircrafts.length}</span> kết quả
-                    </span>
+                    <div className="flex items-center gap-4">
+                        <span className="text-sm text-gray-600 font-medium">
+                            Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredAircrafts.length)}</span> của <span className="font-bold text-blue-600">{filteredAircrafts.length}</span> kết quả
+                        </span>
+                        <select
+                            value={itemsPerPage}
+                            onChange={handleItemsPerPageChange}
+                            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white"
+                        >
+                            <option value={5}>5 / trang</option>
+                            <option value={10}>10 / trang</option>
+                            <option value={20}>20 / trang</option>
+                            <option value={50}>50 / trang</option>
+                        </select>
+                    </div>
                     <nav>
                         <ul className="flex gap-2">
                             <li>

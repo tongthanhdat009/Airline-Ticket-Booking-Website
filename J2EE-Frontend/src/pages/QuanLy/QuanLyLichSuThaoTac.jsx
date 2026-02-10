@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { FaSearch, FaEye, FaHistory, FaFilter, FaSpinner, FaFilePdf, FaFileExcel } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
+import Toast from '../../components/common/Toast';
+import ViewToggleButton from '../../components/common/ViewToggleButton';
+import CardView from '../../components/common/CardView';
+import ResponsiveTable from '../../components/common/ResponsiveTable';
+import { useViewToggle } from '../../hooks/useViewToggle';
 import AuditLogService from '../../services/AuditLogService';
 import { useToast } from '../../hooks/useToast';
+import LichSuCard from '../../components/QuanLy/QuanLyLichSuThaoTac/LichSuCard';
 
 const QuanLyLichSuThaoTac = () => {
     const [auditLogs, setAuditLogs] = useState([]);
@@ -23,9 +29,10 @@ const QuanLyLichSuThaoTac = () => {
         customerActions: 0,
         todayLogs: 0
     });
-    
-    const itemsPerPage = 10;
+
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const { showToast } = useToast();
+    const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-lich-su-thao-tac-view', 'table');
 
     // Load dữ liệu khi component mount hoặc filter thay đổi
     useEffect(() => {
@@ -109,6 +116,12 @@ const QuanLyLichSuThaoTac = () => {
         setCurrentPage(pageNumber);
     };
 
+    const handleItemsPerPageChange = (e) => {
+        const newValue = parseInt(e.target.value);
+        setItemsPerPage(newValue);
+        setCurrentPage(0); // Reset to first page when changing items per page
+    };
+
     // Xử lý xem chi tiết
     const handleViewDetail = (log) => {
         setSelectedLog(log);
@@ -135,12 +148,12 @@ const QuanLyLichSuThaoTac = () => {
             'UPDATE': { text: 'Cập nhật', color: 'bg-blue-100 text-blue-700' },
             'XOA': { text: 'Xóa', color: 'bg-red-100 text-red-700' },
             'DELETE': { text: 'Xóa', color: 'bg-red-100 text-red-700' },
-            'HUY_VE': { text: 'Hủy vé', color: 'bg-orange-100 text-orange-700' },
+            'HUY_VE': { text: 'Hủy vé', color: 'bg-red-100 text-red-700' },
             'DOI_GIO_BAY': { text: 'Đổi giờ bay', color: 'bg-yellow-100 text-yellow-700' },
-            'DOI_CHUYEN_BAY': { text: 'Đổi chuyến bay', color: 'bg-purple-100 text-purple-700' },
-            'CHECK_IN': { text: 'Check-in', color: 'bg-teal-100 text-teal-700' },
-            'HOAN_TIEN': { text: 'Hoàn tiền', color: 'bg-pink-100 text-pink-700' },
-            'REFUND': { text: 'Hoàn tiền', color: 'bg-pink-100 text-pink-700' }
+            'DOI_CHUYEN_BAY': { text: 'Đổi chuyến bay', color: 'bg-blue-100 text-blue-700' },
+            'CHECK_IN': { text: 'Check-in', color: 'bg-green-100 text-green-700' },
+            'HOAN_TIEN': { text: 'Hoàn tiền', color: 'bg-yellow-100 text-yellow-700' },
+            'REFUND': { text: 'Hoàn tiền', color: 'bg-yellow-100 text-yellow-700' }
         };
         return mapping[loai] || { text: loai, color: 'bg-gray-100 text-gray-700' };
     };
@@ -148,8 +161,8 @@ const QuanLyLichSuThaoTac = () => {
     // Get text và color cho loại tài khoản
     const getLoaiTaiKhoanText = (loai) => {
         switch (loai) {
-            case 'ADMIN': return { text: 'Admin', color: 'bg-indigo-100 text-indigo-700' };
-            case 'CUSTOMER': return { text: 'Khách hàng', color: 'bg-cyan-100 text-cyan-700' };
+            case 'ADMIN': return { text: 'Admin', color: 'bg-blue-100 text-blue-700' };
+            case 'CUSTOMER': return { text: 'Khách hàng', color: 'bg-blue-100 text-blue-700' };
             default: return { text: loai, color: 'bg-gray-100 text-gray-700' };
         }
     };
@@ -263,7 +276,7 @@ const QuanLyLichSuThaoTac = () => {
                         <FaHistory size={40} className="opacity-80" />
                     </div>
                 </div>
-                <div className="bg-linear-to-br from-purple-500 to-violet-600 rounded-xl p-5 text-white shadow-lg">
+                <div className="bg-linear-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-90">Thao tác KH</p>
@@ -328,10 +341,15 @@ const QuanLyLichSuThaoTac = () => {
                         ))}
                     </select>
                 </div>
-                <button 
+                <ViewToggleButton
+                    currentView={viewMode}
+                    onViewChange={handleViewChange}
+                    className="shrink-0"
+                />
+                <button
                     onClick={handleSearch}
                     disabled={loading}
-                    className="flex items-center gap-2 bg-linear-to-r from-green-500 to-emerald-600 text-white px-5 py-3 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto disabled:opacity-50"
+                    className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-5 py-3 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto disabled:opacity-50"
                 >
                     {loading ? <FaSpinner className="animate-spin" /> : <FaFilter />}
                     <span>Tìm kiếm</span>
@@ -358,98 +376,129 @@ const QuanLyLichSuThaoTac = () => {
                 </button>
             </div>
 
-            {/* Bảng dữ liệu */}
-            <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                        <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
-                            <tr>
-                                <th className="px-6 py-4 text-left font-semibold">Mã Log</th>
-                                <th className="px-6 py-4 text-left font-semibold">Loại thao tác</th>
-                                <th className="px-6 py-4 text-left font-semibold">Bảng ảnh hưởng</th>
-                                <th className="px-6 py-4 text-left font-semibold">Ngưởi thực hiện</th>
-                                <th className="px-6 py-4 text-left font-semibold">Mô tả</th>
-                                <th className="px-6 py-4 text-left font-semibold">IP</th>
-                                <th className="px-6 py-4 text-left font-semibold">Thờ gian</th>
-                                <th className="px-6 py-4 text-center font-semibold">Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {loading ? (
-                                <tr>
-                                    <td colSpan="8" className="text-center py-12">
-                                        <div className="flex flex-col items-center gap-3">
-                                            <FaSpinner className="text-green-500 text-3xl animate-spin" />
-                                            <p className="text-gray-500 font-medium">Đang tải dữ liệu...</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ) : auditLogs.length > 0 ? (
-                                auditLogs.map((log, index) => {
-                                    const loaiThaoTac = getLoaiThaoTacText(log.loaiThaoTac);
-                                    const loaiTaiKhoan = getLoaiTaiKhoanText(log.loaiTaiKhoan);
-                                    return (
-                                        <tr key={log.maLog} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-green-50 transition-colors`}>
-                                            <td className="px-6 py-4 font-bold text-green-600">#{log.maLog}</td>
-                                            <td className="px-6 py-4">
-                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${loaiThaoTac.color}`}>
-                                                    {loaiThaoTac.text}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-mono">
-                                                    {formatBangAnhHuong(log.bangAnhHuong)}
-                                                </span>
-                                                <span className="text-xs text-gray-500 ml-1">#{log.maBanGhi}</span>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div>
-                                                    <p className="font-medium text-gray-900">{log.nguoiThucHien}</p>
-                                                    <span className={`inline-block px-2 py-0.5 rounded text-xs mt-1 ${loaiTaiKhoan.color}`}>
-                                                        {loaiTaiKhoan.text}
-                                                    </span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-gray-700 max-w-xs truncate" title={log.moTa}>
-                                                {log.moTa}
-                                            </td>
-                                            <td className="px-6 py-4 text-xs text-gray-500 font-mono">{log.diaChiIp || '-'}</td>
-                                            <td className="px-6 py-4 text-gray-700">{formatDateTime(log.thoiGian)}</td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex justify-center items-center gap-2">
-                                                    <button
-                                                        onClick={() => handleViewDetail(log)}
-                                                        className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
-                                                        title="Xem chi tiết"
-                                                    >
-                                                        <FaEye />
-                                                    </button>
+            {/* View Mode: Card or Table */}
+            {viewMode === 'grid' ? (
+                /* Card View */
+                <CardView
+                    items={auditLogs}
+                    renderCard={(log) => (
+                        <LichSuCard
+                            key={log.maLog}
+                            data={log}
+                            onView={handleViewDetail}
+                        />
+                    )}
+                    emptyMessage="Không tìm thấy lịch sử thao tác nào."
+                    loading={loading}
+                />
+            ) : (
+                /* Table View */
+                <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
+                    <div className="overflow-x-auto">
+                        <ResponsiveTable>
+                            <table className="w-full text-sm">
+                                <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
+                                    <tr>
+                                        <th className="px-6 py-4 text-left font-semibold">Mã Log</th>
+                                        <th className="px-6 py-4 text-left font-semibold">Loại thao tác</th>
+                                        <th className="px-6 py-4 text-left font-semibold">Bảng ảnh hưởng</th>
+                                        <th className="px-6 py-4 text-left font-semibold">Người thực hiện</th>
+                                        <th className="px-6 py-4 text-left font-semibold">Mô tả</th>
+                                        <th className="px-6 py-4 text-left font-semibold">IP</th>
+                                        <th className="px-6 py-4 text-left font-semibold">Thời gian</th>
+                                        <th className="px-6 py-4 text-center font-semibold">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200">
+                                    {loading ? (
+                                        <tr>
+                                            <td colSpan="8" className="text-center py-12">
+                                                <div className="flex flex-col items-center gap-3">
+                                                    <FaSpinner className="text-green-500 text-3xl animate-spin" />
+                                                    <p className="text-gray-500 font-medium">Đang tải dữ liệu...</p>
                                                 </div>
                                             </td>
                                         </tr>
-                                    );
-                                })
-                            ) : (
-                                <tr>
-                                    <td colSpan="8" className="text-center py-12">
-                                        <div className="flex flex-col items-center gap-3">
-                                            <FaHistory className="text-gray-300 text-5xl" />
-                                            <p className="text-gray-500 font-medium">Không tìm thấy lịch sử thao tác nào.</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                                    ) : auditLogs.length > 0 ? (
+                                        auditLogs.map((log, index) => {
+                                            const loaiThaoTac = getLoaiThaoTacText(log.loaiThaoTac);
+                                            const loaiTaiKhoan = getLoaiTaiKhoanText(log.loaiTaiKhoan);
+                                            return (
+                                                <tr key={log.maLog} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-green-50 transition-colors`}>
+                                                    <td className="px-6 py-4 font-bold text-green-600">#{log.maLog}</td>
+                                                    <td className="px-6 py-4">
+                                                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${loaiThaoTac.color}`}>
+                                                            {loaiThaoTac.text}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-mono">
+                                                            {formatBangAnhHuong(log.bangAnhHuong)}
+                                                        </span>
+                                                        <span className="text-xs text-gray-500 ml-1">#{log.maBanGhi}</span>
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <div>
+                                                            <p className="font-medium text-gray-900">{log.nguoiThucHien}</p>
+                                                            <span className={`inline-block px-2 py-0.5 rounded text-xs mt-1 ${loaiTaiKhoan.color}`}>
+                                                                {loaiTaiKhoan.text}
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-gray-700 max-w-xs truncate" title={log.moTa}>
+                                                        {log.moTa}
+                                                    </td>
+                                                    <td className="px-6 py-4 text-xs text-gray-500 font-mono">{log.diaChiIp || '-'}</td>
+                                                    <td className="px-6 py-4 text-gray-700">{formatDateTime(log.thoiGian)}</td>
+                                                    <td className="px-6 py-4">
+                                                        <div className="flex justify-center items-center gap-2">
+                                                            <button
+                                                                onClick={() => handleViewDetail(log)}
+                                                                className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
+                                                                title="Xem chi tiết"
+                                                            >
+                                                                <FaEye />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="8" className="text-center py-12">
+                                                <div className="flex flex-col items-center gap-3">
+                                                    <FaHistory className="text-gray-300 text-5xl" />
+                                                    <p className="text-gray-500 font-medium">Không tìm thấy lịch sử thao tác nào.</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </ResponsiveTable>
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Thanh phân trang */}
             {totalPages > 1 && (
                 <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-                    <span className="text-sm text-gray-600 font-medium">
-                        Hiển thị <span className="font-bold text-green-600">{auditLogs.length > 0 ? indexOfFirstItem + 1 : 0}</span> đến <span className="font-bold text-green-600">{Math.min(indexOfLastItem, totalElements)}</span> của <span className="font-bold text-green-600">{totalElements}</span> kết quả
-                    </span>
+                    <div className="flex items-center gap-4">
+                        <span className="text-sm text-gray-600 font-medium">
+                            Hiển thị <span className="font-bold text-green-600">{auditLogs.length > 0 ? indexOfFirstItem + 1 : 0}</span> đến <span className="font-bold text-green-600">{Math.min(indexOfLastItem, totalElements)}</span> của <span className="font-bold text-green-600">{totalElements}</span> kết quả
+                        </span>
+                        <select
+                            value={itemsPerPage}
+                            onChange={handleItemsPerPageChange}
+                            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white"
+                        >
+                            <option value={5}>5 / trang</option>
+                            <option value={10}>10 / trang</option>
+                            <option value={20}>20 / trang</option>
+                            <option value={50}>50 / trang</option>
+                        </select>
+                    </div>
                     <nav>
                         <ul className="flex gap-2">
                             <li>
@@ -493,7 +542,7 @@ const QuanLyLichSuThaoTac = () => {
             {isDetailModalOpen && selectedLog && (
                 <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4">
                     <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                        <div className="bg-linear-to-r from-green-600 to-emerald-700 text-white p-6 rounded-t-xl sticky top-0">
+                        <div className="bg-gradient-to-r from-green-600 to-emerald-700 text-white p-6 rounded-t-xl sticky top-0">
                             <div className="flex justify-between items-center">
                                 <div>
                                     <h2 className="text-2xl font-bold">Chi tiết thao tác</h2>

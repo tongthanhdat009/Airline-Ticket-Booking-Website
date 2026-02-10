@@ -5,6 +5,11 @@ import Card from '../../components/QuanLy/CardChucNang';
 import HangVeModal from '../../components/QuanLy/HangVeModal';
 import Toast from '../../components/common/Toast';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
+import ViewToggleButton from '../../components/common/ViewToggleButton';
+import CardView from '../../components/common/CardView';
+import ResponsiveTable from '../../components/common/ResponsiveTable';
+import { useViewToggle } from '../../hooks/useViewToggle';
+import HangVeCard from '../../components/QuanLy/QuanLyHangVe/HangVeCard';
 
 const QuanLyHangVe = () => {
     const [hangVeList, setHangVeList] = useState([]);
@@ -19,7 +24,8 @@ const QuanLyHangVe = () => {
     const [actionLoading, setActionLoading] = useState(false);
     const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
     const [confirmDialog, setConfirmDialog] = useState({ isVisible: false, onConfirm: null });
-    const itemsPerPage = 5;
+    const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-hang-ve-view', 'table');
+    const [itemsPerPage, setItemsPerPage] = useState(5);
 
     // Toast functions
     const showToast = (message, type = 'success') => {
@@ -62,6 +68,12 @@ const QuanLyHangVe = () => {
     const totalPages = Math.ceil(filteredHangVeList.length / itemsPerPage);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    const handleItemsPerPageChange = (e) => {
+        const newValue = parseInt(e.target.value);
+        setItemsPerPage(newValue);
+        setCurrentPage(1); // Reset to first page when changing items per page
+    };
 
     const handleOpenModalForAdd = () => {
         setIsEditMode(false);
@@ -190,12 +202,17 @@ const QuanLyHangVe = () => {
                         {showDeleted ? <FaEye /> : <FaEyeSlash />}
                         <span>{showDeleted ? 'Đang xem đã xóa' : 'Xem đã xóa'}</span>
                     </button>
+                    <ViewToggleButton
+                        currentView={viewMode}
+                        onViewChange={handleViewChange}
+                        className="shrink-0"
+                    />
                 </div>
                 {!showDeleted && (
                     <button
                         onClick={handleOpenModalForAdd}
                         disabled={actionLoading}
-                        className="flex items-center gap-2 bg-linear-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <FaPlus />
                         <span>Thêm hạng vé</span>
@@ -224,12 +241,30 @@ const QuanLyHangVe = () => {
                 </div>
             )}
 
-            {/* Bảng dữ liệu */}
+            {/* View Mode: Card or Table */}
             {!loading && !error && (
-                <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
-                    <div className="overflow-x-auto">
+                viewMode === 'grid' ? (
+                    /* Card View */
+                    <CardView
+                        items={currentItems}
+                        renderCard={(hangVe, index) => (
+                            <HangVeCard
+                                key={hangVe.maHangVe || index}
+                                data={hangVe}
+                                onView={(data) => handleOpenModalForEdit(data)}
+                                onEdit={(data) => handleOpenModalForEdit(data)}
+                                onDelete={(data) => handleDelete(data.maHangVe, data.tenHangVe)}
+                                onRestore={(data) => handleRestore(data.maHangVe, data.tenHangVe)}
+                                showDeleted={showDeleted}
+                            />
+                        )}
+                        emptyMessage={showDeleted ? 'Không tìm thấy hạng vé đã xóa nào.' : 'Không tìm thấy hạng vé nào.'}
+                    />
+                ) : (
+                    /* Table View */
+                    <ResponsiveTable>
                         <table className="w-full text-sm">
-                            <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
+                            <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
                                 <tr>
                                     <th className="px-6 py-4 text-left font-semibold">Mã hạng vé</th>
                                     <th className="px-6 py-4 text-left font-semibold">Tên hạng vé</th>
@@ -244,12 +279,12 @@ const QuanLyHangVe = () => {
                                             <td className="px-6 py-4 font-bold text-blue-600">#{hv.maHangVe}</td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
-                                                        <FaTicketAlt className="text-purple-600 text-xl" />
+                                                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                                                        <FaTicketAlt className="text-blue-600 text-xl" />
                                                     </div>
                                                     <span className="font-medium text-gray-900">{hv.tenHangVe}</span>
                                                     {showDeleted && hv.tenHangVe?.includes('_deleted_') && (
-                                                        <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">Đã xóa</span>
+                                                        <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded">Đã xóa</span>
                                                     )}
                                                 </div>
                                             </td>
@@ -312,16 +347,28 @@ const QuanLyHangVe = () => {
                                 )}
                             </tbody>
                         </table>
-                    </div>
-                </div>
+                    </ResponsiveTable>
+                )
             )}
 
             {/* Thanh phân trang */}
             {!loading && !error && filteredHangVeList.length > itemsPerPage && (
                 <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-                    <span className="text-sm text-gray-600 font-medium">
-                        Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredHangVeList.length)}</span> của <span className="font-bold text-blue-600">{filteredHangVeList.length}</span> kết quả
-                    </span>
+                    <div className="flex items-center gap-4">
+                        <span className="text-sm text-gray-600 font-medium">
+                            Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredHangVeList.length)}</span> của <span className="font-bold text-blue-600">{filteredHangVeList.length}</span> kết quả
+                        </span>
+                        <select
+                            value={itemsPerPage}
+                            onChange={handleItemsPerPageChange}
+                            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white"
+                        >
+                            <option value={5}>5 / trang</option>
+                            <option value={10}>10 / trang</option>
+                            <option value={20}>20 / trang</option>
+                            <option value={50}>50 / trang</option>
+                        </select>
+                    </div>
                     <nav>
                         <ul className="flex gap-2">
                             <li>

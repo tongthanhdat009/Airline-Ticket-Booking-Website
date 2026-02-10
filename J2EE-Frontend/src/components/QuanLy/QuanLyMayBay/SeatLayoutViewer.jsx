@@ -127,7 +127,7 @@ const SeatLayoutViewer = ({ maMayBay, onClose }) => {
         <div className="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-hidden flex flex-col">
                 {/* Header */}
-                <div className="bg-linear-to-r from-sky-600 to-blue-700 text-white p-6 flex justify-between items-center">
+                <div className="bg-gradient-to-r from-sky-600 to-blue-700 text-white p-6 flex justify-between items-center">
                     <div>
                         <h2 className="text-2xl font-bold flex items-center gap-3">
                             <FaPlane className="text-sky-200" />
@@ -207,7 +207,7 @@ const SeatLayoutViewer = ({ maMayBay, onClose }) => {
                         // Group by class view
                         Object.entries(groupedSeats).map(([className, classSeats]) => (
                             <div key={className} className="mb-8 bg-white rounded-xl shadow-lg overflow-hidden">
-                                <div className="bg-linear-to-r from-sky-50 to-blue-50 px-6 py-4 border-b-2 border-sky-200">
+                                <div className="bg-gradient-to-r from-sky-50 to-blue-50 px-6 py-4 border-b-2 border-sky-200">
                                     <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                                         <FaPlane className="text-sky-600" />
                                         {className}
@@ -248,14 +248,14 @@ const SeatLayoutViewer = ({ maMayBay, onClose }) => {
                                 <div className="text-xs text-gray-500">Left Window</div>
                             </div>
                             <div className="flex items-center gap-2">
-                                <div className="w-16 h-3 bg-linear-to-r from-blue-400 via-green-400 to-blue-400 rounded"></div>
+                                <div className="w-16 h-3 bg-gradient-to-r from-blue-400 via-green-400 to-blue-400 rounded"></div>
                             </div>
                             <div className="text-center">
                                 <div className="font-bold text-gray-800">Lối đi</div>
                                 <div className="text-xs text-gray-500">Aisle</div>
                             </div>
                             <div className="flex items-center gap-2">
-                                <div className="w-16 h-3 bg-linear-to-r from-blue-400 via-green-400 to-blue-400 rounded"></div>
+                                <div className="w-16 h-3 bg-gradient-to-r from-blue-400 via-green-400 to-blue-400 rounded"></div>
                             </div>
                             <div className="text-center">
                                 <div className="font-bold text-gray-800">Cửa sổ phải</div>
@@ -374,7 +374,7 @@ const SeatGrid = ({ seats, getSeatStyle, onSeatHover, onSeatLeave }) => {
                                 <div className="w-0 h-0 border-l-[12px] border-r-[12px] border-b-[12px] border-l-transparent border-r-transparent border-b-sky-600"></div>
                             </div>
                             {/* Body */}
-                            <div className="h-6 bg-linear-to-r from-sky-400 via-sky-500 to-sky-400 rounded-t-full w-64 shadow-md"></div>
+                            <div className="h-6 bg-gradient-to-r from-sky-400 via-sky-500 to-sky-400 rounded-t-full w-64 shadow-md"></div>
                         </div>
                     </div>
 
@@ -451,7 +451,7 @@ const SeatGrid = ({ seats, getSeatStyle, onSeatHover, onSeatLeave }) => {
 
                         {/* Aircraft bottom */}
                         <div className="flex justify-center mt-6">
-                            <div className="h-6 bg-linear-to-r from-sky-400 via-sky-500 to-sky-400 rounded-b-full w-64 shadow-md"></div>
+                            <div className="h-6 bg-gradient-to-r from-sky-400 via-sky-500 to-sky-400 rounded-b-full w-64 shadow-md"></div>
                         </div>
                     </div>
                 </div>

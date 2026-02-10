@@ -658,7 +658,7 @@ const ThemChuyenBay = () => {
                             )}
                         </div>
                         {selectedServices.length > 0 && (
-                            <div className="mt-3 p-2 bg-purple-100 rounded text-sm text-purple-800">
+                            <div className="mt-3 p-2 bg-blue-100 rounded text-sm text-blue-800">
                                 Đã chọn {selectedServices.length} dịch vụ
                             </div>
                         )}
@@ -678,7 +678,7 @@ const ThemChuyenBay = () => {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="flex items-center gap-2 px-6 py-3 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <FaSave />
                         <span>{isSubmitting ? 'Đang lưu...' : 'Lưu chuyến bay'}</span>

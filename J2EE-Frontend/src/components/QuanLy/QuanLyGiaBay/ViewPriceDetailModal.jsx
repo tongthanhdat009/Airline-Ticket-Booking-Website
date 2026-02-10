@@ -70,7 +70,7 @@ const ViewPriceDetailModal = ({
         <div className="fixed inset-0 flex items-center justify-center z-50 p-4 ">
             <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-y-auto relative">
-                <div className="sticky top-0 bg-linear-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex justify-between items-center z-10">
+                <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex justify-between items-center z-10">
                     <h3 className="text-xl font-bold">Chi tiết giá chuyến bay</h3>
                     <div className="flex items-center gap-3">
                         <button 
@@ -124,7 +124,7 @@ const ViewPriceDetailModal = ({
                                     <div className="text-xs text-gray-500 mt-1">{selectedRoute.tuyenBay?.sanBayDen?.quocGiaSanBay}</div>
                                 </div>
                                 
-                                <div className="bg-linear-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
+                                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
                                     <div className="text-sm text-gray-600 mb-2">Tổng quan giá vé</div>
                                     <div className="space-y-2">
                                         {groupPricesByClass(selectedRoute.prices).map((ticketClass) => (
@@ -148,7 +148,7 @@ const ViewPriceDetailModal = ({
                                 </h4>
                                 <button 
                                     onClick={onAddNew}
-                                    className="flex items-center gap-2 bg-linear-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-md hover:shadow-lg text-sm font-semibold"
+                                    className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-md hover:shadow-lg text-sm font-semibold"
                                 >
                                     <FaPlus size={14} />
                                     <span>Thêm giá</span>
@@ -161,7 +161,7 @@ const ViewPriceDetailModal = ({
                                         <div key={ticketClass.maHangVe} className="bg-white rounded-lg p-4 shadow-md border border-gray-200 hover:shadow-lg transition-shadow">
                                             <div className="flex justify-between items-center mb-3 cursor-pointer" onClick={() => toggleClassExpansion(ticketClass.maHangVe)}>
                                                 <div>
-                                                    <span className="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-purple-100 text-purple-800">
+                                                    <span className="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
                                                         {ticketClass.tenHangVe}
                                                     </span>
                                                     <span className="ml-2 text-xs text-gray-500">({ticketClass.count} mức giá)</span>

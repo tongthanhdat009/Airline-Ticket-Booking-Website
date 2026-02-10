@@ -14,10 +14,15 @@ import Card from '../../components/QuanLy/CardChucNang';
 import donHangApi from '../../services/donHangApi';
 import Toast from '../../components/common/Toast';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
+import ViewToggleButton from '../../components/common/ViewToggleButton';
+import CardView from '../../components/common/CardView';
+import ResponsiveTable from '../../components/common/ResponsiveTable';
+import { useViewToggle } from '../../hooks/useViewToggle';
 import DonHangDetailModal from '../../components/QuanLy/QuanLyDonHang/DonHangDetailModal';
 import FilterModal from '../../components/QuanLy/QuanLyDonHang/FilterModal';
 import HoanTienModal from '../../components/QuanLy/QuanLyDonHang/HoanTienModal';
 import HuyDonHangModal from '../../components/QuanLy/QuanLyDonHang/HuyDonHangModal';
+import DonHangCard from '../../components/QuanLy/QuanLyDonHang/DonHangCard';
 
 const QuanLyDonHang = () => {
   // States cho dữ liệu
@@ -32,7 +37,7 @@ const QuanLyDonHang = () => {
 
   // States cho pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   // States cho search và filters
   const [search, setSearch] = useState('');
@@ -70,6 +75,9 @@ const QuanLyDonHang = () => {
     confirmText: 'Xác nhận',
     onConfirm: null
   });
+
+  // View toggle hook
+  const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-don-hang-view', 'table');
 
   // Toast handler
   const showToast = (message, type = 'success') => {
@@ -138,6 +146,12 @@ const QuanLyDonHang = () => {
   const totalPages = Math.ceil(filteredDonHang.length / itemsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const handleItemsPerPageChange = (e) => {
+      const newValue = parseInt(e.target.value);
+      setItemsPerPage(newValue);
+      setCurrentPage(1); // Reset to first page when changing items per page
+  };
 
   // Handlers
   const handleViewDetail = async (donHang) => {
@@ -398,7 +412,7 @@ const QuanLyDonHang = () => {
 
       {/* Thống kê tổng quan */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-linear-to-br from-violet-500 to-purple-600 rounded-xl p-5 text-white shadow-lg">
+        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium opacity-90">Tổng đơn hàng</p>
@@ -407,7 +421,7 @@ const QuanLyDonHang = () => {
             <FaShoppingCart size={40} className="opacity-80" />
           </div>
         </div>
-        <div className="bg-linear-to-br from-green-500 to-emerald-600 rounded-xl p-5 text-white shadow-lg">
+        <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-5 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium opacity-90">Đã thanh toán</p>
@@ -418,7 +432,7 @@ const QuanLyDonHang = () => {
             <FaCheck size={40} className="opacity-80" />
           </div>
         </div>
-        <div className="bg-linear-to-br from-yellow-500 to-orange-600 rounded-xl p-5 text-white shadow-lg">
+        <div className="bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl p-5 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium opacity-90">Chờ thanh toán</p>
@@ -429,7 +443,7 @@ const QuanLyDonHang = () => {
             <FaCalendar size={40} className="opacity-80" />
           </div>
         </div>
-        <div className="bg-linear-to-br from-blue-500 to-cyan-600 rounded-xl p-5 text-white shadow-lg">
+        <div className="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl p-5 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium opacity-90">Tổng doanh thu</p>
@@ -450,21 +464,26 @@ const QuanLyDonHang = () => {
             placeholder="Tìm kiếm theo mã đơn, PNR, tên, email, SĐT..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent shadow-sm"
+            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
           />
           <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
         </div>
+        <ViewToggleButton
+          currentView={viewMode}
+          onViewChange={handleViewChange}
+          className="shrink-0"
+        />
         <div className="flex gap-3 w-full md:w-auto">
           <button
             onClick={() => setIsFilterModalOpen(true)}
-            className="flex items-center gap-2 bg-linear-to-r from-blue-500 to-cyan-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-cyan-700 transition-all shadow-lg hover:shadow-xl font-semibold"
+            className="flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold"
           >
             <FaFilter />
             <span className="hidden sm:inline">Bộ lọc</span>
           </button>
           <button
             onClick={() => loadDonHang()}
-            className="flex items-center gap-2 bg-linear-to-r from-violet-500 to-purple-600 text-white px-5 py-3 rounded-lg hover:from-violet-600 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl font-semibold"
+            className="flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold"
           >
             <FaCalendar />
             <span className="hidden sm:inline">Làm mới</span>
@@ -474,9 +493,9 @@ const QuanLyDonHang = () => {
 
       {/* Batch action buttons */}
       {selectedDonHangs.length > 0 && (
-        <div className="bg-linear-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-4 mb-6 flex flex-col sm:flex-row justify-between items-center gap-3">
+        <div className="bg-gradient-to-r from-blue-50 to-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex flex-col sm:flex-row justify-between items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-indigo-700 font-semibold">
+            <span className="text-blue-700 font-semibold">
               Đã chọn {selectedDonHangs.length} đơn hàng
             </span>
           </div>
@@ -484,7 +503,7 @@ const QuanLyDonHang = () => {
             <button
               onClick={handleOpenBatchRefundModal}
               disabled={batchActionLoading}
-              className="flex items-center gap-2 bg-linear-to-r from-orange-500 to-amber-600 text-white px-4 py-2 rounded-lg hover:from-orange-600 hover:to-amber-700 font-semibold transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-amber-600 text-white px-4 py-2 rounded-lg hover:from-orange-600 hover:to-amber-700 font-semibold transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <FaUndo />
               {batchActionLoading ? 'Đang xử lý...' : 'Hoàn tiền'}
@@ -506,7 +525,7 @@ const QuanLyDonHang = () => {
       {/* Loading state */}
       {loading && (
         <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
       )}
 
@@ -520,124 +539,154 @@ const QuanLyDonHang = () => {
 
       {/* Bảng dữ liệu */}
       {!loading && !error && (
-        <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
-                <tr>
-                  <th className="px-4 py-4 text-center font-semibold w-12">
-                    <button
-                      onClick={handleSelectAll}
-                      className="text-white hover:text-gray-200 transition-colors"
-                      title={isAllSelected ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
-                    >
-                      {isAllSelected ? <FaCheckSquare size={18} /> : <FaSquare size={18} />}
-                    </button>
-                  </th>
-                  <th className="px-6 py-4 text-left font-semibold">Mã ĐH</th>
-                  <th className="px-6 py-4 text-left font-semibold">PNR</th>
-                  <th className="px-6 py-4 text-left font-semibold">Khách hàng</th>
-                  <th className="px-6 py-4 text-left font-semibold">Ngày đặt</th>
-                  <th className="px-6 py-4 text-right font-semibold">Tổng tiền</th>
-                  <th className="px-6 py-4 text-center font-semibold">Trạng thái</th>
-                  <th className="px-6 py-4 text-center font-semibold">Thao tác</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {currentItems.length > 0 ? (
-                  currentItems.map((dh, index) => {
-                    const status = getTrangThaiInfo(dh.trangThai);
-                    const isSelected = selectedDonHangs.some(item => item.maDonHang === dh.maDonHang);
-                    return (
-                      <tr
-                        key={dh.maDonHang}
-                        className={`${
-                          index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                        } ${isSelected ? 'bg-violet-100' : ''} hover:bg-violet-50 transition-colors`}
-                      >
-                        <td className="px-4 py-4 text-center">
-                          <button
-                            onClick={() => handleSelectDonHang(dh)}
-                            className="text-violet-600 hover:text-violet-800 transition-colors"
-                            title={isSelected ? 'Bỏ chọn' : 'Chọn'}
-                          >
-                            {isSelected ? <FaCheckSquare size={18} /> : <FaSquare size={18} />}
-                          </button>
-                        </td>
-                        <td className="px-6 py-4 font-bold text-violet-600">
-                          #{dh.maDonHang}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">
-                            {dh.pnr || 'N/A'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div>
-                            <p className="font-medium text-gray-900">
-                              {dh.hanhKhachNguoiDat?.hoVaTen || 'N/A'}
-                            </p>
-                            <p className="text-xs text-gray-500">{dh.emailNguoiDat || 'N/A'}</p>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-gray-700">
-                          {formatDateTime(dh.ngayDat)}
-                        </td>
-                        <td className="px-6 py-4 text-right font-bold text-gray-900">
-                          {formatCurrency(dh.tongGia)}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-semibold ${status.color}`}
-                          >
-                            {status.icon} {status.text}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex justify-center items-center gap-2">
-                            <button
-                              onClick={() => handleViewDetail(dh)}
-                              className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
-                              title="Xem chi tiết"
-                            >
-                              <FaEye />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
+        <>
+          {viewMode === 'grid' ? (
+            /* Card View */
+            <CardView
+              items={currentItems}
+              renderCard={(donHang) => (
+                <DonHangCard
+                  key={donHang.maDonHang}
+                  data={donHang}
+                  onView={handleViewDetail}
+                  onEdit={() => {/* Edit functionality can be added later */}}
+                  onDelete={() => {/* Delete functionality can be added later */}}
+                />
+              )}
+              emptyMessage="Không tìm thấy đơn hàng nào."
+            />
+          ) : (
+            /* Table View */
+            <ResponsiveTable>
+              <table className="w-full text-sm">
+                <thead className="bg-blue-600 text-white">
                   <tr>
-                    <td colSpan={8} className="text-center py-12">
-                      <div className="flex flex-col items-center gap-3">
-                        <FaShoppingCart className="text-gray-300 text-5xl" />
-                        <p className="text-gray-500 font-medium">
-                          Không tìm thấy đơn hàng nào.
-                        </p>
-                      </div>
-                    </td>
+                    <th className="px-4 py-4 text-center font-semibold w-12">
+                      <button
+                        onClick={handleSelectAll}
+                        className="text-white hover:text-gray-200 transition-colors"
+                        title={isAllSelected ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
+                      >
+                        {isAllSelected ? <FaCheckSquare size={18} /> : <FaSquare size={18} />}
+                      </button>
+                    </th>
+                    <th className="px-6 py-4 text-left font-semibold">Mã ĐH</th>
+                    <th className="px-6 py-4 text-left font-semibold">PNR</th>
+                    <th className="px-6 py-4 text-left font-semibold">Khách hàng</th>
+                    <th className="px-6 py-4 text-left font-semibold">Ngày đặt</th>
+                    <th className="px-6 py-4 text-right font-semibold">Tổng tiền</th>
+                    <th className="px-6 py-4 text-center font-semibold">Trạng thái</th>
+                    <th className="px-6 py-4 text-center font-semibold">Thao tác</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {currentItems.length > 0 ? (
+                    currentItems.map((dh, index) => {
+                      const status = getTrangThaiInfo(dh.trangThai);
+                      const isSelected = selectedDonHangs.some(item => item.maDonHang === dh.maDonHang);
+                      return (
+                        <tr
+                          key={dh.maDonHang}
+                          className={`${
+                            index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                          } ${isSelected ? 'bg-blue-100' : ''} hover:bg-blue-50 transition-colors`}
+                        >
+                          <td className="px-4 py-4 text-center">
+                            <button
+                              onClick={() => handleSelectDonHang(dh)}
+                              className="text-blue-600 hover:text-blue-800 transition-colors"
+                              title={isSelected ? 'Bỏ chọn' : 'Chọn'}
+                            >
+                              {isSelected ? <FaCheckSquare size={18} /> : <FaSquare size={18} />}
+                            </button>
+                          </td>
+                          <td className="px-6 py-4 font-bold text-blue-600">
+                            #{dh.maDonHang}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+                              {dh.pnr || 'N/A'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div>
+                              <p className="font-medium text-gray-900">
+                                {dh.hanhKhachNguoiDat?.hoVaTen || 'N/A'}
+                              </p>
+                              <p className="text-xs text-gray-500">{dh.emailNguoiDat || 'N/A'}</p>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-gray-700">
+                            {formatDateTime(dh.ngayDat)}
+                          </td>
+                          <td className="px-6 py-4 text-right font-bold text-gray-900">
+                            {formatCurrency(dh.tongGia)}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-semibold ${status.color}`}
+                            >
+                              {status.icon} {status.text}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex justify-center items-center gap-2">
+                              <button
+                                onClick={() => handleViewDetail(dh)}
+                                className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
+                                title="Xem chi tiết"
+                              >
+                                <FaEye />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan={8} className="text-center py-12">
+                        <div className="flex flex-col items-center gap-3">
+                          <FaShoppingCart className="text-gray-300 text-5xl" />
+                          <p className="text-gray-500 font-medium">
+                            Không tìm thấy đơn hàng nào.
+                          </p>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </ResponsiveTable>
+          )}
+        </>
       )}
 
       {/* Thanh phân trang */}
       {!loading && !error && filteredDonHang.length > itemsPerPage && (
         <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-          <span className="text-sm text-gray-600 font-medium">
-            Hiển thị{' '}
-            <span className="font-bold text-violet-600">{indexOfFirstItem + 1}</span> đến{' '}
-            <span className="font-bold text-violet-600">
-              {Math.min(indexOfLastItem, filteredDonHang.length)}
-            </span>{' '}
-            của{' '}
-            <span className="font-bold text-violet-600">{filteredDonHang.length}</span> kết
-            quả
-          </span>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600 font-medium">
+              Hiển thị{' '}
+              <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến{' '}
+              <span className="font-bold text-blue-600">
+                {Math.min(indexOfLastItem, filteredDonHang.length)}
+              </span>{' '}
+              của{' '}
+              <span className="font-bold text-blue-600">{filteredDonHang.length}</span> kết
+              quả
+            </span>
+            <select
+              value={itemsPerPage}
+              onChange={handleItemsPerPageChange}
+              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white"
+            >
+              <option value={5}>5 / trang</option>
+              <option value={10}>10 / trang</option>
+              <option value={20}>20 / trang</option>
+              <option value={50}>50 / trang</option>
+            </select>
+          </div>
           <nav>
             <ul className="flex gap-2">
               <li>
@@ -655,7 +704,7 @@ const QuanLyDonHang = () => {
                     onClick={() => paginate(index + 1)}
                     className={`px-4 py-2 rounded-lg font-medium transition-all ${
                       currentPage === index + 1
-                        ? 'bg-violet-600 text-white shadow-lg'
+                        ? 'bg-blue-600 text-white shadow-lg'
                         : 'bg-white border border-gray-300 hover:bg-gray-100'
                     }`}
                   >

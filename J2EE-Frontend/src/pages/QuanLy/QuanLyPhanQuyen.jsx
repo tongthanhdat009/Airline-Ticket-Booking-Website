@@ -1,6 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { FaKey, FaSave, FaCheckSquare, FaSquare, FaSearch, FaChevronRight, FaCopy, FaLock, FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
+import React, { useState, useEffect, useMemo } from 'react';
+import { FaKey, FaSave, FaCheckSquare, FaSquare, FaSearch, FaChevronRight, FaCopy, FaLock, FaSpinner, FaExclamationTriangle, FaEye } from 'react-icons/fa';
 import Toast from '../../components/common/Toast';
+import ViewToggleButton from '../../components/common/ViewToggleButton';
+import CardView from '../../components/common/CardView';
+import { useViewToggle } from '../../hooks/useViewToggle';
+import PhanQuyenCard from '../../components/QuanLy/QuanLyPhanQuyen/PhanQuyenCard';
+import Card from '../../components/QuanLy/CardChucNang';
 import {
     getAllChucNang,
     getAllHanhDong,
@@ -37,6 +42,9 @@ const QuanLyPhanQuyen = () => {
     // Copy permissions modal
     const [showCopyModal, setShowCopyModal] = useState(false);
     const [copyFromRole, setCopyFromRole] = useState(null);
+
+    // View toggle hook
+    const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-phan-quyen-view', 'table');
 
     // Toast functions
     const showToast = (message, type = 'success') => {
@@ -125,6 +133,32 @@ const QuanLyPhanQuyen = () => {
         const matchGroup = filterGroup === 'ALL' || feature.nhom === filterGroup;
         return matchSearch && matchGroup;
     });
+
+    // Prepare role data for card view
+    const roleCardData = useMemo(() => {
+        return roles.map(role => {
+            // Calculate permission count for this role
+            const rolePermissions = Object.entries(permissions).filter(([key, value]) => value).length;
+
+            return {
+                ...role,
+                tongQuyen: role.maVaiTro === selectedRole ? rolePermissions : null,
+                trangThai: role.trangThai !== undefined ? role.trangThai : true
+            };
+        });
+    }, [roles, permissions, selectedRole]);
+
+    // Handle view role permissions
+    const handleViewRole = (role) => {
+        setSelectedRole(role.maVaiTro);
+        handleViewChange('table');
+    };
+
+    // Handle edit role permissions
+    const handleEditRole = (role) => {
+        setSelectedRole(role.maVaiTro);
+        handleViewChange('table');
+    };
 
     // Kiểm tra vai trò hiện tại có phải SUPER_ADMIN không
     const isSuperAdmin = selectedRoleInfo?.isSuperAdmin || false;
@@ -267,22 +301,21 @@ const QuanLyPhanQuyen = () => {
 
     if (loading) {
         return (
-            <div className="p-6 bg-linear-to-br from-slate-50 to-slate-100 min-h-screen flex items-center justify-center">
-                <div className="flex flex-col items-center gap-4">
+            <Card title="Ma trận phân quyền">
+                <div className="flex flex-col items-center gap-4 py-12">
                     <FaSpinner className="text-4xl text-amber-600 animate-spin" />
                     <p className="text-slate-600">Đang tải dữ liệu...</p>
                 </div>
-            </div>
+            </Card>
         );
     }
 
     return (
-        <div className="p-6 bg-linear-to-br from-slate-50 to-slate-100 min-h-screen">
-            <div className="max-w-full mx-auto">
+        <Card title="Ma trận phân quyền">
 
                 {/* Header */}
                 <div className="mb-6">
-                    <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-linear-to-r from-amber-600 to-orange-600 flex items-center gap-3">
+                    <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600 flex items-center gap-3">
                         <FaKey className="text-amber-600" />
                         Ma trận Phân quyền (Permission Matrix)
                     </h1>
@@ -306,7 +339,7 @@ const QuanLyPhanQuyen = () => {
 
                 {/* Control Panel */}
                 <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                         {/* Role Selection */}
                         <div>
                             <label className="block text-slate-700 font-bold mb-2">
@@ -359,6 +392,15 @@ const QuanLyPhanQuyen = () => {
                                 />
                             </div>
                         </div>
+
+                        {/* View Toggle */}
+                        <div className="flex items-end">
+                            <ViewToggleButton
+                                currentView={viewMode}
+                                onViewChange={handleViewChange}
+                                className="shrink-0"
+                            />
+                        </div>
                     </div>
 
                     {/* Action Buttons */}
@@ -368,7 +410,7 @@ const QuanLyPhanQuyen = () => {
                                 <span className="font-semibold">{permissionCount}</span> quyền đã được cấp cho vai trò này
                             </div>
                             {hasChanges() && !isSuperAdmin && (
-                                <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">
+                                <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-semibold">
                                     Có thay đổi chưa lưu
                                 </span>
                             )}
@@ -392,7 +434,7 @@ const QuanLyPhanQuyen = () => {
                                 className={`px-8 py-3 rounded-xl transition-all shadow-lg flex items-center gap-2 font-bold
                                     ${isSuperAdmin 
                                         ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                                        : 'bg-linear-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 shadow-amber-500/50 disabled:opacity-50'
+                                        : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 shadow-amber-500/50 disabled:opacity-50'
                                     }`}
                             >
                                 {saving ? (
@@ -409,8 +451,25 @@ const QuanLyPhanQuyen = () => {
                     </div>
                 </div>
 
-                {/* Permission Dropdown List */}
-                <div className="space-y-3">
+                {/* View Mode: Card or Table */}
+                {viewMode === 'grid' ? (
+                    /* Card View - Show roles */
+                    <CardView
+                        items={roleCardData}
+                        renderCard={(role, index) => (
+                            <PhanQuyenCard
+                                key={role.maVaiTro || index}
+                                data={role}
+                                onView={handleViewRole}
+                                onEdit={handleEditRole}
+                            />
+                        )}
+                        emptyMessage="Không tìm thấy vai trò nào."
+                    />
+                ) : (
+                    <>
+                        {/* Permission Dropdown List */}
+                        <div className="space-y-3">
                     {filteredFeatures.map((feature) => {
                         const isExpanded = expandedFeature === feature.maChucNang;
                         const grantedCount = actions.filter(action =>
@@ -432,7 +491,7 @@ const QuanLyPhanQuyen = () => {
                                             <div className="flex items-center gap-3">
                                                 <span className="font-bold text-slate-800 text-lg">{feature.tenChucNang}</span>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs font-mono">
+                                                    <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-mono">
                                                         {feature.maCode}
                                                     </span>
                                                     {feature.nhom && (
@@ -457,7 +516,7 @@ const QuanLyPhanQuyen = () => {
                                             {!isSuperAdmin && (
                                                 <button
                                                     onClick={() => checkAllFeature(feature.maChucNang)}
-                                                    className="px-4 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors font-semibold text-sm flex items-center gap-2"
+                                                    className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors font-semibold text-sm flex items-center gap-2"
                                                 >
                                                     {isFeatureAllChecked(feature.maChucNang) ? (
                                                         <><FaCheckSquare /> Bỏ chọn tất cả</>
@@ -546,6 +605,8 @@ const QuanLyPhanQuyen = () => {
                         </div>
                     </div>
                 </div>
+                    </>
+                )}
             </div>
 
             {/* Copy Permissions Modal */}
@@ -613,7 +674,7 @@ const QuanLyPhanQuyen = () => {
                 type={toast.type}
                 onClose={hideToast}
             />
-        </div>
+        </Card>
     );
 };
 

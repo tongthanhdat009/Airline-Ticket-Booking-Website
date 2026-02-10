@@ -28,45 +28,45 @@ const ChiTietDatChoModal = ({
   const bookingStatus = getTrangThaiDatCho(datCho.trangThai);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Overlay */}
+    <div className="fixed inset-0 z-50">
+      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50"
         onClick={onClose}
-      />
+      ></div>
 
-      {/* Modal Content */}
-      <div className="relative z-10 w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl">
+      {/* Modal - Full screen on mobile, centered modal on desktop */}
+      <div className="relative z-10 h-full w-full md:h-[85vh] md:max-w-4xl md:mx-auto md:my-8 md:rounded-2xl bg-white md:shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="px-8 py-5 bg-gradient-to-r from-violet-600 to-purple-600">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-12 h-12 bg-white bg-opacity-20 rounded-full">
-                <FaTicketAlt className="w-6 h-6 text-white" />
+        <div className="bg-gradient-to-r from-violet-600 to-purple-600 text-white px-4 md:px-8 py-3 md:py-5 flex justify-between items-center shrink-0">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 md:gap-3">
+              <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-white bg-opacity-20 rounded-full shrink-0">
+                <FaTicketAlt className="w-5 h-5 md:w-6 md:h-6 text-white" />
               </div>
-              <div>
-                <h2 className="text-xl font-bold text-white">Chi tiết đặt chỗ</h2>
-                <p className="text-sm text-white text-opacity-80">Mã đặt chỗ: {datCho.maDatCho}</p>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-lg md:text-xl font-bold text-white truncate">Chi tiết đặt chỗ</h2>
+                <p className="text-xs md:text-sm text-white text-opacity-80 mt-1 truncate">Mã đặt chỗ: {datCho.maDatCho}</p>
               </div>
             </div>
-            <button
-              onClick={onClose}
-              className="flex items-center justify-center w-10 h-10 transition-colors rounded-full hover:bg-white hover:bg-opacity-20"
-            >
-              <FaTimesCircle className="w-6 h-6 text-white" />
-            </button>
           </div>
+          <button
+            onClick={onClose}
+            className="text-white hover:text-gray-200 transition-colors p-1 hover:bg-white/10 rounded-lg ml-2 shrink-0"
+          >
+            <FaTimesCircle className="w-5 h-5 md:w-6 md:h-6" />
+          </button>
         </div>
 
         {/* Body */}
-        <div className="p-8 space-y-6">
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-4 md:space-y-6">
           {/* Thông tin đặt chỗ */}
-          <div className="p-5 border border-gray-200 rounded-xl bg-gray-50">
+          <div className="p-4 md:p-5 border border-gray-200 rounded-xl bg-gray-50">
             <div className="flex items-center gap-2 pb-3 mb-4 border-b border-gray-200">
               <FaTicketAlt className="w-5 h-5 text-violet-600" />
-              <h3 className="text-lg font-semibold text-gray-800">Thông tin đặt chỗ</h3>
+              <h3 className="text-base md:text-lg font-semibold text-gray-800">Thông tin đặt chỗ</h3>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-500">Mã đặt chỗ</p>
                 <p className="font-semibold text-gray-800">{datCho.maDatCho}</p>
@@ -93,12 +93,12 @@ const ChiTietDatChoModal = ({
           </div>
 
           {/* Thông tin hành khách */}
-          <div className="p-5 border border-gray-200 rounded-xl bg-gray-50">
+          <div className="p-4 md:p-5 border border-gray-200 rounded-xl bg-gray-50">
             <div className="flex items-center gap-2 pb-3 mb-4 border-b border-gray-200">
               <FaUserCheck className="w-5 h-5 text-violet-600" />
-              <h3 className="text-lg font-semibold text-gray-800">Thông tin hành khách</h3>
+              <h3 className="text-base md:text-lg font-semibold text-gray-800">Thông tin hành khách</h3>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-500">Họ và tên</p>
                 <p className="font-semibold text-gray-800">{datCho.hoVaTen}</p>
@@ -136,12 +136,12 @@ const ChiTietDatChoModal = ({
           </div>
 
           {/* Thông tin chuyến bay */}
-          <div className="p-5 border border-gray-200 rounded-xl bg-gray-50">
+          <div className="p-4 md:p-5 border border-gray-200 rounded-xl bg-gray-50">
             <div className="flex items-center gap-2 pb-3 mb-4 border-b border-gray-200">
               <FaPlane className="w-5 h-5 text-violet-600" />
-              <h3 className="text-lg font-semibold text-gray-800">Thông tin chuyến bay</h3>
+              <h3 className="text-base md:text-lg font-semibold text-gray-800">Thông tin chuyến bay</h3>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-500">Số hiệu chuyến bay</p>
                 <p className="font-semibold text-gray-800">{datCho.soHieuChuyenBay}</p>
@@ -165,12 +165,12 @@ const ChiTietDatChoModal = ({
           </div>
 
           {/* Thông tin ghế */}
-          <div className="p-5 border border-gray-200 rounded-xl bg-gray-50">
+          <div className="p-4 md:p-5 border border-gray-200 rounded-xl bg-gray-50">
             <div className="flex items-center gap-2 pb-3 mb-4 border-b border-gray-200">
               <FaChair className="w-5 h-5 text-violet-600" />
-              <h3 className="text-lg font-semibold text-gray-800">Thông tin ghế</h3>
+              <h3 className="text-base md:text-lg font-semibold text-gray-800">Thông tin ghế</h3>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-500">Số ghế</p>
                 <p className="font-semibold text-gray-800">{datCho.soGhe}</p>
@@ -187,8 +187,8 @@ const ChiTietDatChoModal = ({
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex justify-end px-8 py-5 bg-gray-50 border-t border-gray-200">
+        {/* Footer - Hidden on mobile, shown on desktop */}
+        <div className="hidden md:flex justify-end px-8 py-5 bg-gray-50 border-t border-gray-200 shrink-0">
           <button
             onClick={onClose}
             className="px-6 py-2.5 font-medium text-gray-700 transition-colors bg-white border border-gray-300 rounded-lg hover:bg-gray-100"

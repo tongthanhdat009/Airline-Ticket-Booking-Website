@@ -3,9 +3,14 @@ import { FaSearch, FaUserPlus, FaFileExport, FaEdit, FaTrash, FaBan, FaEye } fro
 import * as XLSX from 'xlsx';
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
+import ViewToggleButton from '../../components/common/ViewToggleButton';
+import CardView from '../../components/common/CardView';
+import ResponsiveTable from '../../components/common/ResponsiveTable';
+import { useViewToggle } from '../../hooks/useViewToggle';
 import { getAllKhachHang, createKhachHang, deleteKhachHang } from '../../services/QLKhachHangService';
 import { getAllCountries } from '../../services/CountryService';
 import ViewKhachHangModal from '../../components/QuanLy/QuanLyKhachHang/ViewKhachHangModal';
+import KhachHangCard from '../../components/QuanLy/KhachHang/KhachHangCard';
 
 const QuanLyKhachHang = () => {
     const [customers, setCustomers] = useState([]);
@@ -17,10 +22,11 @@ const QuanLyKhachHang = () => {
     const [formData, setFormData] = useState({});
     const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
     const [countries, setCountries] = useState([]);
-    const itemsPerPage = 5;
+    const [itemsPerPage, setItemsPerPage] = useState(5);
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [viewCustomer, setViewCustomer] = useState(null);
     const [viewModalMode, setViewModalMode] = useState('view'); // 'view' or 'edit'
+    const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-khach-hang-view', 'table');
 
     // Fetch data from API
     useEffect(() => {
@@ -64,6 +70,12 @@ const QuanLyKhachHang = () => {
     const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    const handleItemsPerPageChange = (e) => {
+        const newValue = parseInt(e.target.value);
+        setItemsPerPage(newValue);
+        setCurrentPage(1); // Reset to first page when changing items per page
+    };
 
     const showToast = (message, type = 'success') => {
         setToast({ isVisible: true, message, type });
@@ -249,17 +261,22 @@ const QuanLyKhachHang = () => {
                     />
                     <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
                 </div>
+                <ViewToggleButton
+                    currentView={viewMode}
+                    onViewChange={handleViewChange}
+                    className="shrink-0"
+                />
                 <div className="flex gap-2">
-                    <button 
+                    <button
                         onClick={handleExportExcel}
-                        className="flex items-center gap-2 bg-linear-to-r from-green-500 to-emerald-600 text-white px-5 py-3 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl"
+                        className="flex items-center gap-2 bg-green-600 text-white px-5 py-3 rounded-lg hover:bg-green-700 transition-all shadow-lg hover:shadow-xl"
                     >
                         <FaFileExport />
                         <span className="font-semibold">Xuất Excel</span>
                     </button>
-                    <button 
+                    <button
                         onClick={() => handleOpenModal()}
-                        className="flex items-center gap-2 bg-linear-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl"
+                        className="flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl"
                     >
                         <FaUserPlus />
                         <span className="font-semibold">Thêm mới</span>
@@ -267,11 +284,27 @@ const QuanLyKhachHang = () => {
                 </div>
             </div>
 
-            {/* Bảng dữ liệu */}
-            <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
-                <div className="overflow-x-auto">
+            {/* View Mode: Card or Table */}
+            {viewMode === 'grid' ? (
+                /* Card View */
+                <CardView
+                    items={currentItems}
+                    renderCard={(customer, index) => (
+                        <KhachHangCard
+                            key={customer.maHanhKhach || index}
+                            data={customer}
+                            onView={handleViewCustomer}
+                            onEdit={(customer) => handleViewCustomer(customer, 'edit')}
+                            onDelete={handleDelete}
+                        />
+                    )}
+                    emptyMessage="Không tìm thấy khách hàng nào."
+                />
+            ) : (
+                /* Table View */
+                <ResponsiveTable>
                     <table className="w-full text-sm">
-                        <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
+                        <thead className="bg-blue-600 text-white">
                             <tr>
                                 <th scope="col" className="px-6 py-4 text-left font-semibold">Mã KH</th>
                                 <th scope="col" className="px-6 py-4 text-left font-semibold">Họ và tên</th>
@@ -297,9 +330,9 @@ const QuanLyKhachHang = () => {
                                         <td className="px-6 py-4 text-gray-600">{customer.quocGia || '-'}</td>
                                         <td className="px-6 py-4">
                                             <div className="flex justify-center gap-2">
-                                                <button 
+                                                <button
                                                     onClick={() => handleViewCustomer(customer)}
-                                                    className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" 
+                                                    className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
                                                     title="Xem thông tin"
                                                 >
                                                     <FaEye size={16} />
@@ -311,9 +344,9 @@ const QuanLyKhachHang = () => {
                                                 >
                                                     <FaEdit size={16} />
                                                 </button>
-                                                <button 
+                                                <button
                                                     onClick={() => handleDelete(customer.maHanhKhach)}
-                                                    className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors" 
+                                                    className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
                                                     title="Xóa"
                                                 >
                                                     <FaTrash size={16} />
@@ -334,15 +367,27 @@ const QuanLyKhachHang = () => {
                             )}
                         </tbody>
                     </table>
-                </div>
-            </div>
+                </ResponsiveTable>
+            )}
 
             {/* Thanh phân trang */}
             {filteredCustomers.length > itemsPerPage && (
                 <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-                    <span className="text-sm text-gray-600 font-medium">
-                        Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredCustomers.length)}</span> của <span className="font-bold text-blue-600">{filteredCustomers.length}</span> kết quả
-                    </span>
+                    <div className="flex items-center gap-4">
+                        <span className="text-sm text-gray-600 font-medium">
+                            Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredCustomers.length)}</span> của <span className="font-bold text-blue-600">{filteredCustomers.length}</span> kết quả
+                        </span>
+                        <select
+                            value={itemsPerPage}
+                            onChange={handleItemsPerPageChange}
+                            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white"
+                        >
+                            <option value={5}>5 / trang</option>
+                            <option value={10}>10 / trang</option>
+                            <option value={20}>20 / trang</option>
+                            <option value={50}>50 / trang</option>
+                        </select>
+                    </div>
                     <nav>
                         <ul className="flex gap-2">
                             <li>
@@ -387,7 +432,7 @@ const QuanLyKhachHang = () => {
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="absolute inset-0 bg-black/50" onClick={handleCloseModal}></div>
                     <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
-                        <div className="[background:linear-gradient(to_right,rgb(37,99,235),rgb(29,78,216))] text-white px-6 py-4 flex justify-between items-center sticky top-0">
+                        <div className="bg-blue-600 text-white px-6 py-4 flex justify-between items-center sticky top-0">
                             <h3 className="text-xl font-bold">Thêm khách hàng mới</h3>
                             <button onClick={handleCloseModal} className="text-white hover:text-gray-200">
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

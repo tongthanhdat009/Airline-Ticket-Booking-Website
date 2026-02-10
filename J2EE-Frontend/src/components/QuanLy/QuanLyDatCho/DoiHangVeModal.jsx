@@ -88,7 +88,7 @@ const DoiHangVeModal = ({
           {/* Thông tin hiện tại */}
           <div className="bg-gray-50 rounded-lg p-4 mb-6">
             <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-              <FaTicketAlt className="text-violet-600" />
+              <FaTicketAlt className="text-indigo-600" />
               Thông tin hiện tại
             </h3>
             <div className="grid grid-cols-2 gap-3 text-sm">
@@ -102,7 +102,7 @@ const DoiHangVeModal = ({
               </div>
               <div>
                 <span className="text-gray-500">Hạng vé hiện tại:</span>
-                <p className="font-medium text-violet-600">{datCho.tenHangVe}</p>
+                <p className="font-medium text-indigo-600">{datCho.tenHangVe}</p>
               </div>
               <div>
                 <span className="text-gray-500">Giá vé hiện tại:</span>
@@ -117,7 +117,7 @@ const DoiHangVeModal = ({
             
             {loadingHangVe ? (
               <div className="flex items-center justify-center py-4">
-                <FaSpinner className="animate-spin text-violet-600 text-2xl" />
+                <FaSpinner className="animate-spin text-indigo-600 text-2xl" />
               </div>
             ) : (
               <div className="space-y-2">
@@ -127,14 +127,14 @@ const DoiHangVeModal = ({
                     onClick={() => handleSelectHangVe(hangVe)}
                     className={`w-full p-3 rounded-lg border-2 text-left transition-all ${
                       selectedHangVe?.maHangVe === hangVe.maHangVe
-                        ? 'border-violet-500 bg-violet-50'
+                        ? 'border-violet-500 bg-indigo-50'
                         : 'border-gray-200 hover:border-violet-300'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-medium">{hangVe.tenHangVe}</span>
                       {selectedHangVe?.maHangVe === hangVe.maHangVe && (
-                        <span className="text-violet-600">✓</span>
+                        <span className="text-indigo-600">✓</span>
                       )}
                     </div>
                   </button>
@@ -149,12 +149,12 @@ const DoiHangVeModal = ({
           {/* Thông tin phí */}
           {loadingPhi ? (
             <div className="flex items-center justify-center py-4">
-              <FaSpinner className="animate-spin text-violet-600 text-2xl" />
+              <FaSpinner className="animate-spin text-indigo-600 text-2xl" />
               <span className="ml-2 text-gray-600">Đang tính phí...</span>
             </div>
           ) : phiDoiInfo ? (
-            <div className="bg-violet-50 rounded-lg p-4 mb-6 border border-violet-200">
-              <h3 className="font-semibold text-violet-800 mb-3 flex items-center gap-2">
+            <div className="bg-indigo-50 rounded-lg p-4 mb-6 border border-indigo-200">
+              <h3 className="font-semibold text-indigo-800 mb-3 flex items-center gap-2">
                 <FaMoneyBillWave />
                 Chi tiết phí đổi hạng vé
               </h3>
@@ -198,9 +198,9 @@ const DoiHangVeModal = ({
                     <span className="text-orange-600">+{formatCurrency(phiDoiInfo.phiDoi)}</span>
                   </div>
                 )}
-                <div className="border-t border-violet-200 pt-2 mt-2">
+                <div className="border-t border-indigo-200 pt-2 mt-2">
                   <div className="flex justify-between font-semibold text-lg">
-                    <span className="text-violet-800">
+                    <span className="text-indigo-800">
                       {phiDoiInfo.loaiGiaoDich === 'HOAN_TIEN' ? 'Hoàn tiền:' : 'Thanh toán thêm:'}
                     </span>
                     <span className={phiDoiInfo.loaiGiaoDich === 'HOAN_TIEN' ? 'text-green-600' : 'text-red-600'}>

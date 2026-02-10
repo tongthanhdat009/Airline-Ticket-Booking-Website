@@ -126,37 +126,45 @@ const ViewPaymentDetailModal = ({
                           currentPayment?.datCho?.hanhKhach;
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 z-50">
+            {/* Backdrop */}
             <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-y-auto relative">
-                <div className="sticky top-0 bg-linear-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex justify-between items-center z-10">
-                    <h3 className="text-xl font-bold">Chi tiết thanh toán #{currentPayment.maThanhToan}</h3>
-                    <div className="flex items-center gap-3">
-                        <button onClick={onClose} className="text-white hover:text-gray-200">
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
+
+            {/* Modal - Full screen on mobile, centered modal on desktop */}
+            <div className="relative z-10 h-full w-full md:h-[85vh] md:max-w-7xl md:mx-auto md:my-8 md:rounded-xl bg-white md:shadow-2xl flex flex-col overflow-hidden">
+                {/* Header */}
+                <div className="[background:linear-gradient(to_right,rgb(37,99,235),rgb(29,78,216))] text-white px-4 md:px-6 py-3 md:py-4 flex justify-between items-center shrink-0">
+                    <div className="min-w-0 flex-1">
+                        <h3 className="text-lg md:text-xl font-bold truncate">Chi tiết thanh toán #{currentPayment.maThanhToan}</h3>
                     </div>
+                    <button
+                        onClick={onClose}
+                        className="text-white hover:text-gray-200 transition-colors p-1 hover:bg-white/10 rounded-lg ml-2 shrink-0"
+                    >
+                        <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
-                
-                <div className="p-6">
-                    <div className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border mt-3 mb-3 border-blue-200">
-                        <div className="flex justify-between items-center">
+
+                {/* Main Content - Scrollable */}
+                <div className="flex-1 overflow-y-auto p-4 md:p-6">
+                    <div className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-xl p-4 md:p-6 border mt-3 mb-3 border-blue-200">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                             <div>
                                 <h4 className="text-sm font-semibold text-gray-600 mb-2">Trạng thái thanh toán</h4>
-                                <div className="text-3xl">{getStatusBadge(currentPayment.daThanhToan)}</div>
+                                <div className="text-2xl md:text-3xl">{getStatusBadge(currentPayment.daThanhToan)}</div>
                             </div>
-                            <div className="text-right">
+                            <div className="text-left sm:text-right w-full sm:w-auto">
                                 <div className="text-sm text-gray-600 mb-1">Mã thanh toán</div>
-                                <div className="text-2xl font-bold text-blue-600">#{currentPayment.maThanhToan}</div>
+                                <div className="text-xl md:text-2xl font-bold text-blue-600">#{currentPayment.maThanhToan}</div>
                             </div>
                         </div>
                     </div>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                         {/* Cột trái - Thông tin thanh toán */}
                         <div className="space-y-6">
-                            <div className="bg-linear-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200 h-full">
+                            <div className="bg-linear-to-br from-purple-50 to-pink-50 rounded-xl p-4 md:p-6 border border-purple-200 h-full">
                                 <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                                     <FaUser className="text-purple-600" />
                                     Thông tin khách hàng
@@ -201,18 +209,18 @@ const ViewPaymentDetailModal = ({
 
                         <div className="space-y-6">
                             
-                            <div className="bg-linear-to-br from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-200 h-full">
+                            <div className="bg-linear-to-br from-indigo-50 to-purple-50 rounded-xl p-4 md:p-6 border border-indigo-200 h-full">
                                 <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                                     <FaConciergeBell className="text-indigo-600" />
                                     Dịch vụ đã đặt
                                 </h4>
-                                <div className="bg-linear-to-r from-indigo-100 to-purple-100 rounded-lg p-4 border-2 border-indigo-300 mb-5 mt-4">
-                                    <div className="flex justify-between items-center">
+                                <div className="bg-gradient-to-r from-indigo-100 to-purple-100 rounded-lg p-3 md:p-4 border-2 border-indigo-300 mb-4 md:mb-5 mt-4">
+                                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                                         <span className="font-bold text-gray-800">Tổng tiền dịch vụ:</span>
-                                        <span className="text-2xl font-bold text-indigo-600">
+                                        <span className="text-xl md:text-2xl font-bold text-indigo-600">
                                             {formatCurrency(
-                                                bookedServices.reduce((total, service) => 
-                                                    total + ((service.luaChonDichVu?.gia || 0) * (service.soLuong || 1)), 
+                                                bookedServices.reduce((total, service) =>
+                                                    total + ((service.luaChonDichVu?.gia || 0) * (service.soLuong || 1)),
                                                 0)
                                             )}
                                         </span>
@@ -223,7 +231,7 @@ const ViewPaymentDetailModal = ({
                                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
                                     </div>
                                 ) : bookedServices.length > 0 ? (
-                                    <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
+                                    <div className="space-y-3 max-h-[400px] md:max-h-[600px] overflow-y-auto pr-1 md:pr-2">
                                         {bookedServices.map((service, index) => {
                                             const maLuaChon = service.luaChonDichVu?.maLuaChon;
                                             const imageUrl = serviceImages[maLuaChon];
@@ -231,7 +239,7 @@ const ViewPaymentDetailModal = ({
                                             return (
                                                 <div key={index} className="bg-white rounded-lg p-4 shadow-md border border-gray-200 hover:shadow-lg transition-shadow">
                                                     <div className="flex items-start gap-3">
-                                                        <div className="w-16 h-16 rounded-lg bg-indigo-100 flex items-center justify-center shrink-0 overflow-hidden">
+                                                        <div className="w-16 h-16 rounded-lg bg-blue-100 flex items-center justify-center shrink-0 overflow-hidden">
                                                             {imageUrl ? (
                                                                 <img 
                                                                     src={imageUrl} 
@@ -303,7 +311,7 @@ const ViewPaymentDetailModal = ({
                             </div>
                         </div>
                         {chuyenBayInfo && (
-                                <div className="bg-linear-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+                                <div className="bg-linear-to-br from-green-50 to-emerald-50 rounded-xl p-4 md:p-6 border border-green-200">
                                     <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                                         <FaPlane className="text-green-600" />
                                         Thông tin chuyến bay
@@ -361,30 +369,30 @@ const ViewPaymentDetailModal = ({
                                     </div>
                                 </div>)}
                     </div>
-                        <div className="bg-linear-to-br from-yellow-50 to-orange-50 rounded-xl p-6 mt-6 border border-yellow-200">
+                        <div className="bg-linear-to-br from-yellow-50 to-orange-50 rounded-xl p-4 md:p-6 mt-4 md:mt-6 border border-yellow-200">
                             <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                                 <FaMoneyBillWave className="text-yellow-600" />
                                 Thông tin thanh toán
                             </h4>
                             
                             <div className="grid grid-cols-1 gap-4">
-                                <div className="bg-white rounded-lg p-4 shadow-sm">
+                                <div className="bg-white rounded-lg p-3 md:p-4 shadow-sm">
                                     <div className="flex items-center gap-2 text-gray-500 text-xs mb-1">
                                         <FaMoneyBillWave size={12} />
                                         <span>Số tiền thanh toán</span>
                                     </div>
-                                    <div className="text-3xl font-bold text-green-600">{formatCurrency(currentPayment.soTien)}</div>
+                                    <div className="text-2xl md:text-3xl font-bold text-green-600">{formatCurrency(currentPayment.soTien)}</div>
                                 </div>
 
-                                <div className="bg-white rounded-lg p-4 shadow-sm">
+                                <div className="bg-white rounded-lg p-3 md:p-4 shadow-sm">
                                     <div className="flex items-center gap-2 text-gray-500 text-xs mb-1">
                                         <FaCalendarAlt size={12} />
                                         <span>Ngày hết hạn</span>
                                     </div>
-                                    <div className="text-xl font-semibold text-red-600">{formatDate(currentPayment.ngayHetHan)}</div>
+                                    <div className="text-lg md:text-xl font-semibold text-red-600">{formatDate(currentPayment.ngayHetHan)}</div>
                                 </div>
 
-                                <div className="bg-white rounded-lg p-4 shadow-sm">
+                                <div className="bg-white rounded-lg p-3 md:p-4 shadow-sm">
                                     <div className="text-gray-500 text-xs mb-1">Phương thức thanh toán</div>
                                     <div className="font-medium text-gray-900">{currentPayment.phuongThucThanhToan || 'Chưa xác định'}</div>
                                 </div>
@@ -392,37 +400,41 @@ const ViewPaymentDetailModal = ({
                         </div>
                 </div>
 
-                <div className="sticky bottom-0 bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-between items-center">
-                    <div className="flex items-center gap-2">
+
+                {/* Footer - Responsive layout */}
+                <div className="bg-gray-50 px-4 md:px-6 py-3 md:py-4 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-0 shrink-0">
+                    <div className="flex items-center gap-2 text-xs md:text-sm order-2 md:order-1">
                         {currentPayment.daThanhToan === 'Y' && (
-                            <span className="text-xs text-gray-500 italic">
+                            <span className="text-gray-500 italic">
                                 ✓ Invoice is available for download
                             </span>
                         )}
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex gap-2 md:gap-3 order-1 md:order-2 w-full md:w-auto">
                         {currentPayment.daThanhToan === 'Y' && (
                             <button
                                 onClick={handleDownloadInvoice}
                                 disabled={downloadingInvoice}
-                                className="flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 md:px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
                             >
                                 {downloadingInvoice ? (
                                     <>
                                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                        <span>Processing...</span>
+                                        <span className="hidden sm:inline">Processing...</span>
+                                        <span className="sm:hidden">...</span>
                                     </>
                                 ) : (
                                     <>
                                         <FaFilePdf />
-                                        <span>Xuất hoá đơn</span>
+                                        <span className="hidden sm:inline">Xuất hoá đơn</span>
+                                        <span className="sm:hidden">Hóa đơn</span>
                                     </>
                                 )}
                             </button>
                         )}
                         <button
                             onClick={onClose}
-                            className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+                            className="flex-1 md:flex-none px-4 md:px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base"
                         >
                             Đóng
                         </button>

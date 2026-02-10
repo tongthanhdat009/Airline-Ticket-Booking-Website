@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  FaSearch, 
-  FaEye, 
-  FaFilePdf, 
-  FaFileExcel, 
+import {
+  FaSearch,
+  FaEye,
+  FaFilePdf,
+  FaFileExcel,
   FaCalendar,
   FaTimes,
   FaPrint
@@ -12,9 +12,17 @@ import Card from '../../components/QuanLy/CardChucNang';
 import hoaDonApi from '../../services/hoaDonApi';
 import Toast from '../../components/common/Toast';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
+import ViewToggleButton from '../../components/common/ViewToggleButton';
+import CardView from '../../components/common/CardView';
+import ResponsiveTable from '../../components/common/ResponsiveTable';
+import { useViewToggle } from '../../hooks/useViewToggle';
 import { HoaDonDetailModal } from '../../components/QuanLy/QuanLyHoaDon';
+import HoaDonCard from '../../components/QuanLy/QuanLyHoaDon/HoaDonCard';
 
 const QuanLyHoaDon = () => {
+  // View toggle hook
+  const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-hoa-don-view', 'table');
+
   // States cho dữ liệu
   const [hoaDonList, setHoaDonList] = useState([]);
   const [, setLoading] = useState(true);
@@ -34,7 +42,7 @@ const QuanLyHoaDon = () => {
 
   // States cho pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // States cho search và filters
   const [search, setSearch] = useState('');
@@ -140,6 +148,12 @@ const QuanLyHoaDon = () => {
   const totalPages = Math.ceil(filteredHoaDon.length / itemsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const handleItemsPerPageChange = (e) => {
+      const newValue = parseInt(e.target.value);
+      setItemsPerPage(newValue);
+      setCurrentPage(1); // Reset to first page when changing items per page
+  };
 
   // Export PDF
   const handleExportPdf = async (maHoaDon) => {
@@ -297,7 +311,7 @@ const QuanLyHoaDon = () => {
             <FaTimes size={40} className="opacity-80" />
           </div>
         </div>
-        <div className="bg-linear-to-br from-purple-500 to-violet-600 rounded-xl p-5 text-white shadow-lg">
+        <div className="bg-linear-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium opacity-90">Tổng doanh thu</p>
@@ -320,7 +334,13 @@ const QuanLyHoaDon = () => {
           />
           <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
         </div>
-        
+
+        <ViewToggleButton
+          currentView={viewMode}
+          onViewChange={handleViewChange}
+          className="shrink-0"
+        />
+
         <div className="flex gap-3 w-full lg:w-auto flex-wrap">
           <select
             value={filters.trangThai}
@@ -336,7 +356,7 @@ const QuanLyHoaDon = () => {
           <button
             onClick={handleExportExcel}
             disabled={exportLoading || hoaDonList.length === 0}
-            className="flex items-center gap-2 bg-linear-to-r from-green-500 to-emerald-600 text-white px-5 py-3 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-5 py-3 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <FaFileExcel />
             <span className="hidden sm:inline">Xuất Excel</span>
@@ -344,7 +364,7 @@ const QuanLyHoaDon = () => {
 
           <button
             onClick={() => loadData()}
-            className="flex items-center gap-2 bg-linear-to-r from-blue-500 to-cyan-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-cyan-700 transition-all shadow-lg hover:shadow-xl font-semibold"
+            className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-cyan-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-cyan-700 transition-all shadow-lg hover:shadow-xl font-semibold"
           >
             <FaCalendar />
             <span className="hidden sm:inline">Làm mới</span>
@@ -352,11 +372,26 @@ const QuanLyHoaDon = () => {
         </div>
       </div>
 
-      {/* Bảng dữ liệu */}
-      <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
-        <div className="overflow-x-auto">
+      {/* Bảng dữ liệu / Card View */}
+      {viewMode === 'grid' ? (
+        /* Card View */
+        <CardView
+          items={currentItems}
+          renderCard={(hd, index) => (
+            <HoaDonCard
+              key={hd.maHoaDon || index}
+              data={hd}
+              onView={handleViewDetail}
+              onExportPdf={handleExportPdf}
+            />
+          )}
+          emptyMessage="Không tìm thấy hóa đơn nào."
+        />
+      ) : (
+        /* Table View */
+        <ResponsiveTable>
           <table className="w-full text-sm">
-            <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
+            <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
               <tr>
                 <th className="px-4 py-4 text-left font-semibold">Số HĐ</th>
                 <th className="px-4 py-4 text-left font-semibold">PNR</th>
@@ -432,15 +467,27 @@ const QuanLyHoaDon = () => {
               )}
             </tbody>
           </table>
-        </div>
-      </div>
+        </ResponsiveTable>
+      )}
 
       {/* Phân trang */}
       {filteredHoaDon.length > itemsPerPage && (
         <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-          <span className="text-sm text-gray-600 font-medium">
-            Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredHoaDon.length)}</span> của <span className="font-bold text-blue-600">{filteredHoaDon.length}</span> kết quả
-          </span>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600 font-medium">
+              Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredHoaDon.length)}</span> của <span className="font-bold text-blue-600">{filteredHoaDon.length}</span> kết quả
+            </span>
+            <select
+              value={itemsPerPage}
+              onChange={handleItemsPerPageChange}
+              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white"
+            >
+              <option value={5}>5 / trang</option>
+              <option value={10}>10 / trang</option>
+              <option value={20}>20 / trang</option>
+              <option value={50}>50 / trang</option>
+            </select>
+          </div>
           <nav>
             <ul className="flex gap-2">
               <li>
