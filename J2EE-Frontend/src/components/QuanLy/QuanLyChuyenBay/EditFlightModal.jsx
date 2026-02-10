@@ -351,7 +351,7 @@ const EditFlightModal = ({ isOpen, onClose, onSubmit, formData, onFormChange, ro
                                 )}
                             </div>
                             {selectedServices.length > 0 && (
-                                <div className="mt-2 md:mt-3 p-2 bg-purple-100 rounded text-xs md:text-sm text-purple-800">
+                                <div className="mt-2 md:mt-3 p-2 bg-blue-100 rounded text-xs md:text-sm text-blue-800">
                                     Đã chọn {selectedServices.length} dịch vụ
                                 </div>
                             )}

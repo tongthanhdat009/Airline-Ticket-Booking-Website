@@ -224,14 +224,14 @@ const QuanLyKhuyenMai = () => {
                                         <td className="px-6 py-4 font-bold text-pink-600">#{km.maKhuyenMai}</td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
-                                                <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center shrink-0">
+                                                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
                                                     <FaTags className="text-pink-600" />
                                                 </div>
                                                 <span className="font-medium text-gray-900">{km.tenKhuyenMai}</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-semibold">
+                                            <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
                                                 {km.maKM}
                                             </span>
                                         </td>

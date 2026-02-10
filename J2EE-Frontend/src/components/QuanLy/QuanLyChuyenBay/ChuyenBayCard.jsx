@@ -44,7 +44,7 @@ const ChuyenBayCard = memo(({
       return 'bg-blue-100 text-blue-700';
     }
     if (normalizedStatus.includes('đã khởi hành') || normalizedStatus === 'departed') {
-      return 'bg-indigo-100 text-indigo-700';
+      return 'bg-blue-100 text-blue-700';
     }
     if (normalizedStatus.includes('trễ') || normalizedStatus === 'delayed') {
       return 'bg-yellow-100 text-yellow-700';
@@ -53,7 +53,7 @@ const ChuyenBayCard = memo(({
       return 'bg-red-100 text-red-700';
     }
     if (normalizedStatus.includes('lên kế hoạch') || normalizedStatus === 'scheduled' || normalizedStatus === 'chưa bay') {
-      return 'bg-purple-100 text-purple-700';
+      return 'bg-blue-100 text-blue-700';
     }
     return 'bg-gray-100 text-gray-700';
   };

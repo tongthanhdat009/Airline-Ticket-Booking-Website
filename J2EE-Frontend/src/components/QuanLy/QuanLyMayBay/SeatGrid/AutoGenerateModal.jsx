@@ -216,7 +216,7 @@ const AutoGenerateModal = ({
                                     <button
                                         key={key}
                                         onClick={() => applyTemplate(key)}
-                                        className="px-4 py-2 bg-white border border-indigo-300 rounded-lg hover:bg-indigo-100 text-sm font-medium"
+                                        className="px-4 py-2 bg-white border border-blue-300 rounded-lg hover:bg-blue-100 text-sm font-medium"
                                     >
                                         {AIRCRAFT_TEMPLATES[key].name}
                                     </button>

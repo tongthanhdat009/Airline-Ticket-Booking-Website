@@ -76,7 +76,7 @@ const SanBayCard = memo(({
         {/* ICAO Code */}
         {maICAO && (
           <div className="flex items-center gap-2 text-gray-600">
-            <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded text-xs font-semibold flex-shrink-0">
+            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-semibold flex-shrink-0">
               {maICAO}
             </span>
             <span className="text-xs text-gray-400">ICAO</span>

@@ -142,12 +142,12 @@ const QuanLyLichSuThaoTac = () => {
             'UPDATE': { text: 'Cập nhật', color: 'bg-blue-100 text-blue-700' },
             'XOA': { text: 'Xóa', color: 'bg-red-100 text-red-700' },
             'DELETE': { text: 'Xóa', color: 'bg-red-100 text-red-700' },
-            'HUY_VE': { text: 'Hủy vé', color: 'bg-orange-100 text-orange-700' },
+            'HUY_VE': { text: 'Hủy vé', color: 'bg-red-100 text-red-700' },
             'DOI_GIO_BAY': { text: 'Đổi giờ bay', color: 'bg-yellow-100 text-yellow-700' },
             'DOI_CHUYEN_BAY': { text: 'Đổi chuyến bay', color: 'bg-blue-100 text-blue-700' },
-            'CHECK_IN': { text: 'Check-in', color: 'bg-teal-100 text-teal-700' },
-            'HOAN_TIEN': { text: 'Hoàn tiền', color: 'bg-pink-100 text-pink-700' },
-            'REFUND': { text: 'Hoàn tiền', color: 'bg-pink-100 text-pink-700' }
+            'CHECK_IN': { text: 'Check-in', color: 'bg-green-100 text-green-700' },
+            'HOAN_TIEN': { text: 'Hoàn tiền', color: 'bg-yellow-100 text-yellow-700' },
+            'REFUND': { text: 'Hoàn tiền', color: 'bg-yellow-100 text-yellow-700' }
         };
         return mapping[loai] || { text: loai, color: 'bg-gray-100 text-gray-700' };
     };
@@ -156,7 +156,7 @@ const QuanLyLichSuThaoTac = () => {
     const getLoaiTaiKhoanText = (loai) => {
         switch (loai) {
             case 'ADMIN': return { text: 'Admin', color: 'bg-blue-100 text-blue-700' };
-            case 'CUSTOMER': return { text: 'Khách hàng', color: 'bg-cyan-100 text-cyan-700' };
+            case 'CUSTOMER': return { text: 'Khách hàng', color: 'bg-blue-100 text-blue-700' };
             default: return { text: loai, color: 'bg-gray-100 text-gray-700' };
         }
     };

@@ -42,19 +42,19 @@ const VaiTroCard = memo(({
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
           {/* Avatar icon */}
-          <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-            <FaUserShield className="text-indigo-600" size={18} />
+          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+            <FaUserShield className="text-blue-600" size={18} />
           </div>
           <div className="min-w-0 flex-1">
             <h3 className="font-semibold text-gray-900 truncate">{tenVaiTro || 'Không có tên'}</h3>
-            <p className="text-sm text-indigo-600 font-medium">#{maVaiTro}</p>
+            <p className="text-sm text-blue-600 font-medium">#{maVaiTro}</p>
           </div>
         </div>
 
         {/* Status Badge */}
         <div className={`flex-shrink-0`}>
           {trangThai ? (
-            <span className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold flex items-center gap-1">
+            <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold flex items-center gap-1">
               <FaCheck size={10} />
               Hoạt động
             </span>

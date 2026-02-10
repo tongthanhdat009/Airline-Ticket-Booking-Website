@@ -739,7 +739,7 @@ const QuanLyDatCho = () => {
                           </button>
                           <button
                             onClick={() => handleDoiHangVe(dc)}
-                            className="p-2 bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 transition-colors"
+                            className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
                             title="Đổi hạng vé"
                           >
                             <FaTicketAlt />

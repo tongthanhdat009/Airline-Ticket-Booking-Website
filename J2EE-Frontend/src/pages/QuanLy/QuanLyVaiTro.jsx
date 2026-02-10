@@ -353,7 +353,7 @@ const QuanLyVaiTro = () => {
                                                 <td className="px-6 py-4 text-center">
                                                     <span className={`px-4 py-2 rounded-full text-sm font-semibold ${
                                                         role.trangThai
-                                                            ? 'bg-emerald-100 text-emerald-700'
+                                                            ? 'bg-green-100 text-green-700'
                                                             : 'bg-red-100 text-red-700'
                                                     }`}>
                                                         {role.trangThai ? 'Hoạt động' : 'Ngừng'}
@@ -368,7 +368,7 @@ const QuanLyVaiTro = () => {
                                                     <div className="flex items-center justify-center gap-2">
                                                         <button
                                                             onClick={() => openEditModal(role)}
-                                                            className="p-2 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors"
+                                                            className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
                                                             title="Sửa"
                                                         >
                                                             <FaEdit />

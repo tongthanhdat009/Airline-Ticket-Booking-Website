@@ -340,14 +340,14 @@ const SeatGridView = ({ seats, hangVeList, onSeatClick, onDeleteSeat, getHangVeN
     // Tạo màu sắc cho từng hạng vé
     const getHangVeColor = (maHangVe) => {
         const colors = [
-            'bg-purple-100 border-purple-300',
-            'bg-pink-100 border-pink-300',
+            'bg-blue-600 border-blue-300',
+            'bg-blue-500 border-blue-300',
+            'bg-blue-400 border-blue-300',
+            'bg-blue-300 border-blue-300',
+            'bg-blue-200 border-blue-300',
+            'bg-blue-100 border-blue-300',
             'bg-indigo-100 border-indigo-300',
-            'bg-teal-100 border-teal-300',
-            'bg-orange-100 border-orange-300',
-            'bg-cyan-100 border-cyan-300',
-            'bg-rose-100 border-rose-300',
-            'bg-amber-100 border-amber-300'
+            'bg-cyan-100 border-cyan-300'
         ];
         const index = hangVeList.findIndex(h => h.maHangVe === maHangVe);
         return colors[index % colors.length] || 'bg-gray-100 border-gray-300';

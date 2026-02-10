@@ -161,7 +161,7 @@ const ViewPriceDetailModal = ({
                                         <div key={ticketClass.maHangVe} className="bg-white rounded-lg p-4 shadow-md border border-gray-200 hover:shadow-lg transition-shadow">
                                             <div className="flex justify-between items-center mb-3 cursor-pointer" onClick={() => toggleClassExpansion(ticketClass.maHangVe)}>
                                                 <div>
-                                                    <span className="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-indigo-100 text-indigo-800">
+                                                    <span className="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
                                                         {ticketClass.tenHangVe}
                                                     </span>
                                                     <span className="ml-2 text-xs text-gray-500">({ticketClass.count} mức giá)</span>

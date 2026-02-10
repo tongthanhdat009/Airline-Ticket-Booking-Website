@@ -71,7 +71,7 @@ const TaiKhoanAdminCard = memo(({
               tenVaiTro.map((role, idx) => (
                 <span
                   key={idx}
-                  className="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold"
+                  className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold"
                 >
                   {role}
                 </span>

@@ -410,7 +410,7 @@ const QuanLyPhanQuyen = () => {
                                 <span className="font-semibold">{permissionCount}</span> quyền đã được cấp cho vai trò này
                             </div>
                             {hasChanges() && !isSuperAdmin && (
-                                <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">
+                                <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-semibold">
                                     Có thay đổi chưa lưu
                                 </span>
                             )}
@@ -491,7 +491,7 @@ const QuanLyPhanQuyen = () => {
                                             <div className="flex items-center gap-3">
                                                 <span className="font-bold text-slate-800 text-lg">{feature.tenChucNang}</span>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs font-mono">
+                                                    <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-mono">
                                                         {feature.maCode}
                                                     </span>
                                                     {feature.nhom && (
@@ -516,7 +516,7 @@ const QuanLyPhanQuyen = () => {
                                             {!isSuperAdmin && (
                                                 <button
                                                     onClick={() => checkAllFeature(feature.maChucNang)}
-                                                    className="px-4 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors font-semibold text-sm flex items-center gap-2"
+                                                    className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors font-semibold text-sm flex items-center gap-2"
                                                 >
                                                     {isFeatureAllChecked(feature.maChucNang) ? (
                                                         <><FaCheckSquare /> Bỏ chọn tất cả</>

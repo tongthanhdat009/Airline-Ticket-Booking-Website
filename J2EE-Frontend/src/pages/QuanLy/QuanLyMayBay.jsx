@@ -299,12 +299,12 @@ const QuanLyMayBay = () => {
                                 currentItems.map((mb, index) => {
                                     const status = getTrangThaiText(mb.trangThai);
                                     return (
-                                        <tr key={mb.maMayBay} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-sky-50 transition-colors`}>
-                                            <td className="px-6 py-4 font-bold text-sky-600">#{mb.maMayBay}</td>
+                                        <tr key={mb.maMayBay} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
+                                            <td className="px-6 py-4 font-bold text-blue-600">#{mb.maMayBay}</td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center shrink-0">
-                                                        <FaFighterJet className="text-sky-600" />
+                                                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                                                        <FaFighterJet className="text-blue-600" />
                                                     </div>
                                                     <div>
                                                         <p className="font-medium text-gray-900">{mb.tenMayBay}</p>
@@ -315,7 +315,7 @@ const QuanLyMayBay = () => {
                                             <td className="px-6 py-4 text-gray-700">{mb.hangMayBay}</td>
                                             <td className="px-6 py-4 text-gray-700">{mb.soHieu}</td>
                                             <td className="px-6 py-4 text-gray-700">{mb.namKhaiThac || '-'}</td>
-                                            <td className="px-6 py-4 text-center font-bold text-sky-600">{mb.tongSoGhe}</td>
+                                            <td className="px-6 py-4 text-center font-bold text-blue-600">{mb.tongSoGhe}</td>
                                             <td className="px-6 py-4">
                                                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status.color}`}>
                                                     {status.text}
@@ -375,7 +375,7 @@ const QuanLyMayBay = () => {
             {filteredAircrafts.length > itemsPerPage && (
                 <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
                     <span className="text-sm text-gray-600 font-medium">
-                        Hiển thị <span className="font-bold text-sky-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-sky-600">{Math.min(indexOfLastItem, filteredAircrafts.length)}</span> của <span className="font-bold text-sky-600">{filteredAircrafts.length}</span> kết quả
+                        Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredAircrafts.length)}</span> của <span className="font-bold text-blue-600">{filteredAircrafts.length}</span> kết quả
                     </span>
                     <nav>
                         <ul className="flex gap-2">

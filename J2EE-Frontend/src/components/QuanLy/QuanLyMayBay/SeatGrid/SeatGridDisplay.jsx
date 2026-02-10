@@ -287,11 +287,11 @@ const SeatGridDisplay = ({
                                                 const isExitRow = COMMON_EXIT_ROWS.includes(row);
 
                                                 return (
-                                                    <tr key={row} className={`${isExitRow ? 'bg-orange-50/50' : ''} hover:bg-gray-100/70 transition-colors duration-150`}>
+                                                    <tr key={row} className={`${isExitRow ? 'bg-blue-50/50' : ''} hover:bg-gray-100/70 transition-colors duration-150`}>
                                                         <td className="px-2 py-1.5">
                                                             <div className={`flex items-center justify-center w-9 h-9 rounded-lg text-xs font-semibold transition-colors ${
                                                                 isExitRow
-                                                                    ? 'bg-orange-100 text-orange-700 border border-orange-200'
+                                                                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
                                                                     : 'bg-gray-200 text-gray-600'
                                                             }`}>
                                                                 {row}

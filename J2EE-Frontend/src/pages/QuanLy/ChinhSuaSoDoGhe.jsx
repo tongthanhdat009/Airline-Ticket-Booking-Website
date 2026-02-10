@@ -483,11 +483,11 @@ const ChinhSuaSoDoGhe = () => {
                                         <div className="w-6 h-6 bg-sky-500 rounded-md flex items-center justify-center text-white font-semibold text-xs">
                                             {selectedSeats.length}
                                         </div>
-                                        <span className="text-sky-800 text-sm font-medium">ghế đã chọn</span>
+                                        <span className="text-blue-800 text-sm font-medium">ghế đã chọn</span>
                                     </div>
                                     <button
                                         onClick={clearSelection}
-                                        className="p-1.5 text-sky-600 hover:bg-sky-100 rounded-md transition-colors"
+                                        className="p-1.5 text-blue-600 hover:bg-blue-100 rounded-md transition-colors"
                                         title="Bỏ chọn tất cả"
                                     >
                                         <FaTimes className="text-xs" />

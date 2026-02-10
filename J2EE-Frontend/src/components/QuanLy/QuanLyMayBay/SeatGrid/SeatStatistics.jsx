@@ -42,19 +42,19 @@ const SeatStatistics = ({ seats, hangVeList, sidebarCollapsed, setSidebarCollaps
     // Color mapping for ticket classes
     const getClassColor = (className) => {
         const name = className.toLowerCase();
-        if (name.includes('business') || name.includes('thương gia')) 
+        if (name.includes('business') || name.includes('thương gia'))
             return { bg: 'bg-blue-100', text: 'text-blue-700', bar: 'bg-blue-500', icon: 'text-blue-500' };
-        if (name.includes('premium') || name.includes('cao cấp')) 
-            return { bg: 'bg-amber-100', text: 'text-amber-700', bar: 'bg-amber-500', icon: 'text-amber-500' };
-        if (name.includes('first') || name.includes('hạng nhất')) 
-            return { bg: 'bg-purple-100', text: 'text-purple-700', bar: 'bg-purple-500', icon: 'text-purple-500' };
-        return { bg: 'bg-emerald-100', text: 'text-emerald-700', bar: 'bg-emerald-500', icon: 'text-emerald-500' };
+        if (name.includes('premium') || name.includes('cao cấp'))
+            return { bg: 'bg-yellow-100', text: 'text-yellow-700', bar: 'bg-yellow-500', icon: 'text-yellow-500' };
+        if (name.includes('first') || name.includes('hạng nhất'))
+            return { bg: 'bg-blue-100', text: 'text-blue-700', bar: 'bg-blue-500', icon: 'text-blue-500' };
+        return { bg: 'bg-green-100', text: 'text-green-700', bar: 'bg-green-500', icon: 'text-green-500' };
     };
 
     // Color mapping for positions
     const getPositionStyle = (position) => {
         switch (position) {
-            case 'CỬA SỔ': return { icon: <FaWindowMaximize />, color: 'text-sky-600', bg: 'bg-sky-50', border: 'border-sky-200' };
+            case 'CỬA SỔ': return { icon: <FaWindowMaximize />, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' };
             case 'LỐI ĐI': return { icon: <MdAirlineSeatReclineExtra />, color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' };
             case 'GIỮA': return { icon: <FaChair />, color: 'text-gray-600', bg: 'bg-gray-50', border: 'border-gray-200' };
             default: return { icon: <FaChair />, color: 'text-gray-500', bg: 'bg-gray-50', border: 'border-gray-200' };

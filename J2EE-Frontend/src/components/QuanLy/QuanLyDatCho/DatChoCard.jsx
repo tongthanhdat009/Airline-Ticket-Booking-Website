@@ -85,7 +85,7 @@ const DatChoCard = memo(({
   // Get seat color based on ticket class
   const getSeatColor = (hangVe) => {
     if (hangVe?.includes('Thương gia')) {
-      return 'bg-purple-100 text-purple-700';
+      return 'bg-blue-100 text-blue-700';
     }
     if (hangVe?.includes('Phổ thông đặc biệt')) {
       return 'bg-blue-100 text-blue-700';
@@ -101,12 +101,12 @@ const DatChoCard = memo(({
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
           {/* Avatar icon */}
-          <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-            <FaTicketAlt className="text-indigo-600" size={18} />
+          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+            <FaTicketAlt className="text-blue-600" size={18} />
           </div>
           <div className="min-w-0 flex-1">
             <h3 className="font-semibold text-gray-900 truncate">{hoVaTen || 'Không có tên'}</h3>
-            <p className="text-sm text-indigo-600 font-medium">#{maDatCho}</p>
+            <p className="text-sm text-blue-600 font-medium">#{maDatCho}</p>
             {pnr && (
               <p className="text-xs text-gray-500">PNR: {pnr}</p>
             )}
@@ -190,7 +190,7 @@ const DatChoCard = memo(({
         </button>
         <button
           onClick={() => onDoiHangVe?.(data)}
-          className="p-1.5 bg-rose-100 text-rose-600 rounded-lg hover:bg-rose-200 transition-colors"
+          className="p-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
           title="Đổi hạng vé"
         >
           <FaTicketAlt size={14} />

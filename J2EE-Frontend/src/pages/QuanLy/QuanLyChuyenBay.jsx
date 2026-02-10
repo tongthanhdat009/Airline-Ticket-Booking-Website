@@ -659,7 +659,7 @@ const QuanLyChuyenBay = () => {
                                             <td className="px-6 py-4 font-bold text-blue-600">
                                                 {flight.soHieuChuyenBay}
                                                 {showDeleted && flight.soHieuChuyenBay?.includes('_deleted_') && (
-                                                    <span className="ml-2 text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">Đã xóa</span>
+                                                    <span className="ml-2 text-xs bg-red-100 text-red-700 px-2 py-1 rounded">Đã xóa</span>
                                                 )}
                                             </td>
                                             <td className="px-6 py-4 font-medium text-gray-900">

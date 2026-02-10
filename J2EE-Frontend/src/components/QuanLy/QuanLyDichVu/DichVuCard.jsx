@@ -42,12 +42,12 @@ const DichVuCard = memo(({
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
           {/* Icon */}
-          <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-            <FaConciergeBell className="text-indigo-600" size={18} />
+          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+            <FaConciergeBell className="text-blue-600" size={18} />
           </div>
           <div className="min-w-0 flex-1">
             <h3 className="font-semibold text-gray-900 truncate">{tenDichVu || 'Không có tên'}</h3>
-            <p className="text-sm text-indigo-600 font-medium">#{maDichVu}</p>
+            <p className="text-sm text-blue-600 font-medium">#{maDichVu}</p>
           </div>
         </div>
       </div>

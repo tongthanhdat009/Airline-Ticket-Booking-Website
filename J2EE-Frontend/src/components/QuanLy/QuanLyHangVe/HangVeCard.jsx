@@ -55,7 +55,7 @@ const HangVeCard = memo(({
         </div>
         {/* Status badge */}
         {isDeleted && (
-          <span className="px-2 py-1 text-xs font-medium bg-orange-100 text-orange-700 rounded-full flex-shrink-0">
+          <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full flex-shrink-0">
             Đã xóa
           </span>
         )}

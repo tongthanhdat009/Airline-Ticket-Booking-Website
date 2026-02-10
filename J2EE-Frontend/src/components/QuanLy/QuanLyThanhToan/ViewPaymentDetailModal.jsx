@@ -239,7 +239,7 @@ const ViewPaymentDetailModal = ({
                                             return (
                                                 <div key={index} className="bg-white rounded-lg p-4 shadow-md border border-gray-200 hover:shadow-lg transition-shadow">
                                                     <div className="flex items-start gap-3">
-                                                        <div className="w-16 h-16 rounded-lg bg-indigo-100 flex items-center justify-center shrink-0 overflow-hidden">
+                                                        <div className="w-16 h-16 rounded-lg bg-blue-100 flex items-center justify-center shrink-0 overflow-hidden">
                                                             {imageUrl ? (
                                                                 <img 
                                                                     src={imageUrl} 

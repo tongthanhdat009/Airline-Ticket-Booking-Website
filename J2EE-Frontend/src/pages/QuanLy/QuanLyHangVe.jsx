@@ -278,7 +278,7 @@ const QuanLyHangVe = () => {
                                                     </div>
                                                     <span className="font-medium text-gray-900">{hv.tenHangVe}</span>
                                                     {showDeleted && hv.tenHangVe?.includes('_deleted_') && (
-                                                        <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">Đã xóa</span>
+                                                        <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded">Đã xóa</span>
                                                     )}
                                                 </div>
                                             </td>
