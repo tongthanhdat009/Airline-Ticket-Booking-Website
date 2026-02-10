@@ -6,6 +6,7 @@ import CardView from '../../components/common/CardView';
 import ResponsiveTable from '../../components/common/ResponsiveTable';
 import { useViewToggle } from '../../hooks/useViewToggle';
 import VaiTroCard from '../../components/QuanLy/QuanLyVaiTro/VaiTroCard';
+import Card from '../../components/QuanLy/CardChucNang';
 import {
     getAllVaiTro,
     createVaiTro,
@@ -200,7 +201,7 @@ const QuanLyVaiTro = () => {
     };
 
     return (
-        <div className="p-6 bg-linear-to-br from-slate-50 to-slate-100 min-h-screen">
+        <Card title="Quản lý vai trò">
             {/* Toast Component */}
             <Toast
                 message={toast.message}
@@ -210,24 +211,22 @@ const QuanLyVaiTro = () => {
                 duration={3000}
             />
 
-            <div className="max-w-7xl mx-auto">
-
-                {/* Header */}
-                <div className="flex items-center justify-between mb-6">
-                    <div>
-                        <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-600 flex items-center gap-3">
-                            <FaUserShield className="text-blue-600" />
-                            Quản lý Vai trò
-                        </h1>
-                        <p className="text-slate-600 mt-2">Danh sách vai trò trong hệ thống RBAC</p>
-                    </div>
-                    <button
-                        onClick={openAddModal}
-                        className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-600 text-white rounded-xl hover:from-blue-700 hover:to-blue-700 transition-all shadow-lg shadow-blue-600/50 flex items-center gap-2 font-semibold"
-                    >
-                        <FaPlus /> Thêm vai trò
-                    </button>
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                        <FaUserShield className="text-blue-600" />
+                        Quản lý Vai trò
+                    </h1>
+                    <p className="text-gray-600 mt-1">Danh sách vai trò trong hệ thống RBAC</p>
                 </div>
+                <button
+                    onClick={openAddModal}
+                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-600 text-white rounded-xl hover:from-blue-700 hover:to-blue-700 transition-all shadow-lg flex items-center gap-2 font-semibold"
+                >
+                    <FaPlus /> Thêm vai trò
+                </button>
+            </div>
 
                 {/* Statistics Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -478,8 +477,7 @@ const QuanLyVaiTro = () => {
                         </div>
                     </div>
                 )}
-            </div>
-        </div>
+        </Card>
     );
 };
 

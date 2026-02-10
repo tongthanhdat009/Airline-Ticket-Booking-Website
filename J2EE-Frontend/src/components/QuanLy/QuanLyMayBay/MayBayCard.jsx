@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { FaEye, FaEdit, FaTrash, FaFighterJet, FaIndustry, FaHashtag, FaCalendar, FaChair } from 'react-icons/fa';
+import { FaEye, FaEdit, FaTrash, FaFighterJet, FaIndustry, FaHashtag, FaCalendar, FaChair, FaWrench } from 'react-icons/fa';
 import PropTypes from 'prop-types';
 
 /**
@@ -12,7 +12,9 @@ const MayBayCard = memo(({
   data,
   onView,
   onEdit,
-  onDelete
+  onDelete,
+  onViewSeatMap,
+  onEditSeatMap
 }) => {
   if (!data) {
     return null;
@@ -107,7 +109,7 @@ const MayBayCard = memo(({
       </div>
 
       {/* Card Actions */}
-      <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-gray-100">
+      <div className="flex flex-wrap justify-end gap-2 mt-4 pt-4 border-t border-gray-100">
         <button
           onClick={() => onView?.(data)}
           className="px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-1.5"
@@ -117,9 +119,25 @@ const MayBayCard = memo(({
           <span className="hidden sm:inline">Xem</span>
         </button>
         <button
-          onClick={() => onEdit?.(data)}
+          onClick={() => onViewSeatMap?.(data)}
           className="px-3 py-1.5 text-sm text-green-600 hover:bg-green-50 rounded-lg transition-colors flex items-center gap-1.5"
-          title="Chỉnh sửa"
+          title="Xem sơ đồ ghế"
+        >
+          <FaChair size={14} />
+          <span className="hidden sm:inline">Sơ đồ ghế</span>
+        </button>
+        <button
+          onClick={() => onEditSeatMap?.(data)}
+          className="px-3 py-1.5 text-sm text-sky-600 hover:bg-sky-50 rounded-lg transition-colors flex items-center gap-1.5"
+          title="Chỉnh sửa sơ đồ ghế"
+        >
+          <FaWrench size={14} />
+          <span className="hidden sm:inline">Chỉnh SDG</span>
+        </button>
+        <button
+          onClick={() => onEdit?.(data)}
+          className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-1.5"
+          title="Chỉnh sửa thông tin"
         >
           <FaEdit size={14} />
           <span className="hidden sm:inline">Sửa</span>
@@ -165,6 +183,14 @@ MayBayCard.propTypes = {
    * Callback when delete button is clicked
    */
   onDelete: PropTypes.func,
+  /**
+   * Callback when view seat map button is clicked
+   */
+  onViewSeatMap: PropTypes.func,
+  /**
+   * Callback when edit seat map button is clicked
+   */
+  onEditSeatMap: PropTypes.func,
 };
 
 MayBayCard.defaultProps = {
@@ -172,6 +198,8 @@ MayBayCard.defaultProps = {
   onView: undefined,
   onEdit: undefined,
   onDelete: undefined,
+  onViewSeatMap: undefined,
+  onEditSeatMap: undefined,
 };
 
 export default MayBayCard;

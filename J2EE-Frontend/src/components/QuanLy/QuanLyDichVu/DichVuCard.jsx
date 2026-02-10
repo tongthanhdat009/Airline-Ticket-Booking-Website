@@ -54,13 +54,6 @@ const DichVuCard = memo(({
 
       {/* Card Body */}
       <div className="space-y-3 text-sm">
-        {/* Description */}
-        {moTa && (
-          <div className="text-gray-600">
-            <p className="line-clamp-3">{moTa}</p>
-          </div>
-        )}
-
         {/* Service Image */}
         <div className="flex justify-center">
           <img

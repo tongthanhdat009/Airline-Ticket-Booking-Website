@@ -52,7 +52,7 @@ const QuanLyChuyenBay = () => {
     const [showDeleted, setShowDeleted] = useState(false);
     const [actionLoading, setActionLoading] = useState(false);
     const [confirmDialog, setConfirmDialog] = useState({ isVisible: false, onConfirm: null });
-    const itemsPerPage = 5;
+    const [itemsPerPage, setItemsPerPage] = useState(5);
 
     // --- VIEW TOGGLE ---
     const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-chuyen-bay-view', 'table');
@@ -156,6 +156,12 @@ const QuanLyChuyenBay = () => {
     const totalPages = Math.ceil(filteredFlights.length / itemsPerPage);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    const handleItemsPerPageChange = (e) => {
+        const newValue = parseInt(e.target.value);
+        setItemsPerPage(newValue);
+        setCurrentPage(1); // Reset to first page when changing items per page
+    };
 
     // --- MODAL HANDLERS ---
     const _handleOpenModal = async (flight = null) => {
@@ -840,9 +846,21 @@ const QuanLyChuyenBay = () => {
             {/* Thanh phân trang */}
             {filteredFlights.length > itemsPerPage && (
                 <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-                    <span className="text-sm text-gray-600 font-medium">
-                        Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredFlights.length)}</span> của <span className="font-bold text-blue-600">{filteredFlights.length}</span> kết quả
-                    </span>
+                    <div className="flex items-center gap-4">
+                        <span className="text-sm text-gray-600 font-medium">
+                            Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredFlights.length)}</span> của <span className="font-bold text-blue-600">{filteredFlights.length}</span> kết quả
+                        </span>
+                        <select
+                            value={itemsPerPage}
+                            onChange={handleItemsPerPageChange}
+                            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white"
+                        >
+                            <option value={5}>5 / trang</option>
+                            <option value={10}>10 / trang</option>
+                            <option value={20}>20 / trang</option>
+                            <option value={50}>50 / trang</option>
+                        </select>
+                    </div>
                     <nav>
                         <ul className="flex gap-1">
                             <li>

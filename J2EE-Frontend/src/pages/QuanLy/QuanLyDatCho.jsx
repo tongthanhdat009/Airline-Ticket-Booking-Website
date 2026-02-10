@@ -88,7 +88,7 @@ const QuanLyDatCho = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
-  const itemsPerPage = 8;
+  const [itemsPerPage, setItemsPerPage] = useState(8);
 
   // View toggle state
   const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-dat-cho-view', 'table');
@@ -142,8 +142,8 @@ const QuanLyDatCho = () => {
   // Load dữ liệu đặt chỗ
   useEffect(() => {
     loadDatChoData();
-  }, [currentPage, search]);
-  
+  }, [currentPage, search, itemsPerPage]);
+
   // Load tất cả chuyến bay (chỉ một lần khi mount)
   useEffect(() => {
     loadAllFlights();
@@ -790,15 +790,32 @@ const QuanLyDatCho = () => {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-          <span className="text-sm text-gray-600 font-medium">
-            Hiển thị{' '}
-            <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến{' '}
-            <span className="font-bold text-blue-600">
-              {Math.min(indexOfLastItem, totalElements)}
-            </span>{' '}
-            của{' '}
-            <span className="font-bold text-blue-600">{totalElements}</span> kết quả
-          </span>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600 font-medium">
+              Hiển thị{' '}
+              <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến{' '}
+              <span className="font-bold text-blue-600">
+                {Math.min(indexOfLastItem, totalElements)}
+              </span>{' '}
+              của{' '}
+              <span className="font-bold text-blue-600">{totalElements}</span> kết quả
+            </span>
+            <select
+              value={itemsPerPage}
+              onChange={(e) => {
+                  const newValue = parseInt(e.target.value);
+                  setItemsPerPage(newValue);
+                  setCurrentPage(0); // Reset to first page when changing items per page
+              }}
+              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white"
+            >
+              <option value={5}>5 / trang</option>
+              <option value={8}>8 / trang</option>
+              <option value={10}>10 / trang</option>
+              <option value={20}>20 / trang</option>
+              <option value={50}>50 / trang</option>
+            </select>
+          </div>
           <nav>
             <ul className="flex gap-2">
               <li>

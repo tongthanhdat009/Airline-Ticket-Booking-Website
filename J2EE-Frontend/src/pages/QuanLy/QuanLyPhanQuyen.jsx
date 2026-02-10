@@ -5,6 +5,7 @@ import ViewToggleButton from '../../components/common/ViewToggleButton';
 import CardView from '../../components/common/CardView';
 import { useViewToggle } from '../../hooks/useViewToggle';
 import PhanQuyenCard from '../../components/QuanLy/QuanLyPhanQuyen/PhanQuyenCard';
+import Card from '../../components/QuanLy/CardChucNang';
 import {
     getAllChucNang,
     getAllHanhDong,
@@ -300,18 +301,17 @@ const QuanLyPhanQuyen = () => {
 
     if (loading) {
         return (
-            <div className="p-6 bg-linear-to-br from-slate-50 to-slate-100 min-h-screen flex items-center justify-center">
-                <div className="flex flex-col items-center gap-4">
+            <Card title="Ma trận phân quyền">
+                <div className="flex flex-col items-center gap-4 py-12">
                     <FaSpinner className="text-4xl text-amber-600 animate-spin" />
                     <p className="text-slate-600">Đang tải dữ liệu...</p>
                 </div>
-            </div>
+            </Card>
         );
     }
 
     return (
-        <div className="p-6 bg-linear-to-br from-slate-50 to-slate-100 min-h-screen">
-            <div className="max-w-full mx-auto">
+        <Card title="Ma trận phân quyền">
 
                 {/* Header */}
                 <div className="mb-6">
@@ -674,7 +674,7 @@ const QuanLyPhanQuyen = () => {
                 type={toast.type}
                 onClose={hideToast}
             />
-        </div>
+        </Card>
     );
 };
 

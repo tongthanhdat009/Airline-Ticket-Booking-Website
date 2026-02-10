@@ -24,7 +24,7 @@ const QuanLyDichVu = () => {
   const [imageCache, setImageCache] = useState({}); // Cache để lưu ảnh đã tải
   const [currentPage, setCurrentPage] = useState(1);
   const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
-  const itemsPerPage = 5;
+  const [itemsPerPage, setItemsPerPage] = useState(5);
   const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-dich-vu-view', 'table');
 
   useEffect(() => {
@@ -299,6 +299,12 @@ const QuanLyDichVu = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  const handleItemsPerPageChange = (e) => {
+      const newValue = parseInt(e.target.value);
+      setItemsPerPage(newValue);
+      setCurrentPage(1); // Reset to first page when changing items per page
+  };
+
   // Helper để lấy URL ảnh từ cache hoặc trả về placeholder
   const getImageUrl = (imagePath) => {
     if (!imagePath || imagePath.trim() === '') return '/no-product.png';
@@ -441,9 +447,21 @@ const QuanLyDichVu = () => {
       {/* Thanh phân trang */}
       {filteredServices.length > itemsPerPage && (
         <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-          <span className="text-sm text-gray-600 font-medium">
-            Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredServices.length)}</span> của <span className="font-bold text-blue-600">{filteredServices.length}</span> kết quả
-          </span>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600 font-medium">
+              Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredServices.length)}</span> của <span className="font-bold text-blue-600">{filteredServices.length}</span> kết quả
+            </span>
+            <select
+              value={itemsPerPage}
+              onChange={handleItemsPerPageChange}
+              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white"
+            >
+              <option value={5}>5 / trang</option>
+              <option value={10}>10 / trang</option>
+              <option value={20}>20 / trang</option>
+              <option value={50}>50 / trang</option>
+            </select>
+          </div>
           <nav>
             <ul className="flex gap-2">
               <li>

@@ -126,14 +126,6 @@ const DonHangCard = memo(({
           <span className="hidden sm:inline">Xem</span>
         </button>
         <button
-          onClick={() => onEdit?.(data)}
-          className="px-3 py-1.5 text-sm text-green-600 hover:bg-green-50 rounded-lg transition-colors flex items-center gap-1.5"
-          title="Chỉnh sửa"
-        >
-          <FaEdit size={14} />
-          <span className="hidden sm:inline">Sửa</span>
-        </button>
-        <button
           onClick={() => onDelete?.(data)}
           className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5"
           title="Xóa"

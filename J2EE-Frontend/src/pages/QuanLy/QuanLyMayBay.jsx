@@ -17,6 +17,7 @@ const QuanLyMayBay = () => {
     const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-may-bay-view', 'table');
     const [search, setSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(5);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedAircraft, setSelectedAircraft] = useState(null);
     const [aircrafts, setAircrafts] = useState([]);
@@ -25,7 +26,6 @@ const QuanLyMayBay = () => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [aircraftToDelete, setAircraftToDelete] = useState(null);
     const [seatViewerAircraft, setSeatViewerAircraft] = useState(null);
-    const itemsPerPage = 5;
 
     // Toast functions
     const showToast = (message, type = 'success') => {
@@ -69,6 +69,12 @@ const QuanLyMayBay = () => {
     const totalPages = Math.ceil(filteredAircrafts.length / itemsPerPage);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    const handleItemsPerPageChange = (e) => {
+        const newValue = parseInt(e.target.value);
+        setItemsPerPage(newValue);
+        setCurrentPage(1); // Reset to first page when changing items per page
+    };
 
     const handleOpenModalForAdd = () => {
         setSelectedAircraft(null);
@@ -274,6 +280,8 @@ const QuanLyMayBay = () => {
                             data={mb}
                             onEdit={handleOpenModalForEdit}
                             onDelete={() => handleDelete(mb.maMayBay)}
+                            onViewSeatMap={() => setSeatViewerAircraft(mb.maMayBay)}
+                            onEditSeatMap={() => handleEditSeatLayout(mb)}
                         />
                     )}
                     emptyMessage="Không tìm thấy máy bay nào."
@@ -374,9 +382,21 @@ const QuanLyMayBay = () => {
             {/* Thanh phân trang */}
             {filteredAircrafts.length > itemsPerPage && (
                 <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-                    <span className="text-sm text-gray-600 font-medium">
-                        Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredAircrafts.length)}</span> của <span className="font-bold text-blue-600">{filteredAircrafts.length}</span> kết quả
-                    </span>
+                    <div className="flex items-center gap-4">
+                        <span className="text-sm text-gray-600 font-medium">
+                            Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredAircrafts.length)}</span> của <span className="font-bold text-blue-600">{filteredAircrafts.length}</span> kết quả
+                        </span>
+                        <select
+                            value={itemsPerPage}
+                            onChange={handleItemsPerPageChange}
+                            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white"
+                        >
+                            <option value={5}>5 / trang</option>
+                            <option value={10}>10 / trang</option>
+                            <option value={20}>20 / trang</option>
+                            <option value={50}>50 / trang</option>
+                        </select>
+                    </div>
                     <nav>
                         <ul className="flex gap-2">
                             <li>

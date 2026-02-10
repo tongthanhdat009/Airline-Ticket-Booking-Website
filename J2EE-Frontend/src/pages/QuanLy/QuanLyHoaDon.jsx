@@ -42,7 +42,7 @@ const QuanLyHoaDon = () => {
 
   // States cho pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // States cho search và filters
   const [search, setSearch] = useState('');
@@ -148,6 +148,12 @@ const QuanLyHoaDon = () => {
   const totalPages = Math.ceil(filteredHoaDon.length / itemsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const handleItemsPerPageChange = (e) => {
+      const newValue = parseInt(e.target.value);
+      setItemsPerPage(newValue);
+      setCurrentPage(1); // Reset to first page when changing items per page
+  };
 
   // Export PDF
   const handleExportPdf = async (maHoaDon) => {
@@ -467,9 +473,21 @@ const QuanLyHoaDon = () => {
       {/* Phân trang */}
       {filteredHoaDon.length > itemsPerPage && (
         <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-          <span className="text-sm text-gray-600 font-medium">
-            Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredHoaDon.length)}</span> của <span className="font-bold text-blue-600">{filteredHoaDon.length}</span> kết quả
-          </span>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600 font-medium">
+              Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredHoaDon.length)}</span> của <span className="font-bold text-blue-600">{filteredHoaDon.length}</span> kết quả
+            </span>
+            <select
+              value={itemsPerPage}
+              onChange={handleItemsPerPageChange}
+              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white"
+            >
+              <option value={5}>5 / trang</option>
+              <option value={10}>10 / trang</option>
+              <option value={20}>20 / trang</option>
+              <option value={50}>50 / trang</option>
+            </select>
+          </div>
           <nav>
             <ul className="flex gap-2">
               <li>
