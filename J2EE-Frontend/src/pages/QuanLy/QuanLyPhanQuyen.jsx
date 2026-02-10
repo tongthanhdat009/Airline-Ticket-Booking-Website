@@ -567,10 +567,10 @@ const QuanLyPhanQuyen = () => {
                             </div>
                         );
                     })}
-                </div>
+                    </div>
 
-                {/* Empty State */}
-                {filteredFeatures.length === 0 && (
+                    {/* Empty State */}
+                    {filteredFeatures.length === 0 && (
                     <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
                         <FaExclamationTriangle className="text-5xl text-amber-400 mx-auto mb-4" />
                         <h3 className="text-xl font-bold text-slate-700 mb-2">Không tìm thấy chức năng</h3>
@@ -607,7 +607,6 @@ const QuanLyPhanQuyen = () => {
                 </div>
                     </>
                 )}
-            </div>
 
             {/* Copy Permissions Modal */}
             {showCopyModal && (

@@ -617,6 +617,117 @@ const QuanLyChuyenBay = () => {
                 )}
             </div>
 
+            {/* Thanh phân trang - Hiển thị trước bảng/thẻ */}
+            {filteredFlights.length > 0 && (
+                <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                    <div className="flex items-center gap-4">
+                        <span className="text-sm text-gray-600 font-medium">
+                            Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredFlights.length)}</span> của <span className="font-bold text-blue-600">{filteredFlights.length}</span> kết quả
+                        </span>
+                        <select
+                            value={itemsPerPage}
+                            onChange={handleItemsPerPageChange}
+                            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white"
+                        >
+                            <option value={5}>5 / trang</option>
+                            <option value={10}>10 / trang</option>
+                            <option value={20}>20 / trang</option>
+                            <option value={50}>50 / trang</option>
+                        </select>
+                    </div>
+                    {totalPages > 1 && (
+                    <nav>
+                        <ul className="flex gap-1">
+                            <li>
+                                <button
+                                    onClick={() => paginate(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className="px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm text-sm"
+                                >
+                                    Trước
+                                </button>
+                            </li>
+
+                            {/* Trang đầu */}
+                            {currentPage > 3 && (
+                                <>
+                                    <li>
+                                        <button
+                                            onClick={() => paginate(1)}
+                                            className="px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 font-medium transition-all text-sm"
+                                        >
+                                            1
+                                        </button>
+                                    </li>
+                                    {currentPage > 4 && (
+                                        <li className="flex items-center px-2">
+                                            <span className="text-gray-400">...</span>
+                                        </li>
+                                    )}
+                                </>
+                            )}
+
+                            {/* Các trang xung quanh trang hiện tại */}
+                            {[...Array(totalPages)].map((_, index) => {
+                                const pageNum = index + 1;
+                                if (
+                                    pageNum === currentPage ||
+                                    pageNum === currentPage - 1 ||
+                                    pageNum === currentPage + 1 ||
+                                    (currentPage <= 2 && pageNum <= 3) ||
+                                    (currentPage >= totalPages - 1 && pageNum >= totalPages - 2)
+                                ) {
+                                    return (
+                                        <li key={index}>
+                                            <button
+                                                onClick={() => paginate(pageNum)}
+                                                className={`px-3 py-2 rounded-lg font-medium transition-all text-sm ${currentPage === pageNum
+                                                    ? 'bg-blue-600 text-white shadow-lg'
+                                                    : 'bg-white border border-gray-300 hover:bg-gray-100'
+                                                    }`}
+                                            >
+                                                {pageNum}
+                                            </button>
+                                        </li>
+                                    );
+                                }
+                                return null;
+                            })}
+
+                            {/* Trang cuối */}
+                            {currentPage < totalPages - 2 && (
+                                <>
+                                    {currentPage < totalPages - 3 && (
+                                        <li className="flex items-center px-2">
+                                            <span className="text-gray-400">...</span>
+                                        </li>
+                                    )}
+                                    <li>
+                                        <button
+                                            onClick={() => paginate(totalPages)}
+                                            className="px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 font-medium transition-all text-sm"
+                                        >
+                                            {totalPages}
+                                        </button>
+                                    </li>
+                                </>
+                            )}
+
+                            <li>
+                                <button
+                                    onClick={() => paginate(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                    className="px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm text-sm"
+                                >
+                                    Sau
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                    )}
+                </div>
+            )}
+
             {/* View Mode: Card or Table */}
             {viewMode === 'grid' ? (
                 /* Card View */
@@ -841,115 +952,6 @@ const QuanLyChuyenBay = () => {
                         </table>
                     </div>
                 </ResponsiveTable>
-            )}
-
-            {/* Thanh phân trang */}
-            {filteredFlights.length > itemsPerPage && (
-                <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-                    <div className="flex items-center gap-4">
-                        <span className="text-sm text-gray-600 font-medium">
-                            Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredFlights.length)}</span> của <span className="font-bold text-blue-600">{filteredFlights.length}</span> kết quả
-                        </span>
-                        <select
-                            value={itemsPerPage}
-                            onChange={handleItemsPerPageChange}
-                            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white"
-                        >
-                            <option value={5}>5 / trang</option>
-                            <option value={10}>10 / trang</option>
-                            <option value={20}>20 / trang</option>
-                            <option value={50}>50 / trang</option>
-                        </select>
-                    </div>
-                    <nav>
-                        <ul className="flex gap-1">
-                            <li>
-                                <button
-                                    onClick={() => paginate(currentPage - 1)}
-                                    disabled={currentPage === 1}
-                                    className="px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm text-sm"
-                                >
-                                    Trước
-                                </button>
-                            </li>
-
-                            {/* Trang đầu */}
-                            {currentPage > 3 && (
-                                <>
-                                    <li>
-                                        <button
-                                            onClick={() => paginate(1)}
-                                            className="px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 font-medium transition-all text-sm"
-                                        >
-                                            1
-                                        </button>
-                                    </li>
-                                    {currentPage > 4 && (
-                                        <li className="flex items-center px-2">
-                                            <span className="text-gray-400">...</span>
-                                        </li>
-                                    )}
-                                </>
-                            )}
-
-                            {/* Các trang xung quanh trang hiện tại */}
-                            {[...Array(totalPages)].map((_, index) => {
-                                const pageNum = index + 1;
-                                if (
-                                    pageNum === currentPage ||
-                                    pageNum === currentPage - 1 ||
-                                    pageNum === currentPage + 1 ||
-                                    (currentPage <= 2 && pageNum <= 3) ||
-                                    (currentPage >= totalPages - 1 && pageNum >= totalPages - 2)
-                                ) {
-                                    return (
-                                        <li key={index}>
-                                            <button
-                                                onClick={() => paginate(pageNum)}
-                                                className={`px-3 py-2 rounded-lg font-medium transition-all text-sm ${currentPage === pageNum
-                                                    ? 'bg-blue-600 text-white shadow-lg'
-                                                    : 'bg-white border border-gray-300 hover:bg-gray-100'
-                                                    }`}
-                                            >
-                                                {pageNum}
-                                            </button>
-                                        </li>
-                                    );
-                                }
-                                return null;
-                            })}
-
-                            {/* Trang cuối */}
-                            {currentPage < totalPages - 2 && (
-                                <>
-                                    {currentPage < totalPages - 3 && (
-                                        <li className="flex items-center px-2">
-                                            <span className="text-gray-400">...</span>
-                                        </li>
-                                    )}
-                                    <li>
-                                        <button
-                                            onClick={() => paginate(totalPages)}
-                                            className="px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 font-medium transition-all text-sm"
-                                        >
-                                            {totalPages}
-                                        </button>
-                                    </li>
-                                </>
-                            )}
-
-                            <li>
-                                <button
-                                    onClick={() => paginate(currentPage + 1)}
-                                    disabled={currentPage === totalPages}
-                                    className="px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm text-sm"
-                                >
-                                    Sau
-                                </button>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
             )}
 
             {/* Modal */}

@@ -788,7 +788,7 @@ const QuanLyDatCho = () => {
       )}
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {totalElements > 0 && (
         <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-600 font-medium">
@@ -816,6 +816,7 @@ const QuanLyDatCho = () => {
               <option value={50}>50 / trang</option>
             </select>
           </div>
+          {totalPages > 1 && (
           <nav>
             <ul className="flex gap-2">
               <li>
@@ -852,6 +853,7 @@ const QuanLyDatCho = () => {
               </li>
             </ul>
           </nav>
+          )}
         </div>
       )}
     </div>

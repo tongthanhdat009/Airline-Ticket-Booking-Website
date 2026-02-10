@@ -198,6 +198,65 @@ const QuanLyTKAdmin = () => {
         </button>
       </div>
 
+      {/* Thanh phân trang */}
+      {!loading && filteredAccounts.length > 0 && (
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600 font-medium">
+              Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredAccounts.length)}</span> của <span className="font-bold text-blue-600">{filteredAccounts.length}</span> kết quả
+            </span>
+            <select
+              value={itemsPerPage}
+              onChange={handleItemsPerPageChange}
+              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white"
+            >
+              <option value={5}>5 / trang</option>
+              <option value={10}>10 / trang</option>
+              <option value={20}>20 / trang</option>
+              <option value={50}>50 / trang</option>
+            </select>
+          </div>
+          {totalPages > 1 && (
+          <nav>
+            <ul className="flex gap-2">
+              <li>
+                <button
+                  onClick={() => paginate(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm"
+                >
+                  ← Trước
+                </button>
+              </li>
+              {[...Array(totalPages)].map((_, index) => (
+                <li key={index}>
+                  <button
+                    onClick={() => paginate(index + 1)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                      currentPage === index + 1
+                        ? 'bg-blue-600 text-white shadow-lg'
+                        : 'bg-white border border-gray-300 hover:bg-gray-100'
+                    }`}
+                  >
+                    {index + 1}
+                  </button>
+                </li>
+              ))}
+              <li>
+                <button
+                  onClick={() => paginate(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm"
+                >
+                  Sau →
+                </button>
+              </li>
+            </ul>
+          </nav>
+          )}
+        </div>
+      )}
+
       {/* Loading */}
       {loading && (
         <div className="text-center py-12">
@@ -322,62 +381,6 @@ const QuanLyTKAdmin = () => {
         </>
       )}
 
-      {/* Thanh phân trang */}
-      {!loading && filteredAccounts.length > itemsPerPage && (
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600 font-medium">
-              Hiển thị <span className="font-bold text-blue-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-blue-600">{Math.min(indexOfLastItem, filteredAccounts.length)}</span> của <span className="font-bold text-blue-600">{filteredAccounts.length}</span> kết quả
-            </span>
-            <select
-              value={itemsPerPage}
-              onChange={handleItemsPerPageChange}
-              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white"
-            >
-              <option value={5}>5 / trang</option>
-              <option value={10}>10 / trang</option>
-              <option value={20}>20 / trang</option>
-              <option value={50}>50 / trang</option>
-            </select>
-          </div>
-          <nav>
-            <ul className="flex gap-2">
-              <li>
-                <button
-                  onClick={() => paginate(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm"
-                >
-                  ← Trước
-                </button>
-              </li>
-              {[...Array(totalPages)].map((_, index) => (
-                <li key={index}>
-                  <button
-                    onClick={() => paginate(index + 1)}
-                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                      currentPage === index + 1
-                        ? 'bg-blue-600 text-white shadow-lg'
-                        : 'bg-white border border-gray-300 hover:bg-gray-100'
-                    }`}
-                  >
-                    {index + 1}
-                  </button>
-                </li>
-              ))}
-              <li>
-                <button
-                  onClick={() => paginate(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm"
-                >
-                  Sau →
-                </button>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      )}
 
       {/* Modal Form */}
       {showForm && (

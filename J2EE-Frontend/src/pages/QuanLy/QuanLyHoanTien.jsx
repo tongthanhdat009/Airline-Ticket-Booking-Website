@@ -354,7 +354,7 @@ const QuanLyHoanTien = () => {
                     className="shrink-0"
                 />
                 <div className="flex gap-3 w-full md:w-auto">
-                    <button 
+                    <button
                         onClick={loadData}
                         disabled={loading}
                         className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-600 text-white px-5 py-3 rounded-lg hover:from-amber-600 hover:to-yellow-700 transition-all shadow-lg hover:shadow-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
@@ -364,6 +364,65 @@ const QuanLyHoanTien = () => {
                     </button>
                 </div>
             </div>
+
+            {/* Thanh phân trang */}
+            {!loading && !error && filteredRefunds.length > 0 && (
+                <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                    <div className="flex items-center gap-4">
+                        <span className="text-sm text-gray-600 font-medium">
+                            Hiển thị <span className="font-bold text-amber-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-amber-600">{Math.min(indexOfLastItem, filteredRefunds.length)}</span> của <span className="font-bold text-amber-600">{filteredRefunds.length}</span> kết quả
+                        </span>
+                        <select
+                            value={itemsPerPage}
+                            onChange={handleItemsPerPageChange}
+                            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white"
+                        >
+                            <option value={5}>5 / trang</option>
+                            <option value={10}>10 / trang</option>
+                            <option value={20}>20 / trang</option>
+                            <option value={50}>50 / trang</option>
+                        </select>
+                    </div>
+                    {totalPages > 1 && (
+                    <nav>
+                        <ul className="flex gap-2">
+                            <li>
+                                <button
+                                    onClick={() => paginate(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm"
+                                >
+                                    ← Trước
+                                </button>
+                            </li>
+                            {[...Array(totalPages)].map((_, index) => (
+                                <li key={index}>
+                                    <button
+                                        onClick={() => paginate(index + 1)}
+                                        className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                                            currentPage === index + 1
+                                                ? 'bg-amber-600 text-white shadow-lg'
+                                                : 'bg-white border border-gray-300 hover:bg-gray-100'
+                                        }`}
+                                    >
+                                        {index + 1}
+                                    </button>
+                                </li>
+                            ))}
+                            <li>
+                                <button
+                                    onClick={() => paginate(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                    className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm"
+                                >
+                                    Sau →
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                    )}
+                </div>
+            )}
 
             {/* Loading và Error states */}
             {loading && (
@@ -377,7 +436,7 @@ const QuanLyHoanTien = () => {
                 <div className="text-center py-12">
                     <FaTimes className="text-red-500 text-5xl mx-auto mb-4" />
                     <p className="text-red-500 font-medium">{error}</p>
-                    <button 
+                    <button
                         onClick={loadData}
                         className="mt-4 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600"
                     >
@@ -501,62 +560,6 @@ const QuanLyHoanTien = () => {
                 </>
             )}
 
-            {/* Thanh phân trang */}
-            {!loading && !error && filteredRefunds.length > itemsPerPage && (
-                <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-                    <div className="flex items-center gap-4">
-                        <span className="text-sm text-gray-600 font-medium">
-                            Hiển thị <span className="font-bold text-amber-600">{indexOfFirstItem + 1}</span> đến <span className="font-bold text-amber-600">{Math.min(indexOfLastItem, filteredRefunds.length)}</span> của <span className="font-bold text-amber-600">{filteredRefunds.length}</span> kết quả
-                        </span>
-                        <select
-                            value={itemsPerPage}
-                            onChange={handleItemsPerPageChange}
-                            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white"
-                        >
-                            <option value={5}>5 / trang</option>
-                            <option value={10}>10 / trang</option>
-                            <option value={20}>20 / trang</option>
-                            <option value={50}>50 / trang</option>
-                        </select>
-                    </div>
-                    <nav>
-                        <ul className="flex gap-2">
-                            <li>
-                                <button
-                                    onClick={() => paginate(currentPage - 1)}
-                                    disabled={currentPage === 1}
-                                    className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm"
-                                >
-                                    ← Trước
-                                </button>
-                            </li>
-                            {[...Array(totalPages)].map((_, index) => (
-                                <li key={index}>
-                                    <button
-                                        onClick={() => paginate(index + 1)}
-                                        className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                                            currentPage === index + 1
-                                                ? 'bg-amber-600 text-white shadow-lg'
-                                                : 'bg-white border border-gray-300 hover:bg-gray-100'
-                                        }`}
-                                    >
-                                        {index + 1}
-                                    </button>
-                                </li>
-                            ))}
-                            <li>
-                                <button
-                                    onClick={() => paginate(currentPage + 1)}
-                                    disabled={currentPage === totalPages}
-                                    className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm"
-                                >
-                                    Sau →
-                                </button>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            )}
 
             {/* RefundDetailModal Component */}
             <RefundDetailModal
