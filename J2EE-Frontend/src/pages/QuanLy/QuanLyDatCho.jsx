@@ -186,9 +186,25 @@ const QuanLyDatCho = () => {
   const loadAllFlights = async () => {
     try {
       const response = await getAllChuyenBay();
-      if (response.data) {
+      // Xử lý các trường hợp response khác nhau từ API
+      let flightData = response.data;
+      // Nếu API trả về object có field result hoặc items
+      if (flightData && !Array.isArray(flightData)) {
+        if (flightData.result && Array.isArray(flightData.result)) {
+          flightData = flightData.result;
+        } else if (flightData.items && Array.isArray(flightData.items)) {
+          flightData = flightData.items;
+        } else if (flightData.content && Array.isArray(flightData.content)) {
+          flightData = flightData.content;
+        } else {
+          console.warn('Unexpected API response format:', flightData);
+          flightData = [];
+        }
+      }
+
+      if (Array.isArray(flightData) && flightData.length > 0) {
         // Transform dữ liệu từ API để khớp với format hiện tại
-        const flights = response.data.map(cb => ({
+        const flights = flightData.map(cb => ({
           maChuyenBayId: cb.maChuyenBay,
           maChuyenBay: cb.soHieuChuyenBay || cb.maChuyenBay,
           sanBayDi: {
@@ -204,6 +220,11 @@ const QuanLyDatCho = () => {
           ngayGio: cb.ngayGioDi || cb.ngayGio,
           trangThai: cb.trangThai || 'Chưa bay'
         }));
+        setChuyenBayList(flights);
+      } else {
+        // Nếu API trả về mảng rỗng hoặc không có dữ liệu, sử dụng fallback
+        console.warn('API returned empty or invalid data, using fallback');
+        const flights = extractFlights(datChoList);
         setChuyenBayList(flights);
       }
     } catch (error) {

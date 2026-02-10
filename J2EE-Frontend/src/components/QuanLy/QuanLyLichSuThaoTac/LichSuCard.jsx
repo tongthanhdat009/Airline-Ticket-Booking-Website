@@ -181,7 +181,7 @@ LichSuCard.propTypes = {
     loaiTaiKhoan: PropTypes.string,
     moTa: PropTypes.string,
     diaChiIp: PropTypes.string,
-    thoiGian: PropTypes.oneOfType([PropTypes.string, PropTypes.date]),
+    thoiGian: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     duLieuCu: PropTypes.string,
     duLieuMoi: PropTypes.string,
   }),

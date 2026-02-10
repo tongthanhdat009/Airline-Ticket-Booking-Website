@@ -151,7 +151,7 @@ DonHangCard.propTypes = {
       hoVaTen: PropTypes.string,
     }),
     emailNguoiDat: PropTypes.string,
-    ngayDat: PropTypes.oneOfType([PropTypes.string, PropTypes.date]),
+    ngayDat: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     tongGia: PropTypes.number,
     trangThai: PropTypes.string,
   }),

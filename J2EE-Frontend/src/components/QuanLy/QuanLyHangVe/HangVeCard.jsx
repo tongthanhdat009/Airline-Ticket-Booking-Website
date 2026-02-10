@@ -143,7 +143,7 @@ HangVeCard.propTypes = {
   data: PropTypes.shape({
     maHangVe: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     tenHangVe: PropTypes.string,
-    deletedAt: PropTypes.oneOfType([PropTypes.string, PropTypes.date]),
+    deletedAt: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
   }),
   /**
    * Callback when view button is clicked

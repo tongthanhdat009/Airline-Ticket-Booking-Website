@@ -216,8 +216,8 @@ KhuyenMaiCard.propTypes = {
     giaTriGiam: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     soLuong: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     soLuongDaDuocDung: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    ngayBatDau: PropTypes.oneOfType([PropTypes.string, PropTypes.date]),
-    ngayKetThuc: PropTypes.oneOfType([PropTypes.string, PropTypes.date]),
+    ngayBatDau: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
+    ngayKetThuc: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     trangThai: PropTypes.string,
   }),
   /**

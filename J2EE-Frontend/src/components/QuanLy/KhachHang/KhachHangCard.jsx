@@ -156,7 +156,7 @@ KhachHangCard.propTypes = {
     email: PropTypes.string,
     soDienThoai: PropTypes.string,
     gioiTinh: PropTypes.string,
-    ngaySinh: PropTypes.oneOfType([PropTypes.string, PropTypes.date]),
+    ngaySinh: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     quocGia: PropTypes.string,
     maDinhDanh: PropTypes.string,
     diaChi: PropTypes.string,

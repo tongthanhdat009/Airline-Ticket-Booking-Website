@@ -141,7 +141,7 @@ VaiTroCard.propTypes = {
     moTa: PropTypes.string,
     trangThai: PropTypes.bool,
     soAdmin: PropTypes.number,
-    createdAt: PropTypes.oneOfType([PropTypes.string, PropTypes.date]),
+    createdAt: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
   }),
   /**
    * Callback when view button is clicked
