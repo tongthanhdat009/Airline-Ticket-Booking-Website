@@ -170,7 +170,7 @@ const QuanLyTuyenBay = () => {
                 />
                 <button
                     onClick={() => handleOpenModal()}
-                    className="flex items-center gap-2 bg-linear-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
+                    className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
                 >
                     <FaPlus />
                     <span>Thêm tuyến bay</span>
@@ -209,7 +209,7 @@ const QuanLyTuyenBay = () => {
                             <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-sm">
-                                        <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
+                                        <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
                                             <tr>
                                                 <th scope="col" className="px-6 py-4 text-left font-semibold">Mã tuyến bay</th>
                                                 <th scope="col" className="px-6 py-4 text-left font-semibold">Sân bay đi</th>
@@ -299,7 +299,7 @@ const TuyenBayModal = ({ isOpen, onClose, onSubmit, formData, handleFormChange, 
     return (
         <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
-                <div className="bg-linear-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl">
+                <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl">
                     <div className="flex justify-between items-center">
                         <h2 className="text-2xl font-bold">
                             {currentRoute ? 'Chỉnh sửa tuyến bay' : 'Thêm tuyến bay mới'}
@@ -364,7 +364,7 @@ const TuyenBayModal = ({ isOpen, onClose, onSubmit, formData, handleFormChange, 
                         </button>
                         <button 
                             type="submit" 
-                            className="px-6 py-3 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg"
+                            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg"
                         >
                             {currentRoute ? 'Cập nhật' : 'Thêm mới'}
                         </button>

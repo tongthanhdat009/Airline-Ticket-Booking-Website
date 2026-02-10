@@ -146,7 +146,7 @@ function TrangChuAdmin() {
                 <div className="relative z-10 flex flex-col h-full w-72">
                     {/* Logo */}
                     <div className="flex items-center justify-center h-24 border-b border-slate-700/50 bg-slate-900/80">
-                        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-linear-to-r from-sky-500 to-blue-600 shadow-lg shadow-sky-500/50">
+                        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 shadow-lg shadow-sky-500/50">
                             <FaUserCircle className="text-white" size={28} />
                             <h1 className="text-2xl font-bold text-white tracking-tight">Admin</h1>
                         </div>
@@ -163,7 +163,7 @@ function TrangChuAdmin() {
                                         {/* Group Header - Collapsible */}
                                         <button
                                             onClick={() => toggleGroup(groupName)}
-                                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-linear-to-r from-slate-700/50 to-slate-600/50 hover:from-slate-700/70 hover:to-slate-600/70 text-white font-semibold text-sm tracking-wide transition-all duration-300 border border-slate-600/30"
+                                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-slate-700/50 to-slate-600/50 hover:from-slate-700/70 hover:to-slate-600/70 text-white font-semibold text-sm tracking-wide transition-all duration-300 border border-slate-600/30"
                                         >
                                             <span className={`transform transition-transform duration-300 ${isExpanded ? 'rotate-0' : '-rotate-90'}`}>
                                                 <FaChevronDown size={14} />
@@ -190,7 +190,7 @@ function TrangChuAdmin() {
                                                             className={({ isActive }) =>
                                                                 `group flex items-center gap-4 px-5 py-3.5 rounded-xl transition-all duration-200 relative overflow-hidden ${
                                                                     isActive
-                                                                    ? `bg-linear-to-r ${item.color} text-white shadow-lg`
+                                                                    ? `bg-gradient-to-r ${item.color} text-white shadow-lg`
                                                                     : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
                                                                 }`
                                                             }
@@ -216,7 +216,7 @@ function TrangChuAdmin() {
                     <div className="p-3 sm:p-4 border-t border-slate-700/50 bg-slate-900/50">
                         <div className="mb-3 sm:mb-4 p-3 sm:p-4 rounded-xl bg-slate-800/50 border border-slate-700/50">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-linear-to-r from-sky-400 to-blue-500 flex items-center justify-center font-bold text-white shadow-lg shrink-0">
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-sky-400 to-blue-500 flex items-center justify-center font-bold text-white shadow-lg shrink-0">
                                     {getInitial()}
                                 </div>
                                 <div className="overflow-hidden min-w-0 flex-1">
@@ -244,7 +244,7 @@ function TrangChuAdmin() {
             {/* Main Content */}
             <main className="flex-1 flex flex-col overflow-hidden">
                 {/* Header with Breadcrumb */}
-                <header className="bg-linear-to-r from-blue-600 via-blue-700 to-indigo-700 shadow-lg">
+                <header className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 shadow-lg">
                     <div className="w-full mx-auto px-3 sm:px-4 lg:px-6">
                         <div className="flex items-center justify-between h-16">
                             {/* Left side - Menu toggle + Breadcrumb */}

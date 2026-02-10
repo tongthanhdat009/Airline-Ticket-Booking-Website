@@ -15,7 +15,7 @@ const FilterModal = ({
       <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg relative">
         {/* Header */}
-        <div className="bg-linear-to-r from-blue-600 to-cyan-700 text-white p-6 rounded-t-xl">
+        <div className="bg-gradient-to-r from-blue-600 to-cyan-700 text-white p-6 rounded-t-xl">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold">Bộ lọc đơn hàng</h2>
             <button
@@ -123,7 +123,7 @@ const FilterModal = ({
             </button>
             <button
               onClick={onApply}
-              className="px-6 py-3 bg-linear-to-r from-blue-500 to-cyan-600 text-white rounded-lg hover:from-blue-600 hover:to-cyan-700 font-semibold transition-all shadow-lg"
+              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-lg hover:from-blue-600 hover:to-cyan-700 font-semibold transition-all shadow-lg"
             >
               Áp dụng
             </button>

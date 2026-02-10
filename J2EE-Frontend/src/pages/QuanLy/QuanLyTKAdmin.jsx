@@ -185,7 +185,7 @@ const QuanLyTKAdmin = () => {
         />
         <button
           onClick={handleAdd}
-          className="flex items-center gap-2 bg-linear-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
+          className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
         >
           <FaPlus />
           <span>Thêm tài khoản</span>
@@ -223,7 +223,7 @@ const QuanLyTKAdmin = () => {
             <ResponsiveTable>
               <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
                 <table className="w-full text-sm">
-                  <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
+                  <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
                     <tr>
                       <th className="px-6 py-4 text-left font-semibold">ID</th>
                       <th className="px-6 py-4 text-left font-semibold">Họ và tên</th>
@@ -520,7 +520,7 @@ const AccountForm = ({ account, roles = [], onClose, onSave }) => {
     <div className="fixed inset-0 flex justify-center items-center z-50 p-4 overflow-y-auto">
       <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl my-8 max-h-[90vh] overflow-y-auto relative">
-        <div className="bg-linear-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl sticky top-0 z-10">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl sticky top-0 z-10">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold">{account ? 'Chỉnh sửa tài khoản' : 'Thêm tài khoản mới'}</h2>
             <button onClick={onClose} className="text-white hover:text-gray-200 transition-colors">
@@ -674,7 +674,7 @@ const AccountForm = ({ account, roles = [], onClose, onSave }) => {
             </button>
             <button
               type="submit"
-              className="px-6 py-3 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg"
+              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg"
             >
               Lưu
             </button>
@@ -727,7 +727,7 @@ const RoleAssignmentModal = ({ account, roles = [], onClose, onSave }) => {
     <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
       <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
-        <div className="bg-linear-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl sticky top-0 z-10">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl sticky top-0 z-10">
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-2xl font-bold">Gán vai trò</h2>
@@ -805,7 +805,7 @@ const RoleAssignmentModal = ({ account, roles = [], onClose, onSave }) => {
             </button>
             <button
               type="submit"
-              className="px-6 py-3 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg"
+              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg"
             >
               Lưu vai trò
             </button>

@@ -166,7 +166,7 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
                                     </div>
                                 </div>
 
-                                <div className="bg-linear-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
+                                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
                                     <div className="text-sm text-gray-600 mb-1">Trạng thái</div>
                                     <div className="text-xl font-bold text-green-600">{flight.trangThai}</div>
                                     {flight.lyDoDelay && (

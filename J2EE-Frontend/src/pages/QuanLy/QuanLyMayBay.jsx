@@ -216,7 +216,7 @@ const QuanLyMayBay = () => {
                 />
                 <button
                     onClick={handleOpenModalForAdd}
-                    className="flex items-center gap-2 bg-linear-to-r from-sky-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-sky-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
+                    className="flex items-center gap-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white px-5 py-3 rounded-lg hover:from-sky-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
                 >
                     <FaPlus />
                     <span>Thêm máy bay</span>
@@ -282,7 +282,7 @@ const QuanLyMayBay = () => {
                 /* Table View */
                 <ResponsiveTable>
                     <table className="w-full text-sm">
-                        <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
+                        <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
                             <tr>
                                 <th className="px-6 py-4 text-left font-semibold">Mã máy bay</th>
                                 <th className="px-6 py-4 text-left font-semibold">Tên máy bay</th>

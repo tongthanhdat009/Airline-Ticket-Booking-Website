@@ -343,7 +343,7 @@ const QuanLyLichSuThaoTac = () => {
                 <button
                     onClick={handleSearch}
                     disabled={loading}
-                    className="flex items-center gap-2 bg-linear-to-r from-green-500 to-emerald-600 text-white px-5 py-3 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto disabled:opacity-50"
+                    className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-5 py-3 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto disabled:opacity-50"
                 >
                     {loading ? <FaSpinner className="animate-spin" /> : <FaFilter />}
                     <span>Tìm kiếm</span>
@@ -391,7 +391,7 @@ const QuanLyLichSuThaoTac = () => {
                     <div className="overflow-x-auto">
                         <ResponsiveTable>
                             <table className="w-full text-sm">
-                                <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
+                                <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
                                     <tr>
                                         <th className="px-6 py-4 text-left font-semibold">Mã Log</th>
                                         <th className="px-6 py-4 text-left font-semibold">Loại thao tác</th>
@@ -524,7 +524,7 @@ const QuanLyLichSuThaoTac = () => {
             {isDetailModalOpen && selectedLog && (
                 <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4">
                     <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                        <div className="bg-linear-to-r from-green-600 to-emerald-700 text-white p-6 rounded-t-xl sticky top-0">
+                        <div className="bg-gradient-to-r from-green-600 to-emerald-700 text-white p-6 rounded-t-xl sticky top-0">
                             <div className="flex justify-between items-center">
                                 <div>
                                     <h2 className="text-2xl font-bold">Chi tiết thao tác</h2>

@@ -87,7 +87,7 @@ const EditOptionModal = ({ option, onClose, onSave, options }) => {
     <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
       <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-md relative">
-        <div className="bg-linear-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl">
           <h2 className="text-2xl font-bold">Chỉnh sửa lựa chọn</h2>
         </div>
         <form onSubmit={handleSubmit} className="p-6">
@@ -175,7 +175,7 @@ const EditOptionModal = ({ option, onClose, onSave, options }) => {
             </button>
             <button 
               type="submit" 
-              className="px-6 py-3 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg"
+              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg"
             >
               Lưu
             </button>

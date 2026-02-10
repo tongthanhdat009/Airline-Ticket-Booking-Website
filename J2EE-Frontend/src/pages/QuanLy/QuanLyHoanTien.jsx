@@ -306,7 +306,7 @@ const QuanLyHoanTien = () => {
 
             {/* Thông tin tổng tiền */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                <div className="bg-linear-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-5">
+                <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-5">
                     <div className="flex justify-between items-center">
                         <div>
                             <p className="text-sm font-semibold text-amber-800">Tổng tiền đã hoàn</p>
@@ -317,7 +317,7 @@ const QuanLyHoanTien = () => {
                         </div>
                     </div>
                 </div>
-                <div className="bg-linear-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-xl p-5">
+                <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-xl p-5">
                     <div className="flex justify-between items-center">
                         <div>
                             <p className="text-sm font-semibold text-orange-800">Tổng tiền chờ hoàn</p>
@@ -351,7 +351,7 @@ const QuanLyHoanTien = () => {
                     <button 
                         onClick={loadData}
                         disabled={loading}
-                        className="flex items-center gap-2 bg-linear-to-r from-amber-500 to-yellow-600 text-white px-5 py-3 rounded-lg hover:from-amber-600 hover:to-yellow-700 transition-all shadow-lg hover:shadow-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-600 text-white px-5 py-3 rounded-lg hover:from-amber-600 hover:to-yellow-700 transition-all shadow-lg hover:shadow-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <FaCalendar />
                         <span className="hidden sm:inline">{loading ? 'Đang tải...' : 'Làm mới'}</span>
@@ -402,7 +402,7 @@ const QuanLyHoanTien = () => {
                         /* Table View */
                         <ResponsiveTable>
                             <table className="w-full text-sm">
-                                <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
+                                <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
                                     <tr>
                                         <th className="px-6 py-4 text-left font-semibold">Mã hoàn tiền</th>
                                         <th className="px-6 py-4 text-left font-semibold">Mã HĐ</th>

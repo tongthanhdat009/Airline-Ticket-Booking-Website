@@ -647,7 +647,7 @@ const QuanLyDatCho = () => {
         /* Table View */
         <ResponsiveTable>
           <table className="w-full text-sm">
-            <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
+            <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
               <tr>
                 <th className="px-4 py-4 text-left font-semibold">Mã Đặt Chỗ</th>
                 <th className="px-4 py-4 text-left font-semibold">Hành khách</th>
@@ -976,7 +976,7 @@ const QuanLyDatCho = () => {
       {/* Danh sách hành khách của chuyến bay đã chọn */}
       {selectedChuyenBay && (
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-          <div className="bg-linear-to-r from-blue-600 to-blue-600 px-6 py-4">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-600 px-6 py-4">
             <h3 className="text-lg font-bold text-white">
               <FaUsers className="inline mr-2" />
               Danh sách hành khách - {selectedChuyenBay.maChuyenBay}

@@ -214,7 +214,7 @@ const ViewPaymentDetailModal = ({
                                     <FaConciergeBell className="text-indigo-600" />
                                     Dịch vụ đã đặt
                                 </h4>
-                                <div className="bg-linear-to-r from-indigo-100 to-purple-100 rounded-lg p-3 md:p-4 border-2 border-indigo-300 mb-4 md:mb-5 mt-4">
+                                <div className="bg-gradient-to-r from-indigo-100 to-purple-100 rounded-lg p-3 md:p-4 border-2 border-indigo-300 mb-4 md:mb-5 mt-4">
                                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                                         <span className="font-bold text-gray-800">Tổng tiền dịch vụ:</span>
                                         <span className="text-xl md:text-2xl font-bold text-indigo-600">

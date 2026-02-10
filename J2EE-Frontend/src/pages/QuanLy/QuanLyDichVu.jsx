@@ -334,7 +334,7 @@ const QuanLyDichVu = () => {
         />
         <button
           onClick={handleAddNew}
-          className="flex items-center justify-center gap-2 bg-linear-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-5 rounded-lg shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
+          className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-5 rounded-lg shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
         >
           <FaPlus size={18} />
           <span>Thêm dịch vụ mới</span>
@@ -362,7 +362,7 @@ const QuanLyDichVu = () => {
         /* Table View */
         <ResponsiveTable>
           <table className="w-full text-sm">
-            <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
+            <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
               <tr>
                 <th className="px-6 py-4 text-left font-semibold">Tên dịch vụ</th>
                 <th className="px-6 py-4 text-left font-semibold">Mô tả</th>

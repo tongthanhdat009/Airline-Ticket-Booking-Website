@@ -1,4 +1,4 @@
-import { STATUS_COLORS, TAILWIND_COLORS } from '../constants/colorPalette';
+import { STATUS_COLORS, TAILWIND_COLORS } from '../constants/colorPalette.js';
 
 /**
  * Trả về màu badge cho trạng thái cụ thể

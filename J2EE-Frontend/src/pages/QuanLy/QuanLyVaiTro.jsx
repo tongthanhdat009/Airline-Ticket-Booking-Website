@@ -215,7 +215,7 @@ const QuanLyVaiTro = () => {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-blue-600 flex items-center gap-3">
+                        <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-600 flex items-center gap-3">
                             <FaUserShield className="text-blue-600" />
                             Quản lý Vai trò
                         </h1>
@@ -223,7 +223,7 @@ const QuanLyVaiTro = () => {
                     </div>
                     <button
                         onClick={openAddModal}
-                        className="px-6 py-3 bg-linear-to-r from-blue-600 to-blue-600 text-white rounded-xl hover:from-blue-700 hover:to-blue-700 transition-all shadow-lg shadow-blue-600/50 flex items-center gap-2 font-semibold"
+                        className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-600 text-white rounded-xl hover:from-blue-700 hover:to-blue-700 transition-all shadow-lg shadow-blue-600/50 flex items-center gap-2 font-semibold"
                     >
                         <FaPlus /> Thêm vai trò
                     </button>
@@ -327,7 +327,7 @@ const QuanLyVaiTro = () => {
                     <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-linear-to-r from-slate-700 to-slate-800 text-white">
+                                <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
                                     <tr>
                                         <th className="px-6 py-4 text-left text-white font-bold">Mã vai trò</th>
                                         <th className="px-6 py-4 text-left text-white font-bold">Tên vai trò</th>
@@ -400,7 +400,7 @@ const QuanLyVaiTro = () => {
                 {showModal && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
-                            <div className="bg-linear-to-r from-blue-600 to-blue-600 px-6 py-4 rounded-t-2xl">
+                            <div className="bg-gradient-to-r from-blue-600 to-blue-600 px-6 py-4 rounded-t-2xl">
                                 <h2 className="text-2xl font-bold text-white">
                                     {editingRole ? 'Cập nhật vai trò' : 'Thêm vai trò mới'}
                                 </h2>
@@ -454,7 +454,7 @@ const QuanLyVaiTro = () => {
                                     <button
                                         type="submit"
                                         disabled={submitting}
-                                        className="flex-1 px-6 py-3 bg-linear-to-r from-blue-600 to-blue-600 text-white rounded-xl hover:from-blue-700 hover:to-blue-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-600 text-white rounded-xl hover:from-blue-700 hover:to-blue-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                     >
                                         {submitting ? (
                                             <>

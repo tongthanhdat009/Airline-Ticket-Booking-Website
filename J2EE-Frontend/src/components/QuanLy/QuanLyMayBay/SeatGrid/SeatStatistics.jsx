@@ -81,7 +81,7 @@ const SeatStatistics = ({ seats, hangVeList, sidebarCollapsed, setSidebarCollaps
     return (
         <div className="w-80 bg-linear-to-b from-white to-gray-50 border-l border-gray-200 flex flex-col h-full shadow-lg">
             {/* Header */}
-            <div className="bg-linear-to-r from-slate-800 to-slate-900 text-white p-4 flex justify-between items-center">
+            <div className="bg-gradient-to-r from-slate-800 to-slate-900 text-white p-4 flex justify-between items-center">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-white/20 rounded-lg">
                         <HiChartPie className="text-xl" />
@@ -207,7 +207,7 @@ const SeatStatistics = ({ seats, hangVeList, sidebarCollapsed, setSidebarCollaps
                 </div>
 
                 {/* Info tip */}
-                <div className="bg-linear-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4">
+                <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4">
                     <p className="text-xs text-amber-800">
                         💡 <strong>Mẹo:</strong> Click vào ghế để chọn, Ctrl+Click để chọn nhiều, hoặc chuột phải để xem menu.
                     </p>

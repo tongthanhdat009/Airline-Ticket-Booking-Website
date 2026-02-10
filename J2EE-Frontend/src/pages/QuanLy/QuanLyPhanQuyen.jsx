@@ -315,7 +315,7 @@ const QuanLyPhanQuyen = () => {
 
                 {/* Header */}
                 <div className="mb-6">
-                    <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-linear-to-r from-amber-600 to-orange-600 flex items-center gap-3">
+                    <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600 flex items-center gap-3">
                         <FaKey className="text-amber-600" />
                         Ma trận Phân quyền (Permission Matrix)
                     </h1>
@@ -434,7 +434,7 @@ const QuanLyPhanQuyen = () => {
                                 className={`px-8 py-3 rounded-xl transition-all shadow-lg flex items-center gap-2 font-bold
                                     ${isSuperAdmin 
                                         ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                                        : 'bg-linear-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 shadow-amber-500/50 disabled:opacity-50'
+                                        : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 shadow-amber-500/50 disabled:opacity-50'
                                     }`}
                             >
                                 {saving ? (
