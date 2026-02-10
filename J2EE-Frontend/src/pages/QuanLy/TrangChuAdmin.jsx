@@ -129,12 +129,20 @@ function TrangChuAdmin() {
     };
 
     return (
-        <div className="flex h-screen bg-linear-to-br from-slate-50 to-slate-200 font-sans">
+        <div className="flex h-screen bg-linear-to-br from-slate-50 to-slate-200 font-sans overflow-hidden">
+            {/* Mobile overlay when sidebar is open */}
+            {isSidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-20 md:hidden"
+                    onClick={() => setIsSidebarOpen(false)}
+                ></div>
+            )}
+
             {/* Sidebar */}
-            <aside className={`${isSidebarOpen ? 'w-72' : 'w-0'} bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col justify-between shadow-2xl transition-all duration-300 ease-in-out overflow-hidden shrink-0`}>
+            <aside className={`${isSidebarOpen ? 'w-72' : 'w-0'} ${isSidebarOpen ? 'fixed md:relative' : ''} md:relative z-30 md:z-0 bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col justify-between shadow-2xl transition-all duration-300 ease-in-out overflow-hidden shrink-0 h-full`}>
                 {/* Decorative gradient overlay */}
                 <div className="absolute inset-0 bg-linear-to-br from-sky-500/10 to-purple-500/10 pointer-events-none"></div>
-                
+
                 <div className="relative z-10 flex flex-col h-full w-72">
                     {/* Logo */}
                     <div className="flex items-center justify-center h-24 border-b border-slate-700/50 bg-slate-900/80">
@@ -205,13 +213,13 @@ function TrangChuAdmin() {
                     </nav>
                 
                     {/* User Profile / Logout */}
-                    <div className="p-4 border-t border-slate-700/50 bg-slate-900/50">
-                        <div className="mb-4 p-4 rounded-xl bg-slate-800/50 border border-slate-700/50">
+                    <div className="p-3 sm:p-4 border-t border-slate-700/50 bg-slate-900/50">
+                        <div className="mb-3 sm:mb-4 p-3 sm:p-4 rounded-xl bg-slate-800/50 border border-slate-700/50">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-full bg-linear-to-r from-sky-400 to-blue-500 flex items-center justify-center font-bold text-white shadow-lg shrink-0">
                                     {getInitial()}
                                 </div>
-                                <div className="overflow-hidden">
+                                <div className="overflow-hidden min-w-0 flex-1">
                                     <p className="font-semibold text-sm text-white truncate">
                                         {userInfo?.username || 'Admin User'}
                                     </p>
@@ -221,12 +229,12 @@ function TrangChuAdmin() {
                                 </div>
                             </div>
                         </div>
-                        
-                        <button 
+
+                        <button
                             onClick={handleLogout}
-                            className="group flex items-center gap-4 px-5 py-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-red-500/20 hover:border-red-500/50 border border-transparent transition-all duration-200 w-full"
+                            className="group flex items-center justify-center sm:justify-start gap-3 sm:gap-4 px-4 sm:px-5 py-3 sm:py-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-red-500/20 hover:border-red-500/50 border border-transparent transition-all duration-200 w-full"
                         >
-                            <FaSignOutAlt size={20} className="group-hover:rotate-12 transition-transform duration-200" />
+                            <FaSignOutAlt size={18} className="group-hover:rotate-12 transition-transform duration-200 shrink-0" />
                             <span className="font-semibold text-sm">Đăng xuất</span>
                         </button>
                     </div>
@@ -237,28 +245,28 @@ function TrangChuAdmin() {
             <main className="flex-1 flex flex-col overflow-hidden">
                 {/* Header with Breadcrumb */}
                 <header className="bg-linear-to-r from-blue-600 via-blue-700 to-indigo-700 shadow-lg">
-                    <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="w-full mx-auto px-3 sm:px-4 lg:px-6">
                         <div className="flex items-center justify-between h-16">
                             {/* Left side - Menu toggle + Breadcrumb */}
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
                                 <button
                                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-all border border-white/20"
+                                    className="flex items-center justify-center gap-2 px-2 sm:px-3 py-2 rounded-lg bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-all border border-white/20 shrink-0"
                                 >
                                     {isSidebarOpen ? <FaTimes size={18} /> : <FaBars size={18} />}
                                 </button>
-                                
-                                {/* Dynamic Breadcrumb */}
-                                <div className="flex items-center gap-2 text-sm">
+
+                                {/* Dynamic Breadcrumb - Responsive */}
+                                <div className="flex items-center gap-1 sm:gap-2 text-sm hidden sm:flex">
                                     {getBreadcrumbs().map((crumb, index) => (
                                         <React.Fragment key={crumb.path}>
-                                            {index > 0 && <FaChevronRight className="text-blue-300 text-xs" />}
+                                            {index > 0 && <FaChevronRight className="text-blue-300 text-xs shrink-0" />}
                                             {crumb.isLast ? (
-                                                <span className="text-white font-bold">{crumb.label}</span>
+                                                <span className="text-white font-bold truncate">{crumb.label}</span>
                                             ) : (
-                                                <Link 
-                                                    to={crumb.path} 
-                                                    className="text-blue-100 hover:text-white transition-colors font-medium"
+                                                <Link
+                                                    to={crumb.path}
+                                                    className="text-blue-100 hover:text-white transition-colors font-medium truncate"
                                                 >
                                                     {crumb.label}
                                                 </Link>
@@ -266,13 +274,21 @@ function TrangChuAdmin() {
                                         </React.Fragment>
                                     ))}
                                 </div>
+                                {/* Show only current page on mobile */}
+                                <div className="flex items-center sm:hidden text-sm">
+                                    {getBreadcrumbs().length > 0 && (
+                                        <span className="text-white font-semibold truncate">
+                                            {getBreadcrumbs()[getBreadcrumbs().length - 1]?.label || ''}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </header>
 
                 {/* Page Content */}
-                <div className="flex-1 p-8 overflow-y-auto">
+                <div className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
                     <Outlet />
                 </div>
             </main>

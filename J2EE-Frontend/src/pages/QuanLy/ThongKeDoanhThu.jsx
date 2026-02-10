@@ -455,7 +455,7 @@ const ThongKeDoanhThu = () => {
                                     title="Vé đã bán"
                                     value={todayData.soVeDaBanHomNay || 0}
                                     icon={<FaConciergeBell size={24} />}
-                                    color="purple"
+                                    color="indigo"
                                 />
                                 <StatCard
                                     title="Khách check-in"
@@ -523,7 +523,7 @@ const ThongKeDoanhThu = () => {
                                     title="Doanh thu dịch vụ"
                                     value={overviewData ? formatShortCurrency(overviewData.doanhThuDichVu) : '0đ'}
                                     icon={<FaConciergeBell size={24} />}
-                                    color="purple"
+                                    color="indigo"
                                 />
                                 <StatCard
                                     title="Khách hàng mới"
