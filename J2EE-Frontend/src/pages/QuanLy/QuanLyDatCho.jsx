@@ -188,9 +188,11 @@ const QuanLyDatCho = () => {
       const response = await getAllChuyenBay();
       // Xử lý các trường hợp response khác nhau từ API
       let flightData = response.data;
-      // Nếu API trả về object có field result hoặc items
+      // Nếu API trả về object có field data, result, items hoặc content
       if (flightData && !Array.isArray(flightData)) {
-        if (flightData.result && Array.isArray(flightData.result)) {
+        if (flightData.data && Array.isArray(flightData.data)) {
+          flightData = flightData.data;
+        } else if (flightData.result && Array.isArray(flightData.result)) {
           flightData = flightData.result;
         } else if (flightData.items && Array.isArray(flightData.items)) {
           flightData = flightData.items;
@@ -223,7 +225,6 @@ const QuanLyDatCho = () => {
         setChuyenBayList(flights);
       } else {
         // Nếu API trả về mảng rỗng hoặc không có dữ liệu, sử dụng fallback
-        console.warn('API returned empty or invalid data, using fallback');
         const flights = extractFlights(datChoList);
         setChuyenBayList(flights);
       }
