@@ -12,3 +12,6 @@ plan/khuyenmaiplan.md
 .worktrees/
 .security-key
 logs/security/
+
+# Environment variables
+.env
