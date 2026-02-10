@@ -534,19 +534,20 @@ const ThongKeDoanhThu = () => {
                             </div>
 
                             {/* Biểu đồ đường - Enhanced */}
-                            <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 mb-6 hover:shadow-xl transition-shadow">
-                                <div className="flex justify-between items-center mb-6">
+                            <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-lg border border-gray-100 mb-6 hover:shadow-xl transition-shadow">
+                                <div className="flex justify-between items-center mb-4 sm:mb-6">
                                     <div>
-                                        <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                                            <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
+                                        <h4 className="text-base sm:text-lg font-bold text-gray-800 flex items-center gap-2">
+                                            <div className="w-1 h-5 sm:h-6 bg-blue-600 rounded-full"></div>
                                             Xu hướng doanh thu
                                         </h4>
-                                        <p className="text-sm text-gray-500 mt-1">Biểu đồ doanh thu theo từng ngày</p>
+                                        <p className="text-xs sm:text-sm text-gray-500 mt-1">Biểu đồ doanh thu theo từng ngày</p>
                                     </div>
                                 </div>
                                 {dailyRevenueData.length > 0 ? (
-                                    <ResponsiveContainer id="line-chart" width="100%" height={380} debounce={150}>
-                                        <LineChart data={dailyRevenueData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                                    <div className="h-64 sm:h-80 md:h-96 lg:h-[380px]">
+                                        <ResponsiveContainer id="line-chart" width="100%" height="100%" debounce={150}>
+                                            <LineChart data={dailyRevenueData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                                             <defs>
                                                 <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                                                     <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8} />
@@ -554,26 +555,33 @@ const ThongKeDoanhThu = () => {
                                                 </linearGradient>
                                             </defs>
                                             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                                            <XAxis dataKey="date" fontSize={12} stroke="#6B7280" />
-                                            <YAxis tickFormatter={formatShortCurrency} fontSize={12} stroke="#6B7280" />
+                                            <XAxis dataKey="date" fontSize={10} interval="preserveStartEnd" stroke="#6B7280" />
+                                            <YAxis tickFormatter={formatShortCurrency} fontSize={10} width={60} stroke="#6B7280" />
                                             <Tooltip content={<CustomTooltip formatter={formatCurrency} />} />
-                                            <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                                            <Legend
+                                                iconType="circle"
+                                                wrapperStyle={{ paddingTop: '10px', fontSize: '11px' }}
+                                                layout="horizontal"
+                                                verticalAlign="bottom"
+                                                align="center"
+                                            />
                                             <Line
                                                 type="monotone"
                                                 dataKey="Doanh thu"
                                                 stroke="#3B82F6"
-                                                strokeWidth={3}
-                                                dot={{ fill: '#3B82F6', r: 5, strokeWidth: 2, stroke: '#fff' }}
-                                                activeDot={{ r: 7, fill: '#1D4ED8', stroke: '#fff', strokeWidth: 2 }}
+                                                strokeWidth={2}
+                                                dot={{ fill: '#3B82F6', r: 4, strokeWidth: 2, stroke: '#fff' }}
+                                                activeDot={{ r: 6, fill: '#1D4ED8', stroke: '#fff', strokeWidth: 2 }}
                                                 isAnimationActive={true}
                                                 fill="url(#colorRevenue)"
                                             />
                                         </LineChart>
                                     </ResponsiveContainer>
+                                    </div>
                                 ) : (
-                                    <div className="flex flex-col justify-center items-center h-80 text-gray-400">
-                                        <FaChartLine className="text-6xl mb-4 opacity-30" />
-                                        <p className="font-medium">Không có dữ liệu doanh thu theo ngày</p>
+                                    <div className="flex flex-col justify-center items-center h-48 sm:h-80 text-gray-400">
+                                        <FaChartLine className="text-4xl sm:text-6xl mb-4 opacity-30" />
+                                        <p className="text-xs sm:text-sm font-medium px-4 text-center">Không có dữ liệu doanh thu theo ngày</p>
                                     </div>
                                 )}
                             </div>
@@ -581,72 +589,90 @@ const ThongKeDoanhThu = () => {
                             {/* Biểu đồ tròn và cột - Grid Layout */}
                             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                                 {/* Biểu đồ tròn - Enhanced */}
-                                <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-                                    <div className="mb-6">
-                                        <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                                            <div className="w-1 h-6 bg-green-600 rounded-full"></div>
+                                <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+                                    <div className="mb-4 sm:mb-6">
+                                        <h4 className="text-base sm:text-lg font-bold text-gray-800 flex items-center gap-2">
+                                            <div className="w-1 h-5 sm:h-6 bg-green-600 rounded-full"></div>
                                             Cơ cấu doanh thu vé
                                         </h4>
-                                        <p className="text-sm text-gray-500 mt-1">Phân bổ theo hạng vé</p>
+                                        <p className="text-xs sm:text-sm text-gray-500 mt-1">Phân bổ theo hạng vé</p>
                                     </div>
                                     {ticketClassRevenueData.length > 0 ? (
-                                        <ResponsiveContainer id="pie-chart" width="100%" height={340} debounce={150}>
-                                            <PieChart>
-                                                <Pie
-                                                    data={ticketClassRevenueData}
-                                                    cx="50%"
-                                                    cy="50%"
-                                                    labelLine={false}
-                                                    outerRadius={120}
-                                                    fill="#8884d8"
-                                                    dataKey="value"
-                                                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                        <div className="h-56 sm:h-64 md:h-72 lg:h-[340px]">
+                                            <ResponsiveContainer id="pie-chart" width="100%" height="100%" debounce={150}>
+                                                <PieChart>
+                                                    <Pie
+                                                        data={ticketClassRevenueData}
+                                                        cx="50%"
+                                                        cy="50%"
+                                                        labelLine={false}
+                                                        outerRadius={80}
+                                                        fill="#8884d8"
+                                                        dataKey="value"
+                                                        label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
+                                                        labelFontSize={10}
+                                                        isAnimationActive={true}
                                                     isAnimationActive={true}
-                                                >
-                                                    {ticketClassRevenueData.map((entry, index) => (
-                                                        <Cell key={`cell-${index}`} fill={COLORS_CLASS[index % COLORS_CLASS.length]} />
-                                                    ))}
-                                                </Pie>
-                                                <Tooltip content={<CustomTooltip formatter={formatCurrency} />} />
-                                                <Legend />
-                                            </PieChart>
-                                        </ResponsiveContainer>
+                                                    >
+                                                        {ticketClassRevenueData.map((entry, index) => (
+                                                            <Cell key={`cell-${index}`} fill={COLORS_CLASS[index % COLORS_CLASS.length]} />
+                                                        ))}
+                                                    </Pie>
+                                                    <Tooltip content={<CustomTooltip formatter={formatCurrency} />} />
+                                                    <Legend
+                                                        iconType="circle"
+                                                        wrapperStyle={{ fontSize: '11px' }}
+                                                        layout="horizontal"
+                                                        verticalAlign="bottom"
+                                                        align="center"
+                                                    />
+                                                </PieChart>
+                                            </ResponsiveContainer>
+                                        </div>
                                     ) : (
-                                        <div className="flex flex-col justify-center items-center h-80 text-gray-400">
-                                            <FaTicketAlt className="text-6xl mb-4 opacity-30" />
-                                            <p className="font-medium">Không có dữ liệu doanh thu theo hạng vé</p>
+                                        <div className="flex flex-col justify-center items-center h-48 sm:h-80 text-gray-400">
+                                            <FaTicketAlt className="text-4xl sm:text-6xl mb-4 opacity-30" />
+                                            <p className="text-xs sm:text-sm font-medium px-4 text-center">Không có dữ liệu doanh thu theo hạng vé</p>
                                         </div>
                                     )}
                                 </div>
 
                                 {/* Biểu đồ cột - Enhanced */}
-                                <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-                                    <div className="mb-6">
-                                        <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                                            <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
+                                <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+                                    <div className="mb-4 sm:mb-6">
+                                        <h4 className="text-base sm:text-lg font-bold text-gray-800 flex items-center gap-2">
+                                            <div className="w-1 h-5 sm:h-6 bg-blue-600 rounded-full"></div>
                                             Cơ cấu doanh thu dịch vụ
                                         </h4>
-                                        <p className="text-sm text-gray-500 mt-1">So sánh các dịch vụ</p>
+                                        <p className="text-xs sm:text-sm text-gray-500 mt-1">So sánh các dịch vụ</p>
                                     </div>
                                     {serviceRevenueData.length > 0 ? (
-                                        <ResponsiveContainer id="bar-chart" width="100%" height={340} debounce={150}>
-                                            <BarChart data={serviceRevenueData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                                        <div className="h-56 sm:h-64 md:h-72 lg:h-[340px]">
+                                            <ResponsiveContainer id="bar-chart" width="100%" height="100%" debounce={150}>
+                                                <BarChart data={serviceRevenueData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                                                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                                                <XAxis dataKey="name" fontSize={12} stroke="#6B7280" />
-                                                <YAxis tickFormatter={formatShortCurrency} fontSize={12} stroke="#6B7280" />
+                                                <XAxis dataKey="name" fontSize={10} angle={-15} textAnchor="end" height={50} stroke="#6B7280" />
+                                                <YAxis tickFormatter={formatShortCurrency} fontSize={10} width={60} stroke="#6B7280" />
                                                 <Tooltip content={<CustomTooltip formatter={formatCurrency} />} />
-                                                <Legend />
-                                                <Bar dataKey="Doanh thu" fill="#8884d8" radius={[10, 10, 0, 0]} isAnimationActive={true}>
+                                                <Legend
+                                                    iconType="circle"
+                                                    wrapperStyle={{ fontSize: '11px' }}
+                                                    layout="horizontal"
+                                                    verticalAlign="bottom"
+                                                    align="center"
+                                                />
+                                                <Bar dataKey="Doanh thu" fill="#8884d8" radius={[6, 6, 0, 0]} isAnimationActive={true}>
                                                     {serviceRevenueData.map((entry, index) => (
                                                         <Cell key={`cell-${index}`} fill={COLORS_SERVICE[index % COLORS_SERVICE.length]} />
                                                     ))}
                                                 </Bar>
                                             </BarChart>
                                         </ResponsiveContainer>
+                                        </div>
                                     ) : (
-                                        <div className="flex flex-col justify-center items-center h-80 text-gray-400">
-                                            <FaConciergeBell className="text-6xl mb-4 opacity-30" />
-                                            <p className="font-medium">Không có dữ liệu doanh thu theo dịch vụ</p>
+                                        <div className="flex flex-col justify-center items-center h-48 sm:h-80 text-gray-400">
+                                            <FaConciergeBell className="text-4xl sm:text-6xl mb-4 opacity-30" />
+                                            <p className="text-xs sm:text-sm font-medium px-4 text-center">Không có dữ liệu doanh thu theo dịch vụ</p>
                                         </div>
                                     )}
                                 </div>
