@@ -130,4 +130,17 @@ public class AdminUserDetails implements UserDetails {
                 .map(role -> "ROLE_" + role)
                 .collect(Collectors.toSet());
     }
+
+    /**
+     * Tạo AdminUserDetails từ token (không cần database)
+     * Sử dụng khi đã có thông tin roles và permissions từ JWT token
+     */
+    public static AdminUserDetails fromToken(String username, Set<String> roles, Set<String> permissions) {
+        // Tạo một TaiKhoanAdmin giả lập với chỉ có thông tin cần thiết
+        TaiKhoanAdmin fakeAdmin = new TaiKhoanAdmin();
+        fakeAdmin.setTenDangNhap(username);
+        fakeAdmin.setMatKhauBam(""); // Password không cần thiết cho authentication
+
+        return new AdminUserDetails(fakeAdmin, roles, permissions);
+    }
 }

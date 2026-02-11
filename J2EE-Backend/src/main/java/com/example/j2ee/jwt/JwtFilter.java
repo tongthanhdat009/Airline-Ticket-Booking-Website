@@ -1,6 +1,6 @@
 package com.example.j2ee.jwt;
 
-import com.example.j2ee.service.AdminRoleService;
+import com.example.j2ee.security.AdminUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,10 +16,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
-
-import java.util.List;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -27,18 +28,15 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserDetailsService userService;
     private final UserDetailsService adminService;
-    private final AdminRoleService adminRoleService;
 
     public JwtFilter(
             JwtUtil jwtUtil,
             @Lazy @Qualifier("userAccountDetailsService") UserDetailsService userService,
-            @Lazy @Qualifier("adminAccountDetailsService") UserDetailsService adminService,
-            @Lazy AdminRoleService adminRoleService
+            @Lazy @Qualifier("adminAccountDetailsService") UserDetailsService adminService
     ) {
         this.jwtUtil = jwtUtil;
         this.userService = userService;
         this.adminService = adminService;
-        this.adminRoleService = adminRoleService;
     }
 
     // [ADDED] Bỏ qua filter cho các endpoint public (login/refresh) và tài nguyên tĩnh
@@ -97,14 +95,38 @@ public class JwtFilter extends OncePerRequestFilter {
                         && SecurityContextHolder.getContext().getAuthentication() == null
                         && jwtUtil.validate(token)) {
 
-                    // Xác định xem user là admin hay user thường bằng cách kiểm tra roles
-                    UserDetailsService uds = hasAdminRole(token) ? adminService : userService;
+                    // Lấy roles từ token để xác định user type
+                    List<String> roles = jwtUtil.getRoles(token);
+                    // Dùng permissions claim để xác định admin token
+                    // Chỉ admin token mới có permissions claim
+                    List<String> permissions = jwtUtil.getPermissions(token);
+                    boolean isAdmin = !permissions.isEmpty();
 
-                    UserDetails userDetails = uds.loadUserByUsername(username);
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails, null, userDetails.getAuthorities());
-                    SecurityContextHolder.getContext().setAuthentication(auth);
+                    if (isAdmin) {
+                        // === ADMIN USER: Tạo AdminUserDetails từ TOKEN (không load database) ===
+                        // Sử dụng permissions và roles từ token thay vì database
+                        Set<String> roleSet = new HashSet<>(roles);
+                        Set<String> permissionSet = new HashSet<>(permissions);
+
+                        // Tạo AdminUserDetails từ token data
+                        AdminUserDetails adminUserDetails = AdminUserDetails.fromToken(
+                            username,
+                            roleSet,
+                            permissionSet
+                        );
+
+                        UsernamePasswordAuthenticationToken auth =
+                                new UsernamePasswordAuthenticationToken(
+                                        adminUserDetails, null, adminUserDetails.getAuthorities());
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+                    } else {
+                        // === REGULAR USER: Load từ database như trước ===
+                        UserDetails userDetails = userService.loadUserByUsername(username);
+                        UsernamePasswordAuthenticationToken auth =
+                                new UsernamePasswordAuthenticationToken(
+                                        userDetails, null, userDetails.getAuthorities());
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+                    }
                 }
             }
 
@@ -117,48 +139,30 @@ public class JwtFilter extends OncePerRequestFilter {
         }
     }
 
-    /** Lấy token: ưu tiên cookie accessToken, fallback Authorization header */
+    /** Lấy token: ưu tiên Authorization header, fallback cookie */
     private String resolveToken(HttpServletRequest request) {
+        // 1. Ưu tiên Authorization header (frontend gửi token chính xác theo user type)
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7).trim();
+        }
+        // 2. Fallback: đọc từ cookie (admin_access_token hoặc accessToken)
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
+            // Kiểm tra admin cookie trước
+            for (Cookie c : cookies) {
+                if ("admin_access_token".equals(c.getName())) {
+                    return c.getValue();
+                }
+            }
+            // Fallback customer cookie
             for (Cookie c : cookies) {
                 if ("accessToken".equals(c.getName())) {
                     return c.getValue();
                 }
             }
         }
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            return authHeader.substring(7).trim();
-        }
         return null;
-    }
-
-    private boolean isAdminRole(String role) {
-        if (role == null) return false;
-        String r = role.trim().toUpperCase();
-        return "ADMIN".equals(r) || "ROLE_ADMIN".equals(r);
-    }
-
-    /**
-     * Kiểm tra xem người dùng có phải là admin dựa trên roles trong token
-     * Sử dụng AdminRoleService để load roles động từ database
-     * Hỗ trợ multiple roles
-     */
-    private boolean hasAdminRole(String token) {
-        try {
-            List<String> roles = jwtUtil.getRoles(token);
-            // Lấy tất cả admin roles từ database (có cache)
-            var adminRoles = adminRoleService.getAllActiveRoleNames();
-
-            return roles.stream().anyMatch(role -> {
-                String r = role.trim().toUpperCase();
-                // Check cả dạng có ROLE_ prefix và không có prefix
-                return adminRoles.contains(r) || adminRoles.contains("ROLE_" + r);
-            });
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     private void unauthorized(HttpServletResponse response, String message) throws java.io.IOException {
