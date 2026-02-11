@@ -25,6 +25,31 @@ import {
   FaShoppingCart
 } from 'react-icons/fa';
 import { MdLocalAirport } from 'react-icons/md';
+import MenuService from '../services/MenuService';
+
+/**
+ * Icon mapping - Map icon name từ API sang React Icon component
+ * API chỉ trả về string "FaPlaneDeparture", cần map sang component thực tế
+ */
+const iconMap = {
+  FaChartBar,
+  FaUsers,
+  FaRoute,
+  FaPlaneDeparture,
+  FaConciergeBell,
+  FaDollarSign,
+  FaTags,
+  FaFighterJet,
+  FaFileInvoice,
+  FaUndo,
+  FaHistory,
+  FaUserShield,
+  FaKey,
+  FaTicketAlt,
+  FaCalendarCheck,
+  FaShoppingCart,
+  MdLocalAirport
+};
 
 /**
  * Danh sách menu items cho Admin Panel - Đầy đủ thông tin
@@ -581,6 +606,104 @@ export const roleNames = {
   NHAN_VIEN_VE: 'Nhân viên bán vé',
   KE_TOAN: 'Kế toán',
   VAN_HANH: 'Vận hành'
+};
+
+// ============================================================
+// API-DRIVEN MENU FUNCTIONS (NEW)
+// ============================================================
+
+/**
+ * Convert menu item từ API format sang format hiện tại
+ * @param {Object} apiItem - Menu item từ API
+ * @returns {Object} - Menu item format hiện tại
+ */
+const convertMenuItemFromAPI = (apiItem) => {
+  return {
+    path: apiItem.routePath,
+    text: apiItem.tenChucNang,
+    icon: iconMap[apiItem.uiIcon] || FaUsers, // Fallback icon
+    permissionKey: apiItem.permissionKey,
+    featureCode: apiItem.maCode,
+    featureName: apiItem.tenChucNang,
+    group: apiItem.nhom,
+    color: apiItem.uiColor,
+    description: apiItem.uiDescription
+  };
+};
+
+/**
+ * Lấy menu items từ API
+ * Fallback về hardcode data nếu API fail
+ * @returns {Promise<Array>} - Danh sách menu items
+ */
+export const fetchMenuItems = async () => {
+  try {
+    const apiMenuItems = await MenuService.getMenuItems();
+
+    // Convert API format sang format hiện tại
+    const convertedItems = apiMenuItems.map(convertMenuItemFromAPI);
+
+    // Xử lý special case: HangVe (dùng chung permission với GiaBay)
+    const hasGiaBay = convertedItems.find(item => item.path === 'GiaBay');
+    if (hasGiaBay) {
+      convertedItems.push({
+        path: 'HangVe',
+        text: 'Hạng vé',
+        icon: FaTicketAlt,
+        permissionKey: 'PRICE_VIEW',
+        featureCode: 'PRICE',
+        featureName: 'Quản lý Giá vé',
+        group: 'Tài chính',
+        color: 'from-violet-500 to-purple-600',
+        description: 'Quản lý các hạng vé (Economy, Business, ...)'
+      });
+    }
+
+    return convertedItems;
+  } catch (error) {
+    console.error('Không thể lấy menu từ API, fallback về hardcode:', error);
+    // Fallback về hardcode data cũ (adminMenuItems)
+    return adminMenuItems;
+  }
+};
+
+/**
+ * Lấy menu config đầy đủ từ API
+ * @returns {Promise<Object>} - Menu config đầy đủ
+ */
+export const fetchMenuConfig = async () => {
+  try {
+    const config = await MenuService.getMenuConfig();
+
+    // Convert menu items
+    const menuItems = config.menuItems.map(convertMenuItemFromAPI);
+
+    // Special case: HangVe
+    const hasGiaBay = menuItems.find(item => item.path === 'GiaBay');
+    if (hasGiaBay) {
+      menuItems.push({
+        path: 'HangVe',
+        text: 'Hạng vé',
+        icon: FaTicketAlt,
+        permissionKey: 'PRICE_VIEW',
+        featureCode: 'PRICE',
+        featureName: 'Quản lý Giá vé',
+        group: 'Tài chính',
+        color: 'from-violet-500 to-purple-600',
+        description: 'Quản lý các hạng vé (Economy, Business, ...)'
+      });
+    }
+
+    return {
+      menuItems,
+      actions: config.actions,
+      userPermissions: config.userPermissions,
+      groups: config.groups
+    };
+  } catch (error) {
+    console.error('Không thể lấy menu config từ API:', error);
+    throw error;
+  }
 };
 
 // Export default

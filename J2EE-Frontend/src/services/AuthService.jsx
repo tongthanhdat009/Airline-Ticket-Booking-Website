@@ -1,4 +1,4 @@
-import apiClient, { loginAndSetTokens, getRefreshToken } from './apiClient';
+import apiClient, { loginAndSetTokens } from './apiClient';
 import { setAdminUserInfo, clearAdminAuthCookies } from '../utils/cookieUtils';
 
 const AUTH_API_URL = '/admin/dangnhap';
@@ -6,7 +6,8 @@ const AUTH_API_URL = '/admin/dangnhap';
 /**
  * Đăng nhập admin với multi-role và permissions
  * @param {Object} credentials - { username, password }
- * @returns {Object} - { accessToken, refreshToken, roles, permissions, username }
+ * @returns {Object} - { accessToken, roles, permissions, username }
+ * NOTE: refreshToken KHÔNG được trả về nữa, nó được backend set vào httpOnly cookie
  */
 export const loginAdmin = async (credentials) => {
     try {
@@ -15,9 +16,9 @@ export const loginAdmin = async (credentials) => {
             matKhau: credentials.password
         });
 
-        // Lưu token - access token vào cookie, refresh token vào memory
+        // Lưu access token - refresh token đã được backend set vào httpOnly cookie
         if (response.data.accessToken) {
-            loginAndSetTokens('admin', response.data.accessToken, response.data.refreshToken);
+            loginAndSetTokens('admin', response.data.accessToken);
 
             // Lưu thông tin user với roles và permissions
             const userInfo = {
@@ -38,24 +39,14 @@ export const loginAdmin = async (credentials) => {
 // Đăng xuất
 export const logout = async () => {
     try {
-        // Lấy refresh token từ memory
-        const refreshToken = getRefreshToken('admin');
-
-        // Nếu có refresh token trong memory, gửi để revoke
-        if (refreshToken) {
-            await apiClient.post('/admin/dangxuat', {
-                refreshToken: refreshToken
-            });
-        } else {
-            // Nếu không có refresh token (bị mất khi refresh trang),
-            // gọi logout all để revoke tất cả tokens dựa vào access token
-            console.log('Refresh token không có trong memory, sử dụng logout all');
-            await apiClient.post('/admin/dangxuat/all');
-        }
+        // SECURITY: Refresh token giờ ở httpOnly cookie, frontend không thể truy cập
+        // Backend sẽ tự động đọc refreshToken từ cookie và revoke nó
+        // Gọi logout API để backend revoke refresh token và xóa cookie
+        await apiClient.post('/admin/dangxuat');
     } catch (error) {
         console.error("Error calling logout API:", error);
     } finally {
-        // Luôn xóa local cookies và memory ngay cả khi API fail
+        // Luôn xóa local cookies ngay cả khi API fail
         clearAdminAuthCookies();
     }
 };
@@ -82,7 +73,7 @@ export const logoutAllDevices = async () => {
         console.error("Error logging out all devices:", error);
         throw error;
     } finally {
-        // Xóa local cookies và memory
+        // Xóa local cookies
         clearAdminAuthCookies();
     }
 };

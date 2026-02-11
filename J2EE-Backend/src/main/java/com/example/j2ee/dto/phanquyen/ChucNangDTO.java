@@ -16,12 +16,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class ChucNangDTO {
-    
+
     private int maChucNang;
     private String maCode;
     private String tenChucNang;
     private String nhom;
-    
+
     public static ChucNangDTO fromEntity(ChucNang chucNang) {
         return ChucNangDTO.builder()
                 .maChucNang(chucNang.getMaChucNang())

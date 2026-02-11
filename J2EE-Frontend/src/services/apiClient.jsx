@@ -8,6 +8,8 @@ const apiClient = axios.create({
   baseURL: BASE_URL,
   headers: { "Content-Type": "application/json" },
   timeout: 10000,
+  // QUAN TRỌNG: withCredentials = true để gửi httpOnly cookies đi với request
+  withCredentials: true,
 });
 
 // Cờ và hàng đợi để xử lý tình huống refresh token đang diễn ra
@@ -53,67 +55,51 @@ const getAccessTokenByType = (userType) => {
 };
 
 /**
- * Lấy refresh token theo loại người dùng từ memory
- * Refresh token KHÔNG được lưu trong cookies hay localStorage
- * Chỉ lưu trong memory khi login và mất đi khi refresh trang
+ * SECURITY UPDATE:
+ * Refresh token giờ được lưu trong httpOnly cookie (backend set)
+ * Frontend KHÔNG thể truy cập httpOnly cookie qua JavaScript
+ * Browser sẽ tự động gửi cookie cùng với request khi withCredentials = true
+ * Không cần lưu refresh token trong memory nữa!
  */
-let adminRefreshToken = null;
-let customerRefreshToken = null;
 
-const getRefreshTokenByType = (userType) => {
+/**
+ * Lưu access token theo loại người dùng
+ * Refresh token đã được backend set vào httpOnly cookie, frontend không cần quản lý
+ */
+const setAccessTokenByType = (userType, accessToken) => {
   if (userType === 'admin') {
-    return adminRefreshToken;
+    Cookies.set('admin_access_token', accessToken, { expires: 1, sameSite: 'strict' }); // 1 day
   } else if (userType === 'customer') {
-    return customerRefreshToken;
-  }
-  return null;
-};
-
-const setRefreshTokenByType = (userType, refreshToken) => {
-  if (userType === 'admin') {
-    adminRefreshToken = refreshToken;
-  } else if (userType === 'customer') {
-    customerRefreshToken = refreshToken;
+    Cookies.set('accessToken', accessToken, { expires: 7, path: '/', sameSite: 'strict' }); // 7 days
   }
 };
 
-const clearRefreshTokenByType = (userType) => {
+/**
+ * Xóa access token (refresh token ở httpOnly cookie sẽ được backend xóa khi logout)
+ */
+const clearAccessTokenByType = (userType) => {
   if (userType === 'admin') {
-    adminRefreshToken = null;
+    Cookies.remove('admin_access_token');
   } else if (userType === 'customer') {
-    customerRefreshToken = null;
+    Cookies.remove('accessToken', { path: '/' });
   }
 };
 
 /**
  * Lưu token theo loại người dùng
- * Access token lưu vào cookie, refresh token lưu vào memory (in-app only)
+ * Chỉ lưu access token, refresh token đã được backend set vào httpOnly cookie
  */
-const setTokensByType = (userType, accessToken, refreshToken) => {
-  if (userType === 'admin') {
-    Cookies.set('admin_access_token', accessToken, { expires: 1 }); // 1 day
-    if (refreshToken) {
-      setRefreshTokenByType('admin', refreshToken);
-    }
-  } else if (userType === 'customer') {
-    Cookies.set('accessToken', accessToken, { expires: 7, path: '/', sameSite: 'strict' }); // 7 days
-    if (refreshToken) {
-      setRefreshTokenByType('customer', refreshToken);
-    }
-  }
+const setTokensByType = (userType, accessToken) => {
+  setAccessTokenByType(userType, accessToken);
+  // Refresh token được backend quản lý trong httpOnly cookie, frontend không cần làm gì
 };
 
 /**
  * Xóa token theo loại người dùng
  */
 const clearTokensByType = (userType) => {
-  if (userType === 'admin') {
-    Cookies.remove('admin_access_token');
-    clearRefreshTokenByType('admin');
-  } else if (userType === 'customer') {
-    Cookies.remove('accessToken', { path: '/' });
-    clearRefreshTokenByType('customer');
-  }
+  clearAccessTokenByType(userType);
+  // Refresh token ở httpOnly cookie sẽ được backend xóa
 };
 
 /**
@@ -123,7 +109,7 @@ const getRefreshEndpoint = (userType) => {
   if (userType === 'admin') {
     return '/admin/dangnhap/refresh';
   } else if (userType === 'customer') {
-    return '/dangnhap/refresh'; // Sửa từ /customer/dangnhap/refresh thành /dangnhap/refresh
+    return '/dangnhap/refresh';
   }
   return null;
 };
@@ -159,11 +145,11 @@ apiClient.interceptors.request.use(
   (config) => {
     const userType = getUserType(config.url);
     const accessToken = getAccessTokenByType(userType);
-    
+
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
-    
+
     return config;
   },
   (error) => {
@@ -187,10 +173,13 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
 
       const userType = getUserType(originalRequest.url);
-      const refreshToken = getRefreshTokenByType(userType);
 
-      if (!refreshToken) {
-        // Không có refresh token => xóa token
+      // SECURITY: Không cần check refreshToken nữa vì nó ở httpOnly cookie
+      // Backend sẽ tự động đọc refresh token từ cookie
+      const accessToken = getAccessTokenByType(userType);
+
+      if (!accessToken) {
+        // Không có access token => redirect về login
         clearTokensByType(userType);
 
         // Nếu originalRequest.skipRedirect được đặt thì không redirect
@@ -219,12 +208,14 @@ apiClient.interceptors.response.use(
 
         const refreshEndpoint = getRefreshEndpoint(userType);
 
-        // Gọi API refresh token với refreshToken trong body
+        // Gọi API refresh token - KHÔNG gửi refreshToken trong body
+        // Backend sẽ đọc refreshToken từ httpOnly cookie
         const { data } = await axios.post(
           `${BASE_URL}${refreshEndpoint}`,
-          { refreshToken },
+          {}, // Empty body - refreshToken từ cookie
           {
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
+            withCredentials: true // QUAN TRỌNG: để gửi httpOnly cookies
           }
         );
 
@@ -234,8 +225,8 @@ apiClient.interceptors.response.use(
           throw new Error("No accessToken in response");
         }
 
-        // Lưu access token mới (refresh token giữ nguyên trong memory)
-        setTokensByType(userType, newAccessToken, refreshToken);
+        // Lưu access token mới (refresh token vẫn ở httpOnly cookie, backend quản lý)
+        setTokensByType(userType, newAccessToken);
 
         // Cập nhật userInfo trong cookie nếu có roles và permissions mới (cho admin)
         if (userType === 'admin' && (data.roles || data.permissions)) {
@@ -284,16 +275,16 @@ apiClient.interceptors.response.use(
 );
 
 /**
- * Helper function để login và lưu token
- * Lưu access token vào cookie, refresh token vào memory
+ * Helper function để login và lưu access token
+ * Refresh token được backend set vào httpOnly cookie tự động
  */
-export const loginAndSetTokens = (userType, accessToken, refreshToken) => {
-  setTokensByType(userType, accessToken, refreshToken);
+export const loginAndSetTokens = (userType, accessToken) => {
+  setTokensByType(userType, accessToken);
 };
 
 /**
  * Helper function để logout
- * Xóa cả access token và refresh token
+ * Xóa access token và gọi API để xóa httpOnly cookie
  */
 export const logoutAndClearTokens = (userType) => {
   clearTokensByType(userType);
@@ -309,18 +300,20 @@ export const isAuthenticated = (userType) => {
   return !!accessToken;
 };
 
+// DEPRECATED: Các hàm này không còn cần thiết vì refresh token ở httpOnly cookie
 /**
- * Export hàm để component có thể lưu refresh token sau khi login
+ * @deprecated Refresh token giờ được backend quản lý trong httpOnly cookie
  */
-export const setRefreshToken = (userType, refreshToken) => {
-  setRefreshTokenByType(userType, refreshToken);
+export const setRefreshToken = () => {
+  console.warn('setRefreshToken is deprecated - refreshToken now managed by backend in httpOnly cookie');
 };
 
 /**
- * Export hàm để component có thể lấy refresh token
+ * @deprecated Refresh token giờ được backend quản lý trong httpOnly cookie
  */
-export const getRefreshToken = (userType) => {
-  return getRefreshTokenByType(userType);
+export const getRefreshToken = () => {
+  console.warn('getRefreshToken is deprecated - refreshToken now managed by backend in httpOnly cookie');
+  return null;
 };
 
 export default apiClient;

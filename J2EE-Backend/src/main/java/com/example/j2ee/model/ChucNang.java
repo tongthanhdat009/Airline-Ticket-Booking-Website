@@ -33,6 +33,21 @@ public class ChucNang {
     @Column(name = "nhom", length = 50)
     private String nhom;
 
+    @Column(name = "route_path", length = 100)
+    private String routePath;
+
+    @Column(name = "ui_icon", length = 50)
+    private String uiIcon;
+
+    @Column(name = "ui_color", length = 100)
+    private String uiColor;
+
+    @Column(name = "ui_description", columnDefinition = "TEXT")
+    private String uiDescription;
+
+    @Column(name = "display_order")
+    private Integer displayOrder = 0;
+
     /**
      * Mối quan hệ Một-Nhiều: Một chức năng có NHIỀU phân quyền
      */

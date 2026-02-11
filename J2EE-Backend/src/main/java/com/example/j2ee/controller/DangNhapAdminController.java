@@ -6,6 +6,7 @@ import com.example.j2ee.service.RefreshTokenService;
 import com.example.j2ee.jwt.JwtUtil;
 import com.example.j2ee.security.AdminUserDetails;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -25,6 +26,10 @@ public class DangNhapAdminController {
     private final PermissionService permissionService;
     private final UserDetailsService adminDetailsService;
 
+    // Cookie settings cho httpOnly refresh token
+    private static final String REFRESH_COOKIE_NAME = "admin_refresh_token";
+    private static final int REFRESH_COOKIE_MAX_AGE = 30 * 24 * 60 * 60; // 30 ngày (giây)
+
     public DangNhapAdminController(
             DangNhapAdminService dangNhapAdminService,
             JwtUtil jwtUtil,
@@ -40,7 +45,10 @@ public class DangNhapAdminController {
     }
 
     @PostMapping("/dangnhap")
-    public ResponseEntity<?> dangNhap(@RequestBody Map<String, String> payload) {
+    public ResponseEntity<?> dangNhap(
+            @RequestBody Map<String, String> payload,
+            HttpServletResponse response
+    ) {
         try {
             // Lấy username và password từ request
             String tenDangNhap = payload.get("tenDangNhap");
@@ -64,16 +72,24 @@ public class DangNhapAdminController {
             var refreshTokenEntity = refreshTokenService.createRefreshTokenForAdmin(tenDangNhap);
             String refreshToken = refreshTokenEntity.getToken();
 
-            // Trả về body: accessToken + refreshToken + roles + permissions
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Đăng nhập thành công");
-            response.put("accessToken", accessToken);
-            response.put("refreshToken", refreshToken);
-            response.put("roles", roles);
-            response.put("permissions", permissions);
-            response.put("username", tenDangNhap);
+            // === SECURITY: Lưu refresh token vào httpOnly cookie ===
+            // Sử dụng Set-Cookie header để có SameSite attribute
+            String setCookieHeader = String.format(
+                "%s=%s; Path=/; Max-Age=%d; HttpOnly; SameSite=Strict",
+                REFRESH_COOKIE_NAME, refreshToken, REFRESH_COOKIE_MAX_AGE
+            );
+            response.addHeader("Set-Cookie", setCookieHeader);
 
-            return ResponseEntity.ok(response);
+            // Trả về body: KHÔNG bao gồm refreshToken (chỉ accessToken + roles + permissions)
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("message", "Đăng nhập thành công");
+            responseBody.put("accessToken", accessToken);
+            // refreshToken KHÔNG được trả trong body - chỉ ở httpOnly cookie
+            responseBody.put("roles", roles);
+            responseBody.put("permissions", permissions);
+            responseBody.put("username", tenDangNhap);
+
+            return ResponseEntity.ok(responseBody);
 
         } catch (IllegalArgumentException e) {
             Map<String, String> errorResponse = new HashMap<>();
@@ -86,12 +102,12 @@ public class DangNhapAdminController {
         }
     }
 
-    // Endpoint refresh token - nhận refresh token từ request body
-    // Gọi: POST /admin/dangnhap/refresh với body { "refreshToken": "..." }
+    // Endpoint refresh token - Đọc refresh token từ httpOnly cookie
+    // Gọi: POST /admin/dangnhap/refresh (không cần body)
     @PostMapping("/dangnhap/refresh")
-    public ResponseEntity<?> refreshAdmin(@RequestBody Map<String, String> payload) {
-        String refreshToken = payload.get("refreshToken");
-
+    public ResponseEntity<?> refreshAdmin(
+            @CookieValue(value = REFRESH_COOKIE_NAME, required = false) String refreshToken
+    ) {
         if (refreshToken == null || refreshToken.isEmpty() || !jwtUtil.isRefreshToken(refreshToken)) {
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("message", "Thiếu hoặc sai refresh token");
@@ -168,21 +184,28 @@ public class DangNhapAdminController {
         }
     }
 
-    // Endpoint logout - thu hồi refresh token từ request body
+    // Endpoint logout - Thu hồi refresh token từ cookie và xóa cookie
     @PostMapping("/dangxuat")
-    public ResponseEntity<?> logout(@RequestBody(required = false) Map<String, String> payload) {
+    public ResponseEntity<?> logout(
+            @CookieValue(value = REFRESH_COOKIE_NAME, required = false) String refreshToken,
+            HttpServletResponse response
+    ) {
         try {
-            // Thu hồi refresh token từ request body
-            if (payload != null && payload.containsKey("refreshToken")) {
-                String refreshToken = payload.get("refreshToken");
-                if (refreshToken != null && !refreshToken.isEmpty()) {
-                    refreshTokenService.revokeRefreshToken(refreshToken);
-                }
+            // Thu hồi refresh token từ cookie
+            if (refreshToken != null && !refreshToken.isEmpty()) {
+                refreshTokenService.revokeRefreshToken(refreshToken);
             }
 
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Đăng xuất thành công");
-            return ResponseEntity.ok(response);
+            // Xóa cookie bằng Set-Cookie header với Max-Age=0
+            String deleteCookieHeader = String.format(
+                "%s=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict",
+                REFRESH_COOKIE_NAME
+            );
+            response.addHeader("Set-Cookie", deleteCookieHeader);
+
+            Map<String, String> responseBody = new HashMap<>();
+            responseBody.put("message", "Đăng xuất thành công");
+            return ResponseEntity.ok(responseBody);
         } catch (Exception e) {
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("error", "Lỗi khi đăng xuất: " + e.getMessage());
