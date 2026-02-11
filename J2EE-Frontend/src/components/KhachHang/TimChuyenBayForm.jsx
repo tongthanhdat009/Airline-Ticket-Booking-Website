@@ -129,7 +129,7 @@ function TimChuyenBayForm() {
                     onClick={() => setFlightType('round')}
                     className={`flex-1 py-3 rounded-lg font-semibold transition-all ${
                         flightType === 'round'
-                            ? "bg-linear-to-r from-red-600 to-red-700 text-white shadow-md"
+                            ? "bg-linear-to-r from-[#1E88E5] to-[#1565C0] text-white shadow-md"
                             : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                 >
@@ -140,7 +140,7 @@ function TimChuyenBayForm() {
                     onClick={() => setFlightType('one')}
                     className={`flex-1 py-3 rounded-lg font-semibold transition-all ${
                         flightType === 'one'
-                            ? "bg-linear-to-r from-red-600 to-red-700 text-white shadow-md"
+                            ? "bg-linear-to-r from-[#1E88E5] to-[#1565C0] text-white shadow-md"
                             : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                 >
@@ -161,7 +161,7 @@ function TimChuyenBayForm() {
                             id="departure"
                             value={departureValue}
                             onChange={(e) => setDepartureValue(e.target.value)}
-                            className='w-full pl-12 pr-10 py-3 border-2 border-gray-200 rounded-lg focus:border-red-600 focus:outline-none transition-all appearance-none cursor-pointer'
+                            className='w-full pl-12 pr-10 py-3 border-2 border-gray-200 rounded-lg focus:border-[#1E88E5] focus:outline-none transition-all appearance-none cursor-pointer'
                         >
                             <option value="">{t('booking.search_form.from')}</option>
                             {Object.entries(grouped).map(([country, cities]) => (
@@ -189,7 +189,7 @@ function TimChuyenBayForm() {
                             id="arrival"
                             value={arrivalValue}
                             onChange={(e) => setArrivalValue(e.target.value)}
-                            className='w-full pl-12 pr-10 py-3 border-2 border-gray-200 rounded-lg focus:border-red-600 focus:outline-none transition-all appearance-none cursor-pointer'
+                            className='w-full pl-12 pr-10 py-3 border-2 border-gray-200 rounded-lg focus:border-[#1E88E5] focus:outline-none transition-all appearance-none cursor-pointer'
                         >
                             <option value="">{t('booking.search_form.to')}</option>
                             {Object.entries(grouped).map(([country, cities]) => (
@@ -219,7 +219,7 @@ function TimChuyenBayForm() {
                         placeholderText={t('booking.search_form.departure_date')}
                         dateFormat="dd/MM/yyyy"
                         minDate={new Date()}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-red-600 focus:outline-none transition-all"
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#1E88E5] focus:outline-none transition-all"
                     />
                 </div>
                 
@@ -234,7 +234,7 @@ function TimChuyenBayForm() {
                             placeholderText={t('booking.search_form.return_date')}
                             dateFormat="dd/MM/yyyy"
                             minDate={startDate || new Date()}
-                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-red-600 focus:outline-none transition-all"
+                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#1E88E5] focus:outline-none transition-all"
                         />
                     </div>
                 )}
@@ -248,7 +248,7 @@ function TimChuyenBayForm() {
                         <select
                             value={passengers}
                             onChange={(e) => setPassengers(e.target.value)}
-                            className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-red-600 focus:outline-none transition-all"
+                            className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#1E88E5] focus:outline-none transition-all"
                         >
                             <option value="">{t('booking.search_form.passengers')}</option>
                             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
@@ -262,7 +262,7 @@ function TimChuyenBayForm() {
             {/* Nút tìm chuyến bay */}
             <button
                 type="submit"
-                className="w-full py-4 bg-linear-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-gray-900 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all"
+                className="w-full py-4 bg-linear-to-r from-[#FF7043] to-[#F4511E] hover:from-[#FF8A65] hover:to-[#FF7043] text-gray-900 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all"
             >
                 🔍 {t('booking.search_form.btn_search')}
             </button>

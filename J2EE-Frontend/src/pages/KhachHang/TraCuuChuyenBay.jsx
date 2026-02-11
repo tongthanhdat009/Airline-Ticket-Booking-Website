@@ -50,11 +50,11 @@ function TraCuuChuyenBay() {
 
   return (
     <>
-      <div className="min-h-screen bg-linear-to-br from-pink-50 via-yellow-50 to-white py-12 px-4">
+      <div className="min-h-screen bg-linear-to-br from-[#F5F7FA] via-[#E3F2FD] to-white py-12 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-red-600 mb-3">{t('pages.tra_cuu.title')}</h1>
+            <h1 className="text-4xl font-bold text-[#1E88E5] mb-3">{t('pages.tra_cuu.title')}</h1>
             <p className="text-gray-600">{t('pages.tra_cuu.subtitle')}</p>
           </div>
 
@@ -70,7 +70,7 @@ function TraCuuChuyenBay() {
                   value={bookingCode}
                   onChange={(e) => setBookingCode(e.target.value)}
                   placeholder={t('pages.tra_cuu.placeholder_booking_code')}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-red-600 focus:outline-none transition-all"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1E88E5] focus:outline-none transition-all"
                   disabled={loading}
                 />
               </div>
@@ -84,21 +84,21 @@ function TraCuuChuyenBay() {
                   value={passengerName}
                   onChange={(e) => setPassengerName(e.target.value)}
                   placeholder={t('pages.tra_cuu.placeholder_passenger_name')}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-red-600 focus:outline-none transition-all"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1E88E5] focus:outline-none transition-all"
                   disabled={loading}
                 />
               </div>
 
               {error && (
                 <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-                  <p className="text-red-600 text-sm">{error}</p>
+                  <p className="text-[#1E88E5] text-sm">{error}</p>
                 </div>
               )}
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-linear-to-r from-red-600 to-red-700 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 bg-linear-to-r from-[#1E88E5] to-[#1565C0] text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? t('pages.tra_cuu.searching') : t('pages.tra_cuu.search_btn')}
               </button>
@@ -167,7 +167,7 @@ function TraCuuChuyenBay() {
                     <p className="text-sm text-gray-600 mb-2">{t('pages.tra_cuu.payment_status_label')}</p>
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-gray-600">{t('pages.tra_cuu.total_label')}</span>
-                      <span className="text-xl font-bold text-red-600">{formatCurrency(bookingData.thanhToan.soTien)}</span>
+                      <span className="text-xl font-bold text-[#1E88E5]">{formatCurrency(bookingData.thanhToan.soTien)}</span>
                     </div>
                     <div className="flex items-center">
                       {bookingData.thanhToan.daThanhToan === 'Y' ? (

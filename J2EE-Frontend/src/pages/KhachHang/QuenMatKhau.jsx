@@ -154,9 +154,9 @@ function QuenMatKhau() {
   if (isCheckingAuth) {
     return (
       <>
-        <div className="min-h-[calc(100vh-70px)] flex items-center justify-center bg-linear-to-br from-pink-50 via-yellow-50 to-white">
+        <div className="min-h-[calc(100vh-70px)] flex items-center justify-center bg-linear-to-br from-[#F5F7FA] via-[#E3F2FD] to-white">
           <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mb-4"></div>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#1E88E5] mb-4"></div>
             <p className="text-gray-600 font-medium">Đang kiểm tra...</p>
           </div>
         </div>
@@ -171,7 +171,7 @@ function QuenMatKhau() {
         style={{ backgroundImage: 'url(/background/auth/bg_footer.2f611c1f.webp)' }}
       >
         {/* Overlay để làm nổi bật form */}
-        <div className="absolute inset-0 bg-linear-to-br from-pink-50/80 via-yellow-50/80 to-white/80"></div>
+        <div className="absolute inset-0 bg-linear-to-br from-[#F5F7FA]/80 via-[#E3F2FD]/80 to-white/80"></div>
         
         <div className="max-w-2xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden relative z-10">
           <div className="p-12 md:p-16">
@@ -198,7 +198,7 @@ function QuenMatKhau() {
                         onChange={(e) => setEmail(e.target.value)}
                         id="email"
                         type="email"
-                        className="w-full py-3.5 pr-11 pl-12 border-2 border-gray-200 rounded-xl text-[15px] transition-all bg-gray-50 focus:outline-none focus:border-red-600 focus:bg-white focus:shadow-[0_0_0_3px_rgba(227,6,19,0.1)]"
+                        className="w-full py-3.5 pr-11 pl-12 border-2 border-gray-200 rounded-xl text-[15px] transition-all bg-gray-50 focus:outline-none focus:border-[#1E88E5] focus:bg-white focus:shadow-[0_0_0_3px_rgba(30,136,229,0.1)]"
                         placeholder="email@example.com"
                         autoComplete="email"
                       />
@@ -208,13 +208,13 @@ function QuenMatKhau() {
                   {error && <div className="py-3 px-4 rounded-lg text-sm mb-5 font-medium bg-red-50 text-red-700 border border-red-200">{error}</div>}
                   {message && <div className="py-3 px-4 rounded-lg text-sm mb-5 font-medium bg-green-50 text-green-800 border border-green-300">{message}</div>}
 
-                  <button type="submit" className="w-full py-4 bg-linear-to-r from-red-600 to-red-700 text-white border-none rounded-xl text-base font-semibold cursor-pointer transition-all shadow-[0_4px_15px_rgba(227,6,19,0.3)] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(227,6,19,0.4)] disabled:opacity-60 disabled:cursor-not-allowed" disabled={isLoading}>
+                  <button type="submit" className="w-full py-4 bg-linear-to-r from-[#1E88E5] to-[#1565C0] text-white border-none rounded-xl text-base font-semibold cursor-pointer transition-all shadow-[0_4px_15px_rgba(30,136,229,0.3)] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(30,136,229,0.4)] disabled:opacity-60 disabled:cursor-not-allowed" disabled={isLoading}>
                     {isLoading ? "Đang gửi..." : "Gửi mã xác thực"}
                   </button>
 
                   <p className="text-center mt-6 text-sm text-gray-600">
                     Nhớ mật khẩu?{" "}
-                    <a href="/dang-nhap-client" className="text-red-600 no-underline font-semibold hover:underline">
+                    <a href="/dang-nhap-client" className="text-[#1E88E5] no-underline font-semibold hover:underline">
                       Đăng nhập
                     </a>
                   </p>
@@ -235,7 +235,7 @@ function QuenMatKhau() {
                         id={`otp-${index}`}
                         type="text"
                         maxLength="1"
-                        className="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-200 rounded-xl bg-gray-50 transition-all focus:outline-none focus:border-red-600 focus:bg-white focus:shadow-[0_0_0_3px_rgba(227,6,19,0.1)]"
+                        className="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-200 rounded-xl bg-gray-50 transition-all focus:outline-none focus:border-[#1E88E5] focus:bg-white focus:shadow-[0_0_0_3px_rgba(30,136,229,0.1)]"
                         value={digit}
                         onChange={(e) => handleOtpChange(index, e.target.value)}
                         onKeyDown={(e) => handleOtpKeyDown(index, e)}
@@ -246,7 +246,7 @@ function QuenMatKhau() {
                   {error && <div className="py-3 px-4 rounded-lg text-sm mb-5 font-medium bg-red-50 text-red-700 border border-red-200">{error}</div>}
                   {message && <div className="py-3 px-4 rounded-lg text-sm mb-5 font-medium bg-green-50 text-green-800 border border-green-300">{message}</div>}
 
-                  <button type="submit" className="w-full py-4 bg-linear-to-r from-red-600 to-red-700 text-white border-none rounded-xl text-base font-semibold cursor-pointer transition-all shadow-[0_4px_15px_rgba(227,6,19,0.3)] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(227,6,19,0.4)] disabled:opacity-60 disabled:cursor-not-allowed" disabled={isLoading}>
+                  <button type="submit" className="w-full py-4 bg-linear-to-r from-[#1E88E5] to-[#1565C0] text-white border-none rounded-xl text-base font-semibold cursor-pointer transition-all shadow-[0_4px_15px_rgba(30,136,229,0.3)] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(30,136,229,0.4)] disabled:opacity-60 disabled:cursor-not-allowed" disabled={isLoading}>
                     {isLoading ? "Đang xác thực..." : "Xác thực OTP"}
                   </button>
 
@@ -256,7 +256,7 @@ function QuenMatKhau() {
                     ) : (
                       <>
                         Không nhận được mã?{" "}
-                        <button onClick={handleSendOTP} disabled={isLoading} className="bg-none border-none text-red-600 font-semibold cursor-pointer underline disabled:opacity-50 disabled:cursor-not-allowed">
+                        <button onClick={handleSendOTP} disabled={isLoading} className="bg-none border-none text-[#1E88E5] font-semibold cursor-pointer underline disabled:opacity-50 disabled:cursor-not-allowed">
                           Gửi lại
                         </button>
                       </>
@@ -279,7 +279,7 @@ function QuenMatKhau() {
                         onChange={(e) => setMatKhauMoi(e.target.value)}
                         id="new-password"
                         type="password"
-                        className="w-full py-3.5 pr-11 pl-12 border-2 border-gray-200 rounded-xl text-[15px] transition-all bg-gray-50 focus:outline-none focus:border-red-600 focus:bg-white focus:shadow-[0_0_0_3px_rgba(227,6,19,0.1)]"
+                        className="w-full py-3.5 pr-11 pl-12 border-2 border-gray-200 rounded-xl text-[15px] transition-all bg-gray-50 focus:outline-none focus:border-[#1E88E5] focus:bg-white focus:shadow-[0_0_0_3px_rgba(30,136,229,0.1)]"
                         placeholder="Tối thiểu 6 ký tự"
                       />
                     </div>
@@ -296,7 +296,7 @@ function QuenMatKhau() {
                         onChange={(e) => setXacNhanMatKhau(e.target.value)}
                         id="confirm-password"
                         type="password"
-                        className="w-full py-3.5 pr-11 pl-12 border-2 border-gray-200 rounded-xl text-[15px] transition-all bg-gray-50 focus:outline-none focus:border-red-600 focus:bg-white focus:shadow-[0_0_0_3px_rgba(227,6,19,0.1)]"
+                        className="w-full py-3.5 pr-11 pl-12 border-2 border-gray-200 rounded-xl text-[15px] transition-all bg-gray-50 focus:outline-none focus:border-[#1E88E5] focus:bg-white focus:shadow-[0_0_0_3px_rgba(30,136,229,0.1)]"
                         placeholder="Nhập lại mật khẩu mới"
                       />
                     </div>
@@ -305,7 +305,7 @@ function QuenMatKhau() {
                   {error && <div className="py-3 px-4 rounded-lg text-sm mb-5 font-medium bg-red-50 text-red-700 border border-red-200">{error}</div>}
                   {message && <div className="py-3 px-4 rounded-lg text-sm mb-5 font-medium bg-green-50 text-green-800 border border-green-300">{message}</div>}
 
-                  <button type="submit" className="w-full py-4 bg-linear-to-r from-red-600 to-red-700 text-white border-none rounded-xl text-base font-semibold cursor-pointer transition-all shadow-[0_0_0_3px_rgba(227,6,19,0.3)] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(227,6,19,0.4)] disabled:opacity-60 disabled:cursor-not-allowed" disabled={isLoading}>
+                  <button type="submit" className="w-full py-4 bg-linear-to-r from-red-600 to-red-700 text-white border-none rounded-xl text-base font-semibold cursor-pointer transition-all shadow-[0_4px_15px_rgba(30,136,229,0.3)] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(30,136,229,0.4)] disabled:opacity-60 disabled:cursor-not-allowed" disabled={isLoading}>
                     {isLoading ? "Đang xử lý..." : "Đặt lại mật khẩu"}
                   </button>
                 </form>

@@ -111,7 +111,7 @@ function ThanhToan() {
             style={{ backgroundImage: 'url(/background/home/bgBannerHomePage.72a61446.webp)' }}
         >
             {/* Overlay */}
-            <div className="absolute inset-0 bg-linear-to-br from-white/70 via-pink-50/60 to-yellow-50/60"></div>
+            <div className="absolute inset-0 bg-linear-to-br from-white/70 via-blue-50/60 to-[#F5F7FA]/60"></div>
             
             {/* Content wrapper */}
             <div className="relative z-10">
@@ -119,7 +119,7 @@ function ThanhToan() {
 
             <div className="px-32 py-8">
                 <div className="bg-white rounded-lg shadow-lg p-8">
-                    <h2 className="text-3xl font-bold mb-6 text-center text-red-600">
+                    <h2 className="text-3xl font-bold mb-6 text-center text-[#1E88E5]">
                         {t('booking.payment.title')}
                     </h2>
 
@@ -220,7 +220,7 @@ function ThanhToan() {
                                 <span className="font-semibold">583,000 VND</span>
                             </div>
                             <div className="border-t pt-2 mt-2">
-                                <div className="flex justify-between text-xl font-bold text-red-600">
+                                <div className="flex justify-between text-xl font-bold text-[#1E88E5]">
                                     <span>{t('booking.payment.total') || 'Tổng cộng:'}</span>
                                     <span>{formatCurrencyWithCommas(formData.totalPrice)} VND</span>
                                 </div>
@@ -273,7 +273,7 @@ function ThanhToan() {
                             className={`px-8 py-3 rounded-lg font-bold transition ${
                                 isProcessing
                                     ? 'bg-gray-400 cursor-not-allowed'
-                                    : 'bg-linear-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600'
+                                    : 'bg-linear-to-r from-[#FF7043] to-[#F4511E] hover:from-[#FF8A65] hover:to-[#FF7043]'
                             }`}
                         >
                                 {isProcessing ? (

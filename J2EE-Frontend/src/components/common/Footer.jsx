@@ -12,91 +12,91 @@ function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* Column 1 - Đề cố chuyến bay tốt đẹp */}
           <div>
-            <h3 className="text-red-500 font-bold mb-4 flex items-center gap-2">
+            <h3 className="text-[#1E88E5] font-bold mb-4 flex items-center gap-2">
               <span>✈️</span>
               {t('footer.about_us')}
             </h3>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Điều lệ vận chuyển</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Điều kiện vé</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">SGU e-Voucher</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Phiếu quà tặng trực tuyến (e-Forms)</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Thông tin bồi thường</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Phí và lệ phí</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Giấy tờ tùy thân</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Sân bay và phát triển quốc tế</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Quy định hành lý</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Tìm kiếm hành lý</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Hành lý lớn khi Quốc tế</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Thông tin nội chuyện</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Kênh thanh toán</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Hóa đơn VAT</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Hướng dẫn làm thủ tục chuyến bay</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Khuyến cáo đi chuyến</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Điều lệ vận chuyển</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Điều kiện vé</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">SGU e-Voucher</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Phiếu quà tặng trực tuyến (e-Forms)</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Thông tin bồi thường</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Phí và lệ phí</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Giấy tờ tùy thân</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Sân bay và phát triển quốc tế</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Quy định hành lý</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Tìm kiếm hành lý</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Hành lý lớn khi Quốc tế</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Thông tin nội chuyện</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Kênh thanh toán</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Hóa đơn VAT</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Hướng dẫn làm thủ tục chuyến bay</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Khuyến cáo đi chuyến</Link></li>
             </ul>
           </div>
 
           {/* Column 2 - Mua hành lý, suất ăn... */}
           <div>
-            <h3 className="text-red-500 font-bold mb-4 flex items-center gap-2">
+            <h3 className="text-[#1E88E5] font-bold mb-4 flex items-center gap-2">
               <span>✈️</span>
               {t('footer.follow_us')}
             </h3>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Chọn chỗ ngồi ưu tiên</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Mua trước hành lý</Link></li>
-              <li><Link to="/dich-vu-chuyen-bay" className="hover:text-red-500 transition-colors">Đặt trước suất ăn - Vikafe</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Hàng miễn thuế</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Quà lưu niệm</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Giải trí</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Dịch vụ vận chuyển thú cưng</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Dịch vụ trẻ em đi một mình</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Dịch vụ hỗ trợ "Bay cùng bạn"</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Mua thêm chỗ ngồi bên cạnh</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Chọn chỗ ngồi ưu tiên</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Mua trước hành lý</Link></li>
+              <li><Link to="/dich-vu-chuyen-bay" className="hover:text-[#1E88E5] transition-colors">Đặt trước suất ăn - Vikafe</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Hàng miễn thuế</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Quà lưu niệm</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Giải trí</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Dịch vụ vận chuyển thú cưng</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Dịch vụ trẻ em đi một mình</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Dịch vụ hỗ trợ "Bay cùng bạn"</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Mua thêm chỗ ngồi bên cạnh</Link></li>
             </ul>
 
-            <h3 className="text-red-500 font-bold mb-4 mt-6 flex items-center gap-2">
+            <h3 className="text-[#1E88E5] font-bold mb-4 mt-6 flex items-center gap-2">
               <span>✈️</span>
               {t('footer.about_us')}
             </h3>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Giới thiệu công ty</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Nhà đầu tư</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Cơ hội nghề nghiệp</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Tin tức</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Khuyến mại</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Cẩm nang du lịch</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Tổng đài phục vụ khách hàng</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Quy định về tiếp nhận và xử lý phản hồi của hành khách</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Giới thiệu công ty</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Nhà đầu tư</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Cơ hội nghề nghiệp</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Tin tức</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Khuyến mại</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Cẩm nang du lịch</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Tổng đài phục vụ khách hàng</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Quy định về tiếp nhận và xử lý phản hồi của hành khách</Link></li>
             </ul>
           </div>
 
           {/* Column 3 - Dịch vụ cao cấp */}
           <div>
-            <h3 className="text-red-500 font-bold mb-4 flex items-center gap-2">
+            <h3 className="text-[#1E88E5] font-bold mb-4 flex items-center gap-2">
               <span>🌟</span>
               {t('footer.policy')}
             </h3>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Hạng vé thương gia - Business</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Hạng vé Skyboss</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Phòng chờ sang trọng</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Hạng vé thương gia - Business</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Hạng vé Skyboss</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Phòng chờ sang trọng</Link></li>
             </ul>
 
-            <h3 className="text-red-500 font-bold mb-4 mt-6 flex items-center gap-2">
+            <h3 className="text-[#1E88E5] font-bold mb-4 mt-6 flex items-center gap-2">
               <span>💰</span>
               Mua vé ở đâu?
             </h3>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Tổng đài bán vé</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Phòng bán vé</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Đại lý bán vé</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">IOSS / Chuyển Bán Trực Tuyến Danh</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Đăng ký khách hàng Doanh nghiệp</Link></li>
-              <li><Link to="/" className="hover:text-red-500 transition-colors">Đăng ký làm đại lý online</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Tổng đài bán vé</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Phòng bán vé</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Đại lý bán vé</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">IOSS / Chuyển Bán Trực Tuyến Danh</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Đăng ký khách hàng Doanh nghiệp</Link></li>
+              <li><Link to="/" className="hover:text-[#1E88E5] transition-colors">Đăng ký làm đại lý online</Link></li>
             </ul>
 
-            <h3 className="text-red-500 font-bold mb-4 mt-6 flex items-center gap-2">
+            <h3 className="text-[#1E88E5] font-bold mb-4 mt-6 flex items-center gap-2">
               <span>🔍</span>
               Tìm vật phẩm bỏ quên
             </h3>
@@ -104,32 +104,32 @@ function Footer() {
 
           {/* Column 4 - Các dịch vụ khác */}
           <div>
-            <h3 className="text-red-500 font-bold mb-4 flex items-center gap-2">
+            <h3 className="text-[#1E88E5] font-bold mb-4 flex items-center gap-2">
               <span>🎯</span>
               {t('footer.contact')}
             </h3>
             
-            <h3 className="text-red-500 font-bold mb-4 mt-6 flex items-center gap-2">
+            <h3 className="text-[#1E88E5] font-bold mb-4 mt-6 flex items-center gap-2">
               <span>📝</span>
               Đăng nhập đại lý
             </h3>
             
-            <h3 className="text-red-500 font-bold mb-4 mt-6 flex items-center gap-2">
+            <h3 className="text-[#1E88E5] font-bold mb-4 mt-6 flex items-center gap-2">
               <span>📦</span>
               Dịch vụ hàng hóa
             </h3>
             
-            <h3 className="text-red-500 font-bold mb-4 mt-6 flex items-center gap-2">
+            <h3 className="text-[#1E88E5] font-bold mb-4 mt-6 flex items-center gap-2">
               <span>📜</span>
               Chính sách về quyền riêng tư
             </h3>
             
-            <h3 className="text-red-500 font-bold mb-4 mt-6 flex items-center gap-2">
+            <h3 className="text-[#1E88E5] font-bold mb-4 mt-6 flex items-center gap-2">
               <span>🔒</span>
               Chính sách bảo vệ quyền lợi khách hàng để bị tổn thương
             </h3>
             
-            <h3 className="text-red-500 font-bold mb-4 mt-6 flex items-center gap-2">
+            <h3 className="text-[#1E88E5] font-bold mb-4 mt-6 flex items-center gap-2">
               <span>⚙️</span>
               Quy trình xử lý đối, hoàn, hủy vé
             </h3>
@@ -194,7 +194,7 @@ function Footer() {
                 </a>
                 
                 {/* YouTube */}
-                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center hover:bg-red-700 transition-colors">
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-[#1E88E5] rounded-full flex items-center justify-center hover:bg-[#1565C0] transition-colors">
                   <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
                     <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                   </svg>

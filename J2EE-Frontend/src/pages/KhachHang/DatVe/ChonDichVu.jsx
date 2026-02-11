@@ -122,7 +122,7 @@ function ChonDichVu() {
             style={{ backgroundImage: 'url(/background/home/bgBannerHomePage.72a61446.webp)' }}
         >
             {/* Overlay */}
-            <div className="absolute inset-0 bg-linear-to-br from-white/70 via-pink-50/60 to-yellow-50/60"></div>
+            <div className="absolute inset-0 bg-linear-to-br from-white/70 via-blue-50/60 to-[#F5F7FA]/60"></div>
             
             {/* Content wrapper */}
             <div className="relative z-10">
@@ -210,7 +210,7 @@ function ChonDichVu() {
                     <span className="text-2xl font-bold">{formatCurrencyWithCommas(calculateTotal())+" VND"}</span>
                 </div>
                 <span
-                    className="bg-linear-to-bl from-yellow-400 to-yellow-500 rounded-xl flex items-center justify-center px-10 py-2 text-black cursor-pointer"
+                    className="bg-linear-to-bl from-[#FF7043] to-[#F4511E] rounded-xl flex items-center justify-center px-10 py-2 text-black cursor-pointer"
                     onClick={() => tiepTucOnClick()}
                 >
                     {t('common.continue')}

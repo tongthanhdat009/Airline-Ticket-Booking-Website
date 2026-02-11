@@ -110,11 +110,11 @@ function DichVuChuyenBay() {
 
   return (
     <>
-      <div className="min-h-screen bg-linear-to-br from-pink-50 via-yellow-50 to-white py-12 px-4">
+      <div className="min-h-screen bg-linear-to-br from-[#F5F7FA] via-[#E3F2FD] to-white py-12 px-4">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-red-600 mb-3">{t('pages.dich_vu_chuyen_bay.title')}</h1>
+            <h1 className="text-4xl font-bold text-[#1E88E5] mb-3">{t('pages.dich_vu_chuyen_bay.title')}</h1>
           <p className="text-gray-600 text-lg">{t('pages.dich_vu_chuyen_bay.subtitle')}</p>
           </div>
 
@@ -130,7 +130,7 @@ function DichVuChuyenBay() {
                   value={maDatCho}
                   onChange={(e) => setMaDatCho(e.target.value)}
                   placeholder={t('pages.dich_vu_chuyen_bay.placeholder_booking_code')}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-red-600 focus:outline-none transition-all"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1E88E5] focus:outline-none transition-all"
                   disabled={loading}
                 />
               </div>
@@ -144,7 +144,7 @@ function DichVuChuyenBay() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-linear-to-r from-red-600 to-red-700 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50"
+                className="w-full py-3 bg-linear-to-r from-[#1E88E5] to-[#1565C0] text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50"
               >
                 {loading ? t('pages.dich_vu_chuyen_bay.searching') : t('pages.dich_vu_chuyen_bay.search_btn')}
               </button>
@@ -172,7 +172,7 @@ function DichVuChuyenBay() {
                       <p className="font-semibold">{service.luaChon?.tenDichVu} - {service.luaChon?.tenLuaChon}</p>
                       <p className="text-sm text-gray-600">{t('pages.dich_vu_chuyen_bay.quantity_label')} {service.soLuong}</p>
                     </div>
-                    <p className="font-bold text-red-600">{formatCurrency(service.donGia * service.soLuong)}</p>
+                    <p className="font-bold text-[#1E88E5]">{formatCurrency(service.donGia * service.soLuong)}</p>
                   </div>
                 ))}
               </div>
@@ -208,7 +208,7 @@ function DichVuChuyenBay() {
                           <div 
                             key={option.maLuaChon}
                             className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
-                              isSelected ? 'border-red-600 bg-red-50' : 'border-gray-200 hover:border-red-300'
+                              isSelected ? 'border-[#1E88E5] bg-[#E3F2FD]' : 'border-gray-200 hover:border-[#1E88E5]/50'
                             }`}
                             onClick={() => handleSelectService(service.maDichVu, option.maLuaChon, option.gia)}
                           >
@@ -221,9 +221,9 @@ function DichVuChuyenBay() {
                             )}
                             <h4 className="font-bold text-gray-800 mb-1">{option.tenLuaChon}</h4>
                             <p className="text-sm text-gray-600 mb-2">{option.moTa}</p>
-                            <p className="text-red-600 font-bold">{formatCurrency(option.gia)}</p>
+                            <p className="text-[#1E88E5] font-bold">{formatCurrency(option.gia)}</p>
                             {isSelected && (
-                              <div className="mt-2 text-sm text-red-600 font-semibold">✓ {t('pages.dich_vu_chuyen_bay.selected_label')}</div>
+                              <div className="mt-2 text-sm text-[#1E88E5] font-semibold">✓ {t('pages.dich_vu_chuyen_bay.selected_label')}</div>
                             )}
                           </div>
                         );
@@ -238,12 +238,12 @@ function DichVuChuyenBay() {
                 <div className="bg-white rounded-2xl shadow-xl p-8 sticky bottom-4">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-xl font-bold">{t('pages.dich_vu_chuyen_bay.total_label')}</h3>
-                    <p className="text-2xl font-bold text-red-600">{formatCurrency(calculateTotal())}</p>
+                    <p className="text-2xl font-bold text-[#1E88E5]">{formatCurrency(calculateTotal())}</p>
                   </div>
                   <button
                     onClick={handlePayment}
                     disabled={loading}
-                    className="w-full py-3 bg-linear-to-r from-red-600 to-red-700 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50"
+                    className="w-full py-3 bg-linear-to-r from-[#1E88E5] to-[#1565C0] text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50"
                   >
                     {loading ? t('pages.dich_vu_chuyen_bay.processing') : t('pages.dich_vu_chuyen_bay.process_btn')}
                   </button>
@@ -254,7 +254,7 @@ function DichVuChuyenBay() {
 
           {/* Info Banner */}
           {!availableServices.length && !loading && !error && (
-            <div className="bg-linear-to-r from-red-600 to-red-700 rounded-2xl p-8 text-white">
+            <div className="bg-linear-to-r from-[#1E88E5] to-[#1565C0] rounded-2xl p-8 text-white">
               <div className="max-w-3xl mx-auto text-center">
                 <h2 className="text-2xl font-bold mb-4">🎁 {t('pages.dich_vu_chuyen_bay_extra.info_banner_title')}</h2>
                 <p className="text-lg mb-6">

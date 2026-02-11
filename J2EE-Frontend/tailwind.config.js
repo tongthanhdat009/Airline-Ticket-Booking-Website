@@ -4,23 +4,30 @@ export default {
   theme: {
     extend: {
       colors: {
-        // SGU Airline color scheme
+        // SGU Airline color scheme - Blue theme
         primary: {
-          DEFAULT: "#E30613",
-          dark: "#C40511",
-          light: "#FF1F2E",
+          DEFAULT: "#1E88E5",
+          dark: "#1565C0",
+          light: "#42A5F5",
         },
         secondary: {
-          DEFAULT: "#FFD500",
-          dark: "#E6C000",
-          light: "#FFED4E",
+          DEFAULT: "#64B5F6",
+          dark: "#42A5F5",
+          light: "#90CAF9",
+        },
+        accent: {
+          DEFAULT: "#FF7043",
+          dark: "#F4511E",
+          light: "#FF8A65",
         },
         sguAirline: {
-          red: "#E30613",
-          yellow: "#FFD500",
-          pink: "#FFE5E7",
-          orange: "#FF6B00",
+          blue: "#1E88E5",
+          lightblue: "#64B5F6",
+          softbg: "#E3F2FD",
+          accent: "#FF7043",
         },
+        pageBg: "#F5F7FA",
+        textMain: "#222222",
       },
       animation: {
         "pulse-slow": "pulse 15s infinite",
@@ -39,8 +46,8 @@ export default {
       },
       backgroundImage: {
         "gradient-sguairline":
-          "linear-gradient(135deg, #FFE5E7 0%, #FFF5E6 50%, #FFFFFF 100%)",
-        "gradient-red": "linear-gradient(135deg, #E30613 0%, #C40511 100%)",
+          "linear-gradient(135deg, #E3F2FD 0%, #F5F7FA 50%, #FFFFFF 100%)",
+        "gradient-primary": "linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)",
       },
     },
   },

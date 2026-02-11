@@ -60,14 +60,14 @@ function VerifyEmail() {
         className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed relative flex items-center justify-center"
         style={{ backgroundImage: 'url(/background/auth/bg_footer.2f611c1f.webp)' }}
       >
-        <div className="absolute inset-0 bg-linear-to-br from-pink-50/80 via-yellow-50/80 to-white/80"></div>
+        <div className="absolute inset-0 bg-linear-to-br from-[#F5F7FA]/80 via-[#E3F2FD]/80 to-white/80"></div>
         
         <div className="relative z-10 max-w-md w-full mx-4">
           <div className="bg-white rounded-2xl shadow-2xl p-8">
             {status === "verifying" && (
               <div className="text-center">
                 <div className="w-20 h-20 mx-auto mb-6">
-                  <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-red-600"></div>
+                  <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-[#1E88E5]"></div>
                 </div>
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">
                   Đang xác thực email...
@@ -141,7 +141,7 @@ function VerifyEmail() {
                 <div className="space-y-3">
                   <button
                     onClick={() => navigate("/dang-nhap-client")}
-                    className="w-full px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-all"
+                    className="w-full px-6 py-3 bg-[#1E88E5] hover:bg-[#1565C0] text-white rounded-lg font-semibold transition-all"
                   >
                     Đăng nhập
                   </button>

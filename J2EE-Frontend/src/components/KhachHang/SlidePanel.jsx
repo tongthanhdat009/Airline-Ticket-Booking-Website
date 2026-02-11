@@ -313,7 +313,7 @@ function ChoNgoiPanel({
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex bg-linear-to-b from-red-500 to-red-700 items-center px-4 py-3 ">
+          <div className="flex bg-linear-to-b from-[#1E88E5] to-[#1565C0] items-center px-4 py-3 ">
             <h2 className="text-xl text-white font-bold">Chọn dịch vụ</h2>
             <button onClick={onClose} className="text-white text-2xl ml-auto">
               ×
@@ -324,7 +324,7 @@ function ChoNgoiPanel({
           <div className="bg-white text-black flex">
             <button
               className={`flex-1 px-4 py-2 border-b-2 ${
-                tab === "di" ? "border-red-500" : "border-transparent text-gray-500"
+                tab === "di" ? "border-[#1E88E5]" : "border-transparent text-gray-500"
               }`}
               onClick={() => setTab("di")}
             >
@@ -333,7 +333,7 @@ function ChoNgoiPanel({
             {formData.flightType === "round" && (
               <button
                 className={`flex-1 px-4 py-2 border-b-2 ${
-                  tab === "ve" ? "border-red-500" : "border-transparent text-gray-500"
+                  tab === "ve" ? "border-[#1E88E5]" : "border-transparent text-gray-500"
                 }`}
                 onClick={() => setTab("ve")}
               >
@@ -345,7 +345,7 @@ function ChoNgoiPanel({
           {/* Hành khách */}
           <div className="bg-gray-100">
             <div className="w-full flex flex-col justify-center items-center py-4 px-4">
-              <div className="flex flex-col justify-center items-center rounded-t-lg bg-linear-to-b from-red-500 to-red-700 py-2 px-2 text-white w-4/5 min-h-[60px]">
+              <div className="flex flex-col justify-center items-center rounded-t-lg bg-linear-to-b from-[#1E88E5] to-[#1565C0] py-2 px-2 text-white w-4/5 min-h-[60px]">
                 <span className="text-sm">Hành Khách</span>
                 <div className="flex">
                   {(formData?.passengerInfo || []).map((p, i) => (
@@ -455,7 +455,7 @@ function ChoNgoiPanel({
                   )}
                   <div className="flex-1">
                     <span className="font-bold text-xl">{item.tenLuaChon}</span>
-                    <span className="text-red-500 text-2xl block">
+                    <span className="text-[#FF7043] text-2xl block">
                       {item.gia} {item.currency || "VND"}
                     </span>
                   </div>
@@ -497,14 +497,14 @@ function ChoNgoiPanel({
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t bg-linear-to-b from-red-500 to-red-700 flex justify-between items-center text-white">
+          <div className="p-4 border-t bg-linear-to-b from-[#1E88E5] to-[#1565C0] flex justify-between items-center text-white">
             {tab === "di" || formData.flightType === "round" ? (
               <>
                 <div>
                   <span className="font-bold">Chuyến {tab === "di" ? "đi" : "về"}: </span>
                   {dichVu?.maDichVu === 99 ? (
                     <>
-                      <span className="text-yellow-200">
+                      <span className="text-[#E3F2FD]">
                         {selectedSeats.length > 0
                           ? selectedSeats.map((s) => `${s.id}-${s.hangVe}`).join(", ")
                           : "Chưa chọn"}
@@ -512,7 +512,7 @@ function ChoNgoiPanel({
                       ({selectedSeats.length}/{formData?.passengers ?? formData?.passengerInfo?.length ?? 0})
                     </>
                   ) : (
-                    <span className="text-yellow-200">
+                    <span className="text-[#E3F2FD]">
                       {currentService.totalPrice || 0} {currentService.currency || "VND"}
                     </span>
                   )}

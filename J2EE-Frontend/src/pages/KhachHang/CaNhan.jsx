@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/common/Navbar';
 import Footer from '../../components/common/Footer';
@@ -53,7 +53,7 @@ function CaNhan() {
         
         setLoading(false);
       } catch (error) {
-        console.error('Lỗi khi lấy thông tin tài khoản:', error);
+        console.error('L?i khi l?y th�ng tin t�i kho?n:', error);
         setLoading(false);
       }
     };
@@ -74,17 +74,17 @@ function CaNhan() {
     setPasswordSuccess('');
 
     if (!passwordData.oldPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
-      setPasswordError('Vui lòng điền đầy đủ thông tin');
+      setPasswordError('Vui l�ng di?n d?y d? th�ng tin');
       return;
     }
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setPasswordError('Mật khẩu mới và xác nhận mật khẩu không khớp');
+      setPasswordError('M?t kh?u m?i v� x�c nh?n m?t kh?u kh�ng kh?p');
       return;
     }
 
     if (passwordData.newPassword.length < 6) {
-      setPasswordError('Mật khẩu mới phải có ít nhất 6 ký tự');
+      setPasswordError('M?t kh?u m?i ph?i c� �t nh?t 6 k� t?');
       return;
     }
 
@@ -95,7 +95,7 @@ function CaNhan() {
         passwordData.newPassword
       );
       
-      setPasswordSuccess('Đổi mật khẩu thành công!');
+      setPasswordSuccess('�?i m?t kh?u th�nh c�ng!');
       setPasswordData({
         oldPassword: '',
         newPassword: '',
@@ -106,8 +106,8 @@ function CaNhan() {
         setPasswordSuccess('');
       }, 3000);
     } catch (error) {
-      console.error('Lỗi khi đổi mật khẩu:', error);
-      setPasswordError(error.response?.data?.message || 'Có lỗi xảy ra khi đổi mật khẩu');
+      console.error('L?i khi d?i m?t kh?u:', error);
+      setPasswordError(error.response?.data?.message || 'C� l?i x?y ra khi d?i m?t kh?u');
     }
   };
 
@@ -115,8 +115,8 @@ function CaNhan() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-red-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Đang tải thông tin...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#1E88E5] mx-auto mb-4"></div>
+          <p className="text-gray-600">�ang t?i th�ng tin...</p>
         </div>
       </div>
     );
@@ -130,9 +130,9 @@ function CaNhan() {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Left Sidebar - Profile Card */}
           <div className="lg:w-80 shrink-0">
-            <div className="bg-white rounded-2xl shadow-xl overflow-hidden border-t-4 border-red-600">
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden border-t-4 border-[#1E88E5]">
               {/* Profile Header */}
-              <div className="relative bg-linear-to-br from-red-500 via-red-600 to-orange-600 h-32">
+              <div className="relative bg-linear-to-br from-[#1E88E5] via-[#1565C0] to-[#0D47A1] h-32">
                 <div className="absolute inset-0 opacity-10">
                   <div className="absolute inset-0" style={{
                     backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,.1) 10px, rgba(255,255,255,.1) 20px)`
@@ -146,23 +146,23 @@ function CaNhan() {
                   <div className="relative">
                     <div className="w-32 h-32 rounded-full bg-white p-1 shadow-xl">
                       <div className="w-full h-full rounded-full bg-linear-to-br from-gray-200 to-gray-300 flex items-center justify-center text-5xl">
-                        👤
+                        ??
                       </div>
                     </div>
                   </div>
                   
                   <div className="mt-4 text-center">
                     <h2 className="text-2xl font-bold text-gray-800">
-                      {accountInfo?.hanhKhach?.hoVaTen || 'Chưa cập nhật'}
+                      {accountInfo?.hanhKhach?.hoVaTen || 'Chua c?p nh?t'}
                     </h2>
                     <p className="text-sm text-gray-600 mt-1">
                       {accountInfo?.oauth2Provider ? (
                         <span className="inline-flex items-center gap-1 bg-red-50 text-red-700 px-3 py-1 rounded-full text-xs font-medium">
-                          🔐 {accountInfo.oauth2Provider}
+                          ?? {accountInfo.oauth2Provider}
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs">
-                          Hành khách thường xuyên
+                          H�nh kh�ch thu?ng xuy�n
                         </span>
                       )}
                     </p>
@@ -175,10 +175,10 @@ function CaNhan() {
                     onClick={() => navigate('/quan-ly-chuyen-bay')}
                     className="w-full flex items-center gap-3 px-4 py-3 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition shadow-md"
                   >
-                    <span className="text-xl">✈️</span>
+                    <span className="text-xl">??</span>
                     <div className="text-left flex-1">
-                      <p className="font-semibold">Chuyến bay của tôi</p>
-                      <p className="text-xs opacity-90">Quản lý đặt chỗ</p>
+                      <p className="font-semibold">Chuy?n bay c?a t�i</p>
+                      <p className="text-xs opacity-90">Qu?n l� d?t ch?</p>
                     </div>
                   </button>
                   
@@ -186,21 +186,21 @@ function CaNhan() {
                     onClick={() => navigate('/lich-su-giao-dich')}
                     className="w-full flex items-center gap-3 px-4 py-3 bg-linear-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition shadow-md"
                   >
-                    <span className="text-xl">💳</span>
+                    <span className="text-xl">??</span>
                     <div className="text-left flex-1">
-                      <p className="font-semibold">Lịch sử giao dịch</p>
-                      <p className="text-xs opacity-90">Xem hóa đơn</p>
+                      <p className="font-semibold">L?ch s? giao d?ch</p>
+                      <p className="text-xs opacity-90">Xem h�a don</p>
                     </div>
                   </button>
                   
                   <button
                     onClick={() => navigate('/')}
-                    className="w-full flex items-center gap-3 px-4 py-3 bg-linear-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition shadow-md"
+                    className="w-full flex items-center gap-3 px-4 py-3 bg-linear-to-r from-[#1E88E5] to-[#1565C0] text-white rounded-lg hover:from-[#1565C0] hover:to-[#0D47A1] transition shadow-md"
                   >
-                    <span className="text-xl">🎫</span>
+                    <span className="text-xl">??</span>
                     <div className="text-left flex-1">
-                      <p className="font-semibold">Đặt vé mới</p>
-                      <p className="text-xs opacity-90">Tìm chuyến bay</p>
+                      <p className="font-semibold">�?t v� m?i</p>
+                      <p className="text-xs opacity-90">T�m chuy?n bay</p>
                     </div>
                   </button>
                 </div>
@@ -218,26 +218,26 @@ function CaNhan() {
                     onClick={() => setActiveTab('personal')}
                     className={`px-6 py-4 font-semibold text-sm transition-all relative ${
                       activeTab === 'personal'
-                        ? 'text-red-600 bg-white'
-                        : 'text-gray-600 hover:text-red-600 hover:bg-white/50'
+                        ? 'text-[#1E88E5] bg-white'
+                        : 'text-gray-600 hover:text-[#1E88E5] hover:bg-white/50'
                     }`}
                   >
-                    Thông tin cá nhân
+                    Th�ng tin c� nh�n
                     {activeTab === 'personal' && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-600"></div>
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1E88E5]"></div>
                     )}
                   </button>
                   <button
                     onClick={() => setActiveTab('account')}
                     className={`px-6 py-4 font-semibold text-sm transition-all relative ${
                       activeTab === 'account'
-                        ? 'text-red-600 bg-white'
-                        : 'text-gray-600 hover:text-red-600 hover:bg-white/50'
+                        ? 'text-[#1E88E5] bg-white'
+                        : 'text-gray-600 hover:text-[#1E88E5] hover:bg-white/50'
                     }`}
                   >
-                    Tài khoản
+                    T�i kho?n
                     {activeTab === 'account' && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-600"></div>
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1E88E5]"></div>
                     )}
                   </button>
                 </div>
@@ -247,12 +247,12 @@ function CaNhan() {
               <div className="p-8">
                 {activeTab === 'personal' && (
                   <div className="space-y-6">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-6">Thông tin cá nhân</h3>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-6">Th�ng tin c� nh�n</h3>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Họ và tên
+                          H? v� t�n
                         </label>
                         <input
                           type="text"
@@ -264,7 +264,7 @@ function CaNhan() {
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Giới tính
+                          Gi?i t�nh
                         </label>
                         <input
                           type="text"
@@ -276,7 +276,7 @@ function CaNhan() {
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Ngày sinh
+                          Ng�y sinh
                         </label>
                         <input
                           type="date"
@@ -300,7 +300,7 @@ function CaNhan() {
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Số điện thoại
+                          S? di?n tho?i
                         </label>
                         <input
                           type="tel"
@@ -313,7 +313,7 @@ function CaNhan() {
                     
                     <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                       <p className="text-sm text-blue-800">
-                        <strong>Lưu ý:</strong> Để cập nhật thông tin cá nhân, vui lòng liên hệ bộ phận chăm sóc khách hàng.
+                        <strong>Luu �:</strong> �? c?p nh?t th�ng tin c� nh�n, vui l�ng li�n h? b? ph?n cham s�c kh�ch h�ng.
                       </p>
                     </div>
                   </div>
@@ -321,19 +321,19 @@ function CaNhan() {
 
                 {activeTab === 'account' && (
                   <div className="space-y-6">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-6">Cài đặt tài khoản</h3>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-6">C�i d?t t�i kho?n</h3>
                     
                     <div className="bg-gray-50 rounded-lg p-6 mb-6">
-                      <h4 className="font-semibold text-gray-900 mb-4">Thông tin đăng nhập</h4>
+                      <h4 className="font-semibold text-gray-900 mb-4">Th�ng tin dang nh?p</h4>
                       <div className="space-y-3">
                         <div className="flex justify-between items-center">
                           <span className="text-gray-600">Email:</span>
                           <span className="font-medium">{accountInfo?.email}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-gray-600">Phương thức đăng nhập:</span>
+                          <span className="text-gray-600">Phuong th?c dang nh?p:</span>
                           <span className="font-medium">
-                            {accountInfo?.oauth2Provider || 'Tài khoản thường'}
+                            {accountInfo?.oauth2Provider || 'T�i kho?n thu?ng'}
                           </span>
                         </div>
                       </div>
@@ -341,48 +341,48 @@ function CaNhan() {
 
                     {!accountInfo?.oauth2Provider && (
                       <div className="bg-white border border-gray-200 rounded-lg p-6">
-                        <h4 className="font-semibold text-gray-900 mb-4">Đổi mật khẩu</h4>
+                        <h4 className="font-semibold text-gray-900 mb-4">�?i m?t kh?u</h4>
                         
                         <div className="space-y-4">
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Mật khẩu hiện tại
+                              M?t kh?u hi?n t?i
                             </label>
                             <input
                               type="password"
                               name="oldPassword"
                               value={passwordData.oldPassword}
                               onChange={handlePasswordChange}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                              placeholder="Nhập mật khẩu hiện tại"
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1E88E5] focus:border-transparent"
+                              placeholder="Nh?p m?t kh?u hi?n t?i"
                             />
                           </div>
                           
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Mật khẩu mới
+                              M?t kh?u m?i
                             </label>
                             <input
                               type="password"
                               name="newPassword"
                               value={passwordData.newPassword}
                               onChange={handlePasswordChange}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                              placeholder="Nhập mật khẩu mới"
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1E88E5] focus:border-transparent"
+                              placeholder="Nh?p m?t kh?u m?i"
                             />
                           </div>
                           
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Xác nhận mật khẩu mới
+                              X�c nh?n m?t kh?u m?i
                             </label>
                             <input
                               type="password"
                               name="confirmPassword"
                               value={passwordData.confirmPassword}
                               onChange={handlePasswordChange}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                              placeholder="Nhập lại mật khẩu mới"
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1E88E5] focus:border-transparent"
+                              placeholder="Nh?p l?i m?t kh?u m?i"
                             />
                           </div>
 
@@ -400,9 +400,9 @@ function CaNhan() {
 
                           <button
                             onClick={handleChangePassword}
-                            className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition font-semibold"
+                            className="w-full bg-[#1E88E5] text-white py-3 rounded-lg hover:bg-[#1565C0] transition font-semibold"
                           >
-                            Đổi mật khẩu
+                            �?i m?t kh?u
                           </button>
                         </div>
                       </div>
@@ -411,7 +411,7 @@ function CaNhan() {
                     {accountInfo?.oauth2Provider && (
                       <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                         <p className="text-sm text-yellow-800">
-                          <strong>Lưu ý:</strong> Tài khoản của bạn đăng nhập qua {accountInfo.oauth2Provider}, không thể đổi mật khẩu.
+                          <strong>Luu �:</strong> T�i kho?n c?a b?n dang nh?p qua {accountInfo.oauth2Provider}, kh�ng th? d?i m?t kh?u.
                         </p>
                       </div>
                     )}

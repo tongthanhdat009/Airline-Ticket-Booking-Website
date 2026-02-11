@@ -78,11 +78,11 @@ function Navbar() {
   };
 
   return (
-    <nav className="bg-linear-to-r from-red-600 to-red-700 shadow-lg sticky top-0 z-[1000]">
+    <nav className="bg-linear-to-r from-[#1E88E5] to-[#1565C0] shadow-lg sticky top-0 z-[1000]">
       {/* Top Bar - Right aligned items */}
-      <div className="bg-red-700/50 border-b border-red-800/30">
+      <div className="bg-[#1565C0]/50 border-b border-[#0D47A1]/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-1.5 flex justify-end items-center gap-4 text-xs">
-          <Link to="/ho-tro" className="text-white hover:text-yellow-400 transition-colors flex items-center gap-1">
+          <Link to="/ho-tro" className="text-white hover:text-[#64B5F6] transition-colors flex items-center gap-1">
             <span>🏠</span>
             <span>{t('common.support')}</span>
           </Link>
@@ -92,7 +92,7 @@ function Navbar() {
               <span className="text-white/80">|</span>
               <Link 
                 to="/ca-nhan" 
-                className="text-white hover:text-yellow-400 transition-colors flex items-center gap-1"
+                className="text-white hover:text-[#64B5F6] transition-colors flex items-center gap-1"
               >
                 <span>👤</span>
                 <span className="font-medium">{userName}</span>
@@ -100,7 +100,7 @@ function Navbar() {
               <span className="text-white/80">|</span>
               <button 
                 onClick={handleLogout}
-                className="text-white hover:text-yellow-400 transition-colors font-medium"
+                className="text-white hover:text-[#64B5F6] transition-colors font-medium"
               >
                 {t('common.logout')}
               </button>
@@ -110,14 +110,14 @@ function Navbar() {
               <span className="text-white/80">|</span>
               <Link 
                 to="/dang-ky-client"
-                className="text-white hover:text-yellow-400 transition-colors font-medium"
+                className="text-white hover:text-[#64B5F6] transition-colors font-medium"
               >
                 {t('common.register')}
               </Link>
               <span className="text-white/80">|</span>
               <Link 
                 to="/dang-nhap-client"
-                className="text-white hover:text-yellow-400 transition-colors font-medium"
+                className="text-white hover:text-[#64B5F6] transition-colors font-medium"
               >
                 {t('common.login')}
               </Link>
@@ -130,10 +130,10 @@ function Navbar() {
             <select 
               value={currentLanguage}
               onChange={handleLanguageChange}
-              className="bg-transparent text-white text-xs border border-white/30 rounded px-2 py-0.5 focus:outline-none focus:border-yellow-400 cursor-pointer"
+              className="bg-transparent text-white text-xs border border-white/30 rounded px-2 py-0.5 focus:outline-none focus:border-[#64B5F6] cursor-pointer"
             >
-              <option value="vi" className="bg-red-700">Tiếng Việt</option>
-              <option value="en" className="bg-red-700">English</option>
+              <option value="vi" className="bg-[#1565C0]">Tiếng Việt</option>
+              <option value="en" className="bg-[#1565C0]">English</option>
             </select>
           </div>
         </div>
@@ -155,7 +155,7 @@ function Navbar() {
           <li>
             <Link 
               to="/tra-cuu-chuyen-bay" 
-              className="text-white no-underline font-semibold text-sm uppercase tracking-wide hover:text-yellow-400 transition-colors"
+              className="text-white no-underline font-semibold text-sm uppercase tracking-wide hover:text-[#64B5F6] transition-colors"
             >
               {t('navbar.lookup_flight')}
             </Link>
@@ -163,7 +163,7 @@ function Navbar() {
           <li>
             <Link 
               to="/online-check-in" 
-              className="text-white no-underline font-semibold text-sm uppercase tracking-wide hover:text-yellow-400 transition-colors"
+              className="text-white no-underline font-semibold text-sm uppercase tracking-wide hover:text-[#64B5F6] transition-colors"
             >
               {t('navbar.online_checkin')}
             </Link>
@@ -171,7 +171,7 @@ function Navbar() {
           <li>
             <Link 
               to="/dich-vu-chuyen-bay" 
-              className="text-white no-underline font-semibold text-sm uppercase tracking-wide hover:text-yellow-400 transition-colors"
+              className="text-white no-underline font-semibold text-sm uppercase tracking-wide hover:text-[#64B5F6] transition-colors"
             >
               {t('navbar.flight_services')}
             </Link>
@@ -179,7 +179,7 @@ function Navbar() {
           <li>
             <Link 
               to="/dich-vu-khac" 
-              className="text-white no-underline font-semibold text-sm uppercase tracking-wide hover:text-yellow-400 transition-colors"
+              className="text-white no-underline font-semibold text-sm uppercase tracking-wide hover:text-[#64B5F6] transition-colors"
             >
               {t('navbar.other_services')}
             </Link>
@@ -210,7 +210,7 @@ function Navbar() {
           mobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className="px-4 pb-4 pt-2 bg-red-700/50 backdrop-blur-sm border-t border-red-800/30">
+        <div className="px-4 pb-4 pt-2 bg-[#1565C0]/50 backdrop-blur-sm border-t border-[#0D47A1]/30">
           {/* Mobile Top Actions */}
           <div className="mb-3 pb-3 border-b border-red-800/30">
             <div className="flex flex-col gap-2 text-sm">

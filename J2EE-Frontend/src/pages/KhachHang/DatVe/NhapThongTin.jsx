@@ -535,7 +535,7 @@ function NhapThongTin() {
                     </span>
                 </div>
                 <span
-                    className="bg-linear-to-bl from-yellow-400 to-yellow-500 rounded-xl flex items-center justify-center px-10 py-2 text-black cursor-pointer"
+                    className="bg-linear-to-bl from-[#FF7043] to-[#F4511E] rounded-xl flex items-center justify-center px-10 py-2 text-black cursor-pointer"
                     onClick={tiepTucOnClick}
                 >
                     {t('common.continue')}

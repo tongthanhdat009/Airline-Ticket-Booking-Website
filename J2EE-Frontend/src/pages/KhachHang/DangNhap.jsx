@@ -85,9 +85,9 @@ function DangNhap() {
   if (isCheckingAuth) {
     return (
       <>
-        <div className="min-h-[calc(100vh-70px)] flex items-center justify-center bg-linear-to-br from-pink-50 via-yellow-50 to-white">
+        <div className="min-h-[calc(100vh-70px)] flex items-center justify-center bg-linear-to-br from-[#F5F7FA] via-[#E3F2FD] to-white">
           <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mb-4"></div>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#1E88E5] mb-4"></div>
             <p className="text-gray-600 font-medium">Đang kiểm tra...</p>
           </div>
         </div>
@@ -102,7 +102,7 @@ function DangNhap() {
         style={{ backgroundImage: 'url(/background/auth/bg_footer.2f611c1f.webp)' }}
       >
         {/* Overlay để làm nổi bật form */}
-        <div className="absolute inset-0 bg-linear-to-br from-pink-50/80 via-yellow-50/80 to-white/80"></div>
+        <div className="absolute inset-0 bg-linear-to-br from-[#F5F7FA]/80 via-[#E3F2FD]/80 to-white/80"></div>
         
         <div className="max-w-4xl w-full bg-white rounded-2xl shadow-xl grid md:grid-cols-2 overflow-hidden relative z-10">
           {/* Left Side - Form */}
@@ -124,7 +124,7 @@ function DangNhap() {
                       onChange={(e) => setEmail(e.target.value)}
                       id="email"
                       type="email"
-                      className="w-full py-2.5 pr-10 pl-10 border-2 border-gray-200 rounded-lg text-sm transition-all bg-gray-50 focus:outline-none focus:border-red-600 focus:bg-white focus:shadow-[0_0_0_3px_rgba(227,6,19,0.1)]"
+                      className="w-full py-2.5 pr-10 pl-10 border-2 border-gray-200 rounded-lg text-sm transition-all bg-gray-50 focus:outline-none focus:border-[#1E88E5] focus:bg-white focus:shadow-[0_0_0_3px_rgba(227,6,19,0.1)]"
                       placeholder={t('auth.email_phone')}
                       autoComplete="email"
                     />
@@ -142,7 +142,7 @@ function DangNhap() {
                       onChange={(e) => setMatKhau(e.target.value)}
                       id="password"
                       type={showPass ? "text" : "password"}
-                      className="w-full py-2.5 pr-10 pl-10 border-2 border-gray-200 rounded-lg text-sm transition-all bg-gray-50 focus:outline-none focus:border-red-600 focus:bg-white focus:shadow-[0_0_0_3px_rgba(227,6,19,0.1)]"
+                      className="w-full py-2.5 pr-10 pl-10 border-2 border-gray-200 rounded-lg text-sm transition-all bg-gray-50 focus:outline-none focus:border-[#1E88E5] focus:bg-white focus:shadow-[0_0_0_3px_rgba(227,6,19,0.1)]"
                       placeholder={t('auth.password')}
                       autoComplete="current-password"
                     />
@@ -158,10 +158,10 @@ function DangNhap() {
 
                 <div className="flex justify-between items-center mb-4 text-xs">
                   <label className="flex items-center gap-1.5 text-gray-700 cursor-pointer">
-                    <input type="checkbox" className="w-3.5 h-3.5 cursor-pointer accent-red-600" />
+                    <input type="checkbox" className="w-3.5 h-3.5 cursor-pointer accent-[#1E88E5]" />
                     <span>Ghi nhớ đăng nhập</span>
                   </label>
-                  <a href="/quen-mat-khau" className="text-red-600 no-underline font-medium hover:underline">
+                  <a href="/quen-mat-khau" className="text-[#1E88E5] no-underline font-medium hover:underline">
                     {t('auth.forgot_password')}
                   </a>
                 </div>
@@ -179,7 +179,7 @@ function DangNhap() {
 
                 <button 
                   type="submit" 
-                  className="w-full py-3 bg-linear-to-r from-red-600 to-red-700 text-white border-none rounded-lg text-sm font-semibold cursor-pointer transition-all shadow-[0_4px_15px_rgba(227,6,19,0.3)] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(227,6,19,0.4)] disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full py-3 bg-linear-to-r from-[#1E88E5] to-[#1565C0] text-white border-none rounded-lg text-sm font-semibold cursor-pointer transition-all shadow-[0_4px_15px_rgba(30,136,229,0.3)] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(30,136,229,0.4)] disabled:opacity-60 disabled:cursor-not-allowed"
                   disabled={isLoading}
                 >
                   {isLoading ? t('common.processing') : t('common.login')}
@@ -207,7 +207,7 @@ function DangNhap() {
 
                 <p className="text-center mt-5 text-xs text-gray-600">
                   {t('auth.no_account')} {" "}
-                  <a href="/dang-ky-client" className="text-red-600 no-underline font-semibold hover:underline">
+                  <a href="/dang-ky-client" className="text-[#1E88E5] no-underline font-semibold hover:underline">
                     {t('auth.register_now')}
                   </a>
                 </p>
@@ -216,11 +216,11 @@ function DangNhap() {
           </div>
 
           {/* Right Side - Banner */}
-          <div className="bg-linear-to-br from-red-600 to-red-700 p-8 md:p-10 flex items-center justify-center relative overflow-hidden">
-            <div className="absolute -top-1/2 -right-1/2 w-[200%] h-[200%] bg-[radial-gradient(circle,rgba(255,213,0,0.15)_0%,transparent_70%)] animate-pulse-slow"></div>
+          <div className="bg-linear-to-br from-[#1E88E5] to-[#1565C0] p-8 md:p-10 flex items-center justify-center relative overflow-hidden">
+            <div className="absolute -top-1/2 -right-1/2 w-[200%] h-[200%] bg-[radial-gradient(circle,rgba(100,181,246,0.15)_0%,transparent_70%)] animate-pulse-slow"></div>
             
             <div className="relative z-10 text-white">
-              <h2 className="text-2xl font-bold mb-4 text-yellow-400 drop-shadow-md">
+              <h2 className="text-2xl font-bold mb-4 text-[#64B5F6] drop-shadow-md">
                 Chào mừng bạn quay lại!
               </h2>
               <p className="text-sm leading-relaxed mb-6 opacity-95">
@@ -228,15 +228,15 @@ function DangNhap() {
               </p>
               <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="bg-yellow-400/20 text-yellow-400 w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs">✓</span>
+                  <span className="bg-[#64B5F6]/20 text-[#64B5F6] w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs">✓</span>
                   <span>Nhận ngay ưu đãi độc quyền</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="bg-yellow-400/20 text-yellow-400 w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs">✓</span>
+                  <span className="bg-[#64B5F6]/20 text-[#64B5F6] w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs">✓</span>
                   <span>Tích lũy điểm thưởng</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="bg-yellow-400/20 text-yellow-400 w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs">✓</span>
+                  <span className="bg-[#64B5F6]/20 text-[#64B5F6] w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs">✓</span>
                   <span>Hỗ trợ 24/7</span>
                 </div>
               </div>

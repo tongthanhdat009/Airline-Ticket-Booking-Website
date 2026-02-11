@@ -75,11 +75,11 @@ function OnlineCheckIn() {
 
   return (
     <>
-      <div className="min-h-screen bg-linear-to-br from-pink-50 via-yellow-50 to-white py-12 px-4">
+      <div className="min-h-screen bg-linear-to-br from-[#F5F7FA] via-[#E3F2FD] to-white py-12 px-4">
         <div className="max-w-5xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-red-600 mb-3">{t('pages.online_checkin.title')}</h1>
+            <h1 className="text-4xl font-bold text-[#1E88E5] mb-3">{t('pages.online_checkin.title')}</h1>
             <p className="text-gray-600">{t('pages.online_checkin.subtitle')}</p>
           </div>
 
@@ -100,7 +100,7 @@ function OnlineCheckIn() {
                         value={bookingCode}
                         onChange={(e) => setBookingCode(e.target.value)}
                         placeholder={t('pages.online_checkin.placeholder_booking_code')}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-red-600 focus:outline-none transition-all"
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1E88E5] focus:outline-none transition-all"
                         required
                         disabled={loading}
                       />
@@ -115,7 +115,7 @@ function OnlineCheckIn() {
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         placeholder={t('pages.online_checkin.placeholder_last_name')}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-red-600 focus:outline-none transition-all"
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1E88E5] focus:outline-none transition-all"
                         required
                         disabled={loading}
                       />
@@ -130,7 +130,7 @@ function OnlineCheckIn() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full py-3 bg-linear-to-r from-red-600 to-red-700 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full py-3 bg-linear-to-r from-[#1E88E5] to-[#1565C0] text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {loading ? t('pages.online_checkin.searching') : t('pages.online_checkin.checkin_btn')}
                     </button>
@@ -165,7 +165,7 @@ function OnlineCheckIn() {
                           <span className="text-2xl mr-2">✈️</span> {t('pages.online_checkin.flight_info_section')}
                         </h3>
                         <div className="space-y-2 text-sm">
-                          <p className="text-lg font-bold text-red-600">{bookingInfo.soHieuChuyenBay}</p>
+                          <p className="text-lg font-bold text-[#1E88E5]">{bookingInfo.soHieuChuyenBay}</p>
                           <div className="flex items-center justify-between">
                             <div>
                               <p className="font-bold">{bookingInfo.maSanBayDi}</p>
@@ -300,7 +300,7 @@ function OnlineCheckIn() {
                 </div>
                 <button
                   onClick={resetForm}
-                  className="px-8 py-3 bg-linear-to-r from-red-600 to-red-700 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all"
+                  className="px-8 py-3 bg-linear-to-r from-[#1E88E5] to-[#1565C0] text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all"
                 >
                   {t('pages.online_checkin.search_another')}
                 </button>

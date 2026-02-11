@@ -194,7 +194,7 @@ function ChonChuyenBayVe() {
             style={{ backgroundImage: 'url(/background/home/bgBannerHomePage.72a61446.webp)' }}
         >
             {/* Overlay */}
-            <div className="absolute inset-0 bg-linear-to-br from-white/70 via-pink-50/60 to-yellow-50/60"></div>
+            <div className="absolute inset-0 bg-linear-to-br from-white/70 via-blue-50/60 to-[#F5F7FA]/60"></div>
             
             {/* Content wrapper */}
             <div className="relative z-10">
@@ -207,7 +207,7 @@ function ChonChuyenBayVe() {
                             <span>{formData.arrival}</span>
                         </div>
                         <div className="flex flex-col items-center ">
-                            <FaLongArrowAltRight className="text-3xl text-red-700" />
+                            <FaLongArrowAltRight className="text-3xl text-[#1E88E5]" />
                             {formData.flightType === 'round' && (
                             <FaLongArrowAltLeft className="text-3xl text-gray-500" />
                             )}
@@ -225,22 +225,22 @@ function ChonChuyenBayVe() {
                                     <div>
                                         
                                     </div>
-                                    <div className="bg-yellow-600 flex items-center justify-center text-white font-bold rounded-t-lg mx-[4px]">
+                                    <div className="bg-[#1565C0] flex items-center justify-center text-white font-bold rounded-t-lg mx-[4px]">
                                         Business
                                     </div>
-                                    <div className="bg-red-500 flex items-center justify-center text-white font-bold rounded-t-lg mx-[4px]">
+                                    <div className="bg-[#1E88E5] flex items-center justify-center text-white font-bold rounded-t-lg mx-[4px]">
                                         FirstClass
                                     </div>
-                                    <div className="bg-yellow-400 flex items-center justify-center text-white font-bold rounded-t-lg mx-[4px]">
+                                    <div className="bg-[#64B5F6] flex items-center justify-center text-white font-bold rounded-t-lg mx-[4px]">
                                         Deluxe
                                     </div>
                                     <div className="bg-green-500 flex items-center justify-center text-white font-bold rounded-t-lg mx-[4px]">
                                         Economy
                                     </div>
-                                    <div className="bg-linear-to-r from-yellow-500 to-yellow-300 flex flex-col items-center justify-center p-2 rounded-tl-lg text-center cursor-pointer" onClick={() => handleExpand(cb, cb.maChuyenBay, 6)}>
+                                    <div className="bg-linear-to-r from-[#1E88E5] to-[#64B5F6] flex flex-col items-center justify-center p-2 rounded-tl-lg text-center cursor-pointer" onClick={() => handleExpand(cb, cb.maChuyenBay, 6)}>
                                         <div className="text-[15px] mt-2">{cb.soHieuChuyenBay}</div>
                                         <div><span className="text-xl font-bold">{formatTime(cb.gioDi)}</span> <span className="font-[12px]">đến</span > <span className="text-xl font-bold">{formatTime(cb.gioDen)}</span></div>
-                                        <div className="text-[12px] text-red-500 font-bold">{t('booking.flight.direct')}</div>
+                                        <div className="text-[12px] text-[#1E88E5] font-bold">{t('booking.flight.direct')}</div>
                                         {expanded.id === cb.maChuyenBay && expanded.type === 6 ? (
                                             <MdKeyboardArrowUp className="text-gray-700 cursor-pointer mt-1" onClick={() => handleExpand(cb, cb.maChuyenBay, 6)} />
                                         ) : (
@@ -259,13 +259,13 @@ function ChonChuyenBayVe() {
                                 {expanded.id === cb.maChuyenBay && expanded.type === 6 && (
                                     <div className="bg-white p-4 rounded-b-lg mb-3">
                                         <div className="flex items-center pl-2"> 
-                                            <IoAirplaneSharp className="pb-[2px] text-yellow-700 w-[20px] h-[20px] "/> 
+                                            <IoAirplaneSharp className="pb-[2px] text-[#1E88E5] w-[20px] h-[20px] "/> 
                                             <div className="pl-7">{t('booking.flight_info.flight_number')}</div>
-                                            <span className="text-red-500 font-bold pl-1">{cb.soHieuChuyenBay}</span>
+                                            <span className="text-[#1E88E5] font-bold pl-1">{cb.soHieuChuyenBay}</span>
                                         </div>
                                         <div className="grid grid-cols-[40px_1fr] gap-4 mt-3">
                                             <div className="flex flex-col items-center h-24 mt-[6px]">
-                                                <GoDotFill className="border border-red-500 rounded-full w-[16px] h-[16px] text-red-500" />
+                                                <GoDotFill className="border border-[#1E88E5] rounded-full w-[16px] h-[16px] text-red-500" />
                                                 <div className="w-[2px] bg-gray-300 flex-1 my-1" />
                                                 <span className="inline-flex w-[17px] h-[17px] bg-linear-to-r from-green-500 to-green-400 items-center justify-center rounded-full mb-3">
                                                     <GoGoal className="w-[12px] h-[12px] text-white" />
@@ -290,7 +290,7 @@ function ChonChuyenBayVe() {
                                         </div>
                                         <div className="pl-14 pt-2 flex">
                                             <div className="">{t('booking.flight.duration_label')}</div>
-                                            <span className="text-red-500 pl-3">{calcFlightDuration(cb.gioDi, cb.ngayDi, cb.gioDen, cb.ngayDen)}</span>
+                                            <span className="text-[#1E88E5] pl-3">{calcFlightDuration(cb.gioDi, cb.ngayDi, cb.gioDen, cb.ngayDen)}</span>
                                         </div>
                                     </div>
                                 )}
@@ -310,7 +310,7 @@ function ChonChuyenBayVe() {
                                                 <div className="text-xs">{calcFlightDuration(cb.gioDi, cb.ngayDi, cb.gioDen, cb.ngayDen)}</div>
                                                 <div className="flex items-center w-full">
                                                     <div className="w-36 h-[2px] bg-gray-300 rounded" />
-                                                    <IoAirplaneSharp className="text-yellow-500 w-[20px] h-[20px]" />
+                                                    <IoAirplaneSharp className="text-[#64B5F6] w-[20px] h-[20px]" />
                                                     <div className="w-36 h-[2px] bg-gray-300 rounded" />
                                                 </div>
                                                 <span className="text-xs">bay thẳng</span>
@@ -357,7 +357,7 @@ function ChonChuyenBayVe() {
                                                 <div className="text-xs">{calcFlightDuration(cb.gioDi, cb.ngayDi, cb.gioDen, cb.ngayDen)}</div>
                                                 <div className="flex items-center w-full">
                                                     <div className="w-36 h-[2px] bg-gray-300 rounded" />
-                                                    <IoAirplaneSharp className="text-yellow-500 w-[20px] h-[20px]" />
+                                                    <IoAirplaneSharp className="text-[#64B5F6] w-[20px] h-[20px]" />
                                                     <div className="w-36 h-[2px] bg-gray-300 rounded" />
                                                 </div>
                                                 <span className="text-xs">bay thẳng</span>
@@ -404,7 +404,7 @@ function ChonChuyenBayVe() {
                                                 <div className="text-xs">{calcFlightDuration(cb.gioDi, cb.ngayDi, cb.gioDen, cb.ngayDen)}</div>
                                                 <div className="flex items-center w-full">
                                                     <div className="w-36 h-[2px] bg-gray-300 rounded" />
-                                                    <IoAirplaneSharp className="text-yellow-500 w-[20px] h-[20px]" />
+                                                    <IoAirplaneSharp className="text-[#64B5F6] w-[20px] h-[20px]" />
                                                     <div className="w-36 h-[2px] bg-gray-300 rounded" />
                                                 </div>
                                                 <span className="text-xs">bay thẳng</span>
@@ -447,7 +447,7 @@ function ChonChuyenBayVe() {
                                                 <div className="text-xs">{calcFlightDuration(cb.gioDi, cb.ngayDi, cb.gioDen, cb.ngayDen)}</div>
                                                 <div className="flex items-center w-full">
                                                     <div className="w-36 h-[2px] bg-gray-300 rounded" />
-                                                    <IoAirplaneSharp className="text-yellow-500 w-[20px] h-[20px]" />
+                                                    <IoAirplaneSharp className="text-[#64B5F6] w-[20px] h-[20px]" />
                                                     <div className="w-36 h-[2px] bg-gray-300 rounded" />
                                                 </div>
                                                 <span className="text-xs">bay thẳng</span>
@@ -503,7 +503,7 @@ function ChonChuyenBayVe() {
                     <span className="text-xl">{t('common.total_price')}</span>
                     <span className="text-2xl font-bold">{selectedTuyenBayVe ? formatCurrencyWithCommas(calcTotalPrice())+" VND" : formatCurrencyWithCommas(formData.totalPrice)+" VND"}</span>
                 </div>
-                <span className="bg-linear-to-bl from-yellow-400 to-yellow-500 rounded-xl flex items-center justify-center px-10 py-2 text-black cursor-pointer" onClick={() => tiepTucOnClick()}>Đi tiếp</span>
+                <span className="bg-linear-to-bl from-[#FF7043] to-[#F4511E] rounded-xl flex items-center justify-center px-10 py-2 text-black cursor-pointer" onClick={() => tiepTucOnClick()}>Đi tiếp</span>
             </div>
             </div>
         </div>

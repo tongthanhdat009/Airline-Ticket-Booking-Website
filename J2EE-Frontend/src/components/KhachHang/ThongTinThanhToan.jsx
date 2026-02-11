@@ -71,7 +71,7 @@ function ThongTinThanhToan({ cb, onBackToChonChuyenDi = () => {}, onBackToChonCh
 
     return (
         <div className="w-[400px]">
-            <div className="flex justify-start text-xl font-bold bg-red-600 text-white p-4 rounded-t-md">{t('booking.summary.header')}</div>
+            <div className="flex justify-start text-xl font-bold bg-[#1E88E5] text-white p-4 rounded-t-md">{t('booking.summary.header')}</div>
             <div className="p-4 bg-white">
                 <div className="flex justify-between bg-gray-200 px-4 py-2 " onClick={() => toggleExpand("thongTinKhachHang")}>
                     <div>{t('booking.summary.passenger_info')}</div>
@@ -83,17 +83,17 @@ function ThongTinThanhToan({ cb, onBackToChonChuyenDi = () => {}, onBackToChonCh
                     cb.passengerInfo?.map((element, index) => (
                         <div key={index} className="flex justify-between bg-gray-100 px-4 py-2 rounded-b-md text-sm">
                             <span>{element.firstName} {element.lastName}</span>
-                            <LuPencilLine className="mt-1 cursor-pointer text-red-500 text-xl" onClick={(e) => {
+                            <LuPencilLine className="mt-1 cursor-pointer text-[#1E88E5] text-xl" onClick={(e) => {
                                                                     e.stopPropagation();
                                                                     onBackToThongTinKhachHang?.();
                                                                 }}/>
                         </div>
                 ))}
             </div>
-                <div className=" bg-blue-200">
+                <div className=" bg-[#E3F2FD]">
                 <div className="flex justify-between items-center px-4 py-2"> 
                     <span className="text-xm">{t('booking.summary.outbound')}</span>
-                    <span className="flex text-red-500 font-bold">{cb.selectedTuyenBayDi ?<> {formatCurrencyWithCommas(calcTotalPrice())+" VND"} <LuPencilLine className="mt-1 cursor-pointer"   onClick={(e) => {
+                    <span className="flex text-[#1E88E5] font-bold">{cb.selectedTuyenBayDi ?<> {formatCurrencyWithCommas(calcTotalPrice())+" VND"} <LuPencilLine className="mt-1 cursor-pointer"   onClick={(e) => {
                                                                                                                                                                                                     e.stopPropagation();
                                                                                                                                                                                                     onBackToChonChuyenDi?.(); // chỉ gọi khi click
                                                                                                                                                                                                 }}/></> : ""}</span>
@@ -103,7 +103,7 @@ function ThongTinThanhToan({ cb, onBackToChonChuyenDi = () => {}, onBackToChonCh
                 <div className="flex text-sm justify-start font-bold">
                     <span className="mr-1">{sanBayDi?.thanhPhoSanBay}</span>
                     <span>({sanBayDi?.maIATA})</span>
-                    <IoAirplane className="mt-1 mx-2 text-orange-700"/>
+                    <IoAirplane className="mt-1 mx-2 text-[#1E88E5]"/>
                     <span className="mr-1">{sanBayDen?.thanhPhoSanBay} </span>
                     <span>({sanBayDen?.maIATA})</span>
                 </div>
@@ -178,10 +178,10 @@ function ThongTinThanhToan({ cb, onBackToChonChuyenDi = () => {}, onBackToChonCh
             </div>
             {cb.flightType === 'round' &&
                 <div className=" ">
-                    <div className=" bg-yellow-200">
+                    <div className=" bg-[#E3F2FD]">
                         <div className="flex justify-between items-center px-4 py-2"> 
                             <span className="text-xm">{t('booking.summary.return')}</span>
-                            <span className="flex text-red-500 font-bold">
+                            <span className="flex text-[#1E88E5] font-bold">
                             {cb.selectedTuyenBayVe ? (
                                 <>
                                 {formatCurrencyWithCommas(calcTotalPriceVe())+" VND"}
@@ -200,7 +200,7 @@ function ThongTinThanhToan({ cb, onBackToChonChuyenDi = () => {}, onBackToChonCh
                         <div className="flex text-sm justify-start font-bold">
                             <span className="mr-1">{sanBayDen?.thanhPhoSanBay}</span>
                             <span>({sanBayDen?.maIATA})</span>
-                            <IoAirplane className="mt-1 mx-2 text-orange-700" />
+                            <IoAirplane className="mt-1 mx-2 text-[#1E88E5]" />
                             <span className="mr-1">{sanBayDi?.thanhPhoSanBay}</span>
                             <span>({sanBayDi?.maIATA})</span>
                         </div>

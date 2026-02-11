@@ -40,12 +40,12 @@ function TrangChu() {
       
       {/* Announcement Banner */}
       {showBanner && (
-        <div className="relative isolate flex items-center gap-x-6 overflow-hidden bg-linear-to-r from-red-600 via-pink-600 to-red-600 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
+        <div className="relative isolate flex items-center gap-x-6 overflow-hidden bg-linear-to-r from-[#1E88E5] via-[#1976D2] to-[#1E88E5] px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
           <div className="absolute left-[max(-7rem,calc(50%-52rem))] top-1/2 -z-10 -translate-y-1/2 transform-gpu blur-2xl" aria-hidden="true">
-            <div className="aspect-[577/310] w-[36.0625rem] bg-linear-to-r from-yellow-400 to-pink-600 opacity-30" style={{ clipPath: 'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)' }}></div>
+            <div className="aspect-[577/310] w-[36.0625rem] bg-linear-to-r from-[#64B5F6] to-[#1976D2] opacity-30" style={{ clipPath: 'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)' }}></div>
           </div>
           <div className="absolute left-[max(45rem,calc(50%+8rem))] top-1/2 -z-10 -translate-y-1/2 transform-gpu blur-2xl" aria-hidden="true">
-            <div className="aspect-[577/310] w-[36.0625rem] bg-linear-to-r from-yellow-400 to-orange-600 opacity-30" style={{ clipPath: 'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)' }}></div>
+            <div className="aspect-[577/310] w-[36.0625rem] bg-linear-to-r from-[#64B5F6] to-[#FF7043] opacity-30" style={{ clipPath: 'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)' }}></div>
           </div>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <p className="text-sm leading-6 text-white">
@@ -53,7 +53,7 @@ function TrangChu() {
               <svg viewBox="0 0 2 2" className="mx-2 inline h-0.5 w-0.5 fill-current" aria-hidden="true"><circle cx="1" cy="1" r="1" /></svg>
               {t('home_page.announcement_desc')}
             </p>
-            <a href="/" className="flex-none rounded-full bg-yellow-400 px-3.5 py-1 text-sm font-semibold text-gray-900 shadow-sm hover:bg-yellow-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-400 transition-all">
+            <a href="/" className="flex-none rounded-full bg-[#FF7043] px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-[#F4511E] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF7043] transition-all">
               {t('home_page.book_now')} <span aria-hidden="true">&rarr;</span>
             </a>
           </div>
@@ -73,7 +73,7 @@ function TrangChu() {
         style={{ backgroundImage: 'url(/background/home/bgBannerHomePage.72a61446.webp)' }}
       >
         {/* Overlay */}
-        <div className="absolute inset-0 bg-linear-to-br from-white/70 via-pink-50/60 to-yellow-50/60"></div>
+        <div className="absolute inset-0 bg-linear-to-br from-white/70 via-blue-50/60 to-[#F5F7FA]/60"></div>
         
         {/* Content wrapper */}
         <div className="relative z-10">
@@ -104,7 +104,7 @@ function TrangChu() {
                   onClick={() => setCurrentSlide(index)}
                   className={`h-3 rounded-full transition-all ${
                     index === currentSlide
-                      ? "w-8 bg-yellow-400 shadow-lg"
+                      ? "w-8 bg-[#FF7043] shadow-lg"
                       : "w-3 bg-white/60 hover:bg-white/80"
                   }`}
                 />
@@ -142,24 +142,24 @@ function TrangChu() {
           <div className="container mx-auto px-4 lg:px-20 py-5">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold text-gray-800 mb-4">
-                {t('home_page.why_choose')} <span className="bg-linear-to-r from-red-600 to-pink-600 bg-clip-text text-transparent text-4xl">SGU Airline?</span>
+                {t('home_page.why_choose')} <span className="bg-linear-to-r from-[#1E88E5] to-[#1976D2] bg-clip-text text-transparent text-4xl">SGU Airline?</span>
               </h2>
               <p className="text-lg text-gray-600 max-w-1xl mx-auto">
                 {t('home_page.why_choose_desc')}
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 border-t-4 border-red-600">
+              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 border-t-4 border-[#1E88E5]">
                 <div className="text-5xl mb-4">💰</div>
                 <h3 className="text-xl font-bold text-gray-800 mb-3">{t('home_page.best_price')}</h3>
                 <p className="text-gray-600">{t('home_page.best_price_desc')}</p>
               </div>
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 border-t-4 border-yellow-400">
+              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 border-t-4 border-[#64B5F6]">
                 <div className="text-5xl mb-4">⚡</div>
                 <h3 className="text-xl font-bold text-gray-800 mb-3">{t('home_page.fast_booking')}</h3>
                 <p className="text-gray-600">{t('home_page.fast_booking_desc')}</p>
               </div>
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 border-t-4 border-pink-600">
+              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 border-t-4 border-[#FF7043]">
                 <div className="text-5xl mb-4">🎯</div>
                 <h3 className="text-xl font-bold text-gray-800 mb-3">{t('home_page.support_247')}</h3>
                 <p className="text-gray-600">{t('home_page.support_247_desc')}</p>
@@ -175,7 +175,7 @@ function TrangChu() {
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                 {/* Đặt chuyến bay */}
-                <a href="/" className="flex flex-col items-center p-6 bg-linear-to-br from-red-500 to-red-600 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
+                <a href="/" className="flex flex-col items-center p-6 bg-linear-to-br from-[#1E88E5] to-[#1565C0] rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
                   <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 p-3">
                     <img src="/service/booking-1634319183743.svg" alt="Booking" className="w-full h-full" />
                   </div>
@@ -183,7 +183,7 @@ function TrangChu() {
                 </a>
 
                 {/* Mua thêm */}
-                <a href="/dich-vu-chuyen-bay" className="flex flex-col items-center p-6 bg-linear-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
+                <a href="/dich-vu-chuyen-bay" className="flex flex-col items-center p-6 bg-linear-to-br from-[#FF7043] to-[#F4511E] rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
                   <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 p-3">
                     <img src="/service/buymore-1634319183745.svg" alt="Buy more" className="w-full h-full" />
                   </div>
@@ -207,7 +207,7 @@ function TrangChu() {
                 </a>
 
                 {/* Bảo hiểm */}
-                <a href="/dich-vu-khac" className="flex flex-col items-center p-6 bg-linear-to-br from-pink-500 to-pink-600 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
+                <a href="/dich-vu-khac" className="flex flex-col items-center p-6 bg-linear-to-br from-[#1E88E5] to-[#1565C0] rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
                   <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 p-3">
                     <img src="/service/insurance-1634319183751.svg" alt="Insurance" className="w-full h-full" />
                   </div>
@@ -226,14 +226,14 @@ function TrangChu() {
               {/* Card 1 - Với ảnh nền */}
               <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all h-[280px] group">
                 <img src="/artboard/1200x600vn1647922449867-1695094342588.webp" alt="Vé SGU Airline" className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-linear-to-br from-red-500/90 to-pink-600/90 group-hover:from-red-500/80 group-hover:to-pink-600/80 transition-all"></div>
+                <div className="absolute inset-0 bg-linear-to-br from-[#1E88E5]/90 to-[#1565C0]/90 group-hover:from-[#1E88E5]/80 group-hover:to-[#1565C0]/80 transition-all"></div>
                 <div className="relative h-full p-6 text-white flex flex-col justify-between">
                   <div>
                     <div className="text-4xl mb-3">🎟️</div>
                     <h3 className="text-xl font-bold mb-2">{t('home_page.promo_airline_title')}</h3>
                     <p className="text-sm mb-4">{t('home_page.promo_airline_desc')}</p>
                   </div>
-                  <button className="px-6 py-2 bg-yellow-400 text-gray-900 rounded-xl font-bold hover:bg-yellow-500 transition-colors w-full">
+                  <button className="px-6 py-2 bg-[#FF7043] text-white rounded-xl font-bold hover:bg-[#F4511E] transition-colors w-full">
                     {t('home_page.view_now')}
                   </button>
                 </div>
@@ -249,7 +249,7 @@ function TrangChu() {
                     <h3 className="text-xl font-bold mb-2">{t('home_page.promo_fast_title')}</h3>
                     <p className="text-sm mb-4">{t('home_page.promo_fast_desc')}</p>
                   </div>
-                  <button className="px-6 py-2 bg-yellow-400 text-gray-900 rounded-xl font-bold hover:bg-yellow-500 transition-colors w-full">
+                  <button className="px-6 py-2 bg-[#FF7043] text-white rounded-xl font-bold hover:bg-[#F4511E] transition-colors w-full">
                     {t('home_page.buy_now')}
                   </button>
                 </div>
@@ -265,7 +265,7 @@ function TrangChu() {
                     <h3 className="text-xl font-bold mb-2">{t('home_page.promo_card_title')}</h3>
                     <p className="text-sm mb-4">{t('home_page.promo_card_desc')}</p>
                   </div>
-                  <button className="px-6 py-2 bg-yellow-400 text-gray-900 rounded-xl font-bold hover:bg-yellow-500 transition-colors w-full">
+                  <button className="px-6 py-2 bg-[#FF7043] text-white rounded-xl font-bold hover:bg-[#F4511E] transition-colors w-full">
                     {t('home_page.register_card')}
                   </button>
                 </div>
@@ -274,11 +274,11 @@ function TrangChu() {
           </div>
 
           {/* Popular Destinations - CẬP NHẬT VỚI ẢNH TỪ THỦ MỤC DESTINATION */}
-          <div className="bg-linear-to-br from-pink-50 to-yellow-50 py-24 sm:py-32">
+          <div className="bg-linear-to-br from-blue-50 to-[#F5F7FA] py-24 sm:py-32">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
               <div className="mx-auto max-w-2xl text-center">
                 <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 mb-4">
-                  {t('home_page.popular_destinations')} <span className="bg-linear-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">{t('home_page.popular_destinations_highlight')}</span>
+                  {t('home_page.popular_destinations')} <span className="bg-linear-to-r from-[#1E88E5] to-[#1976D2] bg-clip-text text-transparent">{t('home_page.popular_destinations_highlight')}</span>
                 </h2>
                 <p className="text-xl leading-8 text-gray-600">
                   {t('home_page.popular_destinations_desc')}
@@ -298,7 +298,7 @@ function TrangChu() {
                         <circle cx="1" cy="1" r="1" />
                       </svg>
                       <div className="flex gap-x-2.5">
-                        <span className="px-3 py-1 bg-red-600 rounded-full text-xs font-semibold">HOT</span>
+                        <span className="px-3 py-1 bg-[#1E88E5] rounded-full text-xs font-semibold">HOT</span>
                       </div>
                     </div>
                   </div>
@@ -324,7 +324,7 @@ function TrangChu() {
                         <circle cx="1" cy="1" r="1" />
                       </svg>
                       <div className="flex gap-x-2.5">
-                        <span className="px-3 py-1 bg-yellow-400 text-gray-900 rounded-full text-xs font-semibold">SALE</span>
+                        <span className="px-3 py-1 bg-[#FF7043] text-white rounded-full text-xs font-semibold">SALE</span>
                       </div>
                     </div>
                   </div>
@@ -350,7 +350,7 @@ function TrangChu() {
                         <circle cx="1" cy="1" r="1" />
                       </svg>
                       <div className="flex gap-x-2.5">
-                        <span className="px-3 py-1 bg-pink-600 rounded-full text-xs font-semibold">NEW</span>
+                        <span className="px-3 py-1 bg-[#64B5F6] rounded-full text-xs font-semibold">NEW</span>
                       </div>
                     </div>
                   </div>
@@ -451,11 +451,11 @@ function TrangChu() {
                 <div className="lg:grid lg:grid-cols-12 lg:gap-8">
                   <div className="lg:col-span-5">
                     <h2 className="text-3xl font-bold leading-10 tracking-tight text-gray-900">
-                      {t('home_page.faq_title')} <span className="bg-linear-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">{t('home_page.faq_highlight')}</span>
+                      {t('home_page.faq_title')} <span className="bg-linear-to-r from-[#1E88E5] to-[#1976D2] bg-clip-text text-transparent">{t('home_page.faq_highlight')}</span>
                     </h2>
                     <p className="mt-4 text-base leading-7 text-gray-600">
                       {t('home_page.faq_contact')}{' '}
-                      <a href="/ho-tro" className="font-semibold text-red-600 hover:text-red-500">
+                      <a href="/ho-tro" className="font-semibold text-[#1E88E5] hover:text-[#1565C0]">
                         {t('home_page.faq_contact_team')}
                       </a>{' '}
                       {t('home_page.faq_contact_help')}
@@ -470,7 +470,7 @@ function TrangChu() {
                               {t('home_page.faq_q1')}
                             </span>
                             <span className="ml-6 flex h-7 items-center">
-                              <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                              <svg className="h-6 w-6 text-[#1E88E5]" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
                               </svg>
                             </span>
@@ -490,7 +490,7 @@ function TrangChu() {
                               {t('home_page.faq_q2')}
                             </span>
                             <span className="ml-6 flex h-7 items-center">
-                              <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                              <svg className="h-6 w-6 text-[#1E88E5]" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
                               </svg>
                             </span>
@@ -510,7 +510,7 @@ function TrangChu() {
                               {t('home_page.faq_q3')}
                             </span>
                             <span className="ml-6 flex h-7 items-center">
-                              <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                              <svg className="h-6 w-6 text-[#1E88E5]" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
                               </svg>
                             </span>
@@ -530,7 +530,7 @@ function TrangChu() {
                               {t('home_page.faq_q4')}
                             </span>
                             <span className="ml-6 flex h-7 items-center">
-                              <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                              <svg className="h-6 w-6 text-[#1E88E5]" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
                               </svg>
                             </span>
@@ -550,7 +550,7 @@ function TrangChu() {
                               {t('home_page.faq_q5')}
                             </span>
                             <span className="ml-6 flex h-7 items-center">
-                              <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                              <svg className="h-6 w-6 text-[#1E88E5]" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
                               </svg>
                             </span>

@@ -192,9 +192,9 @@ function HoanThienThongTin() {
           className="min-h-[calc(100vh-70px)] flex items-center justify-center py-8 px-4 bg-cover bg-center bg-no-repeat relative"
           style={{ backgroundImage: 'url(/background/auth/bg_footer.2f611c1f.webp)' }}
         >
-          <div className="absolute inset-0 bg-linear-to-br from-red-50/80 via-orange-50/80 to-yellow-50/80"></div>
+          <div className="absolute inset-0 bg-linear-to-br from-[#F5F7FA]/80 via-[#E3F2FD]/80 to-white/80"></div>
           <div className="relative z-10 text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-red-600 mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#1E88E5] mx-auto mb-4"></div>
             <p className="text-gray-700 font-medium">Đang tải thông tin...</p>
           </div>
         </div>
@@ -208,11 +208,11 @@ function HoanThienThongTin() {
         className="min-h-[calc(100vh-70px)] flex items-center justify-center py-8 px-4 bg-cover bg-center bg-no-repeat relative"
         style={{ backgroundImage: 'url(/background/auth/bg_footer.2f611c1f.webp)' }}
       >
-        <div className="absolute inset-0 bg-linear-to-br from-red-50/80 via-orange-50/80 to-yellow-50/80"></div>
+        <div className="absolute inset-0 bg-linear-to-br from-[#F5F7FA]/80 via-[#E3F2FD]/80 to-white/80"></div>
         
         <div className="max-w-2xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden relative z-10">
-          <div className="bg-linear-to-r from-red-600 to-orange-600 p-6 text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,213,0,0.2),transparent_50%)]" />
+          <div className="bg-linear-to-r from-[#1E88E5] to-[#1565C0] p-6 text-center relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(100,181,246,0.2),transparent_50%)]" />
             <div className="relative z-10">
               <div className="text-5xl mb-3">✨</div>
               <h2 className="text-2xl font-bold text-white mb-2">Hoàn thiện thông tin</h2>
@@ -237,7 +237,7 @@ function HoanThienThongTin() {
                       name="hoVaTen"
                       value={formData.hoVaTen}
                       onChange={handleChange}
-                      className="w-full py-3 pl-11 pr-4 border-2 border-gray-200 rounded-lg text-sm transition-all bg-gray-50 focus:outline-none focus:border-red-600 focus:bg-white focus:shadow-[0_0_0_3px_rgba(220,38,38,0.1)]"
+                      className="w-full py-3 pl-11 pr-4 border-2 border-gray-200 rounded-lg text-sm transition-all bg-gray-50 focus:outline-none focus:border-[#1E88E5] focus:bg-white focus:shadow-[0_0_0_3px_rgba(30,136,229,0.1)]"
                       placeholder="Nguyễn Văn A"
                       title="Chỉ được nhập chữ cái và khoảng trắng"
                     />
@@ -258,7 +258,7 @@ function HoanThienThongTin() {
                       value={formData.soDienThoai}
                       onChange={handleChange}
                       maxLength="10"
-                      className="w-full py-3 pl-11 pr-4 border-2 border-gray-200 rounded-lg text-sm transition-all bg-gray-50 focus:outline-none focus:border-red-600 focus:bg-white focus:shadow-[0_0_0_3px_rgba(220,38,38,0.1)]"
+                      className="w-full py-3 pl-11 pr-4 border-2 border-gray-200 rounded-lg text-sm transition-all bg-gray-50 focus:outline-none focus:border-[#1E88E5] focus:bg-white focus:shadow-[0_0_0_3px_rgba(30,136,229,0.1)]"
                       placeholder="0912345678"
                       title="Nhập 10 số, bắt đầu bằng 0"
                     />
@@ -278,7 +278,7 @@ function HoanThienThongTin() {
                       name="ngaySinh"
                       value={formData.ngaySinh}
                       onChange={handleChange}
-                      className="w-full py-3 pl-11 pr-4 border-2 border-gray-200 rounded-lg text-sm transition-all bg-gray-50 focus:outline-none focus:border-red-600 focus:bg-white focus:shadow-[0_0_0_3px_rgba(220,38,38,0.1)]"
+                      className="w-full py-3 pl-11 pr-4 border-2 border-gray-200 rounded-lg text-sm transition-all bg-gray-50 focus:outline-none focus:border-[#1E88E5] focus:bg-white focus:shadow-[0_0_0_3px_rgba(30,136,229,0.1)]"
                     />
                   </div>
                 </div>
@@ -294,7 +294,7 @@ function HoanThienThongTin() {
                       name="gioiTinh"
                       value={formData.gioiTinh}
                       onChange={handleChange}
-                      className="w-full py-3 pl-11 pr-4 border-2 border-gray-200 rounded-lg text-sm transition-all bg-gray-50 focus:outline-none focus:border-red-600 focus:bg-white focus:shadow-[0_0_0_3px_rgba(220,38,38,0.1)]"
+                      className="w-full py-3 pl-11 pr-4 border-2 border-gray-200 rounded-lg text-sm transition-all bg-gray-50 focus:outline-none focus:border-[#1E88E5] focus:bg-white focus:shadow-[0_0_0_3px_rgba(30,136,229,0.1)]"
                     >
                       <option value="Nam">Nam</option>
                       <option value="Nữ">Nữ</option>
@@ -318,7 +318,7 @@ function HoanThienThongTin() {
                         name="quocGia"
                         value={formData.quocGia}
                         onChange={handleChange}
-                        className="w-full py-3 pl-11 pr-4 border-2 border-gray-200 rounded-lg text-sm transition-all bg-gray-50 focus:outline-none focus:border-red-600 focus:bg-white"
+                        className="w-full py-3 pl-11 pr-4 border-2 border-gray-200 rounded-lg text-sm transition-all bg-gray-50 focus:outline-none focus:border-[#1E88E5] focus:bg-white"
                       >
                         <option value="">-- Chọn quốc gia --</option>
                         {countries.map(c => (
@@ -340,7 +340,7 @@ function HoanThienThongTin() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex-1 py-3 bg-linear-to-r from-red-600 to-orange-600 text-white rounded-lg text-sm font-semibold transition-all shadow-lg shadow-red-500/30 hover:-translate-y-0.5 hover:shadow-xl hover:from-red-700 hover:to-orange-700 disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="flex-1 py-3 bg-linear-to-r from-[#1E88E5] to-[#1565C0] text-white rounded-lg text-sm font-semibold transition-all shadow-lg shadow-[#1E88E5]/30 hover:-translate-y-0.5 hover:shadow-xl hover:from-[#1565C0] hover:to-[#0D47A1] disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {isLoading ? '⏳ Đang lưu...' : '💾 Lưu thông tin'}
                 </button>

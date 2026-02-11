@@ -1,19 +1,19 @@
 // SGU Airline Color System
 // Primary brand colors for the application
 export const COLORS = {
-    // Primary colors - Blue theme
+    // Primary colors - SGU Airline Blue theme
     primary: {
-        50: '#eff6ff',   // blue-50 - Light backgrounds
-        100: '#dbeafe',  // blue-100 - Subtle highlights
-        200: '#bfdbfe',  // blue-200 - Hover states
-        300: '#93c5fd',  // blue-300 - Disabled states
-        400: '#60a5fa',  // blue-400 - Active states
-        500: '#3b82f6',  // blue-500 - Links, secondary actions
-        600: '#2563eb',  // blue-600 - Primary buttons, main actions
-        700: '#1d4ed8',  // blue-700 - Primary hover states
-        800: '#1e40af',  // blue-800 - Pressed states
-        900: '#1e3a8a',  // blue-900 - Dark backgrounds
-        950: '#172554',  // blue-950 - Deepest backgrounds
+        50: '#E3F2FD',   // Light backgrounds
+        100: '#BBDEFB',  // Subtle highlights
+        200: '#90CAF9',  // Hover states
+        300: '#64B5F6',  // Secondary / Disabled states
+        400: '#42A5F5',  // Active states
+        500: '#2196F3',  // Links, secondary actions
+        600: '#1E88E5',  // Primary buttons, main actions
+        700: '#1565C0',  // Primary hover states
+        800: '#0D47A1',  // Pressed states
+        900: '#0A3D91',  // Dark backgrounds
+        950: '#062B6E',  // Deepest backgrounds
     },
 
     // Secondary colors - Indigo theme
