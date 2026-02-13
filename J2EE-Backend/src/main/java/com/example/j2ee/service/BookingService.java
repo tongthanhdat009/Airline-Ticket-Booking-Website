@@ -103,9 +103,9 @@ public class BookingService {
             processReturnFlight(request, donHang, danhSachHanhKhach, ngayDatCho, danhSachMaDatCho);
         }
 
-        // Bước 6: Tạo thông tin thanh toán
+        // Bước 6: Tạo thông tin thanh toán (gắn với đơn hàng)
         TrangThaiThanhToan thanhToan = createThanhToan(
-            datChoRepository.findById(danhSachMaDatCho.get(0)).orElseThrow(), 
+            donHang,
             request.getTotalAmount()
         );
 
@@ -340,16 +340,16 @@ public class BookingService {
     /**
      * Tạo thông tin thanh toán
      */
-    private TrangThaiThanhToan createThanhToan(DatCho datCho, BigDecimal totalAmount) {
+    private TrangThaiThanhToan createThanhToan(DonHang donHang, BigDecimal totalAmount) {
         TrangThaiThanhToan thanhToan = new TrangThaiThanhToan();
-        thanhToan.setDatCho(datCho);
+        thanhToan.setDonHang(donHang);
         thanhToan.setSoTien(totalAmount);
         thanhToan.setDaThanhToan('N');
-        
+
         // Set expiration time (15 minutes from now)
         LocalDateTime hetHan = LocalDateTime.now().plusMinutes(15);
         thanhToan.setNgayHetHan(java.sql.Date.valueOf(hetHan.toLocalDate()));
-        
+
         return trangThaiThanhToanRepository.save(thanhToan);
     }
 

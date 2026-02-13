@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../../components/common/Footer';
+import Toast from '../../components/common/Toast';
+import ConfirmDialog from '../../components/common/ConfirmDialog';
+import ModalDetailHoaDon from '../../components/KhachHang/ModalDetailHoaDon';
 import TaiKhoanService from '../../services/TaiKhoanService';
 import DatChoService from '../../services/DatChoService';
 import VNPayService from '../../services/VNPayService';
@@ -15,7 +18,7 @@ function LichSuGiaoDich() {
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [bookingDetails, setBookingDetails] = useState(null);
-  
+
   const [filters, setFilters] = useState({
     status: 'all',
     dateFrom: '',
@@ -23,12 +26,41 @@ function LichSuGiaoDich() {
     search: ''
   });
 
+  // Toast state
+  const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
+
+  // ConfirmDialog state
+  const [confirmDialog, setConfirmDialog] = useState({
+    isVisible: false,
+    title: '',
+    message: '',
+    type: 'warning',
+    confirmText: 'Xác nhận',
+    onConfirm: null
+  });
+
+  const showToast = (message, type = 'success') => {
+    setToast({ isVisible: true, message, type });
+  };
+
+  const hideToast = () => {
+    setToast(prev => ({ ...prev, isVisible: false }));
+  };
+
+  const showConfirm = (title, message, type, confirmText, onConfirm) => {
+    setConfirmDialog({ isVisible: true, title, message, type, confirmText, onConfirm });
+  };
+
+  const hideConfirm = () => {
+    setConfirmDialog(prev => ({ ...prev, isVisible: false }));
+  };
+
   useEffect(() => {
     const fetchAccountInfo = async () => {
       try {
         const email = getClientUserEmail();
         const token = getClientAccessToken();
-        
+
         if (!email || !token) {
           navigate('/dang-nhap-client');
           return;
@@ -38,7 +70,7 @@ function LichSuGiaoDich() {
         setAccountInfo(response.data);
         setLoading(false);
       } catch (error) {
-        console.error('L?i khi l?y th�ng tin t�i kho?n:', error);
+        console.error('Lỗi khi lấy thông tin tài khoản:', error);
         navigate('/dang-nhap-client');
       }
     };
@@ -49,13 +81,13 @@ function LichSuGiaoDich() {
   useEffect(() => {
     const fetchPaymentHistory = async () => {
       if (!accountInfo?.hanhKhach?.maHanhKhach) return;
-      
+
       try {
         setHistoryLoading(true);
         const response = await DatChoService.getLichSuThanhToan(accountInfo.hanhKhach.maHanhKhach);
         setPaymentHistory(response.data || []);
       } catch (error) {
-        console.error('L?i khi l?y l?ch s? thanh to�n:', error);
+        console.error('Lỗi khi lấy lịch sử thanh toán:', error);
         setPaymentHistory([]);
       } finally {
         setHistoryLoading(false);
@@ -69,14 +101,14 @@ function LichSuGiaoDich() {
 
   const handleViewDetail = async (payment) => {
     try {
-      // L?y chi ti?t d?t ch? d? xem d?ch v? d� d?t
+      // Lấy chi tiết đặt chỗ để xem dịch vụ đã đặt
       const response = await DatChoService.getDatChoById(payment.datCho.maDatCho);
       setBookingDetails(response.data);
       setSelectedPayment(payment);
       setShowDetailModal(true);
     } catch (error) {
-      console.error('L?i khi l?y chi ti?t d?t ch?:', error);
-      alert('C� l?i khi t?i chi ti?t h�a don');
+      console.error('Lỗi khi lấy chi tiết đặt chỗ:', error);
+      showToast('Có lỗi khi tải chi tiết hóa đơn', 'error');
     }
   };
 
@@ -89,11 +121,11 @@ function LichSuGiaoDich() {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+
       if (!response.ok) {
-        throw new Error('Kh�ng th? t?i PDF');
+        throw new Error('Không thể tải PDF');
       }
-      
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -104,41 +136,46 @@ function LichSuGiaoDich() {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      console.error('L?i khi t?i PDF:', error);
-      alert('C� l?i khi t?i PDF h�a don');
+      console.error('Lỗi khi tải PDF:', error);
+      showToast('Có lỗi khi tải PDF hóa đơn', 'error');
     }
   };
 
-  const handleCancelTransaction = async (maDatCho) => {
-    if (!window.confirm('B?n c� ch?c ch?n mu?n h?y giao d?ch n�y? �i?u n�y s? h?y d?t ch? v� xo� to�n b? th�ng tin li�n quan.')) {
-      return;
-    }
-
-    try {
-      await DatChoService.huyDatCho(maDatCho);
-      alert('H?y giao d?ch th�nh c�ng!');
-      // Refresh danh s�ch
-      const response = await DatChoService.getLichSuThanhToan(accountInfo.hanhKhach.maHanhKhach);
-      console.log('Updated payment history:', response.data);
-      setPaymentHistory(response.data || []);
-    } catch (error) {
-      console.error('L?i khi h?y giao d?ch:', error);
-      alert('C� l?i x?y ra khi h?y giao d?ch');
-    }
+  const handleCancelTransaction = (maDatCho) => {
+    showConfirm(
+      'Xác nhận hủy giao dịch',
+      'Bạn có chắc chắn muốn hủy giao dịch này? Điều này sẽ hủy đặt chỗ và xóa toàn bộ thông tin liên quan.',
+      'danger',
+      'Hủy giao dịch',
+      async () => {
+        try {
+          await DatChoService.huyDatCho(maDatCho);
+          showToast('Hủy giao dịch thành công!', 'success');
+          // Refresh danh sách
+          const response = await DatChoService.getLichSuThanhToan(accountInfo.hanhKhach.maHanhKhach);
+          console.log('Updated payment history:', response.data);
+          setPaymentHistory(response.data || []);
+          hideConfirm();
+        } catch (error) {
+          console.error('Lỗi khi hủy giao dịch:', error);
+          showToast('Có lỗi xảy ra khi hủy giao dịch', 'error');
+        }
+      }
+    );
   };
 
   const handlePayment = async (maThanhToan) => {
     try {
       const response = await VNPayService.createPayment(maThanhToan);
       if (response.success && response.data.paymentUrl) {
-        // Chuy?n hu?ng d?n trang thanh to�n VNPay
+        // Chuyển hướng đến trang thanh toán VNPay
         window.location.href = response.data.paymentUrl;
       } else {
-        alert('Kh�ng th? t?o URL thanh to�n: ' + response.message);
+        showToast('Không thể tạo URL thanh toán: ' + response.message, 'error');
       }
     } catch (error) {
-      console.error('L?i khi t?o thanh to�n:', error);
-      alert('C� l?i x?y ra khi t?o thanh to�n');
+      console.error('Lỗi khi tạo thanh toán:', error);
+      showToast('Có lỗi xảy ra khi tạo thanh toán', 'error');
     }
   };
 
@@ -146,23 +183,23 @@ function LichSuGiaoDich() {
     if (daThanhToan === 'Y') {
       return (
         <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-          <span>?</span>
-          �� thanh to�n
+          <span>✓</span>
+          Đã thanh toán
         </span>
       );
     }
     if (daThanhToan === 'H') {
       return (
         <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-          <span>?</span>
-          �� h?y
+          <span>✗</span>
+          Đã hủy
         </span>
       );
     }
     return (
       <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-        <span>?</span>
-        Chua thanh to�n
+        <span>⏳</span>
+        Chưa thanh toán
       </span>
     );
   };
@@ -173,27 +210,20 @@ function LichSuGiaoDich() {
     return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
   };
 
-
-
-  const formatTime = (timeString) => {
-    if (!timeString) return '';
-    return timeString.substring(0, 5);
-  };
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   };
 
   const filteredPayments = paymentHistory.filter(payment => {
-    const matchStatus = filters.status === 'all' || 
+    const matchStatus = filters.status === 'all' ||
       (filters.status === 'paid' && payment.daThanhToan === 'Y') ||
       (filters.status === 'unpaid' && payment.daThanhToan === 'N') ||
       (filters.status === 'cancelled' && payment.daThanhToan === 'H');
-    
-    const matchSearch = !filters.search || 
+
+    const matchSearch = !filters.search ||
       payment.datCho?.chiTietGhe?.chiTietChuyenBay?.soHieuChuyenBay?.toLowerCase().includes(filters.search.toLowerCase()) ||
       payment.maThanhToan?.toString().includes(filters.search);
-    
+
     return matchStatus && matchSearch;
   });
 
@@ -202,53 +232,53 @@ function LichSuGiaoDich() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#1E88E5] mx-auto mb-4"></div>
-          <p className="text-gray-600">�ang t?i...</p>
+          <p className="text-gray-600">Đang tải...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-cover bg-center bg-fixed" 
+    <div className="min-h-screen bg-cover bg-center bg-fixed"
          style={{ backgroundImage: 'url(/background/home/bgBannerHomePage.72a61446.webp)' }}>
-      
+
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Left Sidebar - Profile Card */}
           <div className="lg:w-80 shrink-0">
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden border-t-4 border-[#1E88E5]">
               {/* Profile Header */}
-              <div className="relative bg-linear-to-br from-[#1E88E5] via-[#1565C0] to-[#0D47A1] h-32">
+              <div className="relative bg-gradient-to-br from-[#1E88E5] via-[#1565C0] to-[#0D47A1] h-32">
                 <div className="absolute inset-0 opacity-10">
                   <div className="absolute inset-0" style={{
                     backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,.1) 10px, rgba(255,255,255,.1) 20px)`
                   }}></div>
                 </div>
               </div>
-              
+
               {/* Avatar */}
               <div className="relative px-6 pb-6">
                 <div className="flex flex-col items-center -mt-16">
                   <div className="relative">
                     <div className="w-32 h-32 rounded-full bg-white p-1 shadow-xl">
-                      <div className="w-full h-full rounded-full bg-linear-to-br from-gray-200 to-gray-300 flex items-center justify-center text-5xl">
-                        ??
+                      <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-5xl">
+                        👤
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="mt-4 text-center">
                     <h2 className="text-2xl font-bold text-gray-800">
-                      {accountInfo?.hanhKhach?.hoVaTen || 'Chua c?p nh?t'}
+                      {accountInfo?.hanhKhach?.hoVaTen || 'Chưa cập nhật'}
                     </h2>
                     <p className="text-sm text-gray-600 mt-1">
                       {accountInfo?.oauth2Provider ? (
                         <span className="inline-flex items-center gap-1 bg-red-50 text-red-700 px-3 py-1 rounded-full text-xs font-medium">
-                          ?? {accountInfo.oauth2Provider}
+                          🔗 {accountInfo.oauth2Provider}
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs">
-                          H�nh kh�ch thu?ng xuy�n
+                          Hành khách thường xuyên
                         </span>
                       )}
                     </p>
@@ -259,34 +289,34 @@ function LichSuGiaoDich() {
                 <div className="mt-6 space-y-2">
                   <button
                     onClick={() => navigate('/ca-nhan')}
-                    className="w-full flex items-center gap-3 px-4 py-3 bg-linear-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition shadow-md"
+                    className="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition shadow-md"
                   >
-                    <span className="text-xl">??</span>
+                    <span className="text-xl">👤</span>
                     <div className="text-left flex-1">
-                      <p className="font-semibold">Th�ng tin c� nh�n</p>
-                      <p className="text-xs opacity-90">Qu?n l� t�i kho?n</p>
+                      <p className="font-semibold">Thông tin cá nhân</p>
+                      <p className="text-xs opacity-90">Quản lý tài khoản</p>
                     </div>
                   </button>
-                  
+
                   <button
                     onClick={() => navigate('/quan-ly-chuyen-bay')}
-                    className="w-full flex items-center gap-3 px-4 py-3 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition shadow-md"
+                    className="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition shadow-md"
                   >
-                    <span className="text-xl">??</span>
+                    <span className="text-xl">✈️</span>
                     <div className="text-left flex-1">
-                      <p className="font-semibold">Chuy?n bay c?a t�i</p>
-                      <p className="text-xs opacity-90">Qu?n l� d?t ch?</p>
+                      <p className="font-semibold">Chuyến bay của tôi</p>
+                      <p className="text-xs opacity-90">Quản lý đặt chỗ</p>
                     </div>
                   </button>
-                  
+
                   <button
                     onClick={() => navigate('/dat-ve')}
-                    className="w-full flex items-center gap-3 px-4 py-3 bg-linear-to-r from-[#1E88E5] to-[#1565C0] text-white rounded-lg hover:from-[#1565C0] hover:to-[#0D47A1] transition shadow-md"
+                    className="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-[#1E88E5] to-[#1565C0] text-white rounded-lg hover:from-[#1565C0] hover:to-[#0D47A1] transition shadow-md"
                   >
-                    <span className="text-xl">??</span>
+                    <span className="text-xl">🛫</span>
                     <div className="text-left flex-1">
-                      <p className="font-semibold">�?t v� m?i</p>
-                      <p className="text-xs opacity-90">T�m chuy?n bay</p>
+                      <p className="font-semibold">Đặt vé mới</p>
+                      <p className="text-xs opacity-90">Tìm chuyến bay</p>
                     </div>
                   </button>
                 </div>
@@ -298,32 +328,32 @@ function LichSuGiaoDich() {
           <div className="flex-1">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">L?ch s? giao d?ch</h1>
-          <p className="text-white drop-shadow-md">Xem l?i c�c giao d?ch thanh to�n c?a b?n</p>
+          <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">Lịch sử giao dịch</h1>
+          <p className="text-white drop-shadow-md">Xem lại các giao dịch thanh toán của bạn</p>
         </div>
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Tr?ng th�i</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Trạng thái</label>
               <select
                 value={filters.status}
                 onChange={(e) => setFilters({ ...filters, status: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1E88E5] focus:border-transparent"
               >
-                <option value="all">T?t c?</option>
-                <option value="paid">�� thanh to�n</option>
-                <option value="unpaid">Chua thanh to�n</option>
-                <option value="cancelled">�� h?y</option>
+                <option value="all">Tất cả</option>
+                <option value="paid">Đã thanh toán</option>
+                <option value="unpaid">Chưa thanh toán</option>
+                <option value="cancelled">Đã hủy</option>
               </select>
             </div>
-            
+
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">T�m ki?m</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Tìm kiếm</label>
               <input
                 type="text"
-                placeholder="T�m theo m� giao d?ch, s? hi?u chuy?n bay..."
+                placeholder="Tìm theo mã giao dịch, số hiệu chuyến bay..."
                 value={filters.search}
                 onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1E88E5] focus:border-transparent"
@@ -336,18 +366,18 @@ function LichSuGiaoDich() {
         {historyLoading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-[#1E88E5] mx-auto mb-4"></div>
-            <p className="text-gray-600">�ang t?i l?ch s? giao d?ch...</p>
+            <p className="text-gray-600">Đang tải lịch sử giao dịch...</p>
           </div>
         ) : filteredPayments.length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <div className="text-6xl mb-4">??</div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">Chua c� giao d?ch n�o</h3>
-            <p className="text-gray-500 mb-6">B?n chua c� giao d?ch thanh to�n n�o ho?c kh�ng t�m th?y k?t qu? ph� h?p</p>
+            <div className="text-6xl mb-4">📄</div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">Chưa có giao dịch nào</h3>
+            <p className="text-gray-500 mb-6">Bạn chưa có giao dịch thanh toán nào hoặc không tìm thấy kết quả phù hợp</p>
             <button
               onClick={() => navigate('/dat-ve')}
               className="bg-[#1E88E5] text-white px-6 py-3 rounded-lg hover:bg-[#1565C0] transition"
             >
-              �?t v� ngay
+              Đặt vé ngay
             </button>
           </div>
         ) : (
@@ -358,74 +388,74 @@ function LichSuGiaoDich() {
                   {/* Payment Info */}
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-3">
-                      <span className="text-sm text-gray-500">M� giao d?ch:</span>
+                      <span className="text-sm text-gray-500">Mã giao dịch:</span>
                       <span className="font-bold text-lg text-[#1E88E5]">#{payment.maThanhToan}</span>
                       {getStatusBadge(payment.daThanhToan)}
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                       {/* Flight Info */}
                       <div className="space-y-2">
                         <div>
-                          <p className="text-xs text-gray-500">Chuy?n bay</p>
+                          <p className="text-xs text-gray-500">Chuyến bay</p>
                           <p className="font-semibold text-gray-900">
                             {payment.datCho?.chiTietGhe?.chiTietChuyenBay?.soHieuChuyenBay || 'N/A'}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500">H�nh tr�nh</p>
+                          <p className="text-xs text-gray-500">Hành trình</p>
                           <p className="text-sm text-gray-700">
-                            {payment.datCho?.chiTietGhe?.chiTietChuyenBay?.tuyenBay?.sanBayDi?.thanhPhoSanBay} 
-                            {' ? '}
+                            {payment.datCho?.chiTietGhe?.chiTietChuyenBay?.tuyenBay?.sanBayDi?.thanhPhoSanBay}
+                            {' → '}
                             {payment.datCho?.chiTietGhe?.chiTietChuyenBay?.tuyenBay?.sanBayDen?.thanhPhoSanBay}
                           </p>
                         </div>
                       </div>
-                      
+
                       {/* Amount & Date */}
                       <div className="space-y-2">
                         <div>
-                          <p className="text-xs text-gray-500">S? ti?n</p>
+                          <p className="text-xs text-gray-500">Số tiền</p>
                           <p className="font-bold text-xl text-green-600">
                             {formatCurrency(payment.soTien)}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500">Ng�y d?t</p>
+                          <p className="text-xs text-gray-500">Ngày đặt</p>
                           <p className="text-sm text-gray-700">
                             {formatDate(payment.datCho?.ngayDatCho)}
                           </p>
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex gap-4 text-sm text-gray-600">
-                      <span>Gh?: <span className="font-medium">{payment.datCho?.chiTietGhe?.maGhe || 'N/A'}</span></span>
-                      <span>H?ng v�: <span className="font-medium">{payment.datCho?.chiTietGhe?.hangVe?.tenHangVe || 'N/A'}</span></span>
+                      <span>Ghế: <span className="font-medium">{payment.datCho?.chiTietGhe?.maGhe || 'N/A'}</span></span>
+                      <span>Hạng vé: <span className="font-medium">{payment.datCho?.chiTietGhe?.hangVe?.tenHangVe || 'N/A'}</span></span>
                       {payment.ngayHetHan && (
-                        <span>H?t h?n: <span className="font-medium">{formatDate(payment.ngayHetHan)}</span></span>
+                        <span>Hết hạn: <span className="font-medium">{formatDate(payment.ngayHetHan)}</span></span>
                       )}
                     </div>
                   </div>
-                  
+
                   {/* Action Button */}
                   <div className="lg:ml-6 flex flex-col gap-2">
                     <button
                       onClick={() => handleViewDetail(payment)}
                       className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition whitespace-nowrap"
                     >
-                      Xem chi ti?t
+                      Xem chi tiết
                     </button>
                     {payment.daThanhToan === 'Y' ? (
                       <button
                         onClick={() => handleDownloadPDF(payment.maThanhToan)}
                         className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition whitespace-nowrap"
                       >
-                        ?? T?i PDF
+                        📄 Tải PDF
                       </button>
                     ) : payment.daThanhToan === 'H' ? (
                       <div className="px-6 py-2 bg-gray-300 text-gray-600 rounded-lg text-center whitespace-nowrap cursor-not-allowed">
-                        �� h?y
+                        ✗ Đã hủy
                       </div>
                     ) : (
                       <>
@@ -433,15 +463,15 @@ function LichSuGiaoDich() {
                           onClick={() => handlePayment(payment.maThanhToan)}
                           className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition whitespace-nowrap"
                         >
-                          ?? Thanh to�n VNPay
+                          💳 Thanh toán VNPay
                         </button>
-                        {payment.datCho?.chiTietGhe?.chiTietChuyenBay?.trangThai !== '�� bay' && 
-                         payment.datCho?.chiTietGhe?.chiTietChuyenBay?.trangThai !== '�� h?y' && (
+                        {payment.datCho?.chiTietGhe?.chiTietChuyenBay?.trangThai !== 'Đã bay' &&
+                         payment.datCho?.chiTietGhe?.chiTietChuyenBay?.trangThai !== 'Đã hủy' && (
                           <button
                             onClick={() => handleCancelTransaction(payment.datCho.maDatCho)}
                             className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition whitespace-nowrap"
                           >
-                            ? H?y giao d?ch
+                            ✕ Hủy giao dịch
                           </button>
                         )}
                       </>
@@ -452,202 +482,39 @@ function LichSuGiaoDich() {
             ))}
           </div>
         )}
+          {/* Detail Modal */}
+          <ModalDetailHoaDon
+            isVisible={showDetailModal}
+            onClose={() => setShowDetailModal(false)}
+            selectedPayment={selectedPayment}
+            bookingDetails={bookingDetails}
+            onDownloadPDF={handleDownloadPDF}
+            onPayment={handlePayment}
+          />
+        </div>
       </div>
-
-      {/* Detail Modal */}
-      {showDetailModal && selectedPayment && bookingDetails && (
-        <div className="fixed inset-0 flex items-center justify-center z-[1100] p-2 sm:p-4">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setShowDetailModal(false)}></div>
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[95vh] overflow-auto flex flex-col relative z-10">
-            <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center shrink-0">
-              <h2 className="text-lg sm:text-2xl font-bold text-gray-900">Chi ti?t h�a don</h2>
-              <button
-                onClick={() => setShowDetailModal(false)}
-                className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
-              >
-                �
-              </button>
-            </div>
-            
-            <div className="overflow-y-auto flex-1 p-4 sm:p-6 space-y-4 sm:space-y-6">
-              {/* Payment Status */}
-              <div className="bg-linear-to-r from-[#F5F7FA] to-[#E3F2FD] rounded-lg p-3 sm:p-4 border border-[#1E88E5]/20">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                  <div>
-                    <p className="text-xs sm:text-sm text-gray-600 mb-1">M� giao d?ch</p>
-                    <p className="text-xl sm:text-2xl font-bold text-[#1E88E5]">#{selectedPayment.maThanhToan}</p>
-                  </div>
-                  {getStatusBadge(selectedPayment.daThanhToan)}
-                </div>
-              </div>
-
-              {/* Flight Details */}
-              <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
-                <h3 className="font-semibold text-base sm:text-lg mb-2 sm:mb-3 flex items-center gap-2">
-                  ?? Th�ng tin chuy?n bay
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div>
-                    <p className="text-sm text-gray-600">S? hi?u chuy?n bay</p>
-                    <p className="font-semibold">{selectedPayment.datCho?.chiTietGhe?.chiTietChuyenBay?.soHieuChuyenBay}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Tr?ng th�i chuy?n bay</p>
-                    <p className="font-semibold">{selectedPayment.datCho?.chiTietGhe?.chiTietChuyenBay?.trangThai}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">�i?m kh?i h�nh</p>
-                    <p className="font-semibold">{selectedPayment.datCho?.chiTietGhe?.chiTietChuyenBay?.tuyenBay?.sanBayDi?.tenSanBay}</p>
-                    <p className="text-sm text-gray-500">{selectedPayment.datCho?.chiTietGhe?.chiTietChuyenBay?.tuyenBay?.sanBayDi?.thanhPhoSanBay}</p>
-                    <p className="text-sm">{formatDate(selectedPayment.datCho?.chiTietGhe?.chiTietChuyenBay?.ngayDi)} - {formatTime(selectedPayment.datCho?.chiTietGhe?.chiTietChuyenBay?.gioDi)}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">�i?m d?n</p>
-                    <p className="font-semibold">{selectedPayment.datCho?.chiTietGhe?.chiTietChuyenBay?.tuyenBay?.sanBayDen?.tenSanBay}</p>
-                    <p className="text-sm text-gray-500">{selectedPayment.datCho?.chiTietGhe?.chiTietChuyenBay?.tuyenBay?.sanBayDen?.thanhPhoSanBay}</p>
-                    <p className="text-sm">{formatDate(selectedPayment.datCho?.chiTietGhe?.chiTietChuyenBay?.ngayDen)} - {formatTime(selectedPayment.datCho?.chiTietGhe?.chiTietChuyenBay?.gioDen)}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Ticket Details */}
-              <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
-                <h3 className="font-semibold text-base sm:text-lg mb-2 sm:mb-3 flex items-center gap-2">
-                  ?? Th�ng tin v�
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-                  <div>
-                    <p className="text-sm text-gray-600">S? gh?</p>
-                    <p className="font-semibold text-xl text-[#1E88E5]">{bookingDetails.chiTietGhe?.maGhe}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">H?ng v�</p>
-                    <p className="font-semibold">{bookingDetails.chiTietGhe?.hangVe?.tenHangVe}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Ng�y d?t</p>
-                    <p className="font-semibold">{formatDate(bookingDetails.ngayDatCho)}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Passenger Info */}
-              <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
-                <h3 className="font-semibold text-base sm:text-lg mb-2 sm:mb-3 flex items-center gap-2">
-                  ?? Th�ng tin h�nh kh�ch
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div>
-                    <p className="text-sm text-gray-600">H? v� t�n</p>
-                    <p className="font-semibold">{bookingDetails.hanhKhach?.hoVaTen}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Gi?i t�nh</p>
-                    <p className="font-semibold">{bookingDetails.hanhKhach?.gioiTinh}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Ng�y sinh</p>
-                    <p className="font-semibold">{formatDate(bookingDetails.hanhKhach?.ngaySinh)}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">S? di?n tho?i</p>
-                    <p className="font-semibold">{bookingDetails.hanhKhach?.soDienThoai || 'N/A'}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Services */}
-              {bookingDetails.danhSachDichVu && bookingDetails.danhSachDichVu.length > 0 && (
-                <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
-                  <h3 className="font-semibold text-base sm:text-lg mb-2 sm:mb-3 flex items-center gap-2">
-                    ??? D?ch v? d� d?t
-                  </h3>
-                  <div className="space-y-2 sm:space-y-3">
-                    {bookingDetails.danhSachDichVu.map((service, index) => (
-                      <div key={index} className="bg-white rounded-lg p-2 sm:p-3 border border-gray-200">
-                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
-                          <div className="flex-1">
-                            <p className="font-semibold text-gray-900 text-sm sm:text-base">
-                              {service.luaChonDichVu?.dichVuCungCap?.tenDichVu}
-                            </p>
-                            <p className="text-xs sm:text-sm text-gray-600">
-                              {service.luaChonDichVu?.tenLuaChon}
-                            </p>
-                            {service.luaChonDichVu?.moTa && (
-                              <p className="text-xs text-gray-500 mt-1">
-                                {service.luaChonDichVu.moTa}
-                              </p>
-                            )}
-                          </div>
-                          <div className="text-right ml-4">
-                            <p className="text-xs sm:text-sm text-gray-600">SL: {service.soLuong}</p>
-                            <p className="font-semibold text-[#1E88E5] text-sm sm:text-base">
-                              {formatCurrency(service.donGia)}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              T?ng: {formatCurrency(service.donGia * service.soLuong)}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Payment Summary */}
-              <div className="bg-linear-to-r from-green-50 to-emerald-50 rounded-lg p-3 sm:p-4 border border-green-200">
-                <h3 className="font-semibold text-base sm:text-lg mb-2 sm:mb-3 flex items-center gap-2">
-                  ?? T?ng thanh to�n
-                </h3>
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-                  <span className="text-gray-700 text-base sm:text-lg">T?ng s? ti?n:</span>
-                  <span className="text-xl sm:text-2xl font-bold text-green-600">
-                    {formatCurrency(selectedPayment.soTien)}
-                  </span>
-                </div>
-                {selectedPayment.ngayHetHan && (
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-2 text-xs sm:text-sm gap-1">
-                    <span className="text-gray-600">Ng�y h?t h?n:</span>
-                    <span className="font-medium text-orange-600">
-                      {formatDate(selectedPayment.ngayHetHan)}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            <div className="border-t border-gray-200 px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 shrink-0">
-              <button
-                onClick={() => setShowDetailModal(false)}
-                className="px-4 sm:px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition text-sm sm:text-base"
-              >
-                ��ng
-              </button>
-              {selectedPayment.daThanhToan === 'Y' ? (
-                <button
-                  onClick={() => handleDownloadPDF(selectedPayment.maThanhToan)}
-                  className="px-4 sm:px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm sm:text-base"
-                >
-                  ?? T?i PDF
-                </button>
-              ) : selectedPayment.daThanhToan === 'H' ? null : (
-                <button
-                  onClick={() => handlePayment(selectedPayment.maThanhToan)}
-                  className="px-4 sm:px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition text-sm sm:text-base"
-                >
-                  ?? Thanh to�n VNPay
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-          </div>
-        </div>
+      </div>
       <Footer />
+      {/* Toast Component */}
+      <Toast
+        isVisible={toast.isVisible}
+        message={toast.message}
+        type={toast.type}
+        onClose={hideToast}
+      />
+
+      {/* ConfirmDialog Component */}
+      <ConfirmDialog
+        isVisible={confirmDialog.isVisible}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        type={confirmDialog.type}
+        confirmText={confirmDialog.confirmText}
+        onConfirm={confirmDialog.onConfirm}
+        onCancel={hideConfirm}
+      />
     </div>
   );
-}
+};
 
 export default LichSuGiaoDich;

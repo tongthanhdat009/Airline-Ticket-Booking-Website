@@ -568,9 +568,9 @@ const QuanLyChuyenBay = () => {
             )}
 
             {/* Thanh công cụ */}
-            <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-3">
-                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                    <div className="relative w-full md:w-80">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-3">
+                <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full lg:w-auto">
+                    <div className="relative w-full sm:w-auto min-w-[280px]">
                         <input
                             type="text"
                             placeholder="Tìm số hiệu chuyến bay..."
@@ -601,20 +601,22 @@ const QuanLyChuyenBay = () => {
                         <span>{showDeleted ? 'Đang xem đã xóa' : 'Xem đã xóa'}</span>
                     </button>
                 </div>
-                <ViewToggleButton
-                    currentView={viewMode}
-                    onViewChange={handleViewChange}
-                    className="shrink-0"
-                />
-                {!showDeleted && (
-                    <button
-                        onClick={() => navigate('/admin/dashboard/ChuyenBay/them')}
-                        className="flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto"
-                    >
-                        <FaPlus />
-                        <span>Thêm chuyến bay</span>
-                    </button>
-                )}
+                <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-start lg:justify-end">
+                    <ViewToggleButton
+                        currentView={viewMode}
+                        onViewChange={handleViewChange}
+                        className="shrink-0"
+                    />
+                    {!showDeleted && (
+                        <button
+                            onClick={() => navigate('/admin/dashboard/ChuyenBay/them')}
+                            className="flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold shrink-0"
+                        >
+                            <FaPlus />
+                            <span>Thêm chuyến bay</span>
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Thanh phân trang - Hiển thị trước bảng/thẻ */}

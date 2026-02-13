@@ -2,6 +2,8 @@
 import { FaChair, FaTimes, FaPlus, FaTrash, FaSave, FaMagic } from 'react-icons/fa';
 import * as SoDoGheService from '../../../services/SoDoGheService';
 import * as QLHangVeService from '../../../services/QLHangVeService';
+import Toast from '../../common/Toast';
+import ConfirmDialog from '../../common/ConfirmDialog';
 
 const SeatLayoutEditor = ({ maMayBay, onClose }) => {
     const [seats, setSeats] = useState([]);
@@ -10,6 +12,35 @@ const SeatLayoutEditor = ({ maMayBay, onClose }) => {
     const [selectedSeat, setSelectedSeat] = useState(null);
     const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'form'
     const [showAutoGenerate, setShowAutoGenerate] = useState(false);
+
+    // Toast state
+    const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
+
+    // ConfirmDialog state
+    const [confirmDialog, setConfirmDialog] = useState({
+        isVisible: false,
+        title: '',
+        message: '',
+        type: 'warning',
+        confirmText: 'Xác nhận',
+        onConfirm: null
+    });
+
+    const showToast = (message, type = 'success') => {
+        setToast({ isVisible: true, message, type });
+    };
+
+    const hideToast = () => {
+        setToast(prev => ({ ...prev, isVisible: false }));
+    };
+
+    const showConfirm = (title, message, type, confirmText, onConfirm) => {
+        setConfirmDialog({ isVisible: true, title, message, type, confirmText, onConfirm });
+    };
+
+    const hideConfirm = () => {
+        setConfirmDialog(prev => ({ ...prev, isVisible: false }));
+    };
 
     // Auto-generate form state
     const [autoGenConfig, setAutoGenConfig] = useState({
@@ -47,7 +78,7 @@ const SeatLayoutEditor = ({ maMayBay, onClose }) => {
             return true;
         } catch (error) {
             console.error('Lỗi khi thêm ghế:', error);
-            alert(error.response?.data?.message || 'Không thể thêm ghế');
+            showToast(error.response?.data?.message || 'Không thể thêm ghế', 'error');
             return false;
         }
     };
@@ -59,34 +90,49 @@ const SeatLayoutEditor = ({ maMayBay, onClose }) => {
             return true;
         } catch (error) {
             console.error('Lỗi khi cập nhật ghế:', error);
-            alert(error.response?.data?.message || 'Không thể cập nhật ghế');
+            showToast(error.response?.data?.message || 'Không thể cập nhật ghế', 'error');
             return false;
         }
     };
 
     const handleDeleteSeat = async (maGhe) => {
-        if (!window.confirm('Bạn có chắc chắn muốn xóa ghế này?')) return;
-
-        try {
-            await SoDoGheService.deleteSeat(maGhe);
-            await loadData();
-        } catch (error) {
-            console.error('Lỗi khi xóa ghế:', error);
-            alert(error.response?.data?.message || 'Không thể xóa ghế');
-        }
+        showConfirm(
+            'Xác nhận xóa',
+            'Bạn có chắc chắn muốn xóa ghế này?',
+            'danger',
+            'Xóa',
+            async () => {
+                try {
+                    await SoDoGheService.deleteSeat(maGhe);
+                    await loadData();
+                    showToast('Đã xóa ghế thành công', 'success');
+                    hideConfirm();
+                } catch (error) {
+                    console.error('Lỗi khi xóa ghế:', error);
+                    showToast(error.response?.data?.message || 'Không thể xóa ghế', 'error');
+                }
+            }
+        );
     };
 
     const handleDeleteAllSeats = async () => {
-        if (!window.confirm('Bạn có chắc chắn muốn xóa TẤT CẢ ghế của máy bay này? Hành động này không thể hoàn tác!')) return;
-
-        try {
-            await SoDoGheService.deleteAllSeatsByAircraft(maMayBay);
-            await loadData();
-            alert('Đã xóa tất cả ghế thành công');
-        } catch (error) {
-            console.error('Lỗi khi xóa tất cả ghế:', error);
-            alert(error.response?.data?.message || 'Không thể xóa tất cả ghế');
-        }
+        showConfirm(
+            'Xác nhận xóa tất cả',
+            'Bạn có chắc chắn muốn xóa TẤT CẢ ghế của máy bay này? Hành động này không thể hoàn tác!',
+            'danger',
+            'Xóa tất cả',
+            async () => {
+                try {
+                    await SoDoGheService.deleteAllSeatsByAircraft(maMayBay);
+                    await loadData();
+                    showToast('Đã xóa tất cả ghế thành công', 'success');
+                    hideConfirm();
+                } catch (error) {
+                    console.error('Lỗi khi xóa tất cả ghế:', error);
+                    showToast(error.response?.data?.message || 'Không thể xóa tất cả ghế', 'error');
+                }
+            }
+        );
     };
 
     const handleAutoGenerate = async () => {
@@ -99,9 +145,9 @@ const SeatLayoutEditor = ({ maMayBay, onClose }) => {
 
             if (createdCount < totalRequested) {
                 const skipped = totalRequested - createdCount;
-                alert(`Đã tạo ${createdCount} ghế thành công!\n⚠️ ${skipped} vị trí đã có ghế nên bị bỏ qua.`);
+                showToast(`Đã tạo ${createdCount} ghế thành công! ${skipped} vị trí đã có ghế nên bị bỏ qua.`, 'warning');
             } else {
-                alert(`Tạo ${createdCount} ghế thành công!`);
+                showToast(`Tạo ${createdCount} ghế thành công!`, 'success');
             }
 
             await loadData();
@@ -109,7 +155,7 @@ const SeatLayoutEditor = ({ maMayBay, onClose }) => {
         } catch (error) {
             console.error('Lỗi khi tự động tạo sơ đồ ghế:', error);
             const errorMsg = error.response?.data?.message || error.response?.data?.error || 'Không thể tạo sơ đồ ghế';
-            alert(errorMsg);
+            showToast(errorMsg, 'error');
         }
     };
 
@@ -318,6 +364,25 @@ const SeatLayoutEditor = ({ maMayBay, onClose }) => {
                     </div>
                 )}
             </div>
+
+            {/* Toast Component */}
+            <Toast
+                isVisible={toast.isVisible}
+                message={toast.message}
+                type={toast.type}
+                onClose={hideToast}
+            />
+
+            {/* ConfirmDialog Component */}
+            <ConfirmDialog
+                isVisible={confirmDialog.isVisible}
+                title={confirmDialog.title}
+                message={confirmDialog.message}
+                type={confirmDialog.type}
+                confirmText={confirmDialog.confirmText}
+                onConfirm={confirmDialog.onConfirm}
+                onCancel={hideConfirm}
+            />
         </div>
     );
 };

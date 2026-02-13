@@ -70,9 +70,7 @@ public class DatCho {
     @Column(name = "checkin_time")
     private LocalDateTime checkInTime;
 
-    @OneToOne(mappedBy = "datCho", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private TrangThaiThanhToan trangThaiThanhToan;
+    // Payment is now linked to DonHang, not DatCho
 
     @OneToMany(mappedBy = "datCho", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonIgnoreProperties({"datCho"})

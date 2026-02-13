@@ -42,10 +42,19 @@ public class TrangThaiThanhToan {
     @Column(name = "sotien", nullable = false, precision = 10, scale = 2)
     private BigDecimal soTien;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "madatcho", referencedColumnName = "madatcho", nullable = true, unique = true)
-    @JsonIgnoreProperties({"trangThaiThanhToan", "danhSachDichVu"})
-    private DatCho datCho;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "madonhang", nullable = false, unique = true)
+    @JsonIgnoreProperties({"danhSachDatCho"})
+    private DonHang donHang;
+
+    @Column(name = "transaction_code", length = 100)
+    private String transactionCode;
+
+    @Column(name = "trangthai", length = 20)
+    private String trangThai = "PENDING";
+
+    @Column(name = "thoigian_thanhtoan")
+    private LocalDateTime thoigianThanhToan;
 
     // ==================== SOFT DELETE FIELDS ====================
     @Column(name = "da_xoa", nullable = false)

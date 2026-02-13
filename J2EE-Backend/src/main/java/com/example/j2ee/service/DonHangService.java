@@ -328,37 +328,49 @@ public class DonHangService {
         donHang.setTrangThai("ĐÃ HỦY");
         donHangRepository.save(donHang);
 
-        // Bước 7: Cập nhật tất cả DatCho sang trạng thái CANCELLED và tạo bản ghi
-        // HoanTien
+        // Bước 7: Cập nhật tất cả DatCho sang trạng thái CANCELLED và tạo bản ghi HoanTien
+        TrangThaiThanhToan thanhToan = trangThaiThanhToanRepository
+                .findByDonHang_MaDonHang(donHang.getMaDonHang());
+
         if (danhSachDatCho != null && !danhSachDatCho.isEmpty()) {
             for (DatCho datCho : danhSachDatCho) {
                 datCho.setTrangThai("CANCELLED");
                 datChoRepository.save(datCho);
+            }
+        }
 
-                // Tìm TrangThaiThanhToan của DatCho này
-                TrangThaiThanhToan thanhToan = trangThaiThanhToanRepository
-                        .findByDatCho_MaDatCho(datCho.getMaDatCho());
-
-                // Chỉ tạo bản ghi HoanTien nếu đơn hàng đã thanh toán
-                if (thanhToan != null && thanhToan.getDaThanhToan() == 'Y') {
-                    // Tạo bản ghi HoanTien
-                    HoanTien hoanTien = new HoanTien();
-                    hoanTien.setDatCho(datCho);
-                    hoanTien.setTrangThaiThanhToan(thanhToan);
-                    hoanTien.setSoTienHoan(datCho.getGiaVe());
-                    hoanTien.setLyDoHoanTien(lyDoHuy);
-                    hoanTien.setTrangThai("DA_HOAN_TIEN");
-                    hoanTien.setNgayYeuCau(LocalDateTime.now());
-                    hoanTien.setNgayHoan(LocalDateTime.now());
-                    hoanTien.setNguoiXuLy("ADMIN");
-                    hoanTien.setPhuongThucHoan(thanhToan.getPhuongThucThanhToan());
-                    hoanTien.setTaiKhoanHoan(datCho.getHanhKhach().getEmail()); // Lấy email làm tài khoản hoàn
-                    hoanTienRepository.save(hoanTien);
-
-                    // Cập nhật trạng thái thanh toán thành R (Refunded)
-                    thanhToan.setDaThanhToan('R');
-                    trangThaiThanhToanRepository.save(thanhToan);
+        // Tạo HoanTien cho toàn bộ đơn hàng (nếu đã thanh toán)
+        if (thanhToan != null && thanhToan.getDaThanhToan() == 'Y') {
+            // Tính tổng tiền hoàn cho toàn bộ đơn hàng
+            BigDecimal tongTienHoan = BigDecimal.ZERO;
+            if (danhSachDatCho != null) {
+                for (DatCho dc : danhSachDatCho) {
+                    tongTienHoan = tongTienHoan.add(dc.getGiaVe());
                 }
+            }
+
+            // Tạo một bản ghi HoanTien cho đơn hàng (sử dụng DatCho đầu tiên để lưu thông tin)
+            DatCho firstDatCho = danhSachDatCho != null && !danhSachDatCho.isEmpty()
+                    ? danhSachDatCho.iterator().next()
+                    : null;
+
+            if (firstDatCho != null) {
+                HoanTien hoanTien = new HoanTien();
+                hoanTien.setDatCho(firstDatCho);
+                hoanTien.setTrangThaiThanhToan(thanhToan);
+                hoanTien.setSoTienHoan(tongTienHoan);
+                hoanTien.setLyDoHoanTien(lyDoHuy);
+                hoanTien.setTrangThai("DA_HOAN_TIEN");
+                hoanTien.setNgayYeuCau(LocalDateTime.now());
+                hoanTien.setNgayHoan(LocalDateTime.now());
+                hoanTien.setNguoiXuLy("ADMIN");
+                hoanTien.setPhuongThucHoan(thanhToan.getPhuongThucThanhToan());
+                hoanTien.setTaiKhoanHoan(firstDatCho.getHanhKhach().getEmail());
+                hoanTienRepository.save(hoanTien);
+
+                // Cập nhật trạng thái thanh toán thành R (Refunded)
+                thanhToan.setDaThanhToan('R');
+                trangThaiThanhToanRepository.save(thanhToan);
             }
         }
 
@@ -637,30 +649,44 @@ public class DonHangService {
                     for (DatCho datCho : danhSachDatCho) {
                         datCho.setTrangThai("CANCELLED");
                         datChoRepository.save(datCho);
+                    }
+                }
 
-                        // Tìm TrangThaiThanhToan của DatCho này
-                        TrangThaiThanhToan thanhToan = trangThaiThanhToanRepository
-                                .findByDatCho_MaDatCho(datCho.getMaDatCho());
+                // Lấy thông tin thanh toán từ đơn hàng
+                TrangThaiThanhToan thanhToan = trangThaiThanhToanRepository
+                        .findByDonHang_MaDonHang(donHang.getMaDonHang());
 
-                        if (thanhToan != null && thanhToan.getDaThanhToan() == 'Y') {
-                            // Tạo bản ghi HoanTien
-                            HoanTien hoanTien = new HoanTien();
-                            hoanTien.setDatCho(datCho);
-                            hoanTien.setTrangThaiThanhToan(thanhToan);
-                            hoanTien.setSoTienHoan(datCho.getGiaVe()); // Hoàn toàn bộ giá vé
-                            hoanTien.setLyDoHoanTien(lyDoHoanTien);
-                            hoanTien.setTrangThai("DA_HOAN_TIEN"); // Đã hoàn tiền ngay
-                            hoanTien.setNgayYeuCau(LocalDateTime.now());
-                            hoanTien.setNgayHoan(LocalDateTime.now());
-                            hoanTien.setNguoiXuLy("ADMIN");
-                            hoanTien.setPhuongThucHoan(thanhToan.getPhuongThucThanhToan());
-                            hoanTien.setTaiKhoanHoan(datCho.getHanhKhach().getEmail()); // Lấy email làm tài khoản hoàn
-                            hoanTienRepository.save(hoanTien);
-
-                            // Cập nhật trạng thái thanh toán thành R (Refunded)
-                            thanhToan.setDaThanhToan('R');
-                            trangThaiThanhToanRepository.save(thanhToan);
+                if (thanhToan != null && thanhToan.getDaThanhToan() == 'Y') {
+                    // Tính tổng tiền hoàn cho toàn bộ đơn hàng
+                    BigDecimal tongTienHoan = BigDecimal.ZERO;
+                    if (danhSachDatCho != null) {
+                        for (DatCho dc : danhSachDatCho) {
+                            tongTienHoan = tongTienHoan.add(dc.getGiaVe());
                         }
+                    }
+
+                    // Tạo một bản ghi HoanTien cho đơn hàng
+                    DatCho firstDatCho = danhSachDatCho != null && !danhSachDatCho.isEmpty()
+                            ? danhSachDatCho.iterator().next()
+                            : null;
+
+                    if (firstDatCho != null) {
+                        HoanTien hoanTien = new HoanTien();
+                        hoanTien.setDatCho(firstDatCho);
+                        hoanTien.setTrangThaiThanhToan(thanhToan);
+                        hoanTien.setSoTienHoan(tongTienHoan);
+                        hoanTien.setLyDoHoanTien(lyDoHoanTien);
+                        hoanTien.setTrangThai("DA_HOAN_TIEN");
+                        hoanTien.setNgayYeuCau(LocalDateTime.now());
+                        hoanTien.setNgayHoan(LocalDateTime.now());
+                        hoanTien.setNguoiXuLy("ADMIN");
+                        hoanTien.setPhuongThucHoan(thanhToan.getPhuongThucThanhToan());
+                        hoanTien.setTaiKhoanHoan(firstDatCho.getHanhKhach().getEmail());
+                        hoanTienRepository.save(hoanTien);
+
+                        // Cập nhật trạng thái thanh toán thành R (Refunded)
+                        thanhToan.setDaThanhToan('R');
+                        trangThaiThanhToanRepository.save(thanhToan);
                     }
                 }
 

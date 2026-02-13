@@ -52,8 +52,12 @@ public class ThanhToanController {
                 response.put("daThanhToan", thanhToan.getDaThanhToan());
                 response.put("ngayHetHan", thanhToan.getNgayHetHan());
                 
-                // Thông tin đặt chỗ
-                DatCho datCho = thanhToan.getDatCho();
+                // Thông tin đặt chỗ - lấy từ đơn hàng
+                DatCho datCho = null;
+                if (thanhToan.getDonHang() != null && thanhToan.getDonHang().getDanhSachDatCho() != null
+                        && !thanhToan.getDonHang().getDanhSachDatCho().isEmpty()) {
+                    datCho = thanhToan.getDonHang().getDanhSachDatCho().iterator().next();
+                }
                 if (datCho != null) {
                     Map<String, Object> datChoInfo = new HashMap<>();
                     datChoInfo.put("maDatCho", datCho.getMaDatCho());

@@ -83,8 +83,8 @@ public class CheckInService {
             //     return new CheckInResponse(false, "Chỉ có thể check-in trong vòng 24 giờ trước giờ bay", null);
             // }
             
-            // Kiểm tra trạng thái thanh toán
-            TrangThaiThanhToan thanhToan = datCho.getTrangThaiThanhToan();
+            // Kiểm tra trạng thái thanh toán (thông qua DonHang)
+            TrangThaiThanhToan thanhToan = datCho.getDonHang() != null ? datCho.getDonHang().getTrangThaiThanhToan() : null;
             boolean daThanhToan = false;
             Double soTien = null;
             

@@ -29,7 +29,7 @@ const DoiHangVeModal = ({
     setLoadingHangVe(true);
     try {
       // Lấy danh sách hạng vé từ API
-      const response = await QLDatChoService.getAvailableHangVe(datCho.maDatCho);
+      const response = await QLDatChoService.getAvailableHangVe();
       if (response.success) {
         // Lọc bỏ hạng vé hiện tại
         const filtered = response.data.filter(hv => hv.tenHangVe !== datCho.tenHangVe);

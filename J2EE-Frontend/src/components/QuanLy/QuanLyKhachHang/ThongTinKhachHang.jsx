@@ -12,6 +12,7 @@ const ThongTinKhachHang = ({ customer, onUpdate, initialEditMode = false }) => {
         quocGia: ''
     });
     const [errors, setErrors] = useState({});
+    const [submitError, setSubmitError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
@@ -129,6 +130,7 @@ const ThongTinKhachHang = ({ customer, onUpdate, initialEditMode = false }) => {
             return;
         }
 
+        setSubmitError('');
         setIsSubmitting(true);
         try {
             await updateKhachHangPartial(customer.maHanhKhach, formData);
@@ -140,9 +142,9 @@ const ThongTinKhachHang = ({ customer, onUpdate, initialEditMode = false }) => {
             console.error('Error updating customer:', error);
             // Show error from API
             if (error.response && error.response.data && error.response.data.message) {
-                alert(error.response.data.message);
+                setSubmitError(error.response.data.message);
             } else {
-                alert('Có lỗi xảy ra khi cập nhật thông tin khách hàng.');
+                setSubmitError('Có lỗi xảy ra khi cập nhật thông tin khách hàng.');
             }
         } finally {
             setIsSubmitting(false);
@@ -194,6 +196,13 @@ const ThongTinKhachHang = ({ customer, onUpdate, initialEditMode = false }) => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Submit error message */}
+                {submitError && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                        <p className="text-sm">{submitError}</p>
+                    </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Readonly fields */}
                     {readonlyFields.map((field) => (

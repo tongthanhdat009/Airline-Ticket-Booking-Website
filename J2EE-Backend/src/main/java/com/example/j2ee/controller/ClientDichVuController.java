@@ -185,8 +185,10 @@ public class ClientDichVuController {
             
             datChoDichVuRepository.save(datChoDichVu);
             
-            // Cập nhật tổng tiền thanh toán
-            TrangThaiThanhToan thanhToan = trangThaiThanhToanRepository.findByDatCho_MaDatCho(maDatCho);
+            // Cập nhật tổng tiền thanh toán (thông qua DonHang)
+            TrangThaiThanhToan thanhToan = datCho.getDonHang() != null 
+                ? trangThaiThanhToanRepository.findByDonHang_MaDonHang(datCho.getDonHang().getMaDonHang()) 
+                : null;
             if (thanhToan != null) {
                 BigDecimal giaDichVu = luaChon.getGia().multiply(new BigDecimal(soLuong));
                 BigDecimal tongTienMoi = thanhToan.getSoTien().add(giaDichVu);

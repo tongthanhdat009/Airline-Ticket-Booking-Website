@@ -69,6 +69,13 @@ public class DonHang {
     @JsonIgnore
     private Set<DatCho> danhSachDatCho;
 
+    /**
+     * Mối quan hệ Một-Một: Một đơn hàng có một thanh toán
+     */
+    @OneToOne(mappedBy = "donHang", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private TrangThaiThanhToan trangThaiThanhToan;
+
     // ==================== SOFT DELETE FIELDS ====================
     @Column(name = "da_xoa", nullable = false)
     private Boolean daXoa = false;

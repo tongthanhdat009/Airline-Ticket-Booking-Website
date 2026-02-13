@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { FaEye, FaEdit, FaTrash, FaPlane, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaTrash, FaPlane, FaMapMarkerAlt } from 'react-icons/fa';
 import PropTypes from 'prop-types';
 
 /**
@@ -10,8 +10,6 @@ import PropTypes from 'prop-types';
  */
 const SanBayCard = memo(({
   data,
-  onView,
-  onEdit,
   onDelete
 }) => {
   if (!data) {
@@ -44,19 +42,20 @@ const SanBayCard = memo(({
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
       {/* Card Header */}
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-3">
-          {/* Avatar icon */}
-          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-            <FaPlane className="text-blue-600" size={18} />
-          </div>
-          <div className="min-w-0 flex-1">
-            <h3 className="font-semibold text-gray-900 truncate">{tenSanBay || 'Không có tên'}</h3>
-            <p className="text-sm text-blue-600 font-medium">#{maSanBay}</p>
-          </div>
+      <div className="flex items-start gap-3 mb-3">
+        {/* Avatar icon */}
+        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+          <FaPlane className="text-blue-600" size={18} />
         </div>
-        {/* Status badge */}
-        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusBadge.className} flex-shrink-0`}>
+        <div className="min-w-0 flex-1">
+          <h3 className="font-semibold text-gray-900 truncate">{tenSanBay || 'Không có tên'}</h3>
+          <p className="text-sm text-blue-600 font-medium">#{maSanBay}</p>
+        </div>
+      </div>
+
+      {/* Status badge */}
+      <div className="mb-3">
+        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusBadge.className}`}>
           {statusBadge.text}
         </span>
       </div>
@@ -113,22 +112,6 @@ const SanBayCard = memo(({
       {/* Card Actions */}
       <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-gray-100">
         <button
-          onClick={() => onView?.(data)}
-          className="px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-1.5"
-          title="Xem thông tin"
-        >
-          <FaEye size={14} />
-          <span className="hidden sm:inline">Xem</span>
-        </button>
-        <button
-          onClick={() => onEdit?.(data)}
-          className="px-3 py-1.5 text-sm text-green-600 hover:bg-green-50 rounded-lg transition-colors flex items-center gap-1.5"
-          title="Chỉnh sửa"
-        >
-          <FaEdit size={14} />
-          <span className="hidden sm:inline">Sửa</span>
-        </button>
-        <button
           onClick={() => onDelete?.(data)}
           className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5"
           title="Xóa"
@@ -157,14 +140,6 @@ SanBayCard.propTypes = {
     trangThaiHoatDong: PropTypes.string,
   }),
   /**
-   * Callback when view button is clicked
-   */
-  onView: PropTypes.func,
-  /**
-   * Callback when edit button is clicked
-   */
-  onEdit: PropTypes.func,
-  /**
    * Callback when delete button is clicked
    */
   onDelete: PropTypes.func,
@@ -172,8 +147,6 @@ SanBayCard.propTypes = {
 
 SanBayCard.defaultProps = {
   data: null,
-  onView: undefined,
-  onEdit: undefined,
   onDelete: undefined,
 };
 

@@ -102,18 +102,6 @@ const QuanLyDatCho = () => {
     setToast(prev => ({ ...prev, isVisible: false }));
   };
 
-  // ConfirmDialog handlers
-  const showConfirm = (title, message, type, confirmText, onConfirm) => {
-    setConfirmDialog({
-      isVisible: true,
-      title,
-      message,
-      type,
-      confirmText,
-      onConfirm
-    });
-  };
-
   const hideConfirm = () => {
     setConfirmDialog(prev => ({ ...prev, isVisible: false }));
   };

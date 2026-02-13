@@ -94,8 +94,8 @@ public class ThongTinChuyenBayService {
                 }
             }
 
-            // Bước 6: Lấy trangthaithanhtoan
-            TrangThaiThanhToan trangThaiThanhToan = datCho.getTrangThaiThanhToan();
+            // Bước 6: Lấy trangthaithanhtoan (thông qua DonHang)
+            TrangThaiThanhToan trangThaiThanhToan = datCho.getDonHang() != null ? datCho.getDonHang().getTrangThaiThanhToan() : null;
             if (trangThaiThanhToan != null) {
                 map.put("maThanhToan", trangThaiThanhToan.getMaThanhToan());
                 map.put("daThanhToan", trangThaiThanhToan.getDaThanhToan());

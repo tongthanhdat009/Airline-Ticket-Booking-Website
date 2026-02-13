@@ -96,8 +96,14 @@ public class JasperTicketService {
         Map<String, Object> parameters = new HashMap<>();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-        
-        DatCho booking = payment.getDatCho();
+
+        // Get booking from order (payment is now linked to DonHang)
+        DatCho booking = null;
+        if (payment.getDonHang() != null && payment.getDonHang().getDanhSachDatCho() != null
+                && !payment.getDonHang().getDanhSachDatCho().isEmpty()) {
+            booking = payment.getDonHang().getDanhSachDatCho().iterator().next();
+        }
+
         ChiTietGhe chiTietGhe = booking != null ? booking.getChiTietGhe() : null;
         ChiTietChuyenBay flight = booking != null ? booking.getChuyenBay() : null;
 
@@ -239,7 +245,7 @@ public class JasperTicketService {
 
         // Find the actual payment for this booking or create a mock one
         TrangThaiThanhToan mockPayment = new TrangThaiThanhToan();
-        mockPayment.setDatCho(booking);
+        mockPayment.setDonHang(booking.getDonHang());
         mockPayment.setDaThanhToan('Y');
         
         // Calculate payment amount (you may need to adjust this based on your business logic)
@@ -298,8 +304,14 @@ public class JasperTicketService {
         Map<String, Object> parameters = new HashMap<>();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-        
-        DatCho booking = payment.getDatCho();
+
+        // Get booking from order (payment is now linked to DonHang)
+        DatCho booking = null;
+        if (payment.getDonHang() != null && payment.getDonHang().getDanhSachDatCho() != null
+                && !payment.getDonHang().getDanhSachDatCho().isEmpty()) {
+            booking = payment.getDonHang().getDanhSachDatCho().iterator().next();
+        }
+
         ChiTietGhe chiTietGhe = booking != null ? booking.getChiTietGhe() : null;
         ChiTietChuyenBay flight = booking != null ? booking.getChuyenBay() : null;
 

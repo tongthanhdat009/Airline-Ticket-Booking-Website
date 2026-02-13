@@ -297,9 +297,9 @@ const QuanLyLichSuThaoTac = () => {
             </div>
 
             {/* Thanh công cụ */}
-            <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-3">
-                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                    <div className="relative w-full sm:w-64">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-3">
+                <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full lg:w-auto">
+                    <div className="relative w-full sm:w-auto min-w-[250px]">
                         <input
                             type="text"
                             placeholder="Tìm kiếm theo mô tả, ngưởi thực hiện..."
@@ -341,19 +341,21 @@ const QuanLyLichSuThaoTac = () => {
                         ))}
                     </select>
                 </div>
-                <ViewToggleButton
-                    currentView={viewMode}
-                    onViewChange={handleViewChange}
-                    className="shrink-0"
-                />
-                <button
-                    onClick={handleSearch}
-                    disabled={loading}
-                    className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-5 py-3 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl font-semibold w-full md:w-auto disabled:opacity-50"
-                >
-                    {loading ? <FaSpinner className="animate-spin" /> : <FaFilter />}
-                    <span>Tìm kiếm</span>
-                </button>
+                <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-start lg:justify-end">
+                    <ViewToggleButton
+                        currentView={viewMode}
+                        onViewChange={handleViewChange}
+                        className="shrink-0"
+                    />
+                    <button
+                        onClick={handleSearch}
+                        disabled={loading}
+                        className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-5 py-3 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl font-semibold shrink-0 disabled:opacity-50"
+                    >
+                        {loading ? <FaSpinner className="animate-spin" /> : <FaFilter />}
+                        <span>Tìm kiếm</span>
+                    </button>
+                </div>
             </div>
 
             {/* Nút Export */}

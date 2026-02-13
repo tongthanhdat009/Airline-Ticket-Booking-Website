@@ -39,10 +39,6 @@ const AutoGenerateModal = ({
     };
 
     const removeCabinConfig = (id) => {
-        if (cabinConfigs.length === 1) {
-            alert('Phải có ít nhất 1 cabin');
-            return;
-        }
         setCabinConfigs(cabinConfigs.filter(c => c.id !== id));
     };
 

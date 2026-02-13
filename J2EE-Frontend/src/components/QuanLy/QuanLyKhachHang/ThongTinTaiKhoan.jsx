@@ -109,11 +109,6 @@ const ThongTinTaiKhoan = ({ customer }) => {
         setPasswordErrors({});
     };
 
-    const formatDate = (dateString) => {
-        if (!dateString) return '-';
-        return new Date(dateString).toLocaleDateString('vi-VN');
-    };
-
     const formatDateTime = (dateTimeString) => {
         if (!dateTimeString) return '-';
         return new Date(dateTimeString).toLocaleString('vi-VN');

@@ -22,7 +22,6 @@ const DichVuCard = memo(({
   const {
     maDichVu,
     tenDichVu,
-    moTa,
     anh
   } = data;
 

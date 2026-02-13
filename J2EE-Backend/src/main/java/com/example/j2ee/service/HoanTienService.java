@@ -47,8 +47,10 @@ public class HoanTienService {
         DatCho datCho = datChoRepository.findById(maDatCho)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đặt chỗ"));
 
-        // Kiểm tra đã thanh toán chưa
-        TrangThaiThanhToan thanhToan = trangThaiThanhToanRepository.findByDatCho_MaDatCho(maDatCho);
+        // Kiểm tra đã thanh toán chưa (thông qua DonHang)
+        TrangThaiThanhToan thanhToan = datCho.getDonHang() != null 
+                ? trangThaiThanhToanRepository.findByDonHang_MaDonHang(datCho.getDonHang().getMaDonHang()) 
+                : null;
         if (thanhToan == null || thanhToan.getDaThanhToan() != 'Y') {
             throw new IllegalArgumentException("Không thể hoàn tiền cho vé chưa thanh toán");
         }
@@ -109,8 +111,10 @@ public class HoanTienService {
         // Step 3: Update soluong_daban trong bảng giachuyenbay (giảm đi 1)
         updateGiaChuyenBaySoLuongDaBan(datCho);
 
-        // Step 4: Cập nhật trạng thái thanh toán
-        TrangThaiThanhToan thanhToan = trangThaiThanhToanRepository.findByDatCho_MaDatCho(maDatCho);
+        // Step 4: Cập nhật trạng thái thanh toán (thông qua DonHang)
+        TrangThaiThanhToan thanhToan = datCho.getDonHang() != null 
+                ? trangThaiThanhToanRepository.findByDonHang_MaDonHang(datCho.getDonHang().getMaDonHang()) 
+                : null;
         if (thanhToan != null) {
             thanhToan.setDaThanhToan('R'); // R = Refunded
             trangThaiThanhToanRepository.save(thanhToan);

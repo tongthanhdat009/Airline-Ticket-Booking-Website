@@ -11,8 +11,7 @@ import PropTypes from 'prop-types';
 const PhanQuyenCard = memo(({
   data,
   onView,
-  onEdit,
-  onDelete
+  onEdit
 }) => {
   if (!data) {
     return null;
@@ -170,17 +169,12 @@ PhanQuyenCard.propTypes = {
    * Callback when edit button is clicked
    */
   onEdit: PropTypes.func,
-  /**
-   * Callback when delete button is clicked
-   */
-  onDelete: PropTypes.func,
 };
 
 PhanQuyenCard.defaultProps = {
   data: null,
   onView: undefined,
   onEdit: undefined,
-  onDelete: undefined,
 };
 
 export default PhanQuyenCard;

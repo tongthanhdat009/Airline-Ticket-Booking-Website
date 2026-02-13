@@ -185,12 +185,15 @@ public class VNPayService {
      * Formula: 1 email per passenger (containing all their flight tickets).
      */
     private void sendTicketConfirmationEmail(TrangThaiThanhToan thanhToan) throws Exception {
-        if (thanhToan.getDatCho() == null) {
+        if (thanhToan.getDonHang() == null || thanhToan.getDonHang().getDanhSachDatCho() == null
+                || thanhToan.getDonHang().getDanhSachDatCho().isEmpty()) {
             System.err.println("No booking associated with payment: " + thanhToan.getMaThanhToan());
             return;
         }
 
-        DatCho mainBooking = thanhToan.getDatCho();
+        // Lấy booking đầu tiên từ đơn hàng
+        var bookings = thanhToan.getDonHang().getDanhSachDatCho();
+        DatCho mainBooking = bookings.iterator().next();
         java.time.LocalDateTime bookingTime = mainBooking.getNgayDatCho();
 
         // Search for ALL bookings within 5 seconds (regardless of flight)

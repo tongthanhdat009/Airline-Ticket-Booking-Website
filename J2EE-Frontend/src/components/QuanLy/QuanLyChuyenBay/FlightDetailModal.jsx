@@ -29,13 +29,13 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
                 const assignedData = assignedRes.data.data ? assignedRes.data.data : [];
                 const assignedList = Array.isArray(assignedData) ? assignedData : [];
                 setAssignedServices(assignedList);
-            } catch (error) {
+            } catch {
                 setAssignedServices([]);
             }
 
             // Tải ảnh cho tất cả dịch vụ
             await loadServiceImages(allServices);
-        } catch (error) {
+        } catch {
             showToast('Không thể tải danh sách dịch vụ', 'error');
             setServices([]);
             setAssignedServices([]);
@@ -56,7 +56,7 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
                     const imageRes = await fetchImageByName(service.anh);
                     const imageUrl = URL.createObjectURL(imageRes.data);
                     images[service.maDichVu] = imageUrl;
-                } catch (error) {
+                } catch {
                     // Silently handle image load errors
                 }
             }

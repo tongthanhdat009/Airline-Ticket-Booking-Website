@@ -41,15 +41,15 @@ public class DatChoService {
     /**
      * Hủy giao dịch (giải phóng ghế trong chuyến bay và cập nhật trạng thái thanh toán thành Đã hủy)
      */
-    @Auditable(action = "HỦY_VÉ", table = "datcho", paramName = "maDatCho", 
+    @Auditable(action = "HỦY_VÉ", table = "datcho", paramName = "maDatCho",
                description = "Hủy đặt chỗ và giải phóng ghế")
     @Transactional
     public void huyDatCho(int maDatCho) {
         DatCho datCho = datChoRepository.findById(maDatCho)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đặt chỗ"));
-        
-        // Lấy thông tin thanh toán
-        TrangThaiThanhToan thanhToan = trangThaiThanhToanRepository.findByDatCho_MaDatCho(maDatCho);
+
+        // Lấy thông tin thanh toán từ đơn hàng
+        TrangThaiThanhToan thanhToan = trangThaiThanhToanRepository.findByDonHang_MaDonHang(datCho.getDonHang().getMaDonHang());
         if (thanhToan == null) {
             throw new IllegalArgumentException("Không tìm thấy thông tin thanh toán");
         }
@@ -99,13 +99,13 @@ public class DatChoService {
         response.setNgayDatCho(datCho.getNgayDatCho());
         response.setHanhKhach(datCho.getHanhKhach());
         response.setChiTietGhe(datCho.getChiTietGhe());
-        
-        // Thêm thông tin thanh toán
-        if (datCho.getTrangThaiThanhToan() != null) {
+
+        // Thêm thông tin thanh toán từ đơn hàng
+        if (datCho.getDonHang() != null && datCho.getDonHang().getTrangThaiThanhToan() != null) {
             ThanhToanInfo thanhToanInfo = new ThanhToanInfo();
-            thanhToanInfo.setSoTien(datCho.getTrangThaiThanhToan().getSoTien());
-            thanhToanInfo.setDaThanhToan(datCho.getTrangThaiThanhToan().getDaThanhToan());
-            thanhToanInfo.setNgayHetHan(datCho.getTrangThaiThanhToan().getNgayHetHan());
+            thanhToanInfo.setSoTien(datCho.getDonHang().getTrangThaiThanhToan().getSoTien());
+            thanhToanInfo.setDaThanhToan(datCho.getDonHang().getTrangThaiThanhToan().getDaThanhToan());
+            thanhToanInfo.setNgayHetHan(datCho.getDonHang().getTrangThaiThanhToan().getNgayHetHan());
             response.setThanhToan(thanhToanInfo);
         }
         

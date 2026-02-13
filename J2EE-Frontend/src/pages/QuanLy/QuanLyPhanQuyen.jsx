@@ -138,7 +138,7 @@ const QuanLyPhanQuyen = () => {
     const roleCardData = useMemo(() => {
         return roles.map(role => {
             // Calculate permission count for this role
-            const rolePermissions = Object.entries(permissions).filter(([key, value]) => value).length;
+            const rolePermissions = Object.entries(permissions).filter(([, value]) => value).length;
 
             return {
                 ...role,

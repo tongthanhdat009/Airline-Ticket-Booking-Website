@@ -85,7 +85,13 @@ public class JasperInvoiceService {
     private Map<String, Object> prepareInvoiceParameters(TrangThaiThanhToan payment) {
         Map<String, Object> parameters = new HashMap<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        DatCho booking = payment.getDatCho();
+
+        // Get booking from order (payment is now linked to DonHang)
+        DatCho booking = null;
+        if (payment.getDonHang() != null && payment.getDonHang().getDanhSachDatCho() != null
+                && !payment.getDonHang().getDanhSachDatCho().isEmpty()) {
+            booking = payment.getDonHang().getDanhSachDatCho().iterator().next();
+        }
 
         // Invoice info
         parameters.put("invoiceNumber", "INV-" + String.format("%06d", payment.getMaThanhToan()));
@@ -95,11 +101,11 @@ public class JasperInvoiceService {
 
         // Customer information
         if (booking != null && booking.getHanhKhach() != null) {
-            parameters.put("customerName", booking.getHanhKhach().getHoVaTen() != null ? 
+            parameters.put("customerName", booking.getHanhKhach().getHoVaTen() != null ?
                 booking.getHanhKhach().getHoVaTen() : "-");
-            parameters.put("customerEmail", booking.getHanhKhach().getEmail() != null ? 
+            parameters.put("customerEmail", booking.getHanhKhach().getEmail() != null ?
                 booking.getHanhKhach().getEmail() : "-");
-            parameters.put("customerPhone", booking.getHanhKhach().getSoDienThoai() != null ? 
+            parameters.put("customerPhone", booking.getHanhKhach().getSoDienThoai() != null ?
                 booking.getHanhKhach().getSoDienThoai() : "-");
             parameters.put("bookingId", "#" + booking.getMaDatCho());
         } else {
@@ -111,7 +117,7 @@ public class JasperInvoiceService {
 
         // Flight information
         if (booking != null && booking.getChuyenBay() != null) {
-            
+
             var flight = booking.getChuyenBay();
             var route = flight.getTuyenBay();
 
@@ -158,7 +164,14 @@ public class JasperInvoiceService {
      */
     private List<Map<String, Object>> prepareServicesData(TrangThaiThanhToan payment) {
         List<Map<String, Object>> servicesData = new ArrayList<>();
-        DatCho booking = payment.getDatCho();
+
+        // Get booking from order (payment is now linked to DonHang)
+        DatCho booking = null;
+        if (payment.getDonHang() != null && payment.getDonHang().getDanhSachDatCho() != null
+                && !payment.getDonHang().getDanhSachDatCho().isEmpty()) {
+            booking = payment.getDonHang().getDanhSachDatCho().iterator().next();
+        }
+
         int rowNumber = 1;
 
         // Calculate ticket price

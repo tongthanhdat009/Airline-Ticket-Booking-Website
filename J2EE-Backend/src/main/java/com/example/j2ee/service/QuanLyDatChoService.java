@@ -14,6 +14,7 @@ import com.example.j2ee.model.GheDaDat;
 import com.example.j2ee.model.GiaChuyenBay;
 import com.example.j2ee.model.HangVe;
 import com.example.j2ee.model.HanhKhach;
+import com.example.j2ee.model.TrangThaiThanhToan;
 import com.example.j2ee.repository.ChiTietChuyenBayRepository;
 import com.example.j2ee.repository.ChiTietGheRepository;
 import com.example.j2ee.repository.DatChoRepository;
@@ -403,12 +404,13 @@ public class QuanLyDatChoService {
             response.setPnr(datCho.getDonHang().getPnr());
         }
         
-        // Thông tin thanh toán
-        if (datCho.getTrangThaiThanhToan() != null) {
-            char daThanhToan = datCho.getTrangThaiThanhToan().getDaThanhToan();
+        // Thông tin thanh toán (thông qua DonHang)
+        TrangThaiThanhToan ttThanhToan = datCho.getDonHang() != null ? datCho.getDonHang().getTrangThaiThanhToan() : null;
+        if (ttThanhToan != null) {
+            char daThanhToan = ttThanhToan.getDaThanhToan();
             response.setTrangThaiThanhToan(daThanhToan == 'Y' ? "Đã thanh toán" : 
                                           daThanhToan == 'N' ? "Chưa thanh toán" : "Đã hủy");
-            response.setSoTienDaThanhToan(datCho.getTrangThaiThanhToan().getSoTien());
+            response.setSoTienDaThanhToan(ttThanhToan.getSoTien());
         }
         
         return response;

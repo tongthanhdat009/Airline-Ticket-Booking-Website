@@ -1,13 +1,16 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Card from '../../components/QuanLy/CardChucNang';
-import { FaPlus, FaSearch, FaEdit, FaTrash, FaPlane, FaTimes } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaEdit, FaTrash, FaPlane } from 'react-icons/fa';
 import { getAllTuyenBay, addTuyenBay, updateTuyenBay, deleteTuyenBay } from '../../services/QLTuyenBayServices';
-import {getSanBayActive } from '../../services/QLSanBayServices';
+import { getSanBayActive } from '../../services/QLSanBayServices';
 import ViewToggleButton from '../../components/common/ViewToggleButton';
 import CardView from '../../components/common/CardView';
 import ResponsiveTable from '../../components/common/ResponsiveTable';
+import Toast from '../../components/common/Toast';
+import ConfirmDialog from '../../components/common/ConfirmDialog';
 import { useViewToggle } from '../../hooks/useViewToggle';
 import TuyenBayCard from '../../components/QuanLy/QuanLyTuyenBay/TuyenBayCard';
+import TuyenBayModal from '../../components/QuanLy/QuanLyTuyenBay/TuyenBayModal';
 
 const QuanLyTuyenBay = () => {
     const [routes, setRoutes] = useState([]);
@@ -18,6 +21,35 @@ const QuanLyTuyenBay = () => {
     const [airports, setAirports] = useState([]);
     const [loading, setLoading] = useState(false);
     const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-tuyen-bay-view', 'table');
+
+    // Toast state
+    const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
+
+    // ConfirmDialog state
+    const [confirmDialog, setConfirmDialog] = useState({
+        isVisible: false,
+        title: '',
+        message: '',
+        type: 'warning',
+        confirmText: 'Xác nhận',
+        onConfirm: null
+    });
+
+    const showToast = (message, type = 'success') => {
+        setToast({ isVisible: true, message, type });
+    };
+
+    const hideToast = () => {
+        setToast(prev => ({ ...prev, isVisible: false }));
+    };
+
+    const showConfirm = (title, message, type, confirmText, onConfirm) => {
+        setConfirmDialog({ isVisible: true, title, message, type, confirmText, onConfirm });
+    };
+
+    const hideConfirm = () => {
+        setConfirmDialog(prev => ({ ...prev, isVisible: false }));
+    };
 
     useEffect(() => {
         fetchRoutes();
@@ -95,59 +127,66 @@ const QuanLyTuyenBay = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!formData.sanBayDi.maSanBay || !formData.sanBayDen.maSanBay) {
-            alert("Vui lòng chọn cả sân bay đi và sân bay đến.");
+            showToast("Vui lòng chọn cả sân bay đi và sân bay đến.", "error");
             return;
         }
         if (formData.sanBayDi.maSanBay === formData.sanBayDen.maSanBay) {
-            alert("Sân bay đi và sân bay đến không được trùng nhau.");
+            showToast("Sân bay đi và sân bay đến không được trùng nhau.", "error");
             return;
         }
 
         try {
             // Fetch lại danh sách sân bay active để kiểm tra trạng thái mới nhất
             await fetchActiveAirports();
-            
+
             // Kiểm tra xem các sân bay đã chọn còn ACTIVE không
             const sanBayDiActive = airports.find(a => a.maSanBay === formData.sanBayDi.maSanBay);
             const sanBayDenActive = airports.find(a => a.maSanBay === formData.sanBayDen.maSanBay);
-            
+
             if (!sanBayDiActive) {
-                alert("Sân bay đi đã bị vô hiệu hóa. Vui lòng chọn sân bay khác.");
+                showToast("Sân bay đi đã bị vô hiệu hóa. Vui lòng chọn sân bay khác.", "error");
                 return;
             }
-            
+
             if (!sanBayDenActive) {
-                alert("Sân bay đến đã bị vô hiệu hóa. Vui lòng chọn sân bay khác.");
+                showToast("Sân bay đến đã bị vô hiệu hóa. Vui lòng chọn sân bay khác.", "error");
                 return;
             }
 
             if (currentRoute) {
                 // Chế độ chỉnh sửa
                 await updateTuyenBay(currentRoute.maTuyenBay, formData);
-                alert("Cập nhật tuyến bay thành công!");
+                showToast("Cập nhật tuyến bay thành công!", "success");
             } else {
                 // Chế độ thêm mới
                 await addTuyenBay(formData);
-                alert("Thêm tuyến bay thành công!");
+                showToast("Thêm tuyến bay thành công!", "success");
             }
             fetchRoutes();
             handleCloseModal();
         } catch (error) {
             console.error("Chi tiết lỗi:", error);
-            alert(`Lỗi: ${error.message}`);
+            showToast(error.response?.data?.message || "Không thể lưu tuyến bay. Vui lòng thử lại!", "error");
         }
     };
 
     const handleDelete = async (routeId) => {
-        if (window.confirm("Bạn có chắc chắn muốn xóa tuyến bay này?")) {
-            try {
-                await deleteTuyenBay(routeId);
-                alert("Xóa tuyến bay thành công!");
-                fetchRoutes();
-            } catch (error) {
-                alert(`Lỗi: ${error.message}`);
+        showConfirm(
+            'Xác nhận xóa',
+            'Bạn có chắc chắn muốn xóa tuyến bay này?',
+            'danger',
+            'Xóa',
+            async () => {
+                try {
+                    await deleteTuyenBay(routeId);
+                    showToast("Xóa tuyến bay thành công!", "success");
+                    fetchRoutes();
+                    hideConfirm();
+                } catch (error) {
+                    showToast(error.response?.data?.message || "Không thể xóa tuyến bay. Vui lòng thử lại!", "error");
+                }
             }
-        }
+        );
     };
 
     return (
@@ -288,90 +327,26 @@ const QuanLyTuyenBay = () => {
                     currentRoute={currentRoute}
                 />
             )}
+
+            {/* Toast Component */}
+            <Toast
+                isVisible={toast.isVisible}
+                message={toast.message}
+                type={toast.type}
+                onClose={hideToast}
+            />
+
+            {/* ConfirmDialog Component */}
+            <ConfirmDialog
+                isVisible={confirmDialog.isVisible}
+                title={confirmDialog.title}
+                message={confirmDialog.message}
+                type={confirmDialog.type}
+                confirmText={confirmDialog.confirmText}
+                onConfirm={confirmDialog.onConfirm}
+                onCancel={hideConfirm}
+            />
         </Card>
-    );
-};
-
-// Modal Component
-const TuyenBayModal = ({ isOpen, onClose, onSubmit, formData, handleFormChange, airports, currentRoute }) => {
-    if (!isOpen) return null;
-
-    return (
-        <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
-                <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl">
-                    <div className="flex justify-between items-center">
-                        <h2 className="text-2xl font-bold">
-                            {currentRoute ? 'Chỉnh sửa tuyến bay' : 'Thêm tuyến bay mới'}
-                        </h2>
-                        <button onClick={onClose} className="text-white hover:text-gray-200 transition-colors">
-                            <FaTimes size={24} />
-                        </button>
-                    </div>
-                </div>
-                <form onSubmit={onSubmit} className="p-6">
-                    <div className="space-y-6">
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2" htmlFor="maSanBayDi">
-                                <FaPlane className="inline mr-2 text-green-600 transform -rotate-45" />
-                                Sân bay đi <span className="text-red-500">*</span>
-                            </label>
-                            <select 
-                                id="maSanBayDi"
-                                name="sanBayDi"
-                                value={formData.sanBayDi.maSanBay}
-                                onChange={handleFormChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
-                                required
-                            >
-                                <option value="">-- Chọn sân bay đi --</option>
-                                {airports.map(a => (
-                                    <option key={a.maSanBay} value={a.maSanBay}>
-                                        {a.tenSanBay} ({a.maIATA})
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2" htmlFor="maSanBayDen">
-                                <FaPlane className="inline mr-2 text-blue-600 transform rotate-45" />
-                                Sân bay đến <span className="text-red-500">*</span>
-                            </label>
-                            <select
-                                id="maSanBayDen"
-                                name="sanBayDen"
-                                value={formData.sanBayDen.maSanBay}
-                                onChange={handleFormChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
-                                required
-                            >
-                                <option value="">-- Chọn sân bay đến --</option>
-                                {airports.map(a => (
-                                    <option key={a.maSanBay} value={a.maSanBay}>
-                                        {a.tenSanBay} ({a.maIATA})
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-                    <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200">
-                        <button 
-                            type="button" 
-                            onClick={onClose} 
-                            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold transition-colors"
-                        >
-                            Hủy
-                        </button>
-                        <button 
-                            type="submit" 
-                            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition-all shadow-lg"
-                        >
-                            {currentRoute ? 'Cập nhật' : 'Thêm mới'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
     );
 };
 

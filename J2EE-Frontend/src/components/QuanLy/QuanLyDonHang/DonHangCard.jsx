@@ -11,7 +11,6 @@ import PropTypes from 'prop-types';
 const DonHangCard = memo(({
   data,
   onView,
-  onEdit,
   onDelete
 }) => {
   if (!data) {
@@ -160,10 +159,6 @@ DonHangCard.propTypes = {
    */
   onView: PropTypes.func,
   /**
-   * Callback when edit button is clicked
-   */
-  onEdit: PropTypes.func,
-  /**
    * Callback when delete button is clicked
    */
   onDelete: PropTypes.func,
@@ -172,7 +167,6 @@ DonHangCard.propTypes = {
 DonHangCard.defaultProps = {
   data: null,
   onView: undefined,
-  onEdit: undefined,
   onDelete: undefined,
 };
 

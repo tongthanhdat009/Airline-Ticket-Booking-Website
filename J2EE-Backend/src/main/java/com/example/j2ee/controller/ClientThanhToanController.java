@@ -33,11 +33,11 @@ public class ClientThanhToanController {
         try {
             // Lấy tất cả thanh toán và filter theo mã hành khách
             List<TrangThaiThanhToan> allPayments = trangThaiThanhToanRepository.findAll();
-            
+
             List<TrangThaiThanhToan> lichSuThanhToan = allPayments.stream()
-                .filter(payment -> payment.getDatCho() != null 
-                    && payment.getDatCho().getHanhKhach() != null
-                    && payment.getDatCho().getHanhKhach().getMaHanhKhach() == maHanhKhach)
+                .filter(payment -> payment.getDonHang() != null
+                    && payment.getDonHang().getHanhKhachNguoiDat() != null
+                    && payment.getDonHang().getHanhKhachNguoiDat().getMaHanhKhach() == maHanhKhach)
                 .collect(Collectors.toList());
             
             Map<String, Object> response = new HashMap<>();
@@ -121,15 +121,15 @@ public class ClientThanhToanController {
             calendar.add(Calendar.MINUTE, 15);
             thanhToan.setNgayHetHan(calendar.getTime());
             
-            // Nếu có maDatCho thì set (không bắt buộc)
+            // Nếu có maDatCho thì set (không bắt buộc) - lấy từ đơn hàng
             if (request.containsKey("maDatCho") && request.get("maDatCho") != null) {
                 Integer maDatCho = (Integer) request.get("maDatCho");
                 DatCho datCho = datChoRepository.findById(maDatCho).orElse(null);
-                if (datCho != null) {
-                    thanhToan.setDatCho(datCho);
+                if (datCho != null && datCho.getDonHang() != null) {
+                    thanhToan.setDonHang(datCho.getDonHang());
                 }
             }
-            // Không set maDatCho nếu chưa có - sẽ được cập nhật sau
+            // Không set donHang nếu chưa có - sẽ được cập nhật sau
             
             // Lưu vào database
             TrangThaiThanhToan savedThanhToan = trangThaiThanhToanRepository.save(thanhToan);

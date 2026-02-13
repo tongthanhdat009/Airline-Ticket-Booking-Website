@@ -9,10 +9,12 @@ const HoanTienModal = ({
   onConfirm
 }) => {
   const [lyDoHoanTien, setLyDoHoanTien] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (isVisible) {
       setLyDoHoanTien('');
+      setError('');
     }
   }, [isVisible]);
 
@@ -20,7 +22,7 @@ const HoanTienModal = ({
 
   const handleSubmit = () => {
     if (!lyDoHoanTien.trim()) {
-      alert('Vui lòng nhập lý do hoàn tiền');
+      setError('Vui lòng nhập lý do hoàn tiền');
       return;
     }
     onConfirm(lyDoHoanTien.trim());
@@ -88,12 +90,16 @@ const HoanTienModal = ({
             </label>
             <textarea
               value={lyDoHoanTien}
-              onChange={(e) => setLyDoHoanTien(e.target.value)}
+              onChange={(e) => {
+                setLyDoHoanTien(e.target.value);
+                setError('');
+              }}
               placeholder="Nhập lý do hoàn tiền..."
               rows={4}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none ${error ? 'border-red-500' : 'border-gray-300'}`}
               disabled={actionLoading}
             />
+            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
           </div>
 
           {/* Thông tin tổng tiền hoàn */}

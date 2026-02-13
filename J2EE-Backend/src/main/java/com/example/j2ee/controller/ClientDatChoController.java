@@ -6,10 +6,12 @@ import com.example.j2ee.dto.datcho.CreateBookingResponse;
 import com.example.j2ee.dto.datcho.DatChoDetailResponse;
 import com.example.j2ee.dto.datcho.DatChoSearchRequest;
 import com.example.j2ee.model.DatCho;
+import com.example.j2ee.model.DonHang;
 import com.example.j2ee.model.HanhKhach;
 import com.example.j2ee.model.ChiTietGhe;
 import com.example.j2ee.model.TrangThaiThanhToan;
 import com.example.j2ee.repository.DatChoRepository;
+import com.example.j2ee.repository.DonHangRepository;
 import com.example.j2ee.repository.HanhKhachRepository;
 import com.example.j2ee.repository.ChiTietGheRepository;
 import com.example.j2ee.repository.TrangThaiThanhToanRepository;
@@ -32,6 +34,7 @@ public class ClientDatChoController {
 
     private final DatChoService datChoService;
     private final DatChoRepository datChoRepository;
+    private final DonHangRepository donHangRepository;
     private final HanhKhachRepository hanhKhachRepository;
     private final ChiTietGheRepository chiTietGheRepository;
     private final TrangThaiThanhToanRepository trangThaiThanhToanRepository;
@@ -268,12 +271,31 @@ public class ClientDatChoController {
                 System.out.println("DEBUG: Created " + danhSachMaGheVe.size() + " return flight bookings");
             }
 
-            // Create ONE payment for the first booking (main passenger)
-            // Store all booking IDs in the payment's order info for tracking
+            // Create DonHang (order) first, then link payment to it
             DatCho firstBooking = datChoRepository.findById(danhSachMaDatCho.get(0)).orElseThrow();
+            HanhKhach hanhKhachNguoiDat = firstBooking.getHanhKhach();
             
+            DonHang donHang = new DonHang();
+            donHang.setPnr(generatePNR());
+            donHang.setHanhKhachNguoiDat(hanhKhachNguoiDat);
+            donHang.setNgayDat(java.time.LocalDateTime.now());
+            donHang.setTongGia(request.getTotalAmount());
+            donHang.setTrangThai("CHỜ THANH TOÁN");
+            donHang.setEmailNguoiDat(hanhKhachNguoiDat.getEmail());
+            donHang.setSoDienThoaiNguoiDat(hanhKhachNguoiDat.getSoDienThoai());
+            donHang.setGhiChu("");
+            DonHang savedDonHang = donHangRepository.save(donHang);
+            
+            // Link all DatCho to this DonHang
+            for (Integer maDatCho : danhSachMaDatCho) {
+                DatCho dc = datChoRepository.findById(maDatCho).orElseThrow();
+                dc.setDonHang(savedDonHang);
+                datChoRepository.save(dc);
+            }
+            
+            // Create payment linked to DonHang
             TrangThaiThanhToan thanhToan = new TrangThaiThanhToan();
-            thanhToan.setDatCho(firstBooking);
+            thanhToan.setDonHang(savedDonHang);
             thanhToan.setSoTien(request.getTotalAmount());
             thanhToan.setDaThanhToan('N'); // Not paid yet
             
@@ -390,5 +412,15 @@ public class ClientDatChoController {
         }
         
         return hanhKhach;
+    }
+
+    private String generatePNR() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder pnr = new StringBuilder();
+        java.util.Random random = new java.util.Random();
+        for (int i = 0; i < 6; i++) {
+            pnr.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return pnr.toString();
     }
 }

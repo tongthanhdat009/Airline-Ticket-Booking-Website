@@ -15,9 +15,9 @@ public interface TrangThaiThanhToanRepository extends JpaRepository<TrangThaiTha
     
     // Tìm thanh toán theo trạng thái (Y = đã thanh toán, N = đang xử lý)
     List<TrangThaiThanhToan> findByDaThanhToan(char daThanhToan);
-    
-    // Tìm thanh toán theo mã đặt chỗ
-    TrangThaiThanhToan findByDatCho_MaDatCho(int maDatCho);
+
+    // Tìm thanh toán theo mã đơn hàng
+    TrangThaiThanhToan findByDonHang_MaDonHang(int maDonHang);
 
     // ==================== SOFT DELETE METHODS ====================
     /**

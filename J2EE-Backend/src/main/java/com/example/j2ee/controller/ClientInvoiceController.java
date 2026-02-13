@@ -31,10 +31,11 @@ public class ClientInvoiceController {
             TrangThaiThanhToan thanhToan = trangThaiThanhToanRepository.findById(maThanhToan)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy thanh toán"));
             
-            DatCho datCho = thanhToan.getDatCho();
-            if (datCho == null) {
+            DonHang donHang = thanhToan.getDonHang();
+            if (donHang == null || donHang.getDanhSachDatCho() == null || donHang.getDanhSachDatCho().isEmpty()) {
                 throw new RuntimeException("Không tìm thấy thông tin đặt chỗ");
             }
+            DatCho datCho = donHang.getDanhSachDatCho().iterator().next();
 
             // Load jasper template
             InputStream reportStream = new ClassPathResource("jasper/invoice_report.jrxml").getInputStream();

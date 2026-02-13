@@ -51,7 +51,8 @@ public class ThongKeService {
                     SELECT SUM(dcdv.soluong * dcdv.dongia) AS DoanhThuDichVu
                     FROM datchodichvu dcdv
                     JOIN datcho dc ON dcdv.madatcho = dc.madatcho
-                    JOIN trangthaithanhtoan ttt ON dc.madatcho = ttt.madatcho
+                    JOIN donhang dh ON dc.madonhang = dh.madonhang
+                    JOIN trangthaithanhtoan ttt ON dh.madonhang = ttt.madonhang
                     WHERE ttt.dathanhtoan = 1
                     AND DATE(dc.ngaydatcho) BETWEEN ? AND ?
                 """;
@@ -221,7 +222,8 @@ public class ThongKeService {
         String sqlVeDaBan = """
                     SELECT COUNT(*)
                     FROM datcho dc
-                    JOIN trangthaithanhtoan ttt ON dc.madatcho = ttt.madatcho
+                    JOIN donhang dh ON dc.madonhang = dh.madonhang
+                    JOIN trangthaithanhtoan ttt ON dh.madonhang = ttt.madonhang
                     WHERE DATE(dc.ngaydatcho) = ?
                     AND ttt.dathanhtoan = 1
                 """;
@@ -332,7 +334,8 @@ public class ThongKeService {
         String sqlSoLuongVe = """
                     SELECT COUNT(*)
                     FROM datcho dc
-                    JOIN trangthaithanhtoan ttt ON dc.madatcho = ttt.madatcho
+                    JOIN donhang dh ON dc.madonhang = dh.madonhang
+                    JOIN trangthaithanhtoan ttt ON dh.madonhang = ttt.madonhang
                     WHERE ttt.dathanhtoan = 1
                     AND DATE(dc.ngaydatcho) BETWEEN ? AND ?
                 """;
