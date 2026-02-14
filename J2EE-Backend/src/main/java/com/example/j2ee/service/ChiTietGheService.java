@@ -110,6 +110,26 @@ public class ChiTietGheService {
         HangVe hangVe = hangVeRepository.findById(request.getMaHangVe())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy hạng vé với mã: " + request.getMaHangVe()));
 
+        // Kiểm tra tổng số ghế không được vượt quá tổng số ghế của máy bay
+        List<ChiTietGhe> existingSeats = chiTietGheRepository.findByMayBay_MaMayBay(maMayBay);
+        int existingSeatsCount = existingSeats.size();
+        int aircraftMaxSeats = mayBay.getTongSoGhe();
+
+        if (existingSeatsCount >= aircraftMaxSeats) {
+            int canAddMore = aircraftMaxSeats - existingSeatsCount;
+            if (canAddMore <= 0) {
+                throw new IllegalArgumentException(
+                    String.format("Máy bay đã có đủ số ghế tối đa (%d ghế). Không thể thêm ghế mới.",
+                            aircraftMaxSeats)
+                );
+            } else {
+                throw new IllegalArgumentException(
+                    String.format("Máy bay đã có %d ghế, chỉ có thể tạo thêm tối đa %d ghế nữa. Số ghế tối đa của máy bay là %d ghế.",
+                            existingSeatsCount, canAddMore, aircraftMaxSeats)
+                );
+            }
+        }
+
         ChiTietGhe chiTietGhe = new ChiTietGhe();
         chiTietGhe.setMayBay(mayBay);
         chiTietGhe.setHangVe(hangVe);
@@ -176,11 +196,41 @@ public class ChiTietGheService {
 
         // Lấy danh sách ghế hiện tại
         List<ChiTietGhe> existingSeats = chiTietGheRepository.findByMayBay_MaMayBay(maMayBay);
+        int existingSeatsCount = existingSeats.size();
 
         // Tạo set chứa các vị trí đã có (row-col)
         java.util.Set<String> existingPositions = existingSeats.stream()
                 .map(seat -> seat.getHang() + "-" + seat.getCot())
                 .collect(java.util.stream.Collectors.toSet());
+
+        // Tính số ghế mới sẽ tạo (chỉ tính ghế chưa tồn tại)
+        int newSeatsToCreate = 0;
+        for (SeatConfig config : seatConfigs) {
+            int startRow = config.getStartRow();
+            int endRow = config.getEndRow();
+            List<String> columns = config.getColumns();
+
+            for (int row = startRow; row <= endRow; row++) {
+                for (String col : columns) {
+                    String positionKey = row + "-" + col;
+                    if (!existingPositions.contains(positionKey)) {
+                        newSeatsToCreate++;
+                    }
+                }
+            }
+        }
+
+        // Kiểm tra tổng số ghế không được vượt quá tổng số ghế của máy bay
+        int totalSeatsAfterCreation = existingSeatsCount + newSeatsToCreate;
+        int aircraftMaxSeats = mayBay.getTongSoGhe();
+
+        if (totalSeatsAfterCreation > aircraftMaxSeats) {
+            throw new IllegalArgumentException(
+                    String.format("Tổng số ghế tạo (%d ghế) không được lớn hơn tổng số ghế máy bay hiện có (%d ghế). " +
+                                    "Máy bay đã có %d ghế, chỉ có thể tạo thêm tối đa %d ghế nữa.",
+                            totalSeatsAfterCreation, aircraftMaxSeats, existingSeatsCount, aircraftMaxSeats - existingSeatsCount)
+            );
+        }
 
         List<ChiTietGhe> createdSeats = new java.util.ArrayList<>();
         int duplicateCount = 0;

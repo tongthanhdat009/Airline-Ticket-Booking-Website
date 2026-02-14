@@ -7,10 +7,35 @@ const AutoGenerateModal = ({
     setCabinConfigs,
     hangVeList,
     onGenerate,
-    onClose
+    onClose,
+    currentMaxRow = 0  // Số hàng hiện có trên máy bay
 }) => {
     const [showCustomMode, setShowCustomMode] = useState(false);
     const [columnInputs, setColumnInputs] = useState({}); // Store raw input values
+
+    // Auto-calculate startRow and endRow based on previous cabins and numberOfRows
+    const calculateRowRanges = (configs) => {
+        let currentRow = currentMaxRow + 1;  // Bắt đầu từ hàng tiếp theo sau hàng lớn nhất hiện có
+        return configs.map(config => {
+            const startRow = currentRow;
+            const numberOfRows = config.numberOfRows || 10;
+            const endRow = startRow + numberOfRows - 1;
+            currentRow = endRow + 1;
+            return {
+                ...config,
+                startRow,
+                endRow
+            };
+        });
+    };
+
+    // Calculate all row ranges once for display
+    const calculatedConfigs = calculateRowRanges(cabinConfigs);
+
+    // Handle generate with calculated configs
+    const handleGenerate = () => {
+        onGenerate(calculatedConfigs);
+    };
 
     // Preset layouts for quick configuration
     const PRESET_LAYOUTS = [
@@ -28,8 +53,7 @@ const AutoGenerateModal = ({
             id: newId,
             cabinName: 'Economy Class',
             maHangVe: '',
-            startRow: cabinConfigs[cabinConfigs.length - 1].endRow + 1,
-            endRow: cabinConfigs[cabinConfigs.length - 1].endRow + 10,
+            numberOfRows: 10,
             columnsLeft: ['A', 'B', 'C'],
             columnsMiddle: [],
             columnsRight: ['D', 'E', 'F'],
@@ -97,12 +121,11 @@ const AutoGenerateModal = ({
             id: index + 1,
             cabinName: cabin.name,
             maHangVe: '',
-            startRow: cabin.startRow,
-            endRow: cabin.endRow,
+            numberOfRows: cabin.endRow - cabin.startRow + 1,
             columnsLeft: cabin.columnsLeft,
             columnsRight: cabin.columnsRight,
             columnsMiddle: cabin.columnsMiddle || [],
-            exitRows: template.exitRows.filter(row => row >= cabin.startRow && row <= cabin.endRow),
+            exitRows: [],
             backgroundColor: cabin.backgroundColor
         }));
 
@@ -142,8 +165,7 @@ const AutoGenerateModal = ({
             id: 1,
             cabinName: 'Cabin Tùy Chỉnh',
             maHangVe: '',
-            startRow: 1,
-            endRow: 10,
+            numberOfRows: 10,
             columnsLeft: ['A', 'B', 'C'],
             columnsMiddle: ['D', 'E', 'F'],
             columnsRight: ['G', 'H', 'K'],
@@ -226,7 +248,8 @@ const AutoGenerateModal = ({
                         <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                             <p className="font-bold text-blue-900 mb-2">💡 Hướng dẫn tùy biến:</p>
                             <ul className="text-sm text-blue-800 space-y-1">
-                                <li>• Nhập số hàng bắt đầu và kết thúc cho mỗi cabin</li>
+                                <li>• Nhập số lượng hàng cho mỗi cabin (hệ thống tự động tính hàng bắt đầu/kết thúc)</li>
+                                <li>• Các cabin sẽ được sắp xếp liên tiếp không bị chồng lấn</li>
                                 <li>• Nhập các cột phân cách bằng dấu phẩy (ví dụ: A, B, C hoặc A,B,C)</li>
                                 <li>• Cột trái và cột phải sẽ tạo lối đi ở giữa</li>
                                 <li>• Chọn hạng vé tương ứng cho mỗi cabin</li>
@@ -274,26 +297,22 @@ const AutoGenerateModal = ({
                                     </select>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <label className="block text-xs font-bold text-gray-600 mb-1">Hàng bắt đầu</label>
-                                        <input
-                                            type="number"
-                                            value={config.startRow}
-                                            onChange={(e) => updateCabinConfig(config.id, 'startRow', parseInt(e.target.value))}
-                                            className="w-full px-3 py-2 border rounded-lg text-sm"
-                                            min="1"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-bold text-gray-600 mb-1">Hàng kết thúc</label>
-                                        <input
-                                            type="number"
-                                            value={config.endRow}
-                                            onChange={(e) => updateCabinConfig(config.id, 'endRow', parseInt(e.target.value))}
-                                            className="w-full px-3 py-2 border rounded-lg text-sm"
-                                            min={config.startRow}
-                                        />
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-600 mb-1">Số lượng hàng</label>
+                                    <input
+                                        type="number"
+                                        value={config.numberOfRows || 10}
+                                        onChange={(e) => updateCabinConfig(config.id, 'numberOfRows', parseInt(e.target.value) || 1)}
+                                        className="w-full px-3 py-2 border rounded-lg text-sm"
+                                        min="1"
+                                    />
+                                </div>
+
+                                <div className="col-span-2 md:col-span-3">
+                                    <div className="bg-indigo-50 px-3 py-2 rounded-lg border border-indigo-200">
+                                        <span className="text-xs font-bold text-indigo-700">
+                                            📍 Hàng: {calculatedConfigs.find(c => c.id === config.id)?.startRow ?? 1} - {calculatedConfigs.find(c => c.id === config.id)?.endRow ?? 10}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -467,10 +486,10 @@ const AutoGenerateModal = ({
                         Hủy
                     </button>
                     <button
-                        onClick={onGenerate}
+                        onClick={handleGenerate}
                         className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
                     >
-                        Tạo {cabinConfigs.reduce((sum, c) => {
+                        Tạo {calculatedConfigs.reduce((sum, c) => {
                             const totalCols = (c.columnsLeft?.length || 0) + (c.columnsMiddle?.length || 0) + (c.columnsRight?.length || 0);
                             return sum + (c.endRow - c.startRow + 1) * totalCols;
                         }, 0)} ghế

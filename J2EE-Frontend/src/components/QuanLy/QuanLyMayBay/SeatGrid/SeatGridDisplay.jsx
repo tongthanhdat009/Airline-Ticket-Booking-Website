@@ -8,7 +8,10 @@ const SeatGridDisplay = ({
     maxRow,
     selectedSeats,
     onSeatClick,
-    onSeatRightClick
+    onSeatRightClick,
+    selectedRows = [],
+    onToggleRow = null,
+    onToggleRows = null,
     // zoomLevel is now handled by parent component
 }) => {
     const [selectedCabin, setSelectedCabin] = useState('all');
@@ -256,6 +259,29 @@ const SeatGridDisplay = ({
                                                 </span>
                                             </div>
                                         </div>
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={(() => {
+                                                    const rowsInCabin = Array.from({ length: cabin.endRow - cabin.startRow + 1 }, (_, i) => cabin.startRow + i);
+                                                    return rowsInCabin.length > 0 && rowsInCabin.every(r => selectedRows.includes(r));
+                                                })()}
+                                                onChange={() => {
+                                                    // Toggle all rows in this cabin
+                                                    const rowsInCabin = Array.from({ length: cabin.endRow - cabin.startRow + 1 }, (_, i) => cabin.startRow + i);
+                                                    const allSelected = rowsInCabin.every(r => selectedRows.includes(r));
+                                                    // Use bulk toggle if available, otherwise fallback to individual toggles
+                                                    if (onToggleRows) {
+                                                        onToggleRows(rowsInCabin, !allSelected);
+                                                    } else {
+                                                        // Fallback: toggle each row individually
+                                                        rowsInCabin.forEach(r => onToggleRow?.(r));
+                                                    }
+                                                }}
+                                                className="w-5 h-5 text-white rounded focus:ring-2 focus:ring-white/30 cursor-pointer"
+                                                title="Chọn tất cả hàng trong cabin này"
+                                            />
+                                        </label>
                                     </div>
                                 </div>
 
@@ -269,6 +295,7 @@ const SeatGridDisplay = ({
                                                         ROW
                                                     </div>
                                                 </th>
+                                                <th className="px-2 py-2 w-6"></th>
                                                 {cabin.columns.map((col, idx) => (
                                                     <React.Fragment key={col}>
                                                         <th className="px-1 py-2">
@@ -287,7 +314,18 @@ const SeatGridDisplay = ({
                                                 const isExitRow = COMMON_EXIT_ROWS.includes(row);
 
                                                 return (
-                                                    <tr key={row} className={`${isExitRow ? 'bg-blue-50/50' : ''} hover:bg-gray-100/70 transition-colors duration-150`}>
+                                                    <tr key={row} className={`${isExitRow ? 'bg-blue-50/50' : ''} hover:bg-gray-100/70 transition-colors duration-150}`}>
+                                                        <td className="px-2 py-1.5 w-6">
+                                                            <label className="flex items-center justify-center">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={selectedRows.includes(row)}
+                                                                    onChange={() => onToggleRow?.(row)}
+                                                                    className="w-4 h-4 text-slate-600 rounded focus:ring-2 focus:ring-slate-300 cursor-pointer"
+                                                                    title="Chọn toàn bộ hàng này"
+                                                                />
+                                                            </label>
+                                                        </td>
                                                         <td className="px-2 py-1.5">
                                                             <div className={`flex items-center justify-center w-9 h-9 rounded-lg text-xs font-semibold transition-colors ${
                                                                 isExitRow

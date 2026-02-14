@@ -5,6 +5,7 @@ import * as SoDoGheService from '../../services/SoDoGheService';
 import * as QLHangVeService from '../../services/QLHangVeService';
 import * as QLMayBayService from '../../services/QLMayBayService';
 import Toast from '../../components/common/Toast';
+import ConfirmDialog from '../../components/common/ConfirmDialog';
 
 // Import separated components
 import SeatGridDisplay from '../../components/QuanLy/QuanLyMayBay/SeatGrid/SeatGridDisplay';
@@ -29,6 +30,7 @@ const ChinhSuaSoDoGhe = () => {
 
     // UI states
     const [selectedSeats, setSelectedSeats] = useState([]);
+    const [selectedRows, setSelectedRows] = useState([]);
     const [zoomLevel, setZoomLevel] = useState(100);
     const [showAutoGenerate, setShowAutoGenerate] = useState(false);
     const [showBulkEdit, setShowBulkEdit] = useState(false);
@@ -37,6 +39,13 @@ const ChinhSuaSoDoGhe = () => {
     const [editingSeat, setEditingSeat] = useState(null);
     const [contextMenu, setContextMenu] = useState(null);
     const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
+    const [confirmDialog, setConfirmDialog] = useState({
+        isVisible: false,
+        title: '',
+        message: '',
+        type: 'warning',
+        onConfirm: null
+    });
 
     // Auto-generate multi-cabin config
     const [cabinConfigs, setCabinConfigs] = useState([DEFAULT_CABIN_CONFIG]);
@@ -46,6 +55,14 @@ const ChinhSuaSoDoGhe = () => {
         maHangVe: '',
         viTriGhe: ''
     });
+
+    // Delete by class state
+    const [deleteByClassData, setDeleteByClassData] = useState({
+        maHangVe: ''
+    });
+
+    // Delete multiple classes state
+    const [selectedClasses, setSelectedClasses] = useState([]);
 
     // Load data
     const loadData = useCallback(async () => {
@@ -90,18 +107,68 @@ const ChinhSuaSoDoGhe = () => {
         setToast({ ...toast, isVisible: false });
     };
 
+    // Helper: Show confirm dialog with promise-like callback
+    const showConfirm = (title, message, type = 'danger', onConfirm) => {
+        setConfirmDialog({
+            isVisible: true,
+            title,
+            message,
+            type,
+            onConfirm
+        });
+    };
+
+    const handleConfirmDialogClose = () => {
+        setConfirmDialog({ ...confirmDialog, isVisible: false });
+    };
+
+    const handleConfirmDialogConfirm = () => {
+        if (confirmDialog.onConfirm) {
+            confirmDialog.onConfirm();
+        }
+        handleConfirmDialogClose();
+    };
+
+    // Helper: Update selectedRows based on selectedSeats
+    const syncSelectedRowsFromSeats = useCallback((newSeats) => {
+        if (newSeats.length === 0) {
+            setSelectedRows([]);
+            return;
+        }
+
+        // Get all unique rows from selected seats
+        const rowsWithSeats = new Set(newSeats.map(s => s.hang));
+
+        // For each row, check if ALL seats in that row are selected
+        const fullySelectedRows = [];
+        rowsWithSeats.forEach(row => {
+            const rowSeats = seats.filter(s => s.hang === row);
+            const allRowSeatsSelected = rowSeats.every(rs =>
+                newSeats.some(ns => ns.maGhe === rs.maGhe)
+            );
+            if (allRowSeatsSelected) {
+                fullySelectedRows.push(row);
+            }
+        });
+
+        setSelectedRows(fullySelectedRows);
+    }, [seats]);
+
     // Seat selection handlers
     const handleSeatClick = (seat, event) => {
         event.stopPropagation();
         setContextMenu(null);
-        
+
         if (event.ctrlKey || event.metaKey) {
             // Multi-select with Ctrl/Cmd
-            setSelectedSeats(prev =>
-                prev.find(s => s.maGhe === seat.maGhe)
+            setSelectedSeats(prev => {
+                const newSelection = prev.find(s => s.maGhe === seat.maGhe)
                     ? prev.filter(s => s.maGhe !== seat.maGhe)
-                    : [...prev, seat]
-            );
+                    : [...prev, seat];
+                // Sync selectedRows with the new selection
+                syncSelectedRowsFromSeats(newSelection);
+                return newSelection;
+            });
         } else if (event.shiftKey && selectedSeats.length > 0) {
             // Range select with Shift
             const lastSelected = selectedSeats[selectedSeats.length - 1];
@@ -122,6 +189,7 @@ const ChinhSuaSoDoGhe = () => {
                 }
             }
             setSelectedSeats(newSelection);
+            syncSelectedRowsFromSeats(newSelection);
         } else {
             // Check for double-click to edit
             if (selectedSeats.length === 1 && selectedSeats[0].maGhe === seat.maGhe) {
@@ -131,6 +199,8 @@ const ChinhSuaSoDoGhe = () => {
             } else {
                 // Single select
                 setSelectedSeats([seat]);
+                // Clear selectedRows when selecting single seat
+                setSelectedRows([]);
             }
         }
     };
@@ -139,6 +209,7 @@ const ChinhSuaSoDoGhe = () => {
         event.preventDefault();
         event.stopPropagation();
         setSelectedSeats([seat]);
+        setSelectedRows([]); // Clear row selection when selecting single seat
         setContextMenu({
             x: event.clientX,
             y: event.clientY,
@@ -175,6 +246,59 @@ const ChinhSuaSoDoGhe = () => {
 
     const clearSelection = () => {
         setSelectedSeats([]);
+        setSelectedRows([]); // Also clear row selection
+    };
+
+    const handleToggleRow = (row) => {
+        setSelectedRows(prev => {
+            const wasSelected = prev.includes(row);
+            // Select/deselect all seats in this row
+            const rowSeats = seats.filter(s => s.hang === row);
+
+            if (wasSelected) {
+                // Deselecting row - remove all seats in this row
+                const seatIdsInRow = rowSeats.map(s => s.maGhe);
+                setSelectedSeats(prevSeats => prevSeats.filter(s => !seatIdsInRow.includes(s.maGhe)));
+            } else {
+                // Selecting row - add all seats in this row (avoiding duplicates)
+                const seatIdsInRow = new Set(rowSeats.map(s => s.maGhe));
+                setSelectedSeats(prevSeats => {
+                    const existingIds = new Set(prevSeats.map(s => s.maGhe));
+                    const newSeats = rowSeats.filter(s => !existingIds.has(s.maGhe));
+                    return [...prevSeats, ...newSeats];
+                });
+            }
+
+            // Return new selectedRows state
+            return wasSelected ? prev.filter(r => r !== row) : [...prev, row];
+        });
+    };
+
+    // Bulk toggle handler for selecting/deselecting multiple rows at once
+    const handleToggleRows = (rows, shouldSelect) => {
+        setSelectedRows(prev => {
+            let newRows = shouldSelect
+                ? [...new Set([...prev, ...rows])] // Add all rows (avoid duplicates)
+                : prev.filter(r => !rows.includes(r)); // Remove all rows
+
+            // Update selected seats accordingly
+            if (shouldSelect) {
+                // Select all seats in these rows
+                const allRowSeats = seats.filter(s => rows.includes(s.hang));
+                const seatIdsInRows = new Set(allRowSeats.map(s => s.maGhe));
+                setSelectedSeats(prevSeats => {
+                    const existingIds = new Set(prevSeats.map(s => s.maGhe));
+                    const newSeats = allRowSeats.filter(s => !existingIds.has(s.maGhe));
+                    return [...prevSeats, ...newSeats];
+                });
+            } else {
+                // Deselect all seats in these rows
+                const seatIdsInRows = seats.filter(s => rows.includes(s.hang)).map(s => s.maGhe);
+                setSelectedSeats(prevSeats => prevSeats.filter(s => !seatIdsInRows.includes(s.maGhe)));
+            }
+
+            return newRows;
+        });
     };
 
     // Close context menu when clicking outside
@@ -204,6 +328,7 @@ const ChinhSuaSoDoGhe = () => {
             setShowEditSeat(false);
             setEditingSeat(null);
             setSelectedSeats([]);
+            setSelectedRows([]); // Also clear row selection
             showToast('Đã cập nhật ghế thành công');
         } catch (error) {
             console.error('Lỗi khi cập nhật ghế:', error);
@@ -224,33 +349,45 @@ const ChinhSuaSoDoGhe = () => {
 
     const handleDeleteSelectedSeats = async () => {
         if (selectedSeats.length === 0) return;
-        if (!window.confirm(`Bạn có chắc chắn muốn xóa ${selectedSeats.length} ghế đã chọn?`)) return;
-
-        try {
-            for (const seat of selectedSeats) {
-                await SoDoGheService.deleteSeat(seat.maGhe);
+        showConfirm(
+            'Xóa ghế đã chọn',
+            `Bạn có chắc chắn muốn xóa ${selectedSeats.length} ghế đã chọn?`,
+            'danger',
+            async () => {
+                try {
+                    for (const seat of selectedSeats) {
+                        await SoDoGheService.deleteSeat(seat.maGhe);
+                    }
+                    await loadData();
+                    setSelectedSeats([]);
+                    setSelectedRows([]);
+                    showToast(`Đã xóa ${selectedSeats.length} ghế thành công`);
+                } catch (error) {
+                    console.error('Lỗi khi xóa ghế:', error);
+                    showToast('Có lỗi xảy ra khi xóa ghế', 'error');
+                }
             }
-            await loadData();
-            setSelectedSeats([]);
-            showToast(`Đã xóa ${selectedSeats.length} ghế thành công`);
-        } catch (error) {
-            console.error('Lỗi khi xóa ghế:', error);
-            showToast('Có lỗi xảy ra khi xóa ghế', 'error');
-        }
+        );
     };
 
     const handleDeleteAllSeats = async () => {
-        if (!window.confirm('Bạn có chắc chắn muốn xóa TẤT CẢ ghế? Hành động này không thể hoàn tác!')) return;
-
-        try {
-            await SoDoGheService.deleteAllSeatsByAircraft(maMayBay);
-            await loadData();
-            setSelectedSeats([]);
-            showToast('Đã xóa tất cả ghế thành công');
-        } catch (error) {
-            console.error('Lỗi khi xóa tất cả ghế:', error);
-            showToast(error.response?.data?.message || 'Không thể xóa tất cả ghế', 'error');
-        }
+        showConfirm(
+            'Xóa tất cả ghế',
+            'Bạn có chắc chắn muốn xóa TẤT CẢ ghế? Hành động này không thể hoàn tác!',
+            'danger',
+            async () => {
+                try {
+                    await SoDoGheService.deleteAllSeatsByAircraft(maMayBay);
+                    await loadData();
+                    setSelectedSeats([]);
+                    setSelectedRows([]);
+                    showToast('Đã xóa tất cả ghế thành công');
+                } catch (error) {
+                    console.error('Lỗi khi xóa tất cả ghế:', error);
+                    showToast(error.response?.data?.message || 'Không thể xóa tất cả ghế', 'error');
+                }
+            }
+        );
     };
 
     const handleBulkUpdate = async () => {
@@ -265,6 +402,7 @@ const ChinhSuaSoDoGhe = () => {
             }
             await loadData();
             setSelectedSeats([]);
+            setSelectedRows([]); // Also clear row selection
             setShowBulkEdit(false);
             showToast(`Đã cập nhật ${selectedSeats.length} ghế thành công`);
         } catch (error) {
@@ -273,10 +411,82 @@ const ChinhSuaSoDoGhe = () => {
         }
     };
 
+    const handleDeleteByClass = async () => {
+        if (!deleteByClassData.maHangVe) {
+            showToast('Vui lòng chọn hạng vé cần xóa', 'error');
+            return;
+        }
+
+        const seatsToDelete = seats.filter(s => s.maHangVe === deleteByClassData.maHangVe);
+        if (seatsToDelete.length === 0) {
+            showToast('Không có ghế nào thuộc hạng vé này', 'error');
+            return;
+        }
+
+        showConfirm(
+            'Xóa ghế theo hạng vé',
+            `Bạn có chắc chắn muốn xóa ${seatsToDelete.length} ghế của hạng vé đã chọn?`,
+            'danger',
+            async () => {
+                try {
+                    for (const seat of seatsToDelete) {
+                        await SoDoGheService.deleteSeat(seat.maGhe);
+                    }
+                    await loadData();
+                    setDeleteByClassData({ maHangVe: '' });
+                    showToast(`Đã xóa ${seatsToDelete.length} ghế thành công`);
+                } catch (error) {
+                    console.error('Lỗi khi xóa ghế theo hạng vé:', error);
+                    showToast('Có lỗi xảy ra khi xóa ghế', 'error');
+                }
+            }
+        );
+    };
+
+    const handleToggleClass = (maHangVe) => {
+        setSelectedClasses(prev =>
+            prev.includes(maHangVe)
+                ? prev.filter(id => id !== maHangVe)
+                : [...prev, maHangVe]
+        );
+    };
+
+    const handleDeleteSelectedClasses = async () => {
+        if (selectedClasses.length === 0) {
+            showToast('Vui lòng chọn ít nhất một hạng vé', 'error');
+            return;
+        }
+
+        const seatsToDelete = seats.filter(s => selectedClasses.includes(s.maHangVe));
+        if (seatsToDelete.length === 0) {
+            showToast('Không có ghế nào thuộc các hạng vé đã chọn', 'error');
+            return;
+        }
+
+        showConfirm(
+            'Xóa ghế theo hạng vé',
+            `Bạn có chắc chắn muốn xóa ${seatsToDelete.length} ghế của ${selectedClasses.length} hạng vé đã chọn?`,
+            'danger',
+            async () => {
+                try {
+                    for (const seat of seatsToDelete) {
+                        await SoDoGheService.deleteSeat(seat.maGhe);
+                    }
+                    await loadData();
+                    setSelectedClasses([]);
+                    showToast(`Đã xóa ${seatsToDelete.length} ghế thành công`);
+                } catch (error) {
+                    console.error('Lỗi khi xóa ghế theo hạng vé:', error);
+                    showToast('Có lỗi xảy ra khi xóa ghế', 'error');
+                }
+            }
+        );
+    };
+
     // Auto-generate handlers
-    const handleAutoGenerate = async () => {
+    const handleAutoGenerate = async (calculatedConfigs) => {
         try {
-            const validConfigs = cabinConfigs.filter(c => c.maHangVe);
+            const validConfigs = (calculatedConfigs || cabinConfigs).filter(c => c.maHangVe);
             if (validConfigs.length === 0) {
                 showToast('Vui lòng chọn hạng vé cho ít nhất một cabin', 'error');
                 return;
@@ -414,8 +624,11 @@ const ChinhSuaSoDoGhe = () => {
                                         seats={seats}
                                         maxRow={seats.length > 0 ? Math.max(...seats.map(s => s.hang)) : 0}
                                         selectedSeats={selectedSeats}
+                                        selectedRows={selectedRows}
                                         onSeatClick={handleSeatClick}
                                         onSeatRightClick={handleSeatRightClick}
+                                        onToggleRow={handleToggleRow}
+                                        onToggleRows={handleToggleRows}
                                     />
                                 </div>
                             </div>
@@ -545,6 +758,7 @@ const ChinhSuaSoDoGhe = () => {
                     hangVeList={hangVeList}
                     onGenerate={handleAutoGenerate}
                     onClose={() => setShowAutoGenerate(false)}
+                    currentMaxRow={seats.length > 0 ? Math.max(...seats.map(s => s.hang)) : 0}
                 />
             )}
             {/* Edit Seat Modal */}
@@ -565,6 +779,7 @@ const ChinhSuaSoDoGhe = () => {
                 <AddSeatModal
                     initialData={editingSeat}
                     seats={seats}
+                    aircraft={aircraft}
                     onSave={handleAddSeat}
                     onClose={() => {
                         setShowAddSeat(false);
@@ -594,6 +809,16 @@ const ChinhSuaSoDoGhe = () => {
                     onClose={() => setShowBulkEdit(false)}
                 />
             )}
+
+            {/* Confirm Dialog */}
+            <ConfirmDialog
+                isVisible={confirmDialog.isVisible}
+                title={confirmDialog.title}
+                message={confirmDialog.message}
+                type={confirmDialog.type}
+                onConfirm={handleConfirmDialogConfirm}
+                onCancel={handleConfirmDialogClose}
+            />
         </div>
     );
 };
