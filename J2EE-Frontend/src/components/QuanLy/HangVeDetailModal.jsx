@@ -1,22 +1,24 @@
 import React from 'react';
 import { FaTicketAlt, FaTimes, FaEye, FaCheckCircle } from 'react-icons/fa';
 import { AiFillCloseCircle } from 'react-icons/ai';
+import { twToCss, twGradientToCss } from '../../utils/tailwindColorUtils';
 
 /**
- * FlightCard Preview cho Detail Modal
+ * FlightCard Preview cho Detail Modal (dùng inline style)
  */
 const DetailFlightCardPreview = ({ hangVe }) => {
-    const config = {
-        bgColor: hangVe.mauNen || 'bg-sky-50',
-        borderColor: hangVe.mauVien || 'border-sky-200',
-        textColor: hangVe.mauChu || 'text-sky-700',
-        headerBg: hangVe.mauHeader || 'bg-gradient-to-r from-sky-500 to-blue-500',
-        iconColor: hangVe.mauIcon || 'text-sky-500',
-        ringColor: hangVe.mauRing || 'ring-sky-400',
-        badgeBg: hangVe.mauBadge || 'bg-sky-100',
-        tier: hangVe.hangBac || 'basic',
-    };
-    const isPremium = config.tier === 'premium';
+    const bgColor = twToCss(hangVe.mauNen) || 'rgb(240,249,255)';
+    const borderColor = twToCss(hangVe.mauVien) || 'rgb(186,230,253)';
+    const textColor = twToCss(hangVe.mauChu) || 'rgb(3,105,161)';
+    const gradient = twGradientToCss(hangVe.mauHeader);
+    const iconColor = twToCss(hangVe.mauIcon) || 'rgb(14,165,233)';
+    const ringColor = twToCss(hangVe.mauRing) || 'rgb(56,189,248)';
+    const badgeBg = twToCss(hangVe.mauBadge) || 'rgb(224,242,254)';
+    const isPremium = (hangVe.hangBac || 'basic') === 'premium';
+
+    const headerBg = (gradient.from && gradient.to)
+        ? `linear-gradient(to right, ${gradient.from}, ${gradient.to})`
+        : 'linear-gradient(to right, rgb(14,165,233), rgb(59,130,246))';
 
     const parseBenefits = (moTa) => {
         if (!moTa) return [];
@@ -36,20 +38,25 @@ const DetailFlightCardPreview = ({ hangVe }) => {
             </div>
             <div className="p-3">
                 {/* Selected state */}
-                <div className={`flex rounded-lg overflow-hidden ring-4 ring-offset-2 ${config.ringColor} shadow-xl ${config.bgColor} border ${config.borderColor}`}>
-                    <div className={`w-[35%] p-3 flex flex-col justify-center border-r ${config.borderColor} bg-white/80 shadow-inner`}>
-                        <div className={`${config.headerBg} -mx-3 -mt-3 px-3 py-2 mb-2 shadow-md`}>
+                <div className="flex rounded-lg overflow-hidden shadow-xl border"
+                    style={{ backgroundColor: bgColor, borderColor: borderColor, outline: `4px solid ${ringColor}`, outlineOffset: '2px' }}>
+                    <div className="w-[35%] p-3 flex flex-col justify-center border-r bg-white/80 shadow-inner"
+                        style={{ borderColor: borderColor }}>
+                        <div className="-mx-3 -mt-3 px-3 py-2 mb-2 shadow-md"
+                            style={{ background: headerBg }}>
                             <div className="flex items-center justify-center gap-2">
                                 {isPremium && <span className="text-yellow-200 text-xs">★</span>}
                                 <div className="text-white font-semibold text-sm truncate">{hangVe.tenHangVe}</div>
                             </div>
                         </div>
-                        <div className={`text-lg font-bold ${config.textColor} underline decoration-2 underline-offset-4`}>
+                        <div className="text-lg font-bold underline decoration-2 underline-offset-4"
+                            style={{ color: textColor }}>
                             1,500,000
                             <span className="text-xs font-normal text-gray-500"> VND</span>
                         </div>
                         {isPremium && (
-                            <div className={`mt-1 inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${config.badgeBg} ${config.textColor} w-fit`}>
+                            <div className="mt-1 inline-block text-xs font-semibold px-2 py-0.5 rounded-full w-fit"
+                                style={{ backgroundColor: badgeBg, color: textColor }}>
                                 Cao cấp
                             </div>
                         )}
@@ -61,7 +68,7 @@ const DetailFlightCardPreview = ({ hangVe }) => {
                                 {benefits.slice(0, 6).map((benefit, idx) => (
                                     <div key={idx} className="flex items-center gap-1">
                                         {benefit.included ? (
-                                            <FaCheckCircle className={`w-3.5 h-3.5 ${config.iconColor} flex-shrink-0`} />
+                                            <FaCheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: iconColor }} />
                                         ) : (
                                             <AiFillCloseCircle className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
                                         )}
@@ -198,22 +205,30 @@ const HangVeDetailModal = ({ isOpen, onClose, hangVe }) => {
                                 </label>
                                 <div className="bg-gray-50 rounded-xl p-3 border border-gray-200 space-y-2 text-sm">
                                     {[
-                                        { label: 'Màu nền', value: hangVe.mauNen },
-                                        { label: 'Màu viền', value: hangVe.mauVien },
-                                        { label: 'Màu chữ', value: hangVe.mauChu },
-                                        { label: 'Header', value: hangVe.mauHeader },
-                                        { label: 'Màu icon', value: hangVe.mauIcon },
-                                        { label: 'Màu ring', value: hangVe.mauRing },
-                                        { label: 'Màu badge', value: hangVe.mauBadge },
-                                    ].map((item, idx) => (
-                                        <div key={idx} className="flex items-center justify-between">
-                                            <span className="text-gray-500">{item.label}:</span>
-                                            <div className="flex items-center gap-2">
-                                                <code className="text-xs bg-white px-2 py-0.5 rounded border border-gray-200 text-gray-700">{item.value || '—'}</code>
-                                                <div className={`w-5 h-5 rounded border border-gray-300 ${item.value || ''}`}></div>
+                                        { label: 'Màu nền', value: hangVe.mauNen, type: 'single' },
+                                        { label: 'Màu viền', value: hangVe.mauVien, type: 'single' },
+                                        { label: 'Màu chữ', value: hangVe.mauChu, type: 'single' },
+                                        { label: 'Màu icon', value: hangVe.mauIcon, type: 'single' },
+                                        { label: 'Màu ring', value: hangVe.mauRing, type: 'single' },
+                                        { label: 'Màu badge', value: hangVe.mauBadge, type: 'single' },
+                                        { label: 'Header', value: hangVe.mauHeader, type: 'gradient' },
+                                    ].map((item, idx) => {
+                                        const cssColor = item.type === 'single' ? twToCss(item.value) : null;
+                                        const gradient = item.type === 'gradient' ? twGradientToCss(item.value) : null;
+                                        return (
+                                            <div key={idx} className="flex items-center justify-between">
+                                                <span className="text-gray-500">{item.label}:</span>
+                                                <div className="flex items-center gap-2">
+                                                    {cssColor && (
+                                                        <div className="w-5 h-5 rounded border border-gray-300" style={{ backgroundColor: cssColor }}></div>
+                                                    )}
+                                                    {gradient && gradient.from && gradient.to && (
+                                                        <div className="w-12 h-5 rounded border border-gray-300" style={{ background: `linear-gradient(to right, ${gradient.from}, ${gradient.to})` }}></div>
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>

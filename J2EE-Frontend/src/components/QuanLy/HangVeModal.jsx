@@ -1,66 +1,74 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FaTicketAlt, FaPalette, FaEye, FaCheckCircle, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { FaTicketAlt, FaPalette, FaEye, FaCheckCircle } from 'react-icons/fa';
 import { AiFillCloseCircle } from 'react-icons/ai';
 import { message } from 'antd';
+import { twToHex, hexToTw, twGradientToHex, hexToTwGradient, twToCss, twGradientToCss } from '../../utils/tailwindColorUtils';
 
 
-// Các preset màu sắc để admin chọn nhanh
+// Các preset màu sắc (Tailwind arbitrary value syntax)
 const COLOR_PRESETS = [
     {
-        name: 'Sky Blue (Economy)',
-        mauNen: 'bg-sky-50', mauVien: 'border-sky-200', mauChu: 'text-sky-700',
-        mauHeader: 'bg-gradient-to-r from-sky-500 to-blue-500',
-        mauIcon: 'text-sky-500', mauRing: 'ring-sky-400', mauBadge: 'bg-sky-100', hangBac: 'basic',
+        name: 'Sky Blue',
+        preview: '#0ea5e9',
+        mauNen: 'bg-[rgb(240,249,255)]', mauVien: 'border-[rgb(186,230,253)]', mauChu: 'text-[rgb(3,105,161)]',
+        mauHeader: 'bg-gradient-to-r from-[rgb(14,165,233)] to-[rgb(59,130,246)]',
+        mauIcon: 'text-[rgb(14,165,233)]', mauRing: 'ring-[rgb(56,189,248)]', mauBadge: 'bg-[rgb(224,242,254)]', hangBac: 'basic',
     },
     {
-        name: 'Emerald (Saver)',
-        mauNen: 'bg-emerald-50', mauVien: 'border-emerald-200', mauChu: 'text-emerald-700',
-        mauHeader: 'bg-gradient-to-r from-emerald-500 to-teal-500',
-        mauIcon: 'text-emerald-500', mauRing: 'ring-emerald-400', mauBadge: 'bg-emerald-100', hangBac: 'basic',
+        name: 'Emerald',
+        preview: '#10b981',
+        mauNen: 'bg-[rgb(236,253,245)]', mauVien: 'border-[rgb(167,243,208)]', mauChu: 'text-[rgb(4,120,87)]',
+        mauHeader: 'bg-gradient-to-r from-[rgb(16,185,129)] to-[rgb(20,184,166)]',
+        mauIcon: 'text-[rgb(16,185,129)]', mauRing: 'ring-[rgb(52,211,153)]', mauBadge: 'bg-[rgb(209,250,229)]', hangBac: 'basic',
     },
     {
-        name: 'Orange (Deluxe)',
-        mauNen: 'bg-orange-50', mauVien: 'border-orange-200', mauChu: 'text-orange-700',
-        mauHeader: 'bg-gradient-to-r from-orange-500 to-amber-500',
-        mauIcon: 'text-orange-500', mauRing: 'ring-orange-400', mauBadge: 'bg-orange-100', hangBac: 'mid',
+        name: 'Orange',
+        preview: '#f97316',
+        mauNen: 'bg-[rgb(255,247,237)]', mauVien: 'border-[rgb(254,215,170)]', mauChu: 'text-[rgb(194,65,12)]',
+        mauHeader: 'bg-gradient-to-r from-[rgb(249,115,22)] to-[rgb(245,158,11)]',
+        mauIcon: 'text-[rgb(249,115,22)]', mauRing: 'ring-[rgb(251,146,60)]', mauBadge: 'bg-[rgb(255,237,213)]', hangBac: 'mid',
     },
     {
-        name: 'Purple (Business)',
-        mauNen: 'bg-purple-50', mauVien: 'border-purple-300', mauChu: 'text-purple-700',
-        mauHeader: 'bg-gradient-to-r from-purple-600 to-indigo-600',
-        mauIcon: 'text-purple-500', mauRing: 'ring-purple-400', mauBadge: 'bg-purple-100', hangBac: 'premium',
+        name: 'Purple',
+        preview: '#9333ea',
+        mauNen: 'bg-[rgb(250,245,255)]', mauVien: 'border-[rgb(216,180,254)]', mauChu: 'text-[rgb(126,34,206)]',
+        mauHeader: 'bg-gradient-to-r from-[rgb(147,51,234)] to-[rgb(79,70,229)]',
+        mauIcon: 'text-[rgb(168,85,247)]', mauRing: 'ring-[rgb(192,132,252)]', mauBadge: 'bg-[rgb(243,232,255)]', hangBac: 'premium',
     },
     {
-        name: 'Amber/Gold (First Class)',
-        mauNen: 'bg-amber-50', mauVien: 'border-amber-300', mauChu: 'text-amber-700',
-        mauHeader: 'bg-gradient-to-r from-amber-500 to-yellow-500',
-        mauIcon: 'text-amber-500', mauRing: 'ring-amber-400', mauBadge: 'bg-amber-100', hangBac: 'premium',
+        name: 'Amber',
+        preview: '#f59e0b',
+        mauNen: 'bg-[rgb(255,251,235)]', mauVien: 'border-[rgb(252,211,77)]', mauChu: 'text-[rgb(180,83,9)]',
+        mauHeader: 'bg-gradient-to-r from-[rgb(245,158,11)] to-[rgb(234,179,8)]',
+        mauIcon: 'text-[rgb(245,158,11)]', mauRing: 'ring-[rgb(251,191,36)]', mauBadge: 'bg-[rgb(254,243,199)]', hangBac: 'premium',
     },
     {
-        name: 'Rose (VIP)',
-        mauNen: 'bg-rose-50', mauVien: 'border-rose-300', mauChu: 'text-rose-700',
-        mauHeader: 'bg-gradient-to-r from-rose-500 to-pink-500',
-        mauIcon: 'text-rose-500', mauRing: 'ring-rose-400', mauBadge: 'bg-rose-100', hangBac: 'premium',
+        name: 'Rose',
+        preview: '#f43f5e',
+        mauNen: 'bg-[rgb(255,241,242)]', mauVien: 'border-[rgb(253,164,175)]', mauChu: 'text-[rgb(190,18,60)]',
+        mauHeader: 'bg-gradient-to-r from-[rgb(244,63,94)] to-[rgb(236,72,153)]',
+        mauIcon: 'text-[rgb(244,63,94)]', mauRing: 'ring-[rgb(251,113,133)]', mauBadge: 'bg-[rgb(255,228,230)]', hangBac: 'premium',
     },
 ];
 
 const DEFAULT_COLORS = COLOR_PRESETS[0];
 
 /**
- * FlightCard Preview - Hiển thị preview hạng vé trong FlightCard
+ * FlightCard Preview - Hiển thị preview hạng vé trong FlightCard (dùng inline style)
  */
 const FlightCardPreview = ({ formData }) => {
-    const config = {
-        bgColor: formData.mauNen || DEFAULT_COLORS.mauNen,
-        borderColor: formData.mauVien || DEFAULT_COLORS.mauVien,
-        textColor: formData.mauChu || DEFAULT_COLORS.mauChu,
-        headerBg: formData.mauHeader || DEFAULT_COLORS.mauHeader,
-        iconColor: formData.mauIcon || DEFAULT_COLORS.mauIcon,
-        ringColor: formData.mauRing || DEFAULT_COLORS.mauRing,
-        badgeBg: formData.mauBadge || DEFAULT_COLORS.mauBadge,
-        tier: formData.hangBac || 'basic',
-    };
-    const isPremium = config.tier === 'premium';
+    const bgColor = twToCss(formData.mauNen || DEFAULT_COLORS.mauNen);
+    const borderColor = twToCss(formData.mauVien || DEFAULT_COLORS.mauVien);
+    const textColor = twToCss(formData.mauChu || DEFAULT_COLORS.mauChu);
+    const gradient = twGradientToCss(formData.mauHeader || DEFAULT_COLORS.mauHeader);
+    const iconColor = twToCss(formData.mauIcon || DEFAULT_COLORS.mauIcon);
+    const ringColor = twToCss(formData.mauRing || DEFAULT_COLORS.mauRing);
+    const badgeBg = twToCss(formData.mauBadge || DEFAULT_COLORS.mauBadge);
+    const isPremium = (formData.hangBac || 'basic') === 'premium';
+
+    const headerBg = (gradient.from && gradient.to)
+        ? `linear-gradient(to right, ${gradient.from}, ${gradient.to})`
+        : 'linear-gradient(to right, rgb(14,165,233), rgb(59,130,246))';
 
     const parseBenefits = (moTa) => {
         if (!moTa) return [];
@@ -80,9 +88,12 @@ const FlightCardPreview = ({ formData }) => {
             </div>
             <div className="p-3">
                 {/* Selected state */}
-                <div className={`flex rounded-lg overflow-hidden ring-4 ring-offset-2 ${config.ringColor} shadow-xl ${config.bgColor} border ${config.borderColor}`}>
-                    <div className={`w-[35%] p-3 flex flex-col justify-center border-r ${config.borderColor} bg-white/80 shadow-inner`}>
-                        <div className={`${config.headerBg} -mx-3 -mt-3 px-3 py-2 mb-2 shadow-md`}>
+                <div className="flex rounded-lg overflow-hidden shadow-xl border"
+                    style={{ backgroundColor: bgColor, borderColor: borderColor, outline: `4px solid ${ringColor}`, outlineOffset: '2px' }}>
+                    <div className="w-[35%] p-3 flex flex-col justify-center border-r bg-white/80 shadow-inner"
+                        style={{ borderColor: borderColor }}>
+                        <div className="-mx-3 -mt-3 px-3 py-2 mb-2 shadow-md"
+                            style={{ background: headerBg }}>
                             <div className="flex items-center justify-center gap-2">
                                 {isPremium && <span className="text-yellow-200 text-xs">★</span>}
                                 <div className="text-white font-semibold text-sm truncate">
@@ -90,12 +101,14 @@ const FlightCardPreview = ({ formData }) => {
                                 </div>
                             </div>
                         </div>
-                        <div className={`text-lg font-bold ${config.textColor} underline decoration-2 underline-offset-4`}>
+                        <div className="text-lg font-bold underline decoration-2 underline-offset-4"
+                            style={{ color: textColor }}>
                             1,500,000
                             <span className="text-xs font-normal text-gray-500"> VND</span>
                         </div>
                         {isPremium && (
-                            <div className={`mt-1 inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${config.badgeBg} ${config.textColor} w-fit`}>
+                            <div className="mt-1 inline-block text-xs font-semibold px-2 py-0.5 rounded-full w-fit"
+                                style={{ backgroundColor: badgeBg, color: textColor }}>
                                 Cao cấp
                             </div>
                         )}
@@ -107,7 +120,7 @@ const FlightCardPreview = ({ formData }) => {
                                 {benefits.slice(0, 6).map((benefit, idx) => (
                                     <div key={idx} className="flex items-center gap-1">
                                         {benefit.included ? (
-                                            <FaCheckCircle className={`w-3.5 h-3.5 ${config.iconColor} flex-shrink-0`} />
+                                            <FaCheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: iconColor }} />
                                         ) : (
                                             <AiFillCloseCircle className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
                                         )}
@@ -126,9 +139,12 @@ const FlightCardPreview = ({ formData }) => {
                 {/* Unselected state */}
                 <div className="mt-3">
                     <div className="text-xs text-gray-400 mb-1">Trạng thái chưa chọn:</div>
-                    <div className={`flex rounded-lg overflow-hidden bg-gray-50 hover:bg-gray-100 border border-transparent ${isPremium ? `border-l-4 ${config.borderColor}` : ''}`}>
-                        <div className={`w-[35%] p-2 flex flex-col justify-center border-r ${config.borderColor}`}>
-                            <div className={`${config.headerBg} -mx-2 -mt-2 px-2 py-1.5 mb-1.5`}>
+                    <div className={`flex rounded-lg overflow-hidden bg-gray-50 hover:bg-gray-100 border border-transparent ${isPremium ? 'border-l-4' : ''}`}
+                        style={isPremium ? { borderLeftColor: borderColor } : undefined}>
+                        <div className="w-[35%] p-2 flex flex-col justify-center border-r"
+                            style={{ borderColor: borderColor }}>
+                            <div className="-mx-2 -mt-2 px-2 py-1.5 mb-1.5"
+                                style={{ background: headerBg }}>
                                 <div className="flex items-center justify-center gap-1">
                                     {isPremium && <span className="text-yellow-200 text-xs">★</span>}
                                     <div className="text-white font-semibold text-xs truncate">
@@ -136,7 +152,7 @@ const FlightCardPreview = ({ formData }) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className={`text-sm font-bold ${config.textColor}`}>
+                            <div className="text-sm font-bold" style={{ color: textColor }}>
                                 1,500,000
                                 <span className="text-xs font-normal text-gray-500"> VND</span>
                             </div>
@@ -148,7 +164,7 @@ const FlightCardPreview = ({ formData }) => {
                                     {benefits.slice(0, 4).map((benefit, idx) => (
                                         <div key={idx} className="flex items-center gap-1">
                                             {benefit.included ? (
-                                                <FaCheckCircle className={`w-3 h-3 ${config.iconColor} flex-shrink-0`} />
+                                                <FaCheckCircle className="w-3 h-3 flex-shrink-0" style={{ color: iconColor }} />
                                             ) : (
                                                 <AiFillCloseCircle className="w-3 h-3 text-gray-400 flex-shrink-0" />
                                             )}
@@ -168,27 +184,53 @@ const FlightCardPreview = ({ formData }) => {
 };
 
 /**
- * Color Field Input - Compact input hiển thị Tailwind class
+ * Color Picker Field - Chọn màu bằng color picker, lưu dạng Tailwind arbitrary value
+ * Ví dụ: prefix="bg" → bg-[rgb(240,249,255)]
  */
-const ColorField = ({ label, name, value, onChange, placeholder, disabled }) => (
-    <div>
-        <label className="block text-[11px] font-semibold text-gray-500 mb-0.5 truncate">{label}</label>
-        <div className="flex items-center gap-1.5">
-            <input
-                type="text"
-                name={name}
-                value={value || ''}
-                onChange={onChange}
-                disabled={disabled}
-                placeholder={placeholder}
-                className={`flex-1 min-w-0 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-transparent transition-all ${
-                    disabled ? 'bg-gray-100 cursor-not-allowed' : ''
-                }`}
-            />
-            <div className={`w-6 h-6 rounded border border-gray-300 ${value || ''} flex-shrink-0`}></div>
+const ColorPickerField = ({ label, name, value, onChange, prefix, disabled }) => {
+    const hexValue = twToHex(value);
+    const cssColor = twToCss(value);
+    const handleColorChange = (e) => {
+        onChange({ target: { name, value: hexToTw(e.target.value, prefix) } });
+    };
+    return (
+        <div className="flex items-center gap-2">
+            <input type="color" value={hexValue} onChange={handleColorChange} disabled={disabled}
+                className="w-8 h-8 rounded-lg cursor-pointer border border-gray-200 p-0.5 bg-white shrink-0" />
+            <div className="min-w-0">
+                <span className="text-xs font-medium text-gray-600 block">{label}</span>
+                {cssColor && <span className="text-[10px] text-gray-400 block truncate">{cssColor}</span>}
+            </div>
         </div>
-    </div>
-);
+    );
+};
+
+/**
+ * Gradient Picker Field - Chọn 2 màu cho gradient header
+ * Lưu dạng: bg-gradient-to-r from-[rgb(r,g,b)] to-[rgb(r,g,b)]
+ */
+const GradientPickerField = ({ label, name, value, onChange, disabled }) => {
+    const { from, to } = twGradientToHex(value);
+    const handleChange = (type, hex) => {
+        const c = twGradientToHex(value);
+        const newFrom = type === 'from' ? hex : c.from;
+        const newTo = type === 'to' ? hex : c.to;
+        onChange({ target: { name, value: hexToTwGradient(newFrom, newTo) } });
+    };
+    return (
+        <div>
+            <span className="text-xs font-medium text-gray-600 mb-1.5 block">{label}</span>
+            <div className="flex items-center gap-2">
+                <input type="color" value={from} onChange={e => handleChange('from', e.target.value)} disabled={disabled}
+                    className="w-8 h-8 rounded-lg cursor-pointer border border-gray-200 p-0.5 bg-white shrink-0" />
+                <div className="flex-1 h-7 rounded-md border border-gray-200"
+                    style={{ background: `linear-gradient(to right, ${from}, ${to})` }}></div>
+                <input type="color" value={to} onChange={e => handleChange('to', e.target.value)} disabled={disabled}
+                    className="w-8 h-8 rounded-lg cursor-pointer border border-gray-200 p-0.5 bg-white shrink-0" />
+            </div>
+        </div>
+    );
+};
 
 /**
  * Modal Component để thêm/cập nhật hạng vé
@@ -210,7 +252,6 @@ const HangVeModal = ({ isOpen, onClose, onSave, isEditMode, hangVe }) => {
     const [errors, setErrors] = useState({});
     const [submitting, setSubmitting] = useState(false);
     const [activeTab, setActiveTab] = useState('info');
-    const [showDetailColors, setShowDetailColors] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -243,7 +284,6 @@ const HangVeModal = ({ isOpen, onClose, onSave, isEditMode, hangVe }) => {
             }
             setErrors({});
             setActiveTab('info');
-            setShowDetailColors(false);
         }
     }, [isOpen, isEditMode, hangVe]);
 
@@ -433,7 +473,7 @@ const HangVeModal = ({ isOpen, onClose, onSave, isEditMode, hangVe }) => {
                                 {/* Tab: Màu sắc */}
                                 {activeTab === 'colors' && (
                                     <div className="space-y-3">
-                                        {/* Presets - 3 cột gọn */}
+                                        {/* Presets - 3 cột */}
                                         <div>
                                             <label className="block text-xs font-bold text-gray-700 mb-1.5">Chọn nhanh bộ màu</label>
                                             <div className="grid grid-cols-3 gap-1.5">
@@ -445,14 +485,15 @@ const HangVeModal = ({ isOpen, onClose, onSave, isEditMode, hangVe }) => {
                                                         disabled={submitting}
                                                         className="flex items-center gap-1.5 px-2 py-1.5 border border-gray-200 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-all text-left disabled:opacity-50"
                                                     >
-                                                        <div className={`w-5 h-5 rounded-full ${preset.mauHeader} flex-shrink-0`}></div>
+                                                        <div className="w-5 h-5 rounded-full flex-shrink-0"
+                                                            style={{ background: preset.preview }}></div>
                                                         <span className="text-[11px] font-medium text-gray-700 truncate">{preset.name}</span>
                                                     </button>
                                                 ))}
                                             </div>
                                         </div>
 
-                                        {/* Hạng bậc - compact */}
+                                        {/* Hạng bậc */}
                                         <div>
                                             <label className="block text-xs font-bold text-gray-700 mb-1">Hạng bậc</label>
                                             <select
@@ -468,29 +509,20 @@ const HangVeModal = ({ isOpen, onClose, onSave, isEditMode, hangVe }) => {
                                             </select>
                                         </div>
 
-                                        {/* Tùy chỉnh chi tiết - collapsible, 2 cột */}
-                                        <div className="border border-gray-200 rounded-lg overflow-hidden">
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowDetailColors(!showDetailColors)}
-                                                className="w-full flex items-center justify-between px-3 py-2 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
-                                            >
-                                                <span className="text-xs font-bold text-gray-700">Tùy chỉnh chi tiết</span>
-                                                {showDetailColors ? <FaChevronUp className="text-gray-400 text-xs" /> : <FaChevronDown className="text-gray-400 text-xs" />}
-                                            </button>
-                                            {showDetailColors && (
-                                                <div className="p-3 pt-2 grid grid-cols-2 gap-x-3 gap-y-2">
-                                                    <ColorField label="Nền" name="mauNen" value={formData.mauNen} onChange={handleChange} placeholder="bg-sky-50" disabled={submitting} />
-                                                    <ColorField label="Viền" name="mauVien" value={formData.mauVien} onChange={handleChange} placeholder="border-sky-200" disabled={submitting} />
-                                                    <ColorField label="Chữ" name="mauChu" value={formData.mauChu} onChange={handleChange} placeholder="text-sky-700" disabled={submitting} />
-                                                    <ColorField label="Icon" name="mauIcon" value={formData.mauIcon} onChange={handleChange} placeholder="text-sky-500" disabled={submitting} />
-                                                    <ColorField label="Ring" name="mauRing" value={formData.mauRing} onChange={handleChange} placeholder="ring-sky-400" disabled={submitting} />
-                                                    <ColorField label="Badge" name="mauBadge" value={formData.mauBadge} onChange={handleChange} placeholder="bg-sky-100" disabled={submitting} />
-                                                    <div className="col-span-2">
-                                                        <ColorField label="Header gradient" name="mauHeader" value={formData.mauHeader} onChange={handleChange} placeholder="bg-gradient-to-r from-sky-500 to-blue-500" disabled={submitting} />
-                                                    </div>
+                                        {/* Color pickers */}
+                                        <div>
+                                            <label className="block text-xs font-bold text-gray-700 mb-2">Tùy chỉnh màu sắc</label>
+                                            <div className="bg-gray-50 rounded-lg border border-gray-200 p-3 space-y-3">
+                                                <div className="grid grid-cols-3 gap-3">
+                                                    <ColorPickerField label="Nền" name="mauNen" value={formData.mauNen} onChange={handleChange} prefix="bg" disabled={submitting} />
+                                                    <ColorPickerField label="Viền" name="mauVien" value={formData.mauVien} onChange={handleChange} prefix="border" disabled={submitting} />
+                                                    <ColorPickerField label="Chữ" name="mauChu" value={formData.mauChu} onChange={handleChange} prefix="text" disabled={submitting} />
+                                                    <ColorPickerField label="Icon" name="mauIcon" value={formData.mauIcon} onChange={handleChange} prefix="text" disabled={submitting} />
+                                                    <ColorPickerField label="Ring" name="mauRing" value={formData.mauRing} onChange={handleChange} prefix="ring" disabled={submitting} />
+                                                    <ColorPickerField label="Badge" name="mauBadge" value={formData.mauBadge} onChange={handleChange} prefix="bg" disabled={submitting} />
                                                 </div>
-                                            )}
+                                                <GradientPickerField label="Header gradient" name="mauHeader" value={formData.mauHeader} onChange={handleChange} disabled={submitting} />
+                                            </div>
                                         </div>
                                     </div>
                                 )}

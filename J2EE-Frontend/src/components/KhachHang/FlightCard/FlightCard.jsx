@@ -4,6 +4,7 @@ import { IoMdArrowDropdown, IoMdArrowDropup } from 'react-icons/io';
 import { FaCheckCircle, FaCheck } from 'react-icons/fa';
 import { AiFillCloseCircle } from 'react-icons/ai';
 import { formatTime, formatDateType, formatCurrency, calcFlightDuration } from '../../../services/utils';
+import { twToCss, twGradientToCss } from '../../../utils/tailwindColorUtils';
 
 /**
  * FlightCard - Component hiển thị thẻ chuyến bay có thể thu gọn
@@ -29,15 +30,17 @@ const FlightCard = ({
     };
 
     const getHangVeConfig = (hangVe) => {
-        // Sử dụng màu sắc từ database nếu có, fallback về mặc định
+        // Chuyển Tailwind arbitrary value → CSS color cho inline style
+        const gradient = twGradientToCss(hangVe.mauHeader);
         return {
-            bgColor: hangVe.mauNen || 'bg-sky-50',
-            borderColor: hangVe.mauVien || 'border-sky-200',
-            textColor: hangVe.mauChu || 'text-sky-700',
-            headerBg: hangVe.mauHeader || 'bg-gradient-to-r from-sky-500 to-blue-500',
-            iconColor: hangVe.mauIcon || 'text-sky-500',
-            ringColor: hangVe.mauRing || 'ring-sky-400',
-            badgeBg: hangVe.mauBadge || 'bg-sky-100',
+            bgColor: twToCss(hangVe.mauNen) || 'rgb(240,249,255)',
+            borderColor: twToCss(hangVe.mauVien) || 'rgb(186,230,253)',
+            textColor: twToCss(hangVe.mauChu) || 'rgb(3,105,161)',
+            headerFrom: gradient.from || 'rgb(14,165,233)',
+            headerTo: gradient.to || 'rgb(59,130,246)',
+            iconColor: twToCss(hangVe.mauIcon) || 'rgb(14,165,233)',
+            ringColor: twToCss(hangVe.mauRing) || 'rgb(56,189,248)',
+            badgeBg: twToCss(hangVe.mauBadge) || 'rgb(224,242,254)',
             tier: hangVe.hangBac || 'basic',
         };
     };
@@ -126,18 +129,28 @@ const FlightCard = ({
                                             key={hangVe.maHangVe}
                                             className={`flex rounded-lg overflow-hidden cursor-pointer transition-all duration-300 ${
                                                 isSelected
-                                                    ? `ring-4 ring-offset-2 ${config.ringColor} shadow-xl scale-[1.02] ${config.bgColor} border ${config.borderColor}`
-                                                    : `bg-gray-50 hover:bg-gray-100 hover:shadow-md border border-transparent`
-                                            } ${isPremium && !isSelected ? `border-l-4 ${config.borderColor}` : ''}`}
+                                                    ? 'shadow-xl scale-[1.02] border'
+                                                    : 'bg-gray-50 hover:bg-gray-100 hover:shadow-md border border-transparent'
+                                            } ${isPremium && !isSelected ? 'border-l-4' : ''}`}
+                                            style={isSelected ? {
+                                                backgroundColor: config.bgColor,
+                                                borderColor: config.borderColor,
+                                                outline: `4px solid ${config.ringColor}`,
+                                                outlineOffset: '2px',
+                                            } : isPremium ? {
+                                                borderLeftColor: config.borderColor,
+                                            } : undefined}
                                             onClick={() => handleHangVeSelect(hangVe)}
                                         >
                                             {/* 30% - Name and Price */}
-                                            <div className={`w-[30%] p-3 flex flex-col justify-center border-r ${config.borderColor} ${
+                                            <div className={`w-[30%] p-3 flex flex-col justify-center border-r ${
                                                 isSelected ? 'bg-white/80 shadow-inner' : ''
-                                            }`}>
-                                                <div className={`${config.headerBg} -mx-3 -mt-3 px-3 py-2 mb-2 relative ${
+                                            }`}
+                                                style={{ borderColor: config.borderColor }}>
+                                                <div className={`-mx-3 -mt-3 px-3 py-2 mb-2 relative ${
                                                     isSelected ? 'shadow-md' : ''
-                                                }`}>
+                                                }`}
+                                                    style={{ background: `linear-gradient(to right, ${config.headerFrom}, ${config.headerTo})` }}>
                                                     <div className="flex items-center justify-center gap-2">
                                                         {isPremium && (
                                                             <span className="text-yellow-200 text-xs">★</span>
@@ -152,7 +165,8 @@ const FlightCard = ({
                                                     </div>
                                                 </div>
                                                 {hangVe.giaVe != null && hangVe.giaVe !== '' ? (
-                                                    <div className={`text-2xl font-bold ${config.textColor} ${isSelected ? 'underline decoration-2 underline-offset-4' : ''}`}>
+                                                    <div className={`text-2xl font-bold ${isSelected ? 'underline decoration-2 underline-offset-4' : ''}`}
+                                                        style={{ color: config.textColor }}>
                                                         {formatCurrency(hangVe.giaVe)}
                                                         <span className="text-sm font-normal text-gray-500"> VND</span>
                                                     </div>
@@ -160,7 +174,8 @@ const FlightCard = ({
                                                     <div className="text-sm text-red-500">Hết chỗ</div>
                                                 )}
                                                 {isPremium && (
-                                                    <div className={`mt-1 inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${config.badgeBg} ${config.textColor}`}>
+                                                    <div className="mt-1 inline-block text-xs font-semibold px-2 py-0.5 rounded-full"
+                                                        style={{ backgroundColor: config.badgeBg, color: config.textColor }}>
                                                         Cao cấp
                                                     </div>
                                                 )}
@@ -174,7 +189,7 @@ const FlightCard = ({
                                                         {benefits.map((benefit, idx) => (
                                                             <div key={idx} className="flex items-center gap-1">
                                                                 {benefit.included ? (
-                                                                    <FaCheckCircle className={`w-4 h-4 ${config.iconColor} flex-shrink-0`} />
+                                                                    <FaCheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: config.iconColor }} />
                                                                 ) : (
                                                                     <AiFillCloseCircle className="w-4 h-4 text-gray-400 flex-shrink-0" />
                                                                 )}
