@@ -62,6 +62,15 @@ public class QuanLyHangVeController {
         try {
             HangVe hangVe = new HangVe();
             hangVe.setTenHangVe(request.getTenHangVe());
+            hangVe.setMoTa(request.getMoTa());
+            hangVe.setMauNen(request.getMauNen());
+            hangVe.setMauVien(request.getMauVien());
+            hangVe.setMauChu(request.getMauChu());
+            hangVe.setMauHeader(request.getMauHeader());
+            hangVe.setMauIcon(request.getMauIcon());
+            hangVe.setMauRing(request.getMauRing());
+            hangVe.setMauBadge(request.getMauBadge());
+            hangVe.setHangBac(request.getHangBac());
             hangVe.setDaXoa(false);
 
             HangVe createdHangVe = hangVeService.createHangVe(hangVe);
@@ -84,6 +93,15 @@ public class QuanLyHangVeController {
         try {
             HangVe hangVe = new HangVe();
             hangVe.setTenHangVe(request.getTenHangVe());
+            hangVe.setMoTa(request.getMoTa());
+            hangVe.setMauNen(request.getMauNen());
+            hangVe.setMauVien(request.getMauVien());
+            hangVe.setMauChu(request.getMauChu());
+            hangVe.setMauHeader(request.getMauHeader());
+            hangVe.setMauIcon(request.getMauIcon());
+            hangVe.setMauRing(request.getMauRing());
+            hangVe.setMauBadge(request.getMauBadge());
+            hangVe.setHangBac(request.getHangBac());
 
             HangVe updatedHangVe = hangVeService.updateHangVe(id, hangVe);
             return ResponseEntity.ok(

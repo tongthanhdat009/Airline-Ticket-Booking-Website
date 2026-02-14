@@ -23,6 +23,7 @@ const HangVeCard = memo(({
   const {
     maHangVe,
     tenHangVe,
+    moTa,
     deletedAt
   } = data;
 
@@ -77,13 +78,22 @@ const HangVeCard = memo(({
           </div>
         )}
 
-        {/* Features/info section - placeholder for potential future features */}
+        {/* Features/info section */}
         <div className="pt-2">
           <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
-            <p className="text-xs text-blue-700 font-medium mb-1">Thông tin hạng vé</p>
-            <p className="text-xs text-blue-600">
-              Mã: <span className="font-semibold">{maHangVe}</span>
-            </p>
+            <p className="text-xs text-blue-700 font-medium mb-1">Mô tả lợi ích</p>
+            {moTa ? (
+              <div className="text-xs text-blue-600 space-y-0.5">
+                {moTa.split('\n').filter(l => l.trim()).slice(0, 3).map((line, idx) => (
+                  <p key={idx} className="truncate">{line}</p>
+                ))}
+                {moTa.split('\n').filter(l => l.trim()).length > 3 && (
+                  <p className="text-blue-400 italic">...xem thêm</p>
+                )}
+              </div>
+            ) : (
+              <p className="text-xs text-blue-400 italic">Chưa có mô tả</p>
+            )}
           </div>
         </div>
       </div>
@@ -143,6 +153,7 @@ HangVeCard.propTypes = {
   data: PropTypes.shape({
     maHangVe: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     tenHangVe: PropTypes.string,
+    moTa: PropTypes.string,
     deletedAt: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
   }),
   /**

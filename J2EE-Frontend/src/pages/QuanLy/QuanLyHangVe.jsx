@@ -3,6 +3,7 @@ import { FaPlus, FaSearch, FaEdit, FaTrash, FaTicketAlt, FaRecycle, FaEyeSlash, 
 import { getAllHangVeAdmin, getAllDeleted, createHangVe, updateHangVe, deleteHangVe, restoreHangVe } from '../../services/QLHangVeService';
 import Card from '../../components/QuanLy/CardChucNang';
 import HangVeModal from '../../components/QuanLy/HangVeModal';
+import HangVeDetailModal from '../../components/QuanLy/HangVeDetailModal';
 import Toast from '../../components/common/Toast';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import ViewToggleButton from '../../components/common/ViewToggleButton';
@@ -26,6 +27,8 @@ const QuanLyHangVe = () => {
     const [confirmDialog, setConfirmDialog] = useState({ isVisible: false, onConfirm: null });
     const { viewMode, setViewMode: handleViewChange } = useViewToggle('ql-hang-ve-view', 'table');
     const [itemsPerPage, setItemsPerPage] = useState(5);
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [detailHangVe, setDetailHangVe] = useState(null);
 
     // Toast functions
     const showToast = (message, type = 'success') => {
@@ -91,6 +94,16 @@ const QuanLyHangVe = () => {
         setIsModalOpen(false);
         setCurrentHangVe(null);
         setIsEditMode(false);
+    };
+
+    const handleViewDetail = (hangVe) => {
+        setDetailHangVe(hangVe);
+        setIsDetailModalOpen(true);
+    };
+
+    const handleCloseDetailModal = () => {
+        setIsDetailModalOpen(false);
+        setDetailHangVe(null);
     };
 
     const handleSave = async (hangVeData) => {
@@ -310,7 +323,7 @@ const QuanLyHangVe = () => {
                             <HangVeCard
                                 key={hangVe.maHangVe || index}
                                 data={hangVe}
-                                onView={(data) => handleOpenModalForEdit(data)}
+                                onView={(data) => handleViewDetail(data)}
                                 onEdit={(data) => handleOpenModalForEdit(data)}
                                 onDelete={(data) => handleDelete(data.maHangVe, data.tenHangVe)}
                                 onRestore={(data) => handleRestore(data.maHangVe, data.tenHangVe)}
@@ -366,8 +379,17 @@ const QuanLyHangVe = () => {
                                                             <span>Khôi phục</span>
                                                         </button>
                                                     ) : (
-                                                        // Active view: hiện nút sửa và xóa
+                                                        // Active view: hiện nút xem, sửa và xóa
                                                         <>
+                                                            <button
+                                                                onClick={() => handleViewDetail(hv)}
+                                                                disabled={actionLoading}
+                                                                className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all bg-blue-100 text-blue-700 hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                title="Xem chi tiết hạng vé"
+                                                            >
+                                                                <FaEye />
+                                                                <span>Chi tiết</span>
+                                                            </button>
                                                             <button
                                                                 onClick={() => handleOpenModalForEdit(hv)}
                                                                 disabled={actionLoading}
@@ -418,6 +440,13 @@ const QuanLyHangVe = () => {
                 onSave={handleSave}
                 isEditMode={isEditMode}
                 hangVe={currentHangVe}
+            />
+
+            {/* Detail Modal */}
+            <HangVeDetailModal
+                isOpen={isDetailModalOpen}
+                onClose={handleCloseDetailModal}
+                hangVe={detailHangVe}
             />
 
             {/* Toast */}

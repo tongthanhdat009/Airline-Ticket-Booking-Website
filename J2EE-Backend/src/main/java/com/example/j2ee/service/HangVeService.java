@@ -54,6 +54,15 @@ public class HangVeService {
         }
 
         hangVeToUpdate.setTenHangVe(hangVe.getTenHangVe());
+        hangVeToUpdate.setMoTa(hangVe.getMoTa());
+        hangVeToUpdate.setMauNen(hangVe.getMauNen());
+        hangVeToUpdate.setMauVien(hangVe.getMauVien());
+        hangVeToUpdate.setMauChu(hangVe.getMauChu());
+        hangVeToUpdate.setMauHeader(hangVe.getMauHeader());
+        hangVeToUpdate.setMauIcon(hangVe.getMauIcon());
+        hangVeToUpdate.setMauRing(hangVe.getMauRing());
+        hangVeToUpdate.setMauBadge(hangVe.getMauBadge());
+        hangVeToUpdate.setHangBac(hangVe.getHangBac());
 
         return hangVeRepository.save(hangVeToUpdate);
     }

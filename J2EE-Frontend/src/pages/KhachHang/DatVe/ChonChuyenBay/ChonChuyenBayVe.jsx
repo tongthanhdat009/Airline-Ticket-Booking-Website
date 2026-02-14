@@ -1,6 +1,7 @@
 import { useNavigate, useLocation} from "react-router-dom"
 import { useState, useEffect } from 'react';
 import { getSanBayByThanhPhoSanBay, searchChuyenBay, getGiaVe , kiemTraConGhe} from "../../../../services/datVeServices"
+import { getAllHangVe } from "../../../../services/QLHangVeService"
 import { formatCurrency, formatCurrencyWithCommas, formatDate, formatDateType, formatTime, calcFlightDuration } from "../../../../services/utils";
 import { FaLongArrowAltRight, FaLongArrowAltLeft} from 'react-icons/fa';
 import { MdAirplanemodeInactive } from 'react-icons/md';
@@ -15,6 +16,7 @@ import { GoGoal } from 'react-icons/go';
 import HeaderTimKiemChuyen from "../../../../components/KhachHang/HeaderTimKiemChuyen"
 import ThongTinThanhToan from "../../../../components/KhachHang/ThongTinThanhToan"
 import DanhSachNgayBay from "../../../../components/KhachHang/DanhSachNgayBay";
+import FlightCard from "../../../../components/KhachHang/FlightCard/FlightCard";
 import { useTranslation } from 'react-i18next';
 
 function ChonChuyenBayVe() {
@@ -29,6 +31,7 @@ function ChonChuyenBayVe() {
     const [giaVes, setGiaVes] = useState({});
     const [selectedTuyenBayVe, setSelectedTuyenBayVe] = useState(null);
     const [soGheCon, setSoGheCon] = useState({});
+    const [hangVeList, setHangVeList] = useState([]);
 
     const tiepTucOnClick = () => {
         if (!selectedTuyenBayVe) {
@@ -76,18 +79,29 @@ function ChonChuyenBayVe() {
     };
 
     useEffect(() => {
-    if (!chuyenBays.length) return;
+    const fetchHangVe = async () => {
+        try {
+            const res = await getAllHangVe();
+            setHangVeList(Array.isArray(res.data) ? res.data : []);
+        } catch {
+            setHangVeList([]);
+        }
+    };
+    fetchHangVe();
+    }, []);
+
+    useEffect(() => {
+    if (!chuyenBays.length || !hangVeList.length) return;
 
     const fetchSoGhe = async () => {
     const gheMap = {};
     const requests = chuyenBays.flatMap(cb => 
-        [1,2,3,4].map(async hangVeId => {
+        hangVeList.map(async hv => {
         try {
-            const available = await kiemTraConGhe(cb.maChuyenBay, hangVeId, formData.passengers);
-            gheMap[`${cb.maChuyenBay}_${hangVeId}`] = available.data;
-            console.log('So ghe con cho chuyen bay', cb.maChuyenBay, 'hang ve', hangVeId, ':', available.data);
+            const available = await kiemTraConGhe(cb.maChuyenBay, hv.maHangVe, formData.passengers);
+            gheMap[`${cb.maChuyenBay}_${hv.maHangVe}`] = available.data;
         } catch {
-            gheMap[`${cb.maChuyenBay}_${hangVeId}`] = false;
+            gheMap[`${cb.maChuyenBay}_${hv.maHangVe}`] = false;
         }
         })
     );
@@ -96,7 +110,7 @@ function ChonChuyenBayVe() {
     };
 
     fetchSoGhe();
-    }, [chuyenBays, formData.passengers]);
+    }, [chuyenBays, formData.passengers, hangVeList]);
 
     useEffect(() => {
     const fetchSanBay = async () => {
@@ -118,22 +132,21 @@ function ChonChuyenBayVe() {
         formattedDate
         );
         setChuyenBays(results.data);
-    };``
+    };
     fetchChuyenBays();
     }, [sanBayDi, sanBayDen, formData.endDate]);
 
     useEffect(() => {
-    if (!chuyenBays.length) return;
+    if (!chuyenBays.length || !hangVeList.length) return;
 
     const fetchTatCaGiaVe = async () => {
         const giaMap = {};
         for (const cb of chuyenBays) {
-            for (let hangVeId = 1; hangVeId <= 4; hangVeId++) {
+            for (const hv of hangVeList) {
+                const hangVeId = hv.maHangVe;
                 try {
                     const res = await getGiaVe(cb.maChuyenBay, hangVeId);
-                    console.log('Gia ve response:', res.data);
                     if (res.success && res.data) {
-                        console.log(`Gia ve cho chuyen ${cb.maChuyenBay}, hang ${hangVeId}:`, res.data);
                         giaMap[`${cb.maChuyenBay}_${hangVeId}`] = res.data;
                     }
                 } catch (err) {
@@ -146,7 +159,7 @@ function ChonChuyenBayVe() {
     };
 
     fetchTatCaGiaVe();
-    }, [chuyenBays]);
+    }, [chuyenBays, hangVeList]);
 
     const hienThiGiaVe = (maChuyenBay, hangVeId, cb, isLast=false) => {
         const key = `${maChuyenBay}_${hangVeId}`;
@@ -219,264 +232,44 @@ function ChonChuyenBayVe() {
                     </div>
                     <DanhSachNgayBay ngayChon={formData.endDate?formatDate(formData.endDate):""} onSelect={handleSelectNgay} />
                     {Array.isArray(chuyenBays) && chuyenBays.length ? (
-                        chuyenBays.map(cb => (
+                        <div className="space-y-3">
+                        {chuyenBays.map(cb => {
+                            // Prepare hangVe data for this flight using dynamic hangVeList
+                            const hangVesForFlight = hangVeList.map(hv => {
+                                const key = `${cb.maChuyenBay}_${hv.maHangVe}`;
+                                return {
+                                    maHangVe: hv.maHangVe,
+                                    tenHangVe: hv.tenHangVe,
+                                    moTa: hv.moTa,
+                                    mauNen: hv.mauNen,
+                                    mauVien: hv.mauVien,
+                                    mauChu: hv.mauChu,
+                                    mauHeader: hv.mauHeader,
+                                    mauIcon: hv.mauIcon,
+                                    mauRing: hv.mauRing,
+                                    mauBadge: hv.mauBadge,
+                                    hangBac: hv.hangBac,
+                                    giaVe: giaVes[key]?.giaVe,
+                                    available: soGheCon[key] !== false
+                                };
+                            }).filter(hv => hv.available && hv.giaVe != null);
+
+                            return (
                             <div className="w-full" key={cb.maChuyenBay}>
-                                <div className="grid grid-cols-5 grid-rows-2 w-full space mt-3" style={{ gridTemplateColumns: '200px 1fr 1fr 1fr 1fr', gridTemplateRows: '45px 1fr' }}>
-                                    <div>
-                                        
-                                    </div>
-                                    <div className="bg-[#1565C0] flex items-center justify-center text-white font-bold rounded-t-lg mx-[4px]">
-                                        Business
-                                    </div>
-                                    <div className="bg-[#1E88E5] flex items-center justify-center text-white font-bold rounded-t-lg mx-[4px]">
-                                        FirstClass
-                                    </div>
-                                    <div className="bg-[#64B5F6] flex items-center justify-center text-white font-bold rounded-t-lg mx-[4px]">
-                                        Deluxe
-                                    </div>
-                                    <div className="bg-green-500 flex items-center justify-center text-white font-bold rounded-t-lg mx-[4px]">
-                                        Economy
-                                    </div>
-                                    <div className="bg-linear-to-r from-[#1E88E5] to-[#64B5F6] flex flex-col items-center justify-center p-2 rounded-tl-lg text-center cursor-pointer" onClick={() => handleExpand(cb, cb.maChuyenBay, 6)}>
-                                        <div className="text-[15px] mt-2">{cb.soHieuChuyenBay}</div>
-                                        <div><span className="text-xl font-bold">{formatTime(cb.gioDi)}</span> <span className="font-[12px]">đến</span > <span className="text-xl font-bold">{formatTime(cb.gioDen)}</span></div>
-                                        <div className="text-[12px] text-[#1E88E5] font-bold">{t('booking.flight.direct')}</div>
-                                        {expanded.id === cb.maChuyenBay && expanded.type === 6 ? (
-                                            <MdKeyboardArrowUp className="text-gray-700 cursor-pointer mt-1" onClick={() => handleExpand(cb, cb.maChuyenBay, 6)} />
-                                        ) : (
-                                            <MdKeyboardArrowDown className="text-gray-700 cursor-pointer mt-1" onClick={() => handleExpand(cb, cb.maChuyenBay, 6)} />
-                                        )}
-                                    </div>
-                                        {hienThiGiaVe(cb.maChuyenBay, 3, cb)}  {/* Business */}
-
-                                        {hienThiGiaVe(cb.maChuyenBay, 4, cb)} {/* FirstClass */}
-
-                                        {hienThiGiaVe(cb.maChuyenBay, 2, cb)} {/* Deluxe */}
-
-                                        {hienThiGiaVe(cb.maChuyenBay, 1, cb, true)} {/* Economy */}
-
-                                </div>
-                                {expanded.id === cb.maChuyenBay && expanded.type === 6 && (
-                                    <div className="bg-white p-4 rounded-b-lg mb-3">
-                                        <div className="flex items-center pl-2"> 
-                                            <IoAirplaneSharp className="pb-[2px] text-[#1E88E5] w-[20px] h-[20px] "/> 
-                                            <div className="pl-7">{t('booking.flight_info.flight_number')}</div>
-                                            <span className="text-[#1E88E5] font-bold pl-1">{cb.soHieuChuyenBay}</span>
-                                        </div>
-                                        <div className="grid grid-cols-[40px_1fr] gap-4 mt-3">
-                                            <div className="flex flex-col items-center h-24 mt-[6px]">
-                                                <GoDotFill className="border border-[#1E88E5] rounded-full w-[16px] h-[16px] text-red-500" />
-                                                <div className="w-[2px] bg-gray-300 flex-1 my-1" />
-                                                <span className="inline-flex w-[17px] h-[17px] bg-linear-to-r from-green-500 to-green-400 items-center justify-center rounded-full mb-3">
-                                                    <GoGoal className="w-[12px] h-[12px] text-white" />
-                                                </span>
-                                            </div>
-                                            <div>
-                                                <div className="mb-4 flex">
-                                                    <div >{t('booking.flight.departure_label')}</div>
-                                                    <div className="ml-2">
-                                                        <div className="text-black font-bold">{formatTime(cb.gioDi)}, {formatDateType(cb.ngayDi)} (Giờ địa phương)</div>
-                                                        <div className="text-black font-bold">{cb.tuyenBay.sanBayDi.thanhPhoSanBay}</div>
-                                                    </div>
-                                                </div>
-                                                <div className="flex">
-                                                    <div >{t('booking.flight.arrival_label')}</div>
-                                                    <div className="ml-14">
-                                                        <div className="text-black font-bold">{formatTime(cb.gioDen)}, {formatDateType(cb.ngayDen)} (Giờ địa phương)</div>
-                                                        <div className="text-black font-bold">{cb.tuyenBay.sanBayDen.thanhPhoSanBay}</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="pl-14 pt-2 flex">
-                                            <div className="">{t('booking.flight.duration_label')}</div>
-                                            <span className="text-[#1E88E5] pl-3">{calcFlightDuration(cb.gioDi, cb.ngayDi, cb.gioDen, cb.ngayDen)}</span>
-                                        </div>
-                                    </div>
-                                )}
-                                {expanded.id === cb.maChuyenBay && expanded.type === 3 && (
-                                    //Business
-                                    <div className="bg-orange-100 p-4 rounded-b-lg mb-3">
-                                        <div className="flex items-center justify-between px-16">
-                                            <div className="flex flex-col items-center">
-                                                <div className="font-bold">{sanBayDi.maIATA}</div>
-                                                <div className="text-xs">{formData.departure}</div>
-                                                <div className="text-xs">
-                                                    <span>{formatTime(cb.gioDi)}, </span>
-                                                    <span>{formatDateType(cb.ngayDi)}</span>
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-col items-center">
-                                                <div className="text-xs">{calcFlightDuration(cb.gioDi, cb.ngayDi, cb.gioDen, cb.ngayDen)}</div>
-                                                <div className="flex items-center w-full">
-                                                    <div className="w-36 h-[2px] bg-gray-300 rounded" />
-                                                    <IoAirplaneSharp className="text-[#64B5F6] w-[20px] h-[20px]" />
-                                                    <div className="w-36 h-[2px] bg-gray-300 rounded" />
-                                                </div>
-                                                <span className="text-xs">bay thẳng</span>
-                                            </div>
-                                            <div className="flex flex-col items-center">
-                                                <div className="font-bold">{sanBayDen.maIATA}</div>
-                                                <div className="text-xs">{formData.arrival}</div>
-                                                <div className="text-xs">
-                                                    <span>{formatTime(cb.gioDen)}, </span>
-                                                    <span>{formatDateType(cb.ngayDen)}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="w-full border-t-2 border-dashed border-gray-300 my-4 space-10 bg-orange-100" />
-                                        <div className="flex flex-col pl-5 max-h-48 overflow-auto" >
-                                            <span className="font-bold">Bao gồm:</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Hành lý xách tay: 18kg.</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Hành lý ký gửi: 60kg cho đường bay Úc, Kazakhstan; 40kg cho các đường bay còn lại và 01 bộ dụng cụ chơi golf (nếu có).</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Phòng chờ sang trọng (không áp dụng trên các chuyến bay nội địa Thái Lan và các sân bay có phòng chờ không đạt tiêu chuẩn hoặc đóng cửa trong giờ hoạt động của chuyến bay). Thời gian sử dụng dịch vụ là 03 tiếng trước giờ khởi hành chuyến bay. </span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Ưu tiên làm thủ tục trước chuyến bay.</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Ưu tiên phục vụ hành lý.</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Ưu tiên qua cửa an ninh (tùy theo điều kiện từng sân bay).</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Phục vụ đưa đón riêng ra tàu bay (áp dụng trường hợp tàu bay đậu bãi; không áp dụng đối với sân bay không cung cấp dịch vụ xe đưa đón riêng)</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Ưu tiên chọn chỗ ngồi trên tàu bay.</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Thưởng thức ẩm thực tươi ngon suốt chuyến bay.</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Bộ tiện ích (chuyến bay từ 04 tiếng trở lên).</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Hoàn bảo lưu định danh Tiền Vé: 02 năm kể từ ngày khởi hành dự kiến.</span>
-                                        </div>
-                                    </div>
-                                )}
-                                {expanded.id === cb.maChuyenBay && expanded.type === 4 && (
-                                    // FirstClass
-                                    <div className="bg-red-100 p-4 rounded-b-lg mb-3">
-                                        <div className="flex items-center justify-between px-16">
-                                            <div className="flex flex-col items-center">
-                                                <div className="font-bold">{sanBayDi.maIATA}</div>
-                                                <div className="text-xs">{formData.departure}</div>
-                                                <div className="text-xs">
-                                                    <span>{formatTime(cb.gioDi)}, </span>
-                                                    <span>{formatDateType(cb.ngayDi)}</span>
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-col items-center">
-                                                <div className="text-xs">{calcFlightDuration(cb.gioDi, cb.ngayDi, cb.gioDen, cb.ngayDen)}</div>
-                                                <div className="flex items-center w-full">
-                                                    <div className="w-36 h-[2px] bg-gray-300 rounded" />
-                                                    <IoAirplaneSharp className="text-[#64B5F6] w-[20px] h-[20px]" />
-                                                    <div className="w-36 h-[2px] bg-gray-300 rounded" />
-                                                </div>
-                                                <span className="text-xs">bay thẳng</span>
-                                            </div>
-                                            <div className="flex flex-col items-center">
-                                                <div className="font-bold">{sanBayDen.maIATA}</div>
-                                                <div className="text-xs">{formData.arrival}</div>
-                                                <div className="text-xs">
-                                                    <span>{formatTime(cb.gioDen)}, </span>
-                                                    <span>{formatDateType(cb.ngayDen)}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="w-full border-t-2 border-dashed border-gray-300 my-4 space-10" />
-                                        <div className="flex flex-col pl-5 max-h-48 overflow-auto">
-                                            <span className="font-bold">Bao gồm:</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Hành lý xách tay: 10kg.</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Hành lý ký gửi: 50kg cho đường bay Úc, Kazakhstan; 30kg cho các đường bay còn lại và 01 bộ dụng cụ chơi golf (nếu có).</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Phòng chờ sang trọng (không áp dụng trên các chuyến bay nội địa Thái Lan và các sân bay có phòng chờ không đạt tiêu chuẩn hoặc đóng cửa trong giờ hoạt động của chuyến bay). Thời gian sử dụng dịch vụ là 03 tiếng trước giờ khởi hành chuyến bay. </span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Ưu tiên làm thủ tục trước chuyến bay.</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Ưu tiên phục vụ hành lý.</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Ưu tiên qua cửa an ninh (tùy theo điều kiện từng sân bay).</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Phục vụ đưa đón riêng ra tàu bay (áp dụng trường hợp tàu bay đậu bãi; không áp dụng đối với sân bay không cung cấp dịch vụ xe đưa đón riêng)</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Ưu tiên chọn chỗ ngồi trên tàu bay (không áp dụng các hàng ghế dành cho khách Business).</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Thưởng thức ẩm thực tươi ngon suốt chuyến bay.</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Bộ tiện ích (chuyến bay từ 04 tiếng trở lên).</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Hoàn bảo lưu định danh Tiền Vé: 02 năm kể từ ngày khởi hành dự kiến.</span>
-                                        </div>
-                                    </div>
-                                )}
-                                {expanded.id === cb.maChuyenBay && expanded.type === 2 && (
-                                    // deluxe
-                                    <div className="bg-yellow-100 p-4 rounded-b-lg mb-3">
-                                        <div className="flex items-center justify-between px-16">
-                                            <div className="flex flex-col items-center">
-                                                <div className="font-bold">{sanBayDi.maIATA}</div>
-                                                <div className="text-xs">{formData.departure}</div>
-                                                <div className="text-xs">
-                                                    <span>{formatTime(cb.gioDi)}, </span>
-                                                    <span>{formatDateType(cb.ngayDi)}</span>
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-col items-center">
-                                                <div className="text-xs">{calcFlightDuration(cb.gioDi, cb.ngayDi, cb.gioDen, cb.ngayDen)}</div>
-                                                <div className="flex items-center w-full">
-                                                    <div className="w-36 h-[2px] bg-gray-300 rounded" />
-                                                    <IoAirplaneSharp className="text-[#64B5F6] w-[20px] h-[20px]" />
-                                                    <div className="w-36 h-[2px] bg-gray-300 rounded" />
-                                                </div>
-                                                <span className="text-xs">bay thẳng</span>
-                                            </div>
-                                            <div className="flex flex-col items-center">
-                                                <div className="font-bold">{sanBayDen.maIATA}</div>
-                                                <div className="text-xs">{formData.arrival}</div>
-                                                <div className="text-xs">
-                                                    <span>{formatTime(cb.gioDen)}, </span>
-                                                    <span>{formatDateType(cb.ngayDen)}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="w-full border-t-2 border-dashed border-gray-300 my-4 space-10" />
-                                        <div className="flex flex-col pl-5 max-h-48 overflow-auto"> 
-                                            <span className="font-bold">Bao gồm:</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Hành lý xách tay: 10kg cho đường bay Úc, Kazakhstan;  07kg cho các đường bay còn lại.</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Hành lý ký gửi: 40kg cho đường bay Úc, Kazakhstan; 20kg cho các đường bay còn lại.</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Suất ăn & nước uống cho đường bay Úc, Kazakhstan. </span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Chọn trước chỗ ngồi yêu thích (khi còn chỗ, không áp dụng các hàng ghế dành cho SkyBoss và Business).</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Miễn phí thay đổi chuyến bay, ngày bay, hành trình (Thu chênh lệch giá Vé - nếu có).</span>
-                                            <span className="font-bold">Chưa bao gồm:</span>
-                                            <span className="text-sm"><AiFillCloseCircle className="inline-block mr-1 mb-1 text-red-500 w-[16px] h-[16px]" />Bộ tiện ích 3 trong 1.</span>
-                                        </div>
-                                    </div>
-                                )}
-                                {expanded.id === cb.maChuyenBay && expanded.type === 1 && (
-                                    // economy
-                                    <div className="bg-green-100 p-4 rounded-b-lg mb-3 ">
-                                        <div className="flex items-center justify-between px-16">
-                                            <div className="flex flex-col items-center">
-                                                <div className="font-bold">{sanBayDi.maIATA}</div>
-                                                <div className="text-xs">{formData.departure}</div>
-                                                <div className="text-xs">
-                                                    <span>{formatTime(cb.gioDi)}, </span>
-                                                    <span>{formatDateType(cb.ngayDi)}</span>
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-col items-center">
-                                                <div className="text-xs">{calcFlightDuration(cb.gioDi, cb.ngayDi, cb.gioDen, cb.ngayDen)}</div>
-                                                <div className="flex items-center w-full">
-                                                    <div className="w-36 h-[2px] bg-gray-300 rounded" />
-                                                    <IoAirplaneSharp className="text-[#64B5F6] w-[20px] h-[20px]" />
-                                                    <div className="w-36 h-[2px] bg-gray-300 rounded" />
-                                                </div>
-                                                <span className="text-xs">bay thẳng</span>
-                                            </div>
-                                            <div className="flex flex-col items-center">
-                                                <div className="font-bold">{sanBayDen.maIATA}</div>
-                                                <div className="text-xs">{formData.arrival}</div>
-                                                <div className="text-xs">
-                                                    <span>{formatTime(cb.gioDen)}, </span>
-                                                    <span>{formatDateType(cb.ngayDen)}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="w-full border-t-2 border-dashed border-gray-300 my-4 space-10" />
-                                        <div className="flex flex-col pl-5 max-h-48 overflow-auto">
-                                            <span className="font-bold">Bao gồm:</span>
-                                            <span className="text-sm"><FaCheckCircle className="inline-block mr-1 mb-1 text-green-500" />Hành lý xách tay: 07Kg.</span>
-                                            <span className="font-bold">Chưa bao gồm:</span>
-                                            <span className="text-sm"><AiFillCloseCircle className="inline-block mr-1 mb-1 text-red-500 w-[16px] h-[16px]" />Hành lý ký gửi (tùy chọn).</span>
-                                            <span className="text-sm"><AiFillCloseCircle className="inline-block mr-1 mb-1 text-red-500 w-[16px] h-[16px]" />Suất ăn.</span>
-                                            <span className="text-sm"><AiFillCloseCircle className="inline-block mr-1 mb-1 text-red-500 w-[16px] h-[16px]" />Bộ tiện ích 3 trong 1.</span>
-                                            <span className="text-sm"><AiFillCloseCircle className="inline-block mr-1 mb-1 text-red-500 w-[16px] h-[16px]" />Chọn trước chỗ ngồi.</span>
-                                            <span className="text-sm"><AiFillCloseCircle className="inline-block mr-1 mb-1 text-red-500 w-[16px] h-[16px]" />Thay đổi chuyến bay, ngày bay, hành trình.</span>
-                                            <span className="text-sm"><AiFillCloseCircle className="inline-block mr-1 mb-1 text-red-500 w-[16px] h-[16px]" />Chênh lệch tiền vé khi thay đổi (nếu có).</span>
-                                        </div>
-                                    </div>
-                                )}
+                                <FlightCard
+                                    chuyenBay={cb}
+                                    sanBayDi={sanBayDi}
+                                    sanBayDen={sanBayDen}
+                                    hangVes={hangVesForFlight}
+                                    onHangVeClick={(chuyenBay, hangVe) => {
+                                        setSelectedTuyenBayVe({ ...chuyenBay, hangVe: giaVes[`${chuyenBay.maChuyenBay}_${hangVe.maHangVe}`] });
+                                    }}
+                                    selectedHangVe={selectedTuyenBayVe?.hangVe}
+                                />
                             </div>
-                        ))
+                            )
+                        })}
+                        </div>
                     ):(
                         <div className="w-full flex justify-center items-center h-64">
                         Không có chuyến bay
