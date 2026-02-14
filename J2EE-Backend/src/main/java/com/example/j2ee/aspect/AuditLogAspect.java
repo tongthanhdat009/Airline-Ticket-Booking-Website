@@ -28,12 +28,16 @@ import java.time.LocalDateTime;
  */
 @Aspect
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class AuditLogAspect {
 
     private final AuditLogRepository auditLogRepository;
     private final ObjectMapper objectMapper;
+
+    public AuditLogAspect(AuditLogRepository auditLogRepository, ObjectMapper objectMapper) {
+        this.auditLogRepository = auditLogRepository;
+        this.objectMapper = objectMapper;
+    }
 
     /**
      * Xử lý audit log cho các method được đánh dấu @Auditable
@@ -42,27 +46,27 @@ public class AuditLogAspect {
     public Object auditAround(ProceedingJoinPoint joinPoint, Auditable auditable) throws Throwable {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Method method = methodSignature.getMethod();
-        
+
         // Lấy thông tin từ annotation
         String action = auditable.action();
         String table = auditable.table();
         String paramName = auditable.paramName();
         String description = auditable.description();
         String accountType = auditable.accountType();
-        
+
         // Lấy giá trị maBanGhi từ tham số
         int maBanGhi = extractMaBanGhi(joinPoint, paramName);
-        
-        // Lấy thông tin ngưởi thực hiện
+
+        // Lấy thông tin người thực hiện
         String nguoiThucHien = getCurrentUser();
-        
+
         // Lấy IP address
         String ipAddress = getClientIpAddress();
-        
+
         // Serialize dữ liệu đầu vào (nếu có)
         String duLieuCu = null;
         String duLieuMoi = null;
-        
+
         Object[] args = joinPoint.getArgs();
         if (args != null && args.length > 0) {
             try {
@@ -73,13 +77,13 @@ public class AuditLogAspect {
                 log.warn("Không thể serialize dữ liệu đầu vào: {}", e.getMessage());
             }
         }
-        
+
         // Thực hiện method
         Object result = null;
         Exception exception = null;
         try {
             result = joinPoint.proceed();
-            
+
             // Nếu thành công và có kết quả, serialize kết quả
             if (result != null) {
                 try {
@@ -88,16 +92,16 @@ public class AuditLogAspect {
                     log.warn("Không thể serialize kết quả: {}", e.getMessage());
                 }
             }
-            
+
         } catch (Exception e) {
             exception = e;
             // Log lỗi nếu có
             log.error("Lỗi khi thực hiện method {}: {}", method.getName(), e.getMessage());
         }
-        
+
         // Tạo mô tả chi tiết
         String moTa = buildDescription(description, action, table, maBanGhi, exception);
-        
+
         // Tạo và lưu audit log
         AuditLog auditLog = new AuditLog();
         auditLog.setLoaiThaoTac(action);
@@ -110,22 +114,22 @@ public class AuditLogAspect {
         auditLog.setMoTa(moTa);
         auditLog.setDiaChiIp(ipAddress);
         auditLog.setThoiGian(LocalDateTime.now());
-        
+
         try {
             auditLogRepository.save(auditLog);
             log.debug("Đã ghi audit log: {} - {} - {}", action, table, nguoiThucHien);
         } catch (Exception e) {
             log.error("Không thể lưu audit log: {}", e.getMessage());
         }
-        
+
         // Nếu có exception, throw lại
         if (exception != null) {
             throw exception;
         }
-        
+
         return result;
     }
-    
+
     /**
      * Trích xuất mã bản ghi từ tham số của method
      */
@@ -133,7 +137,7 @@ public class AuditLogAspect {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Parameter[] parameters = signature.getMethod().getParameters();
         Object[] args = joinPoint.getArgs();
-        
+
         // Tìm tham số có tên khớp với paramName
         for (int i = 0; i < parameters.length; i++) {
             if (parameters[i].getName().equals(paramName) && args[i] != null) {
@@ -144,7 +148,7 @@ public class AuditLogAspect {
                 }
             }
         }
-        
+
         // Nếu không tìm thấy, thử lấy tham số đầu tiên là int
         for (Object arg : args) {
             if (arg instanceof Integer) {
@@ -154,10 +158,10 @@ public class AuditLogAspect {
                 return ((Number) arg).intValue();
             }
         }
-        
+
         return 0; // Giá trị mặc định
     }
-    
+
     /**
      * Lấy thông tin user hiện tại từ SecurityContext
      */
@@ -168,7 +172,7 @@ public class AuditLogAspect {
         }
         return "ANONYMOUS";
     }
-    
+
     /**
      * Lấy IP address của client
      */
@@ -184,13 +188,13 @@ public class AuditLogAspect {
         }
         return "unknown";
     }
-    
+
     /**
      * Xây dựng mô tả chi tiết cho audit log
      */
     private String buildDescription(String description, String action, String table, int maBanGhi, Exception exception) {
         StringBuilder sb = new StringBuilder();
-        
+
         if (description != null && !description.isEmpty()) {
             sb.append(description);
         } else {
@@ -199,11 +203,11 @@ public class AuditLogAspect {
                 sb.append(" (ID: ").append(maBanGhi).append(")");
             }
         }
-        
+
         if (exception != null) {
             sb.append(" - LỖI: ").append(exception.getMessage());
         }
-        
+
         return sb.toString();
     }
 }

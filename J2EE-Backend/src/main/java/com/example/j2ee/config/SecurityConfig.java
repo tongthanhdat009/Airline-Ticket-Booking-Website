@@ -69,6 +69,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/vnpay/payment-callback").permitAll()
                         // Online Check-in API - không yêu cầu authentication
                         .requestMatchers("/api/checkin/**").permitAll()
+                        // Booking API - cho phép khách vãng lai đặt vé
+                        .requestMatchers("/client/datcho/**").permitAll()
                         // static resources
                         .requestMatchers("/api/ai/**").permitAll()
                         .requestMatchers("/static/**", "/AnhDichVuCungCap/**").permitAll()

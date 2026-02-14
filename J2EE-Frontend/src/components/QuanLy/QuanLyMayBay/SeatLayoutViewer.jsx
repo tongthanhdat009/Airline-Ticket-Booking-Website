@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { FaTimes, FaSync, FaPlane, FaWindowMaximize, FaWalking, FaUser } from 'react-icons/fa';
+import { FaTimes, FaSync, FaPlane, FaWindowMaximize, FaWalking, FaUser, FaChair } from 'react-icons/fa';
 
 const SeatLayoutViewer = ({ maMayBay, onClose }) => {
     const [seats, setSeats] = useState([]);

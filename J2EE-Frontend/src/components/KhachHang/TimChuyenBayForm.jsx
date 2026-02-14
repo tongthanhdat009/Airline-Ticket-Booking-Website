@@ -7,7 +7,6 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 import { getAllSanBay } from '../../services/datVeServices';
-import { checkProfileComplete } from '../../utils/profileUtils';
 
 function TimChuyenBayForm() {
     const navigate = useNavigate();
@@ -94,29 +93,10 @@ function TimChuyenBayForm() {
             alert(t('common.error') + ":\n" + errors.join("\n"));
             return;
         }
-        // Kiểm tra profile của user trước khi cho đặt vé
-        const profile = await checkProfileComplete();
-        if (!profile.isLoggedIn) {
-            // Not logged in - ask user to login first
-            if (window.confirm('Bạn cần đăng nhập để tiếp tục đặt vé. Chuyển đến trang đăng nhập không?')) {
-                navigate('/dang-nhap-client');
-            }
-            return;
-        }
-
-        if (!profile.isComplete) {
-            // Show message and offer to go to completion page
-            const reasons = [];
-            if (profile.needsPhone) reasons.push('số điện thoại');
-            if (profile.needsDob) reasons.push('ngày sinh');
-            const msg = `Bạn chưa hoàn thiện thông tin (${reasons.join(', ')}). Vui lòng cập nhật để tiếp tục đặt vé. Chuyển tới trang hoàn thiện thông tin?`;
-            if (window.confirm(msg)) {
-                navigate('/hoan-thien-thong-tin');
-            }
-            return;
-        }
-
+        // Guest checkout được hỗ trợ - không cần kiểm tra đăng nhập
+        // User có thể đặt vé mà không cần đăng nhập
         const formData = getFormData();
+
         navigate("/chon-chuyen-bay", { state: formData });
     };
 

@@ -32,6 +32,7 @@ public class BookingService {
     private final GheDaDatRepository gheDaDatRepository;
     private final GiaChuyenBayRepository giaChuyenBayRepository;
     private final ChiTietChuyenBayRepository chiTietChuyenBayRepository;
+    private final HanhKhachService hanhKhachService;
 
     /**
      * Tạo đặt vé mới với Transaction hoàn chỉnh
@@ -68,10 +69,10 @@ public class BookingService {
         // Đây là chốt chặn cuối cùng - nếu ghế đã bị đặt, sẽ throw exception và rollback toàn bộ
         List<ChiTietGhe> danhSachGhe = lockAndValidateSeats(danhSachMaGhe, outboundDetail.getMaChuyenBay());
 
-        // Bước 2: Tìm hoặc tạo khách hàng
+        // Bước 2: Tìm hoặc tạo khách hàng (sử dụng HanhKhachService)
         List<HanhKhach> danhSachHanhKhach = new ArrayList<>();
         for (CreateBookingRequest.PassengerInfo passengerInfo : request.getPassengerInfo()) {
-            HanhKhach hanhKhach = findOrCreatePassenger(passengerInfo);
+            HanhKhach hanhKhach = hanhKhachService.findOrCreateHanhKhach(passengerInfo);
             if (!danhSachHanhKhach.contains(hanhKhach)) {
                 danhSachHanhKhach.add(hanhKhach);
             }
@@ -154,69 +155,7 @@ public class BookingService {
         return danhSachGhe;
     }
 
-    /**
-     * Tìm hoặc tạo khách hàng mới
-     */
-    private HanhKhach findOrCreatePassenger(CreateBookingRequest.PassengerInfo passengerInfo) {
-        HanhKhach hanhKhach = null;
-        
-        // Tìm bằng email
-        HanhKhach hanhKhachByEmail = hanhKhachRepository.findByEmail(passengerInfo.getEmail()).orElse(null);
-        
-        // Tìm bằng số điện thoại
-        HanhKhach hanhKhachByPhone = hanhKhachRepository.findBySoDienThoai(passengerInfo.getPhone()).orElse(null);
-        
-        if (hanhKhachByEmail != null) {
-            hanhKhach = hanhKhachByEmail;
-            updatePassengerInfo(hanhKhach, passengerInfo, hanhKhachByPhone);
-        } else if (hanhKhachByPhone != null) {
-            hanhKhach = hanhKhachByPhone;
-            updatePassengerInfo(hanhKhach, passengerInfo, null);
-        } else {
-            hanhKhach = createNewPassenger(passengerInfo);
-        }
-        
-        return hanhKhachRepository.save(hanhKhach);
-    }
-
-    private void updatePassengerInfo(HanhKhach hanhKhach, CreateBookingRequest.PassengerInfo passengerInfo, HanhKhach hanhKhachByPhone) {
-        hanhKhach.setHoVaTen(passengerInfo.getFullName());
-        hanhKhach.setGioiTinh(passengerInfo.getGender());
-        hanhKhach.setMaDinhDanh(passengerInfo.getIdNumber());
-        
-        if (!passengerInfo.getPhone().equals(hanhKhach.getSoDienThoai())) {
-            if (hanhKhachByPhone == null || hanhKhachByPhone.getMaHanhKhach() == hanhKhach.getMaHanhKhach()) {
-                hanhKhach.setSoDienThoai(passengerInfo.getPhone());
-            }
-        }
-        
-        if (passengerInfo.getBirthDate() != null && !passengerInfo.getBirthDate().isEmpty()) {
-            try {
-                hanhKhach.setNgaySinh(java.sql.Date.valueOf(passengerInfo.getBirthDate()));
-            } catch (Exception e) {
-                // Ignore date parsing error
-            }
-        }
-    }
-
-    private HanhKhach createNewPassenger(CreateBookingRequest.PassengerInfo passengerInfo) {
-        HanhKhach hanhKhach = new HanhKhach();
-        hanhKhach.setHoVaTen(passengerInfo.getFullName());
-        hanhKhach.setEmail(passengerInfo.getEmail());
-        hanhKhach.setSoDienThoai(passengerInfo.getPhone());
-        hanhKhach.setGioiTinh(passengerInfo.getGender());
-        hanhKhach.setMaDinhDanh(passengerInfo.getIdNumber());
-        
-        if (passengerInfo.getBirthDate() != null && !passengerInfo.getBirthDate().isEmpty()) {
-            try {
-                hanhKhach.setNgaySinh(java.sql.Date.valueOf(passengerInfo.getBirthDate()));
-            } catch (Exception e) {
-                // Ignore date parsing error
-            }
-        }
-        
-        return hanhKhach;
-    }
+    // Logic xử lý hành khách đã được chuyển sang HanhKhachService.findOrCreateHanhKhach()
 
     /**
      * Tạo đơn hàng mới

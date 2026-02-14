@@ -47,10 +47,10 @@ public class HanhKhach {
     @Column(name = "quocgia", length = 100)
     private String quocGia;
 
-    @Column(name = "email", unique = true, length = 100)
+    @Column(name = "email", length = 100)
     private String email;
 
-    @Column(name = "sodienthoai", unique = true, length = 20)
+    @Column(name = "sodienthoai", length = 20)
     private String soDienThoai;
 
     @Column(name = "madinhdanh", length = 50)

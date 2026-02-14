@@ -63,12 +63,19 @@ function ThanhToan() {
                 totalAmount: formData.totalPrice
             };
 
+            // Prepare headers (token is optional for guest customers)
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            
+            // Only add Authorization header if token exists (logged in user)
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
             // Create booking and payment record
             const response = await apiClient.post('/client/datcho/create', bookingData, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
+                headers: headers
             });
 
             if (response.data.success) {

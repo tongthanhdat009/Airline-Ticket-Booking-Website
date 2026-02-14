@@ -68,18 +68,27 @@ public class HanhKhachService {
             throw new DataIntegrityViolationException("Định dạng số điện thoại không hợp lệ: " + input.getSoDienThoai());
         }
 
-        // Kiểm tra unique mã định danh
-        if (input.getMaDinhDanh() != null && hanhKhachRepository.findByMaDinhDanh(input.getMaDinhDanh()).isPresent()) {
-            throw new DataIntegrityViolationException("Mã định danh đã tồn tại: " + input.getMaDinhDanh());
+        // LƯU Ý: Mã định danh (CCCD/CMND/Passport) là identifier chính
+        // Nếu tìm thấy mã định danh trùng → Ghi đè (update) thông tin hành khách
+        if (input.getMaDinhDanh() != null) {
+            Optional<HanhKhach> existingByMaDinhDanh = hanhKhachRepository.findByMaDinhDanh(input.getMaDinhDanh());
+            if (existingByMaDinhDanh.isPresent()) {
+                // Cập nhật thông tin hành khách hiện có
+                HanhKhach existing = existingByMaDinhDanh.get();
+                existing.setHoVaTen(input.getHoVaTen());
+                existing.setNgaySinh(input.getNgaySinh());
+                existing.setGioiTinh(input.getGioiTinh());
+                existing.setSoDienThoai(input.getSoDienThoai());
+                existing.setEmail(input.getEmail());
+                existing.setDiaChi(input.getDiaChi());
+                existing.setQuocGia(input.getQuocGia());
+                return hanhKhachRepository.save(existing);
+            }
         }
-        // Kiểm tra unique email
-        if (input.getEmail() != null && hanhKhachRepository.findByEmail(input.getEmail()).isPresent()) {
-            throw new DataIntegrityViolationException("Email đã tồn tại: " + input.getEmail());
-        }
-        // Kiểm tra unique số điện thoại
-        if (input.getSoDienThoai() != null && hanhKhachRepository.findBySoDienThoai(input.getSoDienThoai()).isPresent()) {
-            throw new DataIntegrityViolationException("Số điện thoại đã tồn tại: " + input.getSoDienThoai());
-        }
+        
+        // LƯU Ý: Đã xóa validation unique cho email và số điện thoại
+        // để cho phép khách vãng lai đặt vé cho nhiều người với cùng thông tin liên hệ
+        
         // kiểm tra ngày sinh lớn hơn 2 tuổi
         if (input.getNgaySinh() != null) {
             java.time.LocalDate today = java.time.LocalDate.now();
@@ -109,18 +118,8 @@ public class HanhKhachService {
         }
 
         return hanhKhachRepository.findById(id).map(existing -> {
-            // Kiểm tra unique email nếu thay đổi
-            if (input.getEmail() != null) {
-                hanhKhachRepository.findByEmail(input.getEmail())
-                        .filter(other -> other.getMaHanhKhach() != id)
-                        .ifPresent(other -> { throw new DataIntegrityViolationException("Email đã tồn tại: " + input.getEmail()); });
-            }
-            // Kiểm tra unique số điện thoại nếu thay đổi
-            if (input.getSoDienThoai() != null) {
-                hanhKhachRepository.findBySoDienThoai(input.getSoDienThoai())
-                        .filter(other -> other.getMaHanhKhach() != id)
-                        .ifPresent(other -> { throw new DataIntegrityViolationException("Số điện thoại đã tồn tại: " + input.getSoDienThoai()); });
-            }
+            // LƯU Ý: Đã xóa validation unique cho email và số điện thoại
+            // để cho phép khách vãng lai có thể trùng lặp thông tin liên hệ
 
             // Cập nhật toàn bộ các trường theo schema
             existing.setHoVaTen(input.getHoVaTen());
@@ -297,5 +296,117 @@ public class HanhKhachService {
         taiKhoanRepository.save(taiKhoan);
 
         return true;
+    }
+
+    // ==================== BUSINESS LOGIC FOR BOOKING ====================
+
+    /**
+     * Tìm hoặc tạo hành khách mới cho đặt vé
+     * Logic nghiệp vụ:
+     * 1. Ưu tiên tìm theo mã định danh (CCCD/CMND/Passport) nếu có
+     * 2. Nếu tìm thấy theo CCCD → Ghi đè toàn bộ thông tin
+     * 3. Nếu không có CCCD → Tìm theo email/phone (cho phép khách vãng lai)
+     * 
+     * @param passengerInfo Thông tin hành khách từ booking request
+     * @return HanhKhach đã được tạo hoặc cập nhật
+     */
+    public HanhKhach findOrCreateHanhKhach(com.example.j2ee.dto.datcho.CreateBookingRequest.PassengerInfo passengerInfo) {
+        HanhKhach hanhKhach = null;
+        
+        // ƯU TIÊN 1: Tìm theo mã định danh (CCCD/CMND/Passport) nếu có
+        if (passengerInfo.getIdNumber() != null && !passengerInfo.getIdNumber().trim().isEmpty()) {
+            HanhKhach hanhKhachByCCCD = hanhKhachRepository.findByMaDinhDanh(passengerInfo.getIdNumber()).orElse(null);
+            
+            if (hanhKhachByCCCD != null) {
+                // Tìm thấy theo CCCD → GHI ĐÈ toàn bộ thông tin
+                hanhKhach = hanhKhachByCCCD;
+                hanhKhach.setHoVaTen(passengerInfo.getFullName());
+                hanhKhach.setEmail(passengerInfo.getEmail());
+                hanhKhach.setSoDienThoai(passengerInfo.getPhone());
+                hanhKhach.setGioiTinh(passengerInfo.getGender());
+                hanhKhach.setMaDinhDanh(passengerInfo.getIdNumber());
+                
+                if (passengerInfo.getBirthDate() != null && !passengerInfo.getBirthDate().isEmpty()) {
+                    try {
+                        hanhKhach.setNgaySinh(java.sql.Date.valueOf(passengerInfo.getBirthDate()));
+                    } catch (Exception e) {
+                        // Ignore date parsing error
+                    }
+                }
+                
+                return hanhKhachRepository.save(hanhKhach);
+            } else {
+                // Không tìm thấy theo CCCD → Tạo mới với CCCD này
+                hanhKhach = createNewPassenger(passengerInfo);
+                return hanhKhachRepository.save(hanhKhach);
+            }
+        }
+        
+        // ƯU TIÊN 2: Nếu không có CCCD → Tìm theo email/phone (khách vãng lai)
+        // Tìm bằng email
+        HanhKhach hanhKhachByEmail = hanhKhachRepository.findByEmail(passengerInfo.getEmail()).orElse(null);
+        
+        // Tìm bằng số điện thoại
+        HanhKhach hanhKhachByPhone = hanhKhachRepository.findBySoDienThoai(passengerInfo.getPhone()).orElse(null);
+        
+        if (hanhKhachByEmail != null) {
+            hanhKhach = hanhKhachByEmail;
+            updatePassengerInfo(hanhKhach, passengerInfo, hanhKhachByPhone);
+        } else if (hanhKhachByPhone != null) {
+            hanhKhach = hanhKhachByPhone;
+            updatePassengerInfo(hanhKhach, passengerInfo, null);
+        } else {
+            // Tạo mới (cho phép trùng email/phone cho khách vãng lai)
+            hanhKhach = createNewPassenger(passengerInfo);
+        }
+        
+        return hanhKhachRepository.save(hanhKhach);
+    }
+
+    /**
+     * Cập nhật thông tin hành khách từ passenger info
+     */
+    private void updatePassengerInfo(HanhKhach hanhKhach, 
+                                      com.example.j2ee.dto.datcho.CreateBookingRequest.PassengerInfo passengerInfo, 
+                                      HanhKhach hanhKhachByPhone) {
+        hanhKhach.setHoVaTen(passengerInfo.getFullName());
+        hanhKhach.setGioiTinh(passengerInfo.getGender());
+        hanhKhach.setMaDinhDanh(passengerInfo.getIdNumber());
+        
+        if (!passengerInfo.getPhone().equals(hanhKhach.getSoDienThoai())) {
+            if (hanhKhachByPhone == null || hanhKhachByPhone.getMaHanhKhach() == hanhKhach.getMaHanhKhach()) {
+                hanhKhach.setSoDienThoai(passengerInfo.getPhone());
+            }
+        }
+        
+        if (passengerInfo.getBirthDate() != null && !passengerInfo.getBirthDate().isEmpty()) {
+            try {
+                hanhKhach.setNgaySinh(java.sql.Date.valueOf(passengerInfo.getBirthDate()));
+            } catch (Exception e) {
+                // Ignore date parsing error
+            }
+        }
+    }
+
+    /**
+     * Tạo hành khách mới từ passenger info
+     */
+    private HanhKhach createNewPassenger(com.example.j2ee.dto.datcho.CreateBookingRequest.PassengerInfo passengerInfo) {
+        HanhKhach hanhKhach = new HanhKhach();
+        hanhKhach.setHoVaTen(passengerInfo.getFullName());
+        hanhKhach.setEmail(passengerInfo.getEmail());
+        hanhKhach.setSoDienThoai(passengerInfo.getPhone());
+        hanhKhach.setGioiTinh(passengerInfo.getGender());
+        hanhKhach.setMaDinhDanh(passengerInfo.getIdNumber());
+        
+        if (passengerInfo.getBirthDate() != null && !passengerInfo.getBirthDate().isEmpty()) {
+            try {
+                hanhKhach.setNgaySinh(java.sql.Date.valueOf(passengerInfo.getBirthDate()));
+            } catch (Exception e) {
+                // Ignore date parsing error
+            }
+        }
+        
+        return hanhKhach;
     }
 }
