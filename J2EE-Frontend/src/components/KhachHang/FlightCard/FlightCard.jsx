@@ -16,7 +16,8 @@ const FlightCard = ({
     sanBayDen,
     hangVes, // Array of ticket classes with price and availability
     onHangVeClick,
-    selectedHangVe
+    selectedTuyenBay, // Thay đổi từ selectedHangVe sang selectedTuyenBay
+    lockedHangVe = null // Hạng vé bị khóa (chỉ được chọn hạng vé này)
 }) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -25,6 +26,11 @@ const FlightCard = ({
     };
 
     const handleHangVeSelect = (hangVe) => {
+        // Nếu có hạng vé bị khóa và người dùng chọn hạng khác, hiển thị thông báo
+        if (lockedHangVe && hangVe.maHangVe !== lockedHangVe) {
+            alert(`Vui lòng chọn cùng hạng vé với chuyến bay đi (${hangVes.find(hv => hv.maHangVe === lockedHangVe)?.tenHangVe || 'Hạng vé đã chọn'})`);
+            return;
+        }
         onHangVeClick(chuyenBay, hangVe);
         // Không đóng collapse sau khi chọn - giữ mở để user thấy các lựa chọn khác
     };
@@ -121,36 +127,53 @@ const FlightCard = ({
                                 {hangVes.map((hangVe) => {
                                     const config = getHangVeConfig(hangVe);
                                     const benefits = parseBenefits(hangVe.moTa);
-                                    const isSelected = selectedHangVe?.maHangVe === hangVe.maHangVe;
+                                    // selectedTuyenBay chứa cả thông tin chuyenBay và hangVe
+                                    const selectedMaHangVe = selectedTuyenBay?.hangVe?.maHangVe;
+                                    const selectedMaChuyenBay = selectedTuyenBay?.maChuyenBay;
+                                    // Chỉ coi là selected khi khớp cả maChuyenBay VÀ maHangVe
+                                    const isSelected = selectedMaChuyenBay === chuyenBay.maChuyenBay && selectedMaHangVe === hangVe.maHangVe;
                                     const isPremium = config.tier === 'premium';
+                                    // Kiểm tra hạng vé có bị khóa không (chỉ được chọn hạng vé lockedHangVe)
+                                    const isLocked = lockedHangVe && hangVe.maHangVe !== lockedHangVe;
+                                    const isRequired = lockedHangVe && hangVe.maHangVe === lockedHangVe;
 
                                     return (
                                         <div
                                             key={hangVe.maHangVe}
-                                            className={`flex rounded-lg overflow-hidden cursor-pointer transition-all duration-300 ${
+                                            className={`relative flex rounded-lg overflow-hidden ${
                                                 isSelected
-                                                    ? 'shadow-xl scale-[1.02] border'
+                                                    ? 'shadow-xl border-2'
                                                     : 'bg-gray-50 hover:bg-gray-100 hover:shadow-md border border-transparent'
-                                            } ${isPremium && !isSelected ? 'border-l-4' : ''}`}
-                                            style={isSelected ? {
-                                                backgroundColor: config.bgColor,
-                                                borderColor: config.borderColor,
-                                                outline: `4px solid ${config.ringColor}`,
-                                                outlineOffset: '2px',
-                                            } : isPremium ? {
-                                                borderLeftColor: config.borderColor,
-                                            } : undefined}
+                                            } ${isPremium && !isSelected ? 'border-l-4' : ''} ${
+                                                isLocked ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'
+                                            }`}
+                                            style={{
+                                                backgroundColor: isSelected ? config.bgColor : undefined,
+                                                borderColor: isSelected ? config.borderColor : (isPremium ? config.borderColor : undefined),
+                                            }}
                                             onClick={() => handleHangVeSelect(hangVe)}
                                         >
+                                            {/* Ring effect - instant color change, no animation */}
+                                            {isSelected && (
+                                                <div
+                                                    className="absolute inset-0 rounded-lg pointer-events-none"
+                                                    style={{
+                                                        boxShadow: `0 0 0 3px ${config.ringColor}`,
+                                                    }}
+                                                />
+                                            )}
                                             {/* 30% - Name and Price */}
-                                            <div className={`w-[30%] p-3 flex flex-col justify-center border-r ${
+                                            <div className={`w-[30%] p-3 flex flex-col justify-center border-r relative z-10 ${
                                                 isSelected ? 'bg-white/80 shadow-inner' : ''
                                             }`}
-                                                style={{ borderColor: config.borderColor }}>
-                                                <div className={`-mx-3 -mt-3 px-3 py-2 mb-2 relative ${
-                                                    isSelected ? 'shadow-md' : ''
-                                                }`}
-                                                    style={{ background: `linear-gradient(to right, ${config.headerFrom}, ${config.headerTo})` }}>
+                                                style={{
+                                                    borderColor: config.borderColor,
+                                                }}>
+                                                <div className={`-mx-3 -mt-3 px-3 py-2 mb-2 relative`}
+                                                    style={{
+                                                        background: `linear-gradient(to right, ${config.headerFrom}, ${config.headerTo})`,
+                                                        boxShadow: isSelected ? '0 1px 3px rgba(0,0,0,0.12)' : 'none',
+                                                    }}>
                                                     <div className="flex items-center justify-center gap-2">
                                                         {isPremium && (
                                                             <span className="text-yellow-200 text-xs">★</span>
@@ -158,16 +181,18 @@ const FlightCard = ({
                                                         <div className="text-white font-semibold text-sm">{hangVe.tenHangVe}</div>
                                                         {isSelected && (
                                                             <div className="flex items-center gap-1">
-                                                                <FaCheck className="text-white text-lg animate-pulse" />
+                                                                <FaCheck className="text-white text-lg" />
                                                                 <span className="text-xs text-white/90 font-medium">ĐÃ CHỌN</span>
                                                             </div>
                                                         )}
                                                     </div>
                                                 </div>
                                                 {hangVe.giaVe != null && hangVe.giaVe !== '' ? (
-                                                    <div className={`text-2xl font-bold ${isSelected ? 'underline decoration-2 underline-offset-4' : ''}`}
+                                                    <div className="text-2xl font-bold relative"
                                                         style={{ color: config.textColor }}>
-                                                        {formatCurrency(hangVe.giaVe)}
+                                                        <span className={isSelected ? 'underline decoration-2 underline-offset-4' : ''}>
+                                                            {formatCurrency(hangVe.giaVe)}
+                                                        </span>
                                                         <span className="text-sm font-normal text-gray-500"> VND</span>
                                                     </div>
                                                 ) : (
@@ -179,10 +204,15 @@ const FlightCard = ({
                                                         Cao cấp
                                                     </div>
                                                 )}
+                                                {isRequired && (
+                                                    <div className="mt-1 inline-block text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700">
+                                                        Cùng hạng vé đi
+                                                    </div>
+                                                )}
                                             </div>
 
                                             {/* 70% - Benefits */}
-                                            <div className={`w-[70%] p-3 ${isSelected ? 'bg-white/60' : ''}`}>
+                                            <div className={`w-[70%] p-3 relative z-10 ${isSelected ? 'bg-white/60' : ''}`}>
                                                 <div className="text-sm font-semibold text-gray-700 mb-2">Lợi ích:</div>
                                                 {benefits.length > 0 ? (
                                                     <div className="grid grid-cols-2 gap-1 text-sm">

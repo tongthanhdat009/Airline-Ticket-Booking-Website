@@ -2,16 +2,8 @@ import { useNavigate, useLocation } from "react-router-dom"
 import { useState, useEffect } from 'react';
 import { getSanBayByThanhPhoSanBay, searchChuyenBay, getGiaVe, kiemTraConGhe} from "../../../../services/datVeServices"
 import { getAllHangVe } from "../../../../services/QLHangVeService"
-import { formatCurrency, formatCurrencyWithCommas, formatDate, formatDateType, formatTime, calcFlightDuration } from "../../../../services/utils";
+import { formatCurrencyWithCommas, formatDate } from "../../../../services/utils";
 import { FaLongArrowAltRight, FaLongArrowAltLeft} from 'react-icons/fa';
-import { MdAirplanemodeInactive } from 'react-icons/md';
-import { MdKeyboardArrowDown } from 'react-icons/md';
-import { MdKeyboardArrowUp } from 'react-icons/md';
-import { IoAirplaneSharp } from 'react-icons/io5';
-import { FaCheckCircle } from 'react-icons/fa';
-import { AiFillCloseCircle } from 'react-icons/ai';
-import { GoDotFill } from 'react-icons/go';
-import { GoGoal } from 'react-icons/go';
 
 import HeaderTimKiemChuyen from "../../../../components/KhachHang/HeaderTimKiemChuyen"
 import ThongTinThanhToan from "../../../../components/KhachHang/ThongTinThanhToan"
@@ -27,7 +19,6 @@ function ChonChuyenBay() {
     const [sanBayDi, setSanBayDi] = useState(null);
     const [sanBayDen, setSanBayDen] = useState(null);
     const [chuyenBays, setChuyenBays] = useState([]);
-    const [expanded, setExpanded] = useState({ id: null, type: null });
     const [giaVes, setGiaVes] = useState({});
     const [selectedTuyenBayDi, setSelectedTuyenBayDi] = useState(null);
     const [soGheCon, setSoGheCon] = useState({});
@@ -44,15 +35,6 @@ function ChonChuyenBay() {
             navigate("/thong-tin-hanh-khach", { state: { ...formData, selectedTuyenBayDi: selectedTuyenBayDi, totalPrice: calcTotalPrice()} });
         }
     };
-    console.log("formData in ChonChuyenBayDi: ", formData);
-    const SoldOutIcon = ({ size = 18 }) => (
-        <div className="flex flex-col items-center">
-            <span className="inline-flex items-center justify-center w-8 h-8 rounded-full border-[2px] border-gray-400 text-gray-400">
-                <MdAirplanemodeInactive size={size} />
-            </span>
-        </div>
-    );
-
     const calcTotalPrice = () => {
         if(!selectedTuyenBayDi.hangVe) return 0;
         const giaVe = selectedTuyenBayDi.hangVe.giaVe || 0;
@@ -60,19 +42,6 @@ function ChonChuyenBay() {
         const dichVu =  0;
         return giaVe * formData.passengers + thuePhi + dichVu;
     }
-
-    const handleExpand = (cb , id, type) => {
-        if (expanded.id === id && expanded.type === type ) {
-            setExpanded({ id: null, type: null });
-        } else {
-            setExpanded({ id, type });
-            if (type >= 1 && type <= 4) {
-                const key = `${id}_${type}`;
-                const hangVe = giaVes[key] || null;
-                setSelectedTuyenBayDi({ ...cb, hangVe: hangVe });
-            }
-        }
-    };
 
     const handleSelectNgay = (ngay) => {
         setFormData(prev => ({
@@ -167,56 +136,6 @@ function ChonChuyenBay() {
     fetchTatCaGiaVe();
     }, [chuyenBays, hangVeList]);
 
-    const hienThiGiaVe = (maChuyenBay, hangVeId, cb) => {
-        const key = `${maChuyenBay}_${hangVeId}`;
-        const gia = giaVes[key];
-        const giaVeValue = gia?.giaVe;
-        const conGhe = soGheCon[key];
-        const hetCho = !gia || giaVeValue == null || giaVeValue === '' || conGhe === false;
-        
-        console.log(`[DEBUG] Hiển thị giá - Chuyến: ${maChuyenBay}, Hạng: ${hangVeId}`);
-        console.log(`[DEBUG] - Key: ${key}`);
-        console.log(`[DEBUG] - Giá data:`, gia);
-        console.log(`[DEBUG] - Giá vé value:`, giaVeValue, typeof giaVeValue);
-        console.log(`[DEBUG] - Ghế còn:`, conGhe, typeof conGhe);
-        console.log(`[DEBUG] - Hết chỗ?:`, hetCho);
-        
-        if (hetCho) {
-            return (
-            <div className={`bg-gray-100 flex flex-col items-center justify-center ${ hangVeId===1 ? '' : 'border-r-[1px]'}`}>
-                <div className="flex flex-col items-center justify-center text-gray-400">
-                    <SoldOutIcon />
-                    HẾT CHỖ
-                </div>
-            </div>
-            );
-        }
-        return (
-            <div className={`flex flex-col items-center justify-center ${ hangVeId===1 ? '' : 'border-r-[1px]'} cursor-pointer transition-colors ${
-                expanded.id === cb.maChuyenBay && expanded.type === hangVeId ? getBackgroundColor(hangVeId) : 'bg-gray-100'
-                }`} onClick={() => handleExpand(cb, cb.maChuyenBay, hangVeId)}>
-                <div className="flex flex-col items-center justify-center text-black font-bold">
-                    <span className="text-3xl mt-4">{formatCurrency(gia.giaVe)}</span>
-                    <span className="text-gray-500 text-xl">000 VND</span>
-                    {expanded.id === cb.maChuyenBay && expanded.type === hangVeId ? (
-                        <MdKeyboardArrowUp className="text-gray-700 cursor-pointer mt-1"/>
-                    ) : (
-                        <MdKeyboardArrowDown className="text-gray-700 cursor-pointer mt-1"/>
-                    )}
-                </div>
-            </div>
-        );
-    };
-
-    const getBackgroundColor = (hangVeId) => {
-        switch (hangVeId) {
-        case 1: return "bg-green-100";   // Economy
-        case 2: return "bg-yellow-100";     // Premium
-        case 3: return "bg-red-100";    // Business
-        case 4: return "bg-orange-100";   // First
-        }
-    };
-
     return (
         <div 
             className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed relative"
@@ -247,6 +166,7 @@ function ChonChuyenBay() {
                         </div>
                     </div>
                     <DanhSachNgayBay ngayChon={formData.startDate?formatDate(formData.startDate):""} onSelect={handleSelectNgay} />
+                    <br/>
                     {Array.isArray(chuyenBays) && chuyenBays.length ? (
                         <div className="space-y-3">
                         {chuyenBays.map(cb => {
@@ -278,9 +198,11 @@ function ChonChuyenBay() {
                                     sanBayDen={sanBayDen}
                                     hangVes={hangVesForFlight}
                                     onHangVeClick={(chuyenBay, hangVe) => {
-                                        setSelectedTuyenBayDi({ ...chuyenBay, hangVe: giaVes[`${chuyenBay.maChuyenBay}_${hangVe.maHangVe}`] });
+                                        // Truyền cả object hangVe (có maHangVe) và giaVe
+                                        const giaVeData = giaVes[`${chuyenBay.maChuyenBay}_${hangVe.maHangVe}`];
+                                        setSelectedTuyenBayDi({ ...chuyenBay, hangVe: { ...hangVe, ...giaVeData } });
                                     }}
-                                    selectedHangVe={selectedTuyenBayDi?.hangVe}
+                                    selectedTuyenBay={selectedTuyenBayDi}
                                 />
                             </div>
                             )

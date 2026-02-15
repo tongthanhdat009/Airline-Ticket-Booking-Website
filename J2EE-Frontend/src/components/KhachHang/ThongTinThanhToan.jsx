@@ -67,7 +67,7 @@ function ThongTinThanhToan({ cb, onBackToChonChuyenDi = () => {}, onBackToChonCh
         };
         fetchSanBayDi();
         fetchSanBayDen();
-    }, [cb]);
+    }, [cb.departure, cb.arrival]);
 
     return (
         <div className="w-[400px]">
