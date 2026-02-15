@@ -3,8 +3,11 @@ package com.example.j2ee.service;
 import com.example.j2ee.annotation.Auditable;
 import com.example.j2ee.config.VNPayConfig;
 import com.example.j2ee.model.DatCho;
+import com.example.j2ee.model.DonHang;
+import com.example.j2ee.model.HoaDon;
 import com.example.j2ee.model.TrangThaiThanhToan;
 import com.example.j2ee.repository.DatChoRepository;
+import com.example.j2ee.repository.DonHangRepository;
 import com.example.j2ee.repository.TrangThaiThanhToanRepository;
 import com.example.j2ee.util.VNPayUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +22,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -30,6 +34,8 @@ public class VNPayService {
     private final DatChoRepository datChoRepository;
     private final JasperTicketService jasperTicketService;
     private final EmailService emailService;
+    private final DonHangService donHangService;
+    private final DonHangRepository donHangRepository;
 
     /**
      * Lấy frontend URL
@@ -120,7 +126,12 @@ public class VNPayService {
     }
 
     /**
-     * Xử lý kết quả trả về từ VNPay (BỎ QUA VERIFY CHỮ KÝ)
+     * Xử lý kết quả trả về từ VNPay
+     * Bước 7a: Verify chữ ký VNPay
+     * Bước 7b: Update trangthaithanhtoan
+     * Bước 7c: Update donhang.trangThai
+     * Bước 7d: Tạo hoadon
+     * Bước 7e: Gửi email xác nhận
      */
     @Auditable(action = "THANH_TOÁN_VNPAY", table = "trangthaithanhtoan",
                description = "Xử lý kết quả thanh toán VNPay", accountType = "CUSTOMER")
@@ -132,6 +143,21 @@ public class VNPayService {
         try {
             String responseCode = params.get("vnp_ResponseCode");
             String txnRef = params.get("vnp_TxnRef");
+            String vnpSecureHash = params.get("vnp_SecureHash");
+            String vnpTransactionNo = params.get("vnp_TransactionNo");
+
+            // Bước 7a: Verify chữ ký VNPay
+            Map<String, String> vnpParams = new HashMap<>(params);
+            vnpParams.remove("vnp_SecureHash");
+            vnpParams.remove("vnp_SecureHashType");
+
+            String calculatedHash = VNPayUtil.hashAllFields(vnpParams, vnPayConfig.getSecretKey());
+            if (!calculatedHash.equals(vnpSecureHash)) {
+                result.put("success", false);
+                result.put("message", "Chữ ký không hợp lệ");
+                result.put("data", null);
+                return result;
+            }
 
             // Trích xuất maThanhToan từ txnRef (format: MAT{maThanhToan}_{timestamp})
             int maThanhToan;
@@ -145,12 +171,33 @@ public class VNPayService {
             TrangThaiThanhToan thanhToan = trangThaiThanhToanRepository.findById(maThanhToan)
                     .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thông tin thanh toán"));
 
+            DonHang donHang = thanhToan.getDonHang();
+            if (donHang == null) {
+                throw new IllegalArgumentException("Không tìm thấy đơn hàng liên quan đến thanh toán");
+            }
+
             if ("00".equals(responseCode)) {
-                // Thanh toán thành công
+                // Bước 7b: Update trangthaithanhtoan
                 thanhToan.setDaThanhToan('Y');
+                thanhToan.setPhuongThucThanhToan("VNPAY");
+                thanhToan.setTrangThai("COMPLETED");
+                thanhToan.setTransactionCode(vnpTransactionNo);
+                thanhToan.setThoigianThanhToan(LocalDateTime.now());
                 trangThaiThanhToanRepository.save(thanhToan);
 
-                // Generate ticket PDF and send email
+                // Bước 7c: Update donhang.trangThai
+                donHang.setTrangThai("ĐÃ THANH TOÁN");
+                donHangRepository.save(donHang);
+
+                // Bước 7d: Tạo hoadon
+                try {
+                    HoaDon hoaDon = donHangService.taoHoaDon(donHang);
+                    System.out.println("Đã tạo hóa đơn: " + hoaDon.getSoHoaDon());
+                } catch (Exception e) {
+                    System.err.println("Failed to create invoice: " + e.getMessage());
+                }
+
+                // Bước 7e: Gửi email xác nhận
                 try {
                     sendTicketConfirmationEmail(thanhToan);
                 } catch (Exception e) {
@@ -163,6 +210,9 @@ public class VNPayService {
                 result.put("data", thanhToan);
             } else {
                 // Thanh toán thất bại
+                thanhToan.setTrangThai("FAILED");
+                trangThaiThanhToanRepository.save(thanhToan);
+
                 result.put("success", false);
                 result.put("message", "Thanh toán thất bại. Mã lỗi: " + responseCode);
                 result.put("data", null);
@@ -191,27 +241,9 @@ public class VNPayService {
             return;
         }
 
-        // Lấy booking đầu tiên từ đơn hàng
-        var bookings = thanhToan.getDonHang().getDanhSachDatCho();
-        DatCho mainBooking = bookings.iterator().next();
-        java.time.LocalDateTime bookingTime = mainBooking.getNgayDatCho();
-
-        // Search for ALL bookings within 5 seconds (regardless of flight)
-        // This captures both outbound and return flights for round-trip bookings
-        java.time.LocalDateTime startTime = bookingTime.minusSeconds(5);
-        java.time.LocalDateTime endTime = bookingTime.plusSeconds(5);
-
-        // Find all bookings in the same time window (captures all flights in group
-        // booking)
-        List<DatCho> allBookings = datChoRepository.findAllBookingsByTime(startTime, endTime);
-
-        // If no bookings found, just process the main booking
-        if (allBookings.isEmpty()) {
-            allBookings = new ArrayList<>();
-            allBookings.add(mainBooking);
-        }
-
-        System.out.println("Found " + allBookings.size() + " bookings in time window");
+        // Lấy tất cả bookings từ đơn hàng trực tiếp (KHÔNG dùng time window)
+        List<DatCho> allBookings = new ArrayList<>(thanhToan.getDonHang().getDanhSachDatCho());
+        System.out.println("Found " + allBookings.size() + " bookings for order");
 
         // Group bookings by passenger (same email and name)
         Map<String, List<DatCho>> bookingsByPassenger = new HashMap<>();

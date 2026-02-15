@@ -36,7 +36,13 @@ public class BookingService {
 
     /**
      * Tạo đặt vé mới với Transaction hoàn chỉnh
-     * Sử dụng @Transactional để rollback nếu có lỗi bất kỳ
+     * Flow 6 bước:
+     * 1. Insert hanhkhach (người đặt)
+     * 2. Insert hanhkhach (các hành khách bay)
+     * 3. Insert donhang
+     * 4. Insert datcho
+     * 5. Insert ghe_da_dat
+     * 6. Insert trangthaithanhtoan (PENDING)
      */
     @Transactional
     public CreateBookingResponse createBooking(CreateBookingRequest request) throws Exception {
@@ -44,7 +50,7 @@ public class BookingService {
         if (request.getPassengerInfo() == null || request.getPassengerInfo().isEmpty()) {
             throw new IllegalArgumentException("Vui lòng cung cấp thông tin hành khách");
         }
-        
+
         if (request.getFlightInfo() == null || request.getFlightInfo().getOutbound() == null) {
             throw new IllegalArgumentException("Vui lòng cung cấp thông tin chuyến bay");
         }
@@ -55,7 +61,7 @@ public class BookingService {
         if (danhSachMaGhe.isEmpty()) {
             throw new IllegalArgumentException("Vui lòng chọn ghế cho chuyến bay");
         }
-        
+
         // Validate: number of seats must match number of passengers
         if (danhSachMaGhe.size() != request.getPassengerInfo().size()) {
             throw new IllegalArgumentException("Số lượng ghế (" + danhSachMaGhe.size() + ") phải bằng số lượng hành khách (" + request.getPassengerInfo().size() + ")");
@@ -65,11 +71,20 @@ public class BookingService {
         ChiTietChuyenBay chuyenBayDi = chiTietChuyenBayRepository.findById(outboundDetail.getMaChuyenBay())
             .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy chuyến bay"));
 
-        // Bước 1: Kiểm tra và ghim ghế (CHỐNG RACE CONDITION)
+        // Bước 0: Kiểm tra và ghim ghế (CHỐNG RACE CONDITION)
         // Đây là chốt chặn cuối cùng - nếu ghế đã bị đặt, sẽ throw exception và rollback toàn bộ
         List<ChiTietGhe> danhSachGhe = lockAndValidateSeats(danhSachMaGhe, outboundDetail.getMaChuyenBay());
 
-        // Bước 2: Tìm hoặc tạo khách hàng (sử dụng HanhKhachService)
+        // Bước 1: Insert hanhkhach (người đặt)
+        // Lấy passengerInfo đầu tiên có isFromAccount=true, hoặc passengerInfo[0] làm người đặt
+        CreateBookingRequest.PassengerInfo nguoiDatInfo = request.getPassengerInfo().stream()
+            .filter(p -> p.isFromAccount())
+            .findFirst()
+            .orElse(request.getPassengerInfo().get(0));
+        HanhKhach hanhKhachNguoiDat = hanhKhachService.findOrCreateHanhKhach(nguoiDatInfo);
+
+        // Bước 2: Insert hanhkhach (các hành khách bay)
+        // Loop qua tất cả passengerInfo và tạo HanhKhach (bao gồm cả người đặt nếu cũng là hành khách)
         List<HanhKhach> danhSachHanhKhach = new ArrayList<>();
         for (CreateBookingRequest.PassengerInfo passengerInfo : request.getPassengerInfo()) {
             HanhKhach hanhKhach = hanhKhachService.findOrCreateHanhKhach(passengerInfo);
@@ -78,39 +93,54 @@ public class BookingService {
             }
         }
 
-        // Bước 3: Tạo đơn hàng
-        DonHang donHang = createDonHang(request, danhSachHanhKhach.get(0));
+        // Bước 3: Insert donhang
+        DonHang donHang = createDonHang(request, hanhKhachNguoiDat);
 
-        // Bước 4: Tạo đặt chỗ cho từng hành khách
+        // Bước 4: Insert datcho
+        List<DatCho> danhSachDatCho = new ArrayList<>();
         List<Integer> danhSachMaDatCho = new ArrayList<>();
         List<Integer> danhSachMaHanhKhach = new ArrayList<>();
         LocalDateTime ngayDatCho = LocalDateTime.now();
-        
+
         for (int i = 0; i < request.getPassengerInfo().size(); i++) {
             HanhKhach hanhKhach = danhSachHanhKhach.get(i);
             ChiTietGhe ghe = danhSachGhe.get(i);
-            
+
             if (!danhSachMaHanhKhach.contains(hanhKhach.getMaHanhKhach())) {
                 danhSachMaHanhKhach.add(hanhKhach.getMaHanhKhach());
             }
-            
-            // Tạo đặt chỗ
-            DatCho datCho = createDatCho(donHang, hanhKhach, ghe, chuyenBayDi, ngayDatCho);
+
+            // Tạo đặt chỗ (KHÔNG tạo GheDaDat bên trong)
+            DatCho datCho = createDatChoWithoutGheDaDat(donHang, hanhKhach, ghe, chuyenBayDi, ngayDatCho);
+            danhSachDatCho.add(datCho);
             danhSachMaDatCho.add(datCho.getMaDatCho());
         }
 
         // Bước 5: Xử lý chiều về (nếu có)
+        List<ChiTietGhe> danhSachGheVe = new ArrayList<>();
         if (request.getFlightInfo().getReturnFlight() != null) {
-            processReturnFlight(request, donHang, danhSachHanhKhach, ngayDatCho, danhSachMaDatCho);
+            danhSachGheVe = processReturnFlightWithoutGheDaDat(request, donHang, danhSachHanhKhach, ngayDatCho, danhSachDatCho);
         }
 
-        // Bước 6: Tạo thông tin thanh toán (gắn với đơn hàng)
-        TrangThaiThanhToan thanhToan = createThanhToan(
-            donHang,
-            request.getTotalAmount()
-        );
+        // Bước 6: Insert ghe_da_dat (tách riêng khỏi createDatCho)
+        // Tạo GheDaDat cho tất cả ghế (đi + về) sau khi tất cả DatCho đã insert
+        for (int i = 0; i < danhSachDatCho.size(); i++) {
+            DatCho datCho = danhSachDatCho.get(i);
+            ChiTietGhe ghe = danhSachGhe.get(i);
+            createGheDaDat(chuyenBayDi, ghe, datCho);
+        }
+        // Xử lý ghế chiều về
+        for (int i = 0; i < danhSachGheVe.size(); i++) {
+            ChiTietGhe gheVe = danhSachGheVe.get(i);
+            // Tìm DatCho tương ứng (có cùng index)
+            DatCho datChoVe = danhSachDatCho.get(danhSachGhe.size() + i);
+            createGheDaDat(datChoVe.getChuyenBay(), gheVe, datChoVe);
+        }
 
-        // Bước 7: Tạo response
+        // Bước 7: Insert trangthaithanhtoan (PENDING)
+        TrangThaiThanhToan thanhToan = createThanhToanPending(donHang, request.getTotalAmount());
+
+        // Tạo response
         CreateBookingResponse response = new CreateBookingResponse();
         response.setMaDatCho(danhSachMaDatCho.get(0));
         response.setMaThanhToan(thanhToan.getMaThanhToan());
@@ -175,9 +205,10 @@ public class BookingService {
     }
 
     /**
-     * Tạo đặt chỗ
+     * Tạo đặt chỗ (KHÔNG tạo GheDaDat - đã tách riêng)
+     * Lưu ý: Method này vẫn giữ lại để tương thích với code cũ
      */
-    private DatCho createDatCho(DonHang donHang, HanhKhach hanhKhach, ChiTietGhe ghe, 
+    private DatCho createDatCho(DonHang donHang, HanhKhach hanhKhach, ChiTietGhe ghe,
                                 ChiTietChuyenBay chuyenBay, LocalDateTime ngayDatCho) {
         DatCho datCho = new DatCho();
         datCho.setDonHang(donHang);
@@ -188,17 +219,12 @@ public class BookingService {
         datCho.setNgayDatCho(ngayDatCho);
         datCho.setTrangThai("ACTIVE");
         datCho.setCheckInStatus(false);
-        
+
         // Tính giá vé
         BigDecimal giaVe = calculateGiaVe(chuyenBay.getMaChuyenBay(), ghe.getHangVe().getMaHangVe());
         datCho.setGiaVe(giaVe);
-        
+
         DatCho savedDatCho = datChoRepository.save(datCho);
-        
-        // Tạo GheDaDat sau khi DatCho đã được lưu (để có maDatCho)
-        // Đây là bước chính thức ghi nhận ghế đã được đặt
-        createGheDaDat(chuyenBay, ghe, savedDatCho);
-        
         return savedDatCho;
     }
 
@@ -245,54 +271,6 @@ public class BookingService {
     }
 
     /**
-     * Xử lý chuyến bay chiều về
-     */
-    private void processReturnFlight(CreateBookingRequest request, DonHang donHang, 
-                                   List<HanhKhach> danhSachHanhKhach, LocalDateTime ngayDatCho,
-                                   List<Integer> danhSachMaDatCho) {
-        CreateBookingRequest.FlightDetail returnFlight = request.getFlightInfo().getReturnFlight();
-        
-        // Get return flight seats
-        List<Integer> danhSachMaGheVe = getSeatList(returnFlight);
-        
-        if (danhSachMaGheVe.size() != request.getPassengerInfo().size()) {
-            throw new IllegalArgumentException("Số lượng ghế chiều về (" + danhSachMaGheVe.size() + ") phải bằng số lượng hành khách (" + request.getPassengerInfo().size() + ")");
-        }
-        
-        // Get chuyến bay về
-        ChiTietChuyenBay chuyenBayVe = chiTietChuyenBayRepository.findById(returnFlight.getMaChuyenBay())
-            .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy chuyến bay chiều về"));
-        
-        // Lock and validate return seats
-        List<ChiTietGhe> danhSachGheVe = lockAndValidateSeats(danhSachMaGheVe, returnFlight.getMaChuyenBay());
-        
-        // Create return bookings
-        for (int i = 0; i < request.getPassengerInfo().size(); i++) {
-            HanhKhach hanhKhach = danhSachHanhKhach.get(i);
-            ChiTietGhe gheVe = danhSachGheVe.get(i);
-            
-            DatCho datChoVe = createDatCho(donHang, hanhKhach, gheVe, chuyenBayVe, ngayDatCho);
-            danhSachMaDatCho.add(datChoVe.getMaDatCho());
-        }
-    }
-
-    /**
-     * Tạo thông tin thanh toán
-     */
-    private TrangThaiThanhToan createThanhToan(DonHang donHang, BigDecimal totalAmount) {
-        TrangThaiThanhToan thanhToan = new TrangThaiThanhToan();
-        thanhToan.setDonHang(donHang);
-        thanhToan.setSoTien(totalAmount);
-        thanhToan.setDaThanhToan('N');
-
-        // Set expiration time (15 minutes from now)
-        LocalDateTime hetHan = LocalDateTime.now().plusMinutes(15);
-        thanhToan.setNgayHetHan(java.sql.Date.valueOf(hetHan.toLocalDate()));
-
-        return trangThaiThanhToanRepository.save(thanhToan);
-    }
-
-    /**
      * Lấy danh sách mã ghế từ FlightDetail
      */
     private List<Integer> getSeatList(CreateBookingRequest.FlightDetail flightDetail) {
@@ -312,14 +290,90 @@ public class BookingService {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         StringBuilder pnr = new StringBuilder();
         Random random = new Random();
-        
+
         do {
             pnr.setLength(0);
             for (int i = 0; i < 6; i++) {
                 pnr.append(chars.charAt(random.nextInt(chars.length())));
             }
         } while (donHangRepository.existsByPnr(pnr.toString()));
-        
+
         return pnr.toString();
+    }
+
+    /**
+     * Tạo đặt chỗ (KHÔNG tạo GheDaDat - sẽ tạo ở bước riêng)
+     */
+    private DatCho createDatChoWithoutGheDaDat(DonHang donHang, HanhKhach hanhKhach, ChiTietGhe ghe,
+                                                ChiTietChuyenBay chuyenBay, LocalDateTime ngayDatCho) {
+        DatCho datCho = new DatCho();
+        datCho.setDonHang(donHang);
+        datCho.setHanhKhach(hanhKhach);
+        datCho.setChiTietGhe(ghe);
+        datCho.setChuyenBay(chuyenBay);
+        datCho.setHangVe(ghe.getHangVe());
+        datCho.setNgayDatCho(ngayDatCho);
+        datCho.setTrangThai("ACTIVE");
+        datCho.setCheckInStatus(false);
+
+        // Tính giá vé
+        BigDecimal giaVe = calculateGiaVe(chuyenBay.getMaChuyenBay(), ghe.getHangVe().getMaHangVe());
+        datCho.setGiaVe(giaVe);
+
+        return datChoRepository.save(datCho);
+    }
+
+    /**
+     * Xử lý chuyến bay chiều về (KHÔNG tạo GheDaDat - sẽ tạo ở bước riêng)
+     */
+    private List<ChiTietGhe> processReturnFlightWithoutGheDaDat(CreateBookingRequest request, DonHang donHang,
+                                                               List<HanhKhach> danhSachHanhKhach, LocalDateTime ngayDatCho,
+                                                               List<DatCho> danhSachDatCho) {
+        CreateBookingRequest.FlightDetail returnFlight = request.getFlightInfo().getReturnFlight();
+
+        // Get return flight seats
+        List<Integer> danhSachMaGheVe = getSeatList(returnFlight);
+
+        if (danhSachMaGheVe.size() != request.getPassengerInfo().size()) {
+            throw new IllegalArgumentException("Số lượng ghế chiều về (" + danhSachMaGheVe.size() + ") phải bằng số lượng hành khách (" + request.getPassengerInfo().size() + ")");
+        }
+
+        // Get chuyến bay về
+        ChiTietChuyenBay chuyenBayVe = chiTietChuyenBayRepository.findById(returnFlight.getMaChuyenBay())
+            .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy chuyến bay chiều về"));
+
+        // Lock and validate return seats
+        List<ChiTietGhe> danhSachGheVe = lockAndValidateSeats(danhSachMaGheVe, returnFlight.getMaChuyenBay());
+
+        // Create return bookings (KHÔNG tạo GheDaDat)
+        for (int i = 0; i < request.getPassengerInfo().size(); i++) {
+            HanhKhach hanhKhach = danhSachHanhKhach.get(i);
+            ChiTietGhe gheVe = danhSachGheVe.get(i);
+
+            DatCho datChoVe = createDatChoWithoutGheDaDat(donHang, hanhKhach, gheVe, chuyenBayVe, ngayDatCho);
+            danhSachDatCho.add(datChoVe);
+        }
+
+        return danhSachGheVe;
+    }
+
+    /**
+     * Tạo thông tin thanh toán PENDING với V7 fields
+     */
+    private TrangThaiThanhToan createThanhToanPending(DonHang donHang, BigDecimal totalAmount) {
+        TrangThaiThanhToan thanhToan = new TrangThaiThanhToan();
+        thanhToan.setDonHang(donHang);
+        thanhToan.setSoTien(totalAmount);
+        thanhToan.setDaThanhToan('N');
+        thanhToan.setPhuongThucThanhToan("VNPAY"); // Set ngay vì hiện tại chỉ có VNPay
+        thanhToan.setTrangThai("PENDING"); // V7 field
+        thanhToan.setTransactionCode(null); // Sẽ fill sau callback
+        thanhToan.setThoigianThanhToan(null); // Sẽ fill sau callback
+
+        // Set expiration time (15 minutes from now)
+        LocalDateTime hetHan = LocalDateTime.now().plusMinutes(15);
+        thanhToan.setNgayHetHan(java.sql.Date.valueOf(hetHan.toLocalDate()));
+
+        return trangThaiThanhToanRepository.save(thanhToan);
     }
 }

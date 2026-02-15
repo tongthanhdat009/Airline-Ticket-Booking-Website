@@ -8,12 +8,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface DatChoRepository extends JpaRepository<DatCho, Integer> {
-    
+
+    // Tìm đặt chỗ theo đơn hàng
+    List<DatCho> findByDonHang_MaDonHang(int maDonHang);
+
     // Tìm đặt chỗ theo hành khách
     List<DatCho> findByHanhKhach_MaHanhKhach(int maHanhKhach);
     

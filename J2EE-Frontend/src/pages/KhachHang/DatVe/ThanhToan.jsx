@@ -219,12 +219,14 @@ function ThanhToan() {
                             <div className="flex justify-between mb-2">
                                 <span>{t('booking.payment.ticket_price')}</span>
                                 <span className="font-semibold">
-                                    {formatCurrencyWithCommas(formData.totalPrice - 583000)} VND
+                                    {formatCurrencyWithCommas(formData.basePrice || formData.totalPrice)} VND
                                 </span>
                             </div>
                             <div className="flex justify-between mb-2">
                                 <span>{t('booking.payment.tax_fee') || 'Thuế và phí'}</span>
-                                <span className="font-semibold">583,000 VND</span>
+                                <span className="font-semibold">
+                                    {formatCurrencyWithCommas(formData.taxFee || 0)} VND
+                                </span>
                             </div>
                             <div className="border-t pt-2 mt-2">
                                 <div className="flex justify-between text-xl font-bold text-[#1E88E5]">

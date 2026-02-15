@@ -708,11 +708,12 @@ public class DonHangService {
 
     /**
      * Tạo hóa đơn cho đơn hàng khi xác nhận thanh toán
-     * 
+     * Public method để có thể gọi từ VNPayService
+     *
      * @param donHang Đơn hàng cần tạo hóa đơn
      * @return HoaDon đã tạo
      */
-    private HoaDon taoHoaDon(DonHang donHang) {
+    public HoaDon taoHoaDon(DonHang donHang) {
         // Kiểm tra xem đã có hóa đơn cho đơn hàng này chưa
         List<HoaDon> existingHoaDon = hoaDonRepository.findByDonHang_MaDonHang(donHang.getMaDonHang());
         if (!existingHoaDon.isEmpty()) {
