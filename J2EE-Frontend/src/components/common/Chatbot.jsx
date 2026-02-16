@@ -1,5 +1,6 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { getApiUrl } from '../../config/api.config';
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,7 +34,7 @@ const Chatbot = () => {
 
     try {
       // Gọi API chat với AI
-      const response = await axios.post('http://localhost:8080/api/ai/chat', {
+      const response = await axios.post(getApiUrl('/api/ai/chat'), {
         message: userMessage,
         temperature: 0.7,
         maxTokens: 4096

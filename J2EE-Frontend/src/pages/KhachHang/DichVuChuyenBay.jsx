@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import ClientDichVuService from "../../services/ClientDichVuService";
+import { getAssetUrl } from "../../config/api.config";
 
 function DichVuChuyenBay() {
   const { t } = useTranslation();
@@ -190,7 +191,7 @@ function DichVuChuyenBay() {
                     <div className="flex items-start mb-4">
                       {service.anh && (
                         <img 
-                          src={`http://localhost:8080/admin/dashboard/dichvu/anh/${service.anh}`}
+                          src={getAssetUrl(`/admin/dashboard/dichvu/anh/${service.anh}`)}
                           alt={service.tenDichVu}
                           className="w-16 h-16 object-contain mr-4"
                         />
@@ -214,7 +215,7 @@ function DichVuChuyenBay() {
                           >
                             {option.anh && (
                               <img 
-                                src={`http://localhost:8080/admin/dashboard/dichvu/luachon/anh/${option.anh}`}
+                                src={getAssetUrl(`/admin/dashboard/dichvu/luachon/anh/${option.anh}`)}
                                 alt={option.tenLuaChon}
                                 className="w-full h-32 object-cover rounded-lg mb-3"
                               />

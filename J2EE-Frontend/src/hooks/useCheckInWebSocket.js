@@ -1,8 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-
-const WS_URL = 'http://localhost:8080/ws';
+import { WS_BASE_URL } from '../config/api.config';
 
 /**
  * Hook để lắng nghe sự kiện check-in real-time qua WebSocket
@@ -13,7 +12,7 @@ export const useCheckInWebSocket = (onCheckIn) => {
 
   useEffect(() => {
     const client = new Client({
-      webSocketFactory: () => new SockJS(WS_URL),
+      webSocketFactory: () => new SockJS(WS_BASE_URL),
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,

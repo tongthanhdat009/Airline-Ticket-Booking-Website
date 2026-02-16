@@ -1,7 +1,8 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
-const BASE_URL = "http://localhost:8080";
+// Lấy BASE_URL từ biến môi trường, fallback về localhost khi phát triển
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 // Tạo một axios instance dùng chung
 const apiClient = axios.create({

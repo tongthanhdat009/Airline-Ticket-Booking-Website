@@ -2,6 +2,7 @@
 import { FaPlus, FaEdit, FaTrash, FaConciergeBell } from 'react-icons/fa';
 import CreateOptionModal from './CreateOptionModal';
 import EditOptionModal from './EditOptionModal';
+import { getAssetUrl } from '../../../config/api.config';
 
 const ServiceDetailModal = ({ service, options, onClose, onCreateOption, onEditOption, onDeleteOption }) => {
   const [isCreateOptionModalOpen, setIsCreateOptionModalOpen] = useState(false);
@@ -84,7 +85,7 @@ const ServiceDetailModal = ({ service, options, onClose, onCreateOption, onEditO
                     <div className="flex justify-between items-start">
                       <div className="flex-1 flex gap-4">
                         <img 
-                          src={option.anh ? `http://localhost:8080/admin/dashboard/dichvu/luachon/anh/${option.anh}` : '/no-product.png'} 
+                          src={option.anh ? getAssetUrl(`/admin/dashboard/dichvu/luachon/anh/${option.anh}`) : '/no-product.png'} 
                           alt={option.tenLuaChon} 
                           className="w-16 h-16 object-contain border border-gray-300 rounded-lg shrink-0"
                           onError={(e) => {

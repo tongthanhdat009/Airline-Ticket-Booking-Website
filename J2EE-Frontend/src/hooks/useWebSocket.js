@@ -2,6 +2,9 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 
+// Lấy WebSocket URL từ biến môi trường, fallback về localhost khi phát triển
+const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL || "http://localhost:8080/ws";
+
 // Hàm để lấy access token từ localStorage
 const getAccessToken = () => {
   return localStorage.getItem("accessToken") || "";
@@ -18,7 +21,7 @@ const useWebSocket = () => {
     const token = getAccessToken();
 
     // Tạo kết nối WebSocket với authentication headers
-    const socket = new SockJS("http://localhost:8080/ws");
+    const socket = new SockJS(WS_BASE_URL);
     const stompClient = new Client({
       webSocketFactory: () => socket,
       connectHeaders: {

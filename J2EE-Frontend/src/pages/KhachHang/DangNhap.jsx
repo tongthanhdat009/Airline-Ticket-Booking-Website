@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { DangNhapClientServices } from "../../services/DangNhapClientServices";
 import { getClientAccessToken, setClientUserEmail } from "../../utils/cookieUtils";
 import { loginAndSetTokens } from "../../services/apiClient";
+import { getOAuthUrl } from "../../config/api.config";
 
 function DangNhap() {
   const { t } = useTranslation()
@@ -78,7 +79,7 @@ function DangNhap() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8080/oauth2/authorization/google";
+    window.location.href = getOAuthUrl('google');
   };
 
   // Hiển thị loading khi đang kiểm tra authentication

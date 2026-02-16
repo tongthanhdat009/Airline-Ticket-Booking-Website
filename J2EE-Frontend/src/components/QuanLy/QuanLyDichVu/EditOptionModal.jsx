@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getAssetUrl } from '../../../config/api.config';
 
 const EditOptionModal = ({ option, onClose, onSave, options }) => {
   const [formData, setFormData] = useState({
@@ -13,7 +14,7 @@ const EditOptionModal = ({ option, onClose, onSave, options }) => {
   // Load image preview when editing
   useEffect(() => {
     if (option?.anh) {
-      setImagePreview(`http://localhost:8080/admin/dashboard/dichvu/luachon/anh/${option.anh}`);
+      setImagePreview(getAssetUrl(`/admin/dashboard/dichvu/luachon/anh/${option.anh}`));
     }
   }, [option]);
 

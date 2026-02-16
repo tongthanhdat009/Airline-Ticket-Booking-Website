@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getAssetUrl } from '../../../config/api.config';
 
 const ServiceModal = ({ service, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -124,7 +125,7 @@ const ServiceModal = ({ service, onClose, onSave }) => {
                 {imagePreview && (
                   <div className="flex justify-center">
                     <img
-                      src={imagePreview.startsWith('blob:') ? imagePreview : `http://localhost:8080${imagePreview}`}
+                      src={getAssetUrl(imagePreview)}
                       alt="Preview"
                       className="w-20 h-20 md:w-24 md:h-24 object-contain border border-gray-300 rounded-lg"
                       onError={(e) => {

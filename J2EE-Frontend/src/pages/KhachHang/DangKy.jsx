@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { DangKyClientServices } from "../../services/DangKyClientServices";
 import { EmailVerificationService } from "../../services/EmailVerificationService";
 import { getClientAccessToken } from "../../utils/cookieUtils";
+import { getOAuthUrl } from "../../config/api.config";
 
 function DangKy() {
   const { t } = useTranslation()
@@ -120,7 +121,7 @@ function DangKy() {
   };
 
   const handleGoogleRegister = () => {
-    window.location.href = "http://localhost:8080/oauth2/authorization/google";
+    window.location.href = getOAuthUrl('google');
   };
 
   // Hiển thị loading khi đang kiểm tra authentication

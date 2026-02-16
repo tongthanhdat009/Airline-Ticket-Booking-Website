@@ -8,6 +8,7 @@ import TaiKhoanService from '../../services/TaiKhoanService';
 import DatChoService from '../../services/DatChoService';
 import VNPayService from '../../services/VNPayService';
 import { getClientUserEmail, getClientAccessToken } from '../../utils/cookieUtils';
+import { getPdfUrl } from '../../config/api.config';
 
 function LichSuGiaoDich() {
   const navigate = useNavigate();
@@ -115,7 +116,7 @@ function LichSuGiaoDich() {
   const handleDownloadPDF = async (maThanhToan) => {
     try {
       const token = getClientAccessToken();
-      const response = await fetch(`http://localhost:8080/client/invoice/pdf/${maThanhToan}`, {
+      const response = await fetch(getPdfUrl(`/client/invoice/pdf/${maThanhToan}`), {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`
