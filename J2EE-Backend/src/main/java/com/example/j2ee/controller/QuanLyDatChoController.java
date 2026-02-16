@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
  * Cung cấp API: xem danh sách, đổi ghế, đổi chuyến bay, check-in, hủy vé
  */
 @RestController
-@RequestMapping("/api/admin/datcho")
+@RequestMapping("/admin/datcho")
 @Tag(name = "Quản lý đặt chỗ", description = "Admin API quản lý đặt chỗ")
 public class QuanLyDatChoController {
 

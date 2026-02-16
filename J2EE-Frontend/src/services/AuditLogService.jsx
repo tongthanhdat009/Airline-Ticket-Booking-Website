@@ -1,6 +1,6 @@
 import apiClient from './apiClient';
 
-const BASE_URL = '/api/admin/audit-logs';
+const BASE_URL = '/admin/audit-logs';
 
 /**
  * Service cho Audit Log (Lịch sử thao tác)

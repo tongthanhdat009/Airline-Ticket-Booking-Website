@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/checkin")
+@RequestMapping("/checkin")
 public class CheckInController {
     
     private static final Logger logger = LoggerFactory.getLogger(CheckInController.class);

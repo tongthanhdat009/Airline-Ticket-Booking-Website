@@ -1,6 +1,6 @@
 import apiClient from './apiClient';
 
-const BASE_URL = '/api/admin/datcho';
+const BASE_URL = '/admin/datcho';
 
 /**
  * Service cho Quản lý Đặt Chỗ (Admin)

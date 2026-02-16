@@ -1,6 +1,6 @@
 import apiClient from "./apiClient";
 
-const BASE_URL = "/api/khuyenmai";
+const BASE_URL = "/khuyenmai";
 
 /**
  * Service cho Quản lý Khuyến Mãi

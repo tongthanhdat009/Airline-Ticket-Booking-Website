@@ -13,7 +13,7 @@ import java.util.List;
  * API này không cần authentication và chỉ trả về các hạng vé đang hoạt động
  */
 @RestController
-@RequestMapping("/api/hangve")
+@RequestMapping("/hangve")
 public class HangVeController {
 
     private final HangVeService hangVeService;

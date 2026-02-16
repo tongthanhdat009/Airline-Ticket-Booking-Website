@@ -19,7 +19,7 @@ import com.example.j2ee.service.GiaChuyenBayService;
 import com.example.j2ee.service.SanBayService;
 
 @RestController
-@RequestMapping("/api/sanbay")
+@RequestMapping("/sanbay")
 public class SanBayController {
     private final SanBayService sanBayService;
     private final GiaChuyenBayService giaChuyenBayService;

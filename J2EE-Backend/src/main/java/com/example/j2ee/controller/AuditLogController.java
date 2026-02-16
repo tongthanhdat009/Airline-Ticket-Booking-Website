@@ -27,7 +27,7 @@ import java.util.List;
  * Tích hợp RBAC với @RequirePermission
  */
 @RestController
-@RequestMapping("/api/admin/audit-logs")
+@RequestMapping("/admin/audit-logs")
 @RequiredArgsConstructor
 @Tag(name = "Audit Log", description = "API quản lý lịch sử thao tác")
 public class AuditLogController {

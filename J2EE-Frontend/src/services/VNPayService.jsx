@@ -1,6 +1,6 @@
 import apiClient from './apiClient';
 
-const API_BASE_URL = '/api/vnpay';
+const API_BASE_URL = '/vnpay';
 
 const VNPayService = {
   /**
