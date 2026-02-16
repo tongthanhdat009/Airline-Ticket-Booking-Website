@@ -2,7 +2,7 @@ import apiClient from "./apiClient";
 
 export const getAllSanBay = async () =>{
     try{
-        const response = await apiClient.get("/api/sanbay");
+        const response = await apiClient.get("/sanbay");
         return response.data;
     } catch (error) {
         console.error("Lỗi khi lấy danh sách sân bay", error);
@@ -12,7 +12,7 @@ export const getAllSanBay = async () =>{
 
 export const getSanBayByThanhPhoSanBay = async (thanhPhoSanBay) =>{
     try{
-        const response = await apiClient.get(`/api/sanbay/${thanhPhoSanBay}`);
+        const response = await apiClient.get(`/sanbay/${thanhPhoSanBay}`);
         return response.data;
     } catch (error) {
         console.error("Lỗi khi lấy sân bay theo thành phố", error);
@@ -22,7 +22,7 @@ export const getSanBayByThanhPhoSanBay = async (thanhPhoSanBay) =>{
 
 export const searchChuyenBay = async (sanBayDi, sanBayDen, ngayDi) => {
     try {
-        const response = await apiClient.get(`/api/sanbay/${sanBayDi}/${sanBayDen}/${ngayDi}`);
+        const response = await apiClient.get(`/sanbay/${sanBayDi}/${sanBayDen}/${ngayDi}`);
         return response.data;
     } catch (error) {
         console.error("Lỗi khi tìm kiếm chuyến bay", error);
@@ -32,7 +32,7 @@ export const searchChuyenBay = async (sanBayDi, sanBayDen, ngayDi) => {
 
 export const getGiaVe = async (chuyenBayId, hangVeId) => {
     try {
-        const response = await apiClient.get(`/api/sanbay/giave/${chuyenBayId}/${hangVeId}`);
+        const response = await apiClient.get(`/sanbay/giave/${chuyenBayId}/${hangVeId}`);
         return response.data;
     } catch (error) {
         console.error("Lỗi khi lấy giá vé", error);
@@ -42,7 +42,7 @@ export const getGiaVe = async (chuyenBayId, hangVeId) => {
 
 export const getChiTietGheByGheId = async (gheId) => {
     try {
-        const response = await apiClient.get(`/api/sanbay/chitiet/${gheId}`);
+        const response = await apiClient.get(`/sanbay/chitiet/${gheId}`);
         return response.data;
     } catch (error) {
         console.error("Lỗi khi lấy chi tiết ghế", error);
@@ -52,7 +52,7 @@ export const getChiTietGheByGheId = async (gheId) => {
 
 export const getAllDichVuCungCapByChuyenBay = async (maChuyenBay) => {
     try {
-        const response = await apiClient.get(`/api/sanbay/dichvu/${maChuyenBay}`);
+        const response = await apiClient.get(`/sanbay/dichvu/${maChuyenBay}`);
         return response.data;
     } catch (error) {
         console.error("Lỗi khi lấy danh sách dịch vụ cung cấp", error);
@@ -62,7 +62,7 @@ export const getAllDichVuCungCapByChuyenBay = async (maChuyenBay) => {
 
 export const getLuaChonByDichVuId = async (dichVuId) => {
     try {
-        const response = await apiClient.get(`/api/sanbay/chitietdichvu/${dichVuId}`);
+        const response = await apiClient.get(`/sanbay/chitietdichvu/${dichVuId}`);
         return response.data;
     } catch (error) {
         console.error("Lỗi khi lấy lựa chọn dịch vụ theo dịch vụ ID", error);
@@ -72,7 +72,7 @@ export const getLuaChonByDichVuId = async (dichVuId) => {
 
 export const kiemTraConGhe = async (maChuyenBay, maHangVe, soLuongNguoi) => {
     try {
-        const response = await apiClient.get(`/api/sanbay/${maChuyenBay}/hang-ve/${maHangVe}/${soLuongNguoi}`);
+        const response = await apiClient.get(`/sanbay/${maChuyenBay}/hang-ve/${maHangVe}/${soLuongNguoi}`);
         console.log(response);
         return response.data;
     } catch (error) {

@@ -34,7 +34,7 @@ const Chatbot = () => {
 
     try {
       // Gọi API chat với AI
-      const response = await axios.post(getApiUrl('/api/ai/chat'), {
+      const response = await axios.post(getApiUrl('/ai/chat'), {
         message: userMessage,
         temperature: 0.7,
         maxTokens: 4096

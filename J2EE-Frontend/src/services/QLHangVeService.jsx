@@ -1,7 +1,7 @@
 import apiClient from "./apiClient";
 
 const ADMIN_BASE_PATH = '/admin/dashboard/hangve';
-const PUBLIC_BASE_PATH = '/api/hangve';
+const PUBLIC_BASE_PATH = '/hangve';
 
 // ==================== PUBLIC API (Read-only) ====================
 /**

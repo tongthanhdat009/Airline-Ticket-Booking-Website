@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("admin/dashboard/hanhkhach") // Tiền tố chung cho tất cả các API trong controller này
+@RequestMapping("/admin/dashboard/hanhkhach") // Tiền tố chung cho tất cả các API trong controller này
 public class QuanLyHanhKhachController {
 
     private final HanhKhachService hanhKhachService;

@@ -17,7 +17,7 @@ import java.util.Map;
  * Controller quản lý sơ đồ ghế máy bay
  */
 @RestController
-@RequestMapping("/admin/dashboard/maybay")
+@RequestMapping("/admin/dashboard/sodoghe")
 public class QuanLySoDoGheController {
 
     private final ChiTietGheService chiTietGheService;

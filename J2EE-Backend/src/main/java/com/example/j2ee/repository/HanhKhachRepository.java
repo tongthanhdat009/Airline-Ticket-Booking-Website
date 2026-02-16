@@ -79,7 +79,9 @@ public interface HanhKhachRepository extends JpaRepository<HanhKhach, Integer> {
         JOIN
             sanbay sb_den ON tb.masanbayden = sb_den.masanbay
         JOIN
-            trangthaithanhtoan ttt ON dc.madatcho = ttt.madatcho
+            donhang dh ON dc.madonhang = dh.madonhang
+        JOIN
+            trangthaithanhtoan ttt ON dh.madonhang = ttt.madonhang
         WHERE
             hk.mahanhkhach = :maHanhKhach
         ORDER BY

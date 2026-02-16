@@ -132,7 +132,9 @@ public class ThongKeService {
                     JOIN
                         datcho dc ON dcdv.madatcho = dc.madatcho
                     JOIN
-                        trangthaithanhtoan ttt ON dc.madatcho = ttt.madatcho
+                        donhang dh ON dc.madonhang = dh.madonhang
+                    JOIN
+                        trangthaithanhtoan ttt ON dh.madonhang = ttt.madonhang
                     WHERE
                         ttt.dathanhtoan = 1
                         AND DATE(dc.ngaydatcho) BETWEEN ? AND ?

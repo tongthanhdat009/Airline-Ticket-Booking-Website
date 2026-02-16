@@ -546,7 +546,7 @@ const ThongKeDoanhThu = () => {
                                 </div>
                                 {dailyRevenueData.length > 0 ? (
                                     <div className="h-64 sm:h-80 md:h-96 lg:h-[380px]">
-                                        <ResponsiveContainer id="line-chart" width="100%" height="100%" debounce={150}>
+                                        <ResponsiveContainer id="line-chart" width="100%" height="100%" minWidth={0} debounce={150}>
                                             <LineChart data={dailyRevenueData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                                             <defs>
                                                 <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
@@ -599,7 +599,7 @@ const ThongKeDoanhThu = () => {
                                     </div>
                                     {ticketClassRevenueData.length > 0 ? (
                                         <div className="h-56 sm:h-64 md:h-72 lg:h-[340px]">
-                                            <ResponsiveContainer id="pie-chart" width="100%" height="100%" debounce={150}>
+                                            <ResponsiveContainer id="pie-chart" width="100%" height="100%" minWidth={0} debounce={150}>
                                                 <PieChart>
                                                     <Pie
                                                         data={ticketClassRevenueData}
@@ -647,7 +647,7 @@ const ThongKeDoanhThu = () => {
                                     </div>
                                     {serviceRevenueData.length > 0 ? (
                                         <div className="h-56 sm:h-64 md:h-72 lg:h-[340px]">
-                                            <ResponsiveContainer id="bar-chart" width="100%" height="100%" debounce={150}>
+                                            <ResponsiveContainer id="bar-chart" width="100%" height="100%" minWidth={0} debounce={150}>
                                                 <BarChart data={serviceRevenueData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                                                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                                                 <XAxis dataKey="name" fontSize={10} angle={-15} textAnchor="end" height={50} stroke="#6B7280" />

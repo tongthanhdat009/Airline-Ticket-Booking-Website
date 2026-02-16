@@ -27,7 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
-@RequestMapping("admin/dashboard/thongke")
+@RequestMapping("/admin/dashboard/thongke")
 public class ThongKeController {
 
     private final ThongKeService thongKeService;

@@ -61,18 +61,18 @@ public class SecurityConfig {
                         // public endpoints - đặt trước tất cả
                         .requestMatchers("/dangky", "/dangnhap", "/dangnhap/**").permitAll()
                         .requestMatchers("/admin/dangnhap", "/admin/dangnhap/**").permitAll()
-                        .requestMatchers("/api/forgot-password/**").permitAll()
+                        .requestMatchers("/forgot-password/**").permitAll()
                         .requestMatchers("/auth/**").permitAll() // Allow all auth endpoints including verify-email
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         // VNPay callback endpoint - không yêu cầu authentication
-                        .requestMatchers("/api/vnpay/payment-callback").permitAll()
+                        .requestMatchers("/vnpay/payment-callback").permitAll()
                         // Online Check-in API - không yêu cầu authentication
-                        .requestMatchers("/api/checkin/**").permitAll()
+                        .requestMatchers("/checkin/**").permitAll()
                         // Booking API - cho phép khách vãng lai đặt vé
                         .requestMatchers("/client/datcho/**").permitAll()
                         // static resources
-                        .requestMatchers("/api/ai/**").permitAll()
+                        .requestMatchers("/ai/**").permitAll()
                         .requestMatchers("/static/**", "/AnhDichVuCungCap/**").permitAll()
                         .requestMatchers("/admin/dashboard/dichvu/anh/**").permitAll()
                         .requestMatchers("/admin/dashboard/dichvu/luachon/anh/**").permitAll()
@@ -94,9 +94,9 @@ public class SecurityConfig {
                         // 3. Hiệu suất - roles được cache trong JWT token
                         // 4. Flexible - frontend ẩn/hiện UI dựa trên permissions
                         .requestMatchers("/admin/dashboard/**").access(dynamicAdminAuthManager)
-                        .requestMatchers("/api/admin/**").access(dynamicAdminAuthManager)
+                        .requestMatchers("/admin/**").access(dynamicAdminAuthManager)
                         // rest yêu cầu authentication
-                        .requestMatchers("/api/sanbay/**").permitAll()
+                        .requestMatchers("/sanbay/**").permitAll()
                         .requestMatchers("/AnhDichVuCungCap/**").permitAll()
                         .anyRequest().authenticated()
                 )
