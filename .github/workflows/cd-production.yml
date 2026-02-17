@@ -30,22 +30,33 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         with:
           host: ${{ secrets.PRODUCTION_HOST }}
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
           port: ${{ secrets.PRODUCTION_PORT || 22 }}
           script_stop: true
-          envs: GITHUB_TOKEN
+          envs: GITHUB_TOKEN,GITHUB_REPOSITORY
           script: |
             set -e
             echo "=== Production Deploy ==="
             echo "Commit: ${{ github.sha }}"
             echo "Ref: ${{ github.ref_name }}"
             echo "Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+            # Configure git to use GITHUB_TOKEN for HTTPS clone
+            git config --global credential.helper store
+            echo "https://x-access-token:${GITHUB_TOKEN}@github.com" > ~/.git-credentials
+            export REPO_URL="https://github.com/${GITHUB_REPOSITORY}.git"
+
             if [ ! -x /opt/airline/deploy-production.sh ]; then
               echo "ERROR: Missing or not executable /opt/airline/deploy-production.sh"
               exit 1
             fi
             /opt/airline/deploy-production.sh
+
+            # Cleanup credentials
+            rm -f ~/.git-credentials
+            git config --global --unset credential.helper || true
             echo "Production deploy completed successfully"
