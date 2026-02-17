@@ -33,7 +33,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.STAGING_PORT || 22 }}
           script_stop: true
-          envs: GITHUB_TOKEN
+          envs: GITHUB_TOKEN=${{ github.token }}
           script: |
             set -e
             echo "=== Staging Deploy ==="

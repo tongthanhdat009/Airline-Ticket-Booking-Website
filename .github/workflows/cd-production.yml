@@ -34,7 +34,7 @@ jobs:
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
           port: ${{ secrets.PRODUCTION_PORT || 22 }}
           script_stop: true
-          envs: GITHUB_TOKEN
+          envs: GITHUB_TOKEN=${{ github.token }}
           script: |
             set -e
             echo "=== Production Deploy ==="
