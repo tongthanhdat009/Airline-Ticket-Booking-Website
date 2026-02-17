@@ -10,7 +10,8 @@ ENV="production"
 DEPLOY_DIR="/opt/airline-prod"
 BACKEND_DIR="$DEPLOY_DIR/backend"
 FRONTEND_DIR="$DEPLOY_DIR/frontend"
-GIT_REPO="${GITHUB_REPO_URL:-tongthanhdat009/Airline-Ticket-Booking-Website}"
+# Use REPO_URL from workflow, or fallback to default
+GIT_REPO_URL="${REPO_URL:-https://github.com/tongthanhdat009/Airline-Ticket-Booking-Website.git}"
 GIT_BRANCH="main"
 BACKEND_PORT=8080
 DB_NAME="airline_prod_db"
@@ -28,17 +29,8 @@ cd $TEMP_DIR
 
 echo "📥 Cloning repository..."
 
-# Clone với GitHub Token (nếu có) hoặc SSH
-if [ -n "$GITHUB_TOKEN" ]; then
-    # Clone với token
-    git clone -b $GIT_BRANCH --depth 1 https://${GITHUB_TOKEN}@github.com/${GIT_REPO}.git temp-repo
-elif [ -f ~/.ssh/id_rsa ]; then
-    # Clone với SSH
-    git clone -b $GIT_BRANCH --depth 1 git@github.com:${GIT_REPO}.git temp-repo
-else
-    echo "❌ ERROR: Neither GITHUB_TOKEN nor SSH key found!"
-    exit 1
-fi
+# Clone repo (git credentials already configured by workflow)
+git clone -b $GIT_BRANCH --depth 1 $GIT_REPO_URL temp-repo
 
 cd temp-repo
 

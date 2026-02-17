@@ -29,7 +29,7 @@ jobs:
       - name: Deploy to production VPS via SSH
         uses: appleboy/ssh-action@v1.0.3
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         with:
           host: ${{ secrets.PRODUCTION_HOST }}
