@@ -16,7 +16,7 @@ const ThongTinTaiKhoan = ({ customer }) => {
         if (customer) {
             fetchAccountInfo();
         }
-    }, [customer]);
+    }, [customer, fetchAccountInfo]);
 
     const fetchAccountInfo = async () => {
         if (!customer) return;

@@ -13,7 +13,7 @@ const ManageServiceModal = ({ isOpen, onClose, flight, showToast }) => {
         if (isOpen && flight) {
             fetchAllData();
         }
-    }, [isOpen, flight]);
+    }, [isOpen, flight, fetchAllData]);
 
     const fetchAllData = async () => {
         setLoading(true);

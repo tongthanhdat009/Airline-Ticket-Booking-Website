@@ -22,7 +22,7 @@ const DoiHangVeModal = ({
       setPhiDoiInfo(null);
       loadHangVeList();
     }
-  }, [isOpen, datCho]);
+  }, [isOpen, datCho, loadHangVeList]);
 
   // Load danh sách hạng vé
   const loadHangVeList = async () => {

@@ -34,12 +34,12 @@ function TimChuyenBayForm() {
         if (departureValue && departureValue === arrivalValue) {
             setArrivalValue("");
         }
-    }, [departureValue]);
+    }, [departureValue, arrivalValue]);
     useEffect(() => {
         if (arrivalValue && arrivalValue === departureValue) {
             setDepartureValue("");
         }
-    }, [arrivalValue]);
+    }, [arrivalValue, departureValue]);
 
     useEffect(() => {
         const fetchData = async () => {

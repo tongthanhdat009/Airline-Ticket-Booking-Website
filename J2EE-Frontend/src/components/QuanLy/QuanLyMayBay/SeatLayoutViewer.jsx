@@ -35,7 +35,7 @@ const SeatLayoutViewer = ({ maMayBay, onClose }) => {
 
     useEffect(() => {
         loadSeats();
-    }, [maMayBay]);
+    }, [maMayBay, loadSeats]);
 
     // Group seats by class (hangVe)
     const groupSeatsByClass = (seatList) => {

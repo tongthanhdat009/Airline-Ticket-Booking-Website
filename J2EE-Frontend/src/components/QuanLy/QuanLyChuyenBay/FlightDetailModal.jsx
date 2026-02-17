@@ -13,7 +13,7 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
         if (isOpen && flight) {
             fetchAllData();
         }
-    }, [isOpen, flight]);
+    }, [isOpen, flight, fetchAllData]);
 
     const fetchAllData = async () => {
         setLoading(true);

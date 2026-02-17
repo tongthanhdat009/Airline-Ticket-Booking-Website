@@ -10,6 +10,8 @@ import com.example.j2ee.model.DonHang;
 import com.example.j2ee.model.HanhKhach;
 import com.example.j2ee.repository.DatChoRepository;
 import com.example.j2ee.repository.DonHangRepository;
+import com.example.j2ee.repository.HoaDonRepository;
+import com.example.j2ee.repository.TrangThaiThanhToanRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,6 +47,12 @@ class DonHangServiceTest {
 
     @Mock
     private DatChoRepository datChoRepository;
+
+    @Mock
+    private HoaDonRepository hoaDonRepository;
+
+    @Mock
+    private TrangThaiThanhToanRepository trangThaiThanhToanRepository;
 
     @InjectMocks
     private DonHangService donHangService;
@@ -102,7 +110,7 @@ class DonHangServiceTest {
     void testGetAllDonHang_WithFilters() {
         // Given
         List<DonHang> expectedOrders = List.of(testDonHang);
-        when(donHangRepository.findAll(any(Specification.class))).thenReturn(expectedOrders);
+        when(donHangRepository.findAll(any(Specification.class), any(Sort.class))).thenReturn(expectedOrders);
 
         // When
         List<DonHangResponse> result = donHangService.getAllDonHang(
@@ -122,7 +130,7 @@ class DonHangServiceTest {
         assertEquals(1, result.size());
         assertEquals("ABC123", result.get(0).getPnr());
         assertEquals("CHỜ THANH TOÁN", result.get(0).getTrangThai());
-        verify(donHangRepository, times(1)).findAll(any(Specification.class));
+        verify(donHangRepository, times(1)).findAll(any(Specification.class), any(Sort.class));
     }
 
     @Test
@@ -196,6 +204,8 @@ class DonHangServiceTest {
 
         when(donHangRepository.findById(1)).thenReturn(Optional.of(testDonHang));
         when(donHangRepository.save(any(DonHang.class))).thenReturn(testDonHang);
+        when(hoaDonRepository.findByDonHang_MaDonHang(anyInt())).thenReturn(List.of());
+        when(hoaDonRepository.countHoaDonInCurrentYear()).thenReturn(0L);
 
         // When
         DonHangResponse result = donHangService.updateTrangThai(1, request);
@@ -342,7 +352,7 @@ class DonHangServiceTest {
     @Test
     void testGetDonHangByPnr_Found() {
         // Given
-        when(donHangRepository.findByPnrIgnoreCase("ABC123")).thenReturn(Optional.of(testDonHang));
+        when(donHangRepository.findByPnr("ABC123")).thenReturn(Optional.of(testDonHang));
 
         // When
         DonHangDetailResponse result = donHangService.getDonHangByPnr("ABC123");
@@ -350,13 +360,13 @@ class DonHangServiceTest {
         // Then
         assertNotNull(result);
         assertEquals("ABC123", result.getPnr());
-        verify(donHangRepository, times(1)).findByPnrIgnoreCase("ABC123");
+        verify(donHangRepository, times(1)).findByPnr("ABC123");
     }
 
     @Test
     void testGetDonHangByPnr_NotFound() {
         // Given
-        when(donHangRepository.findByPnrIgnoreCase("INVALID")).thenReturn(Optional.empty());
+        when(donHangRepository.findByPnr("INVALID")).thenReturn(Optional.empty());
 
         // When & Then
         IllegalArgumentException exception = assertThrows(
@@ -365,6 +375,6 @@ class DonHangServiceTest {
         );
 
         assertTrue(exception.getMessage().contains("Không tìm thấy đơn hàng với PNR"));
-        verify(donHangRepository, times(1)).findByPnrIgnoreCase("INVALID");
+        verify(donHangRepository, times(1)).findByPnr("INVALID");
     }
 }

@@ -53,7 +53,7 @@ const SeatLayoutEditor = ({ maMayBay, onClose }) => {
 
     useEffect(() => {
         loadData();
-    }, [maMayBay]);
+    }, [maMayBay, loadData]);
 
     const loadData = async () => {
         try {

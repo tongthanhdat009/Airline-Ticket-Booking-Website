@@ -65,7 +65,7 @@ function DanhSachNgayBay({ ngayChon, onSelect = () => {} }) {
       setSelectedIndex(foundIndex);
       scrollToIndex(foundIndex);
     }
-  }, [ngayChon, days]);
+  }, [ngayChon, days, selectedIndex, scrollToIndex]);
 
   return (
     <div className="relative flex items-center justify-center mt-3 px-38">

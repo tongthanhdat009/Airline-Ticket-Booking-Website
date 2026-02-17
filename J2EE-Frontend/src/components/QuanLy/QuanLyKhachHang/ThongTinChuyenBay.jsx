@@ -15,7 +15,7 @@ const ThongTinChuyenBay = ({ customer }) => {
         if (customer) {
             fetchFlights();
         }
-    }, [customer]);
+    }, [customer, fetchFlights]);
 
     const fetchFlights = async () => {
         if (!customer) return;
