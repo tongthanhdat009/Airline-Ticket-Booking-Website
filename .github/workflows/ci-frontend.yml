@@ -14,8 +14,8 @@ on:
   workflow_call:
 
 concurrency:
-  group: ci-frontend-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-frontend-${{ github.ref }}-${{ github.run_id }}
+  cancel-in-progress: false
 
 jobs:
   frontend-lint-build:

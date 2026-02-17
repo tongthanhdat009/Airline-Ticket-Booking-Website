@@ -27,21 +27,30 @@ jobs:
 
       - name: Deploy to staging VPS via SSH
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         with:
-          host: ${{ secrets.VPS_IP }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.STAGING_PORT || 22 }}
           script_stop: true
+          envs: GITHUB_TOKEN,GITHUB_REPOSITORY
           script: |
             set -e
             echo "=== Staging Deploy ==="
             echo "Commit: ${{ github.sha }}"
             echo "Branch: ${{ github.ref_name }}"
             echo "Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+            # Direct URL with token (simpler than credential.helper)
+            export REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+
             if [ ! -x /opt/airline/deploy-staging.sh ]; then
               echo "ERROR: Missing or not executable /opt/airline/deploy-staging.sh"
               exit 1
             fi
-            /opt/airline/deploy-staging.sh
+            /opt/airline/deploy-staging.sh "$REPO_URL"
+
             echo "Staging deploy completed successfully"

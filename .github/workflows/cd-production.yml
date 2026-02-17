@@ -28,21 +28,30 @@ jobs:
 
       - name: Deploy to production VPS via SSH
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         with:
-          host: ${{ secrets.VPS_IP }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          port: ${{ secrets.PRODUCTION_PORT || 22 }}
           script_stop: true
+          envs: GITHUB_TOKEN,GITHUB_REPOSITORY
           script: |
             set -e
             echo "=== Production Deploy ==="
             echo "Commit: ${{ github.sha }}"
             echo "Ref: ${{ github.ref_name }}"
             echo "Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+            # Direct URL with token (simpler than credential.helper)
+            export REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+
             if [ ! -x /opt/airline/deploy-production.sh ]; then
               echo "ERROR: Missing or not executable /opt/airline/deploy-production.sh"
               exit 1
             fi
-            /opt/airline/deploy-production.sh
+            /opt/airline/deploy-production.sh "$REPO_URL"
+
             echo "Production deploy completed successfully"
