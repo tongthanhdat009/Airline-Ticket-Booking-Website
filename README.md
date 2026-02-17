@@ -1,3 +1,2 @@
 # Airline Ticket Booking Website
-
-hehe
+This is a web application for booking airline tickets. It allows users to search for flights, view flight details, and book tickets. The application is built using Java Spring Boot for the backend and React for the frontend.
