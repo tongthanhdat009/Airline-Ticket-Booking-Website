@@ -231,7 +231,7 @@ class DonHangServiceTest {
                 () -> donHangService.updateTrangThai(1, request)
         );
 
-        assertTrue(exception.getMessage().contains("Không thể chuyển từ trạng thái ĐÃ HỦY sang ĐÃ THANH TOÁN"));
+        assertTrue(exception.getMessage().contains("Không thể chuyển từ trạng thái 'ĐÃ HỦY' sang 'ĐÃ THANH TOÁN'"));
         verify(donHangRepository, never()).save(any(DonHang.class));
     }
 
@@ -245,7 +245,7 @@ class DonHangServiceTest {
 
         when(donHangRepository.findById(1)).thenReturn(Optional.of(testDonHang));
         when(donHangRepository.save(any(DonHang.class))).thenReturn(testDonHang);
-        when(datChoRepository.saveAll(any())).thenReturn(null);
+        when(datChoRepository.save(any())).thenReturn(testDatCho);
 
         // When
         DonHangResponse result = donHangService.huyDonHang(1, request);
@@ -253,10 +253,10 @@ class DonHangServiceTest {
         // Then
         assertNotNull(result);
         assertEquals("ĐÃ HỦY", result.getTrangThai());
-        assertEquals("Khách thay đổi kế hoạch", testDonHang.getGhiChu());
+        assertEquals("[Lý do hủy: Khách thay đổi kế hoạch]", testDonHang.getGhiChu());
         assertEquals("CANCELLED", testDatCho.getTrangThai());
         verify(donHangRepository, times(1)).save(any(DonHang.class));
-        verify(datChoRepository, times(1)).saveAll(any());
+        verify(datChoRepository, times(1)).save(any(DatCho.class));
     }
 
     @Test
