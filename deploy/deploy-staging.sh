@@ -10,7 +10,7 @@ ENV="staging"
 DEPLOY_DIR="/opt/airline-stag"
 BACKEND_DIR="$DEPLOY_DIR/backend"
 FRONTEND_DIR="$DEPLOY_DIR/frontend"
-GIT_REPO="${GIT_REPO:-https://github.com/$(git remote get-url origin | sed 's/.*github.com[:/]\(.*\)\.git/\1/')}"
+GIT_REPO="${GITHUB_REPO_URL:-tongthanhdat009/Airline-Ticket-Booking-Website}"
 GIT_BRANCH="develop"
 BACKEND_PORT=8081
 DB_NAME="airline_stag_db"
@@ -31,15 +31,13 @@ echo "📥 Cloning repository..."
 # Clone với GitHub Token (nếu có) hoặc SSH
 if [ -n "$GITHUB_TOKEN" ]; then
     # Clone với token
-    GIT_REPO="https://${GITHUB_TOKEN}@github.com/$(git remote get-url origin | sed 's/.*github.com[:/]\(.*\)\.git/\1/')"
-    git clone -b $GIT_BRANCH --depth 1 $GIT_REPO temp-repo
-elif [ -n "$SSH_KEY" ] || [ -f ~/.ssh/id_rsa ]; then
+    git clone -b $GIT_BRANCH --depth 1 https://${GITHUB_TOKEN}@github.com/${GIT_REPO}.git temp-repo
+elif [ -f ~/.ssh/id_rsa ]; then
     # Clone với SSH
-    GIT_REPO="git@github.com:$(git remote get-url origin | sed 's/.*github.com[:/]\(.*\)\.git/\1/')"
-    git clone -b $GIT_BRANCH --depth 1 $GIT_REPO temp-repo
+    git clone -b $GIT_BRANCH --depth 1 git@github.com:${GIT_REPO}.git temp-repo
 else
-    # Clone public (chỉ đọc được public repo)
-    git clone -b $GIT_BRANCH --depth 1 https://github.com/$(git remote get-url origin | sed 's/.*github.com[:/]\(.*\)\.git/\1/') temp-repo
+    echo "❌ ERROR: Neither GITHUB_TOKEN nor SSH key found!"
+    exit 1
 fi
 
 cd temp-repo
@@ -63,7 +61,7 @@ fuser -k ${BACKEND_PORT}/tcp 2>/dev/null || true
 sleep 2
 
 # Backup version cũ (nếu có)
-if [ -d "$BACKEND_DIR" ] && [ "$(ls -A $BACKEND_DIR)" ]; then
+if [ -d "$BACKEND_DIR" ] && [ "$(ls -A $BACKEND_DIR 2>/dev/null)" ]; then
     echo "💾 Backing up old backend..."
     cp -r $BACKEND_DIR ${BACKEND_DIR}_backup_$(date +%Y%m%d_%H%M%S) || true
 fi
