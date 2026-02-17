@@ -27,13 +27,15 @@ jobs:
 
       - name: Deploy to staging VPS via SSH
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           host: ${{ secrets.STAGING_HOST }}
           username: ${{ secrets.STAGING_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.STAGING_PORT || 22 }}
           script_stop: true
-          envs: GITHUB_TOKEN=${{ github.token }}
+          envs: GITHUB_TOKEN
           script: |
             set -e
             echo "=== Staging Deploy ==="
