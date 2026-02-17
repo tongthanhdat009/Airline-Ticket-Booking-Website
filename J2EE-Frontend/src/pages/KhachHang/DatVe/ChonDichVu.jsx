@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 
 import { formatCurrencyWithCommas } from "../../../services/utils";
-import { getAssetUrl } from "../../../config/api.config";
 
 import { getDichVuByChuyenBay } from "../../../services/QLDichVuChuyenBayService";
 import SlidePanel from "../../../components/KhachHang/SlidePanel";

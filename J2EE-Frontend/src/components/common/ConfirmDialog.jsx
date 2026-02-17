@@ -26,6 +26,22 @@ const ConfirmDialog = ({
   onCancel,
   showIcon = true
 }) => {
+  const handleCancel = () => {
+    if (onCancel) onCancel();
+  };
+
+  // Đóng dialog khi nhấn phím Escape
+  React.useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && isVisible) {
+        handleCancel();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isVisible]);
+
   if (!isVisible) return null;
 
   // Định nghĩa style theo loại
@@ -68,22 +84,6 @@ const ConfirmDialog = ({
   const handleConfirm = () => {
     if (onConfirm) onConfirm();
   };
-
-  const handleCancel = () => {
-    if (onCancel) onCancel();
-  };
-
-  // Đóng dialog khi nhấn phím Escape
-  React.useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape' && isVisible) {
-        handleCancel();
-      }
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [isVisible]);
 
   return (
     <div className="fixed inset-0 z-60 flex items-center justify-center p-4">

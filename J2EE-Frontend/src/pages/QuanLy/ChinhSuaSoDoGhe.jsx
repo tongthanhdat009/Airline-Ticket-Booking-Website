@@ -257,11 +257,9 @@ const ChinhSuaSoDoGhe = () => {
 
             if (wasSelected) {
                 // Deselecting row - remove all seats in this row
-                const seatIdsInRow = rowSeats.map(s => s.maGhe);
-                setSelectedSeats(prevSeats => prevSeats.filter(s => !seatIdsInRow.includes(s.maGhe)));
+                setSelectedSeats(prevSeats => prevSeats.filter(s => !rowSeats.map(seat => seat.maGhe).includes(s.maGhe)));
             } else {
                 // Selecting row - add all seats in this row (avoiding duplicates)
-                const seatIdsInRow = new Set(rowSeats.map(s => s.maGhe));
                 setSelectedSeats(prevSeats => {
                     const existingIds = new Set(prevSeats.map(s => s.maGhe));
                     const newSeats = rowSeats.filter(s => !existingIds.has(s.maGhe));
@@ -285,7 +283,6 @@ const ChinhSuaSoDoGhe = () => {
             if (shouldSelect) {
                 // Select all seats in these rows
                 const allRowSeats = seats.filter(s => rows.includes(s.hang));
-                const seatIdsInRows = new Set(allRowSeats.map(s => s.maGhe));
                 setSelectedSeats(prevSeats => {
                     const existingIds = new Set(prevSeats.map(s => s.maGhe));
                     const newSeats = allRowSeats.filter(s => !existingIds.has(s.maGhe));
@@ -293,8 +290,7 @@ const ChinhSuaSoDoGhe = () => {
                 });
             } else {
                 // Deselect all seats in these rows
-                const seatIdsInRows = seats.filter(s => rows.includes(s.hang)).map(s => s.maGhe);
-                setSelectedSeats(prevSeats => prevSeats.filter(s => !seatIdsInRows.includes(s.maGhe)));
+                setSelectedSeats(prevSeats => prevSeats.filter(s => !seats.filter(seat => rows.includes(seat.hang)).map(seat => seat.maGhe).includes(s.maGhe)));
             }
 
             return newRows;

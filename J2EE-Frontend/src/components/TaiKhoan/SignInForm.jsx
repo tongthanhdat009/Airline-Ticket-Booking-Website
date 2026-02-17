@@ -3,3 +3,5 @@ function SignInForm() {
     <div>SignInForm</div>
   )
 }
+
+export default SignInForm;

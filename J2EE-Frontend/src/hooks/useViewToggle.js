@@ -17,7 +17,7 @@ export const useViewToggle = (storageKey, defaultView = 'table') => {
       if (savedView && (savedView === 'table' || savedView === 'grid')) {
         return savedView;
       }
-    } catch (error) {
+    } catch {
       // Silent fail
     }
 
@@ -80,7 +80,7 @@ export const useViewToggle = (storageKey, defaultView = 'table') => {
 
     try {
       localStorage.setItem(storageKey, newView);
-    } catch (error) {
+    } catch {
       // Silent fail nếu localStorage không available
     }
   }, [viewMode, storageKey]);
