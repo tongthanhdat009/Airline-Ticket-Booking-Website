@@ -5,13 +5,19 @@ set -e
 # PRODUCTION DEPLOY SCRIPT
 # ==========================================
 
+# Receive REPO_URL from argument (passed by workflow)
+if [ -n "$1" ]; then
+    GIT_REPO_URL="$1"
+else
+    # Fallback to environment variable or default
+    GIT_REPO_URL="${REPO_URL:-https://github.com/tongthanhdat009/Airline-Ticket-Booking-Website.git}"
+fi
+
 # Cấu hình
 ENV="production"
 DEPLOY_DIR="/opt/airline-prod"
 BACKEND_DIR="$DEPLOY_DIR/backend"
 FRONTEND_DIR="$DEPLOY_DIR/frontend"
-# Use REPO_URL from workflow, or fallback to default
-GIT_REPO_URL="${REPO_URL:-https://github.com/tongthanhdat009/Airline-Ticket-Booking-Website.git}"
 GIT_BRANCH="main"
 BACKEND_PORT=8080
 DB_NAME="airline_prod_db"
@@ -29,7 +35,7 @@ cd $TEMP_DIR
 
 echo "📥 Cloning repository..."
 
-# Clone repo (git credentials already configured by workflow)
+# Clone repo with token embedded in URL
 git clone -b $GIT_BRANCH --depth 1 $GIT_REPO_URL temp-repo
 
 cd temp-repo

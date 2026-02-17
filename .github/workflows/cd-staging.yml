@@ -44,18 +44,13 @@ jobs:
             echo "Branch: ${{ github.ref_name }}"
             echo "Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
-            # Configure git to use GITHUB_TOKEN for HTTPS clone
-            git config --global credential.helper store
-            echo "https://x-access-token:${GITHUB_TOKEN}@github.com" > ~/.git-credentials
-            export REPO_URL="https://github.com/${GITHUB_REPOSITORY}.git"
+            # Direct URL with token (simpler than credential.helper)
+            export REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 
             if [ ! -x /opt/airline/deploy-staging.sh ]; then
               echo "ERROR: Missing or not executable /opt/airline/deploy-staging.sh"
               exit 1
             fi
-            /opt/airline/deploy-staging.sh
+            /opt/airline/deploy-staging.sh "$REPO_URL"
 
-            # Cleanup credentials
-            rm -f ~/.git-credentials
-            git config --global --unset credential.helper || true
             echo "Staging deploy completed successfully"
