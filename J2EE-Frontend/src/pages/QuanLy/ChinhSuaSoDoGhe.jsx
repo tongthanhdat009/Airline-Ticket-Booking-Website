@@ -56,14 +56,6 @@ const ChinhSuaSoDoGhe = () => {
         viTriGhe: ''
     });
 
-    // Delete by class state
-    const [deleteByClassData, setDeleteByClassData] = useState({
-        maHangVe: ''
-    });
-
-    // Delete multiple classes state
-    const [selectedClasses, setSelectedClasses] = useState([]);
-
     // Load data
     const loadData = useCallback(async () => {
         try {
