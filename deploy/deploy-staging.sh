@@ -1,0 +1,162 @@
+#!/bin/bash
+set -e
+
+# ==========================================
+# STAGING DEPLOY SCRIPT
+# ==========================================
+
+# Cấu hình
+ENV="staging"
+DEPLOY_DIR="/opt/airline-stag"
+BACKEND_DIR="$DEPLOY_DIR/backend"
+FRONTEND_DIR="$DEPLOY_DIR/frontend"
+GIT_REPO="${GIT_REPO:-https://github.com/$(git remote get-url origin | sed 's/.*github.com[:/]\(.*\)\.git/\1/')}"
+GIT_BRANCH="develop"
+BACKEND_PORT=8081
+DB_NAME="airline_stag_db"
+DB_USER="${DB_USERNAME:-airline_user}"
+SPRING_PROFILE="staging"
+
+echo "=========================================="
+echo "  Deploying STAGING to $DEPLOY_DIR"
+echo "  Branch: $GIT_BRANCH"
+echo "=========================================="
+
+# Tạo thư mục tạm để clone code
+TEMP_DIR=$(mktemp -d)
+cd $TEMP_DIR
+
+echo "📥 Cloning repository..."
+
+# Clone với GitHub Token (nếu có) hoặc SSH
+if [ -n "$GITHUB_TOKEN" ]; then
+    # Clone với token
+    GIT_REPO="https://${GITHUB_TOKEN}@github.com/$(git remote get-url origin | sed 's/.*github.com[:/]\(.*\)\.git/\1/')"
+    git clone -b $GIT_BRANCH --depth 1 $GIT_REPO temp-repo
+elif [ -n "$SSH_KEY" ] || [ -f ~/.ssh/id_rsa ]; then
+    # Clone với SSH
+    GIT_REPO="git@github.com:$(git remote get-url origin | sed 's/.*github.com[:/]\(.*\)\.git/\1/')"
+    git clone -b $GIT_BRANCH --depth 1 $GIT_REPO temp-repo
+else
+    # Clone public (chỉ đọc được public repo)
+    git clone -b $GIT_BRANCH --depth 1 https://github.com/$(git remote get-url origin | sed 's/.*github.com[:/]\(.*\)\.git/\1/') temp-repo
+fi
+
+cd temp-repo
+
+# ==================== BACKEND DEPLOY ====================
+echo ""
+echo "🚀 Deploying Backend..."
+
+# Dừng application hiện tại
+if [ -f "$BACKEND_DIR/app.pid" ]; then
+    PID=$(cat $BACKEND_DIR/app.pid)
+    if ps -p $PID > /dev/null 2>&1; then
+        echo "🛑 Stopping backend (PID: $PID)..."
+        kill $PID
+        sleep 5
+    fi
+fi
+
+# Kill all processes on backend port
+fuser -k ${BACKEND_PORT}/tcp 2>/dev/null || true
+sleep 2
+
+# Backup version cũ (nếu có)
+if [ -d "$BACKEND_DIR" ] && [ "$(ls -A $BACKEND_DIR)" ]; then
+    echo "💾 Backing up old backend..."
+    cp -r $BACKEND_DIR ${BACKEND_DIR}_backup_$(date +%Y%m%d_%H%M%S) || true
+fi
+
+# Build backend
+echo "🔨 Building Spring Boot backend..."
+cd J2EE-Backend
+
+# Setup Maven wrapper permissions
+chmod +x mvnw 2>/dev/null || true
+
+# Build
+./mvnw clean package -DskipTests -q
+
+# Copy jar file
+mkdir -p $BACKEND_DIR
+cp target/*.jar $BACKEND_DIR/app.jar
+
+# Copy application properties (nếu có)
+if [ -f "src/main/resources/application-${ENV}.properties" ]; then
+    cp src/main/resources/application-${ENV}.properties $BACKEND_DIR/
+fi
+
+# Create log directory
+mkdir -p $DEPLOY_DIR/logs
+
+# ==================== FRONTEND DEPLOY ====================
+echo ""
+echo "🎨 Deploying Frontend..."
+
+cd ../J2EE-Frontend
+
+# Check pnpm or npm
+if command -v pnpm &> /dev/null; then
+    echo "📦 Installing dependencies with pnpm..."
+    pnpm install --frozen-lockfile --silent
+
+    echo "🔨 Building React frontend..."
+    pnpm build --silent
+elif command -v npm &> /dev/null; then
+    echo "📦 Installing dependencies with npm..."
+    npm install --silent
+
+    echo "🔨 Building React frontend..."
+    npm run build --silent
+else
+    echo "❌ ERROR: Neither pnpm nor npm found!"
+    exit 1
+fi
+
+# Copy build to staging directory
+mkdir -p $FRONTEND_DIR
+rm -rf $FRONTEND_DIR/*
+cp -r dist/* $FRONTEND_DIR/
+
+# ==================== START SERVICES ====================
+echo ""
+echo "🚀 Starting services..."
+
+# Start backend với staging profile
+cd $BACKEND_DIR
+
+# Load environment variables if .env exists
+if [ -f "/opt/airline-stag/.env" ]; then
+    export $(cat /opt/airline-stag/.env | grep -v '^#' | xargs)
+fi
+
+nohup java -jar -Dspring.profiles.active=$SPRING_PROFILE \
+    -Dserver.port=$BACKEND_PORT \
+    -Xms256m -Xmx512m \
+    app.jar > $DEPLOY_DIR/logs/backend.log 2>&1 &
+
+echo $! > $BACKEND_DIR/app.pid
+echo "✅ Backend started on port $BACKEND_PORT (PID: $(cat $BACKEND_DIR/app.pid))"
+
+# Wait for backend to start
+sleep 10
+
+# Check if backend is running
+if ps -p $(cat $BACKEND_DIR/app.pid) > /dev/null; then
+    echo "✅ Backend is running!"
+else
+    echo "❌ ERROR: Backend failed to start! Check logs at $DEPLOY_DIR/logs/backend.log"
+    tail -50 $DEPLOY_DIR/logs/backend.log
+    exit 1
+fi
+
+# Cleanup
+rm -rf $TEMP_DIR
+
+echo ""
+echo "=========================================="
+echo "  ✅ STAGING deploy completed!"
+echo "  Backend: http://43.255.120.80:$BACKEND_PORT/api"
+echo "  Frontend: http://43.255.120.80:$BACKEND_PORT"
+echo "=========================================="

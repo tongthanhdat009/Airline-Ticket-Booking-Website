@@ -34,6 +34,7 @@ jobs:
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
           port: ${{ secrets.PRODUCTION_PORT || 22 }}
           script_stop: true
+          envs: GITHUB_TOKEN
           script: |
             set -e
             echo "=== Production Deploy ==="
@@ -41,7 +42,7 @@ jobs:
             echo "Ref: ${{ github.ref_name }}"
             echo "Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
             if [ ! -x /opt/airline/deploy-production.sh ]; then
-              echo "ERROR: Missing or not executable /opt/airline/deploy-production.sh"
+              echo "ERROR: Missing or not executable /opt/airline-deploy-production.sh"
               exit 1
             fi
             /opt/airline/deploy-production.sh
