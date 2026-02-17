@@ -16,7 +16,6 @@ export const getStatusColor = (status) => {
   const statusMap = {
     // Active states
     'active': STATUS_COLORS.active,
-    'active': STATUS_COLORS.active,
     'hoatdong': STATUS_COLORS.active,
     'hoạt động': STATUS_COLORS.active,
 
@@ -146,7 +145,7 @@ export const mergeClasses = (...classes) => {
  * @returns {string} - CSS class string đầy đủ
  */
 export const getStatusBadgeClasses = (status, options = {}) => {
-  const { size = 'md', dot = false } = options;
+  const { size = 'md' } = options;
 
   const baseClasses = ['inline-flex', 'items-center', 'font-medium'];
 

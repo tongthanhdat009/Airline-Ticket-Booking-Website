@@ -55,7 +55,7 @@ export const useViewToggle = (storageKey, defaultView = 'table') => {
       try {
         const savedView = localStorage.getItem(storageKey);
         if (savedView) return; // User đã chọn preference, không tự động chuyển
-      } catch (error) {
+      } catch {
         // Silent fail
       }
 
@@ -92,7 +92,7 @@ export const useViewToggle = (storageKey, defaultView = 'table') => {
 
       try {
         localStorage.setItem(storageKey, newView);
-      } catch (error) {
+      } catch {
         // Silent fail nếu localStorage không available
       }
     }
