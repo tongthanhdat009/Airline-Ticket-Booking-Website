@@ -1,0 +1,47 @@
+name: CD Staging
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+concurrency:
+  group: cd-staging
+  cancel-in-progress: true
+
+jobs:
+  # Run CI checks before deploying
+  ci-backend:
+    uses: ./.github/workflows/ci-backend.yml
+
+  ci-frontend:
+    uses: ./.github/workflows/ci-frontend.yml
+
+  deploy-staging:
+    needs: [ci-backend, ci-frontend]
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to staging VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -e
+            echo "=== Staging Deploy ==="
+            echo "Commit: ${{ github.sha }}"
+            echo "Branch: ${{ github.ref_name }}"
+            echo "Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            if [ ! -x /opt/airline/deploy-staging.sh ]; then
+              echo "ERROR: Missing or not executable /opt/airline/deploy-staging.sh"
+              exit 1
+            fi
+            /opt/airline/deploy-staging.sh
+            echo "Staging deploy completed successfully"
