@@ -2,8 +2,7 @@ name: CD Production
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -11,7 +10,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Run CI checks before deploying
+  # Backend + Frontend CI chạy song song (có cache nên rất nhanh)
   ci-backend:
     uses: ./.github/workflows/ci-backend.yml
 
@@ -23,35 +22,63 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Download backend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-jar
+          path: artifacts/backend
 
-      - name: Deploy to production VPS via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
+      - name: Download frontend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: artifacts/frontend
+
+      # Đổi tên JAR thành app.jar để deploy script không cần quan tâm tên phiên bản
+      - name: Rename JAR to app.jar
+        run: mv artifacts/backend/*.jar artifacts/backend/app.jar
+
+      # Đóng gói frontend thành 1 file tar để SCP 1 lần duy nhất (nhanh hơn upload nhiều file)
+      - name: Package frontend dist
+        run: tar -czf artifacts/frontend-dist.tar.gz -C artifacts/frontend .
+
+      # Upload JAR trực tiếp vào thư mục backend trên VPS
+      # strip_components: 2 → bỏ prefix "artifacts/backend/" → file nằm ngay trong target dir
+      - name: Upload JAR to VPS
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.PRODUCTION_HOST }}
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
-          port: ${{ secrets.PRODUCTION_PORT || 22 }}
+          port: ${{ secrets.PRODUCTION_PORT }}
+          source: "artifacts/backend/app.jar"
+          target: "/opt/airline-prod/backend/"
+          strip_components: 2
+
+      # Upload frontend tar vào /tmp để deploy script giải nén
+      - name: Upload frontend dist to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          port: ${{ secrets.PRODUCTION_PORT }}
+          source: "artifacts/frontend-dist.tar.gz"
+          target: "/tmp/"
+          strip_components: 2
+
+      # SSH vào VPS: giải nén frontend rồi restart backend
+      - name: Restart services via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          port: ${{ secrets.PRODUCTION_PORT }}
           script_stop: true
-          envs: GITHUB_TOKEN,GITHUB_REPOSITORY
           script: |
-            set -e
             echo "=== Production Deploy ==="
             echo "Commit: ${{ github.sha }}"
-            echo "Ref: ${{ github.ref_name }}"
             echo "Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-
-            # Direct URL with token (simpler than credential.helper)
-            export REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-
-            if [ ! -x /opt/airline/deploy-production.sh ]; then
-              echo "ERROR: Missing or not executable /opt/airline/deploy-production.sh"
-              exit 1
-            fi
-            /opt/airline/deploy-production.sh "$REPO_URL"
-
-            echo "Production deploy completed successfully"
+            /opt/airline/deploy-production.sh
+            echo "Deploy completed successfully"

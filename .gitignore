@@ -15,3 +15,4 @@ logs/security/
 
 # Environment variables
 .env
+/deploy

@@ -4,155 +4,106 @@ set -e
 # ==========================================
 # PRODUCTION DEPLOY SCRIPT
 # ==========================================
+# Script này KHÔNG build - chỉ nhận artifacts đã upload bởi CI/CD:
+#   JAR đã nằm sẵn tại : /opt/airline-prod/backend/app.jar
+#   Frontend tar tại   : /tmp/frontend-dist.tar.gz
+# ==========================================
 
-# Receive REPO_URL from argument (passed by workflow)
-if [ -n "$1" ]; then
-    GIT_REPO_URL="$1"
-else
-    # Fallback to environment variable or default
-    GIT_REPO_URL="${REPO_URL:-https://github.com/tongthanhdat009/Airline-Ticket-Booking-Website.git}"
-fi
-
-# Cấu hình
-ENV="production"
 DEPLOY_DIR="/opt/airline-prod"
 BACKEND_DIR="$DEPLOY_DIR/backend"
 FRONTEND_DIR="$DEPLOY_DIR/frontend"
-GIT_BRANCH="main"
+FRONTEND_TAR="/tmp/frontend-dist.tar.gz"
 BACKEND_PORT=8080
-DB_NAME="airline_prod_db"
-DB_USER="${DB_USERNAME:-airline_user}"
-SPRING_PROFILE="prod"
 
 echo "=========================================="
-echo "  Deploying PRODUCTION to $DEPLOY_DIR"
-echo "  Branch: $GIT_BRANCH"
+echo "  Deploying PRODUCTION (pre-built)"
+echo "  Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo "=========================================="
 
-# Tạo thư mục tạm để clone code
-TEMP_DIR=$(mktemp -d)
-cd $TEMP_DIR
-
-echo "📥 Cloning repository..."
-
-# Clone repo with token embedded in URL
-git clone -b $GIT_BRANCH --depth 1 $GIT_REPO_URL temp-repo
-
-cd temp-repo
-
-# ==================== BACKEND DEPLOY ====================
-echo ""
-echo "🚀 Deploying Backend..."
-
-# Dừng application hiện tại
-if [ -f "$BACKEND_DIR/app.pid" ]; then
-    PID=$(cat $BACKEND_DIR/app.pid)
-    if ps -p $PID > /dev/null 2>&1; then
-        echo "🛑 Stopping backend (PID: $PID)..."
-        kill $PID
-        sleep 5
-    fi
+# Kiểm tra artifacts có tồn tại
+if [ ! -f "$BACKEND_DIR/app.jar" ]; then
+    echo "❌ ERROR: JAR not found at $BACKEND_DIR/app.jar"
+    exit 1
 fi
 
-# Kill all processes on backend port
+if [ ! -f "$FRONTEND_TAR" ]; then
+    echo "❌ ERROR: Frontend tar not found at $FRONTEND_TAR"
+    exit 1
+fi
+
+# ==================== DEPLOY FRONTEND ====================
+echo ""
+echo "🎨 Deploying frontend..."
+
+mkdir -p "$FRONTEND_DIR" "$DEPLOY_DIR/logs"
+rm -rf "${FRONTEND_DIR:?}"/*
+tar -xzf "$FRONTEND_TAR" -C "$FRONTEND_DIR"
+echo "  ✅ Frontend extracted to $FRONTEND_DIR"
+
+# ==================== STOP BACKEND ====================
+echo ""
+echo "🛑 Stopping backend..."
+
+if [ -f "$BACKEND_DIR/app.pid" ]; then
+    PID=$(cat "$BACKEND_DIR/app.pid")
+    if ps -p "$PID" > /dev/null 2>&1; then
+        echo "  Stopping PID: $PID"
+        kill "$PID"
+        sleep 5
+    fi
+    rm -f "$BACKEND_DIR/app.pid"
+fi
+
+# Kill process còn sót trên port
 fuser -k ${BACKEND_PORT}/tcp 2>/dev/null || true
 sleep 2
 
-# Backup version cũ (nếu có)
-if [ -d "$BACKEND_DIR" ] && [ "$(ls -A $BACKEND_DIR 2>/dev/null)" ]; then
-    echo "💾 Backing up old backend..."
-    cp -r $BACKEND_DIR ${BACKEND_DIR}_backup_$(date +%Y%m%d_%H%M%S) || true
-fi
-
-# Build backend
-echo "🔨 Building Spring Boot backend..."
-cd J2EE-Backend
-
-# Setup Maven wrapper permissions
-chmod +x mvnw 2>/dev/null || true
-
-# Build
-./mvnw clean package -DskipTests -q
-
-# Copy jar file
-mkdir -p $BACKEND_DIR
-cp target/*.jar $BACKEND_DIR/app.jar
-
-# Copy application properties (nếu có)
-if [ -f "src/main/resources/application-${ENV}.properties" ]; then
-    cp src/main/resources/application-${ENV}.properties $BACKEND_DIR/
-fi
-
-# Create log directory
-mkdir -p $DEPLOY_DIR/logs
-
-# ==================== FRONTEND DEPLOY ====================
+# ==================== START BACKEND ====================
 echo ""
-echo "🎨 Deploying Frontend..."
+echo "🚀 Starting backend..."
 
-cd ../J2EE-Frontend
+cd "$BACKEND_DIR"
 
-# Check pnpm or npm
-if command -v pnpm &> /dev/null; then
-    echo "📦 Installing dependencies with pnpm..."
-    pnpm install --frozen-lockfile --silent
-
-    echo "🔨 Building React frontend..."
-    pnpm build --silent
-elif command -v npm &> /dev/null; then
-    echo "📦 Installing dependencies with npm..."
-    npm install --silent
-
-    echo "🔨 Building React frontend..."
-    npm run build --silent
-else
-    echo "❌ ERROR: Neither pnpm nor npm found!"
-    exit 1
+# Load environment variables từ .env
+if [ -f "$DEPLOY_DIR/.env" ]; then
+    set -a
+    source "$DEPLOY_DIR/.env"
+    set +a
+    echo "  .env loaded from $DEPLOY_DIR/.env"
 fi
 
-# Copy build to production directory
-mkdir -p $FRONTEND_DIR
-rm -rf $FRONTEND_DIR/*
-cp -r dist/* $FRONTEND_DIR/
-
-# ==================== START SERVICES ====================
-echo ""
-echo "🚀 Starting services..."
-
-# Start backend với production profile
-cd $BACKEND_DIR
-
-# Load environment variables if .env exists
-if [ -f "/opt/airline-prod/.env" ]; then
-    export $(cat /opt/airline-prod/.env | grep -v '^#' | xargs)
-fi
-
-nohup java -jar -Dspring.profiles.active=$SPRING_PROFILE \
+nohup java -jar \
     -Dserver.port=$BACKEND_PORT \
     -Xms512m -Xmx1024m \
-    app.jar > $DEPLOY_DIR/logs/backend.log 2>&1 &
+    app.jar > "$DEPLOY_DIR/logs/backend.log" 2>&1 &
 
-echo $! > $BACKEND_DIR/app.pid
-echo "✅ Backend started on port $BACKEND_PORT (PID: $(cat $BACKEND_DIR/app.pid))"
+echo $! > "$BACKEND_DIR/app.pid"
+echo "  Backend started on port $BACKEND_PORT (PID: $(cat "$BACKEND_DIR/app.pid"))"
 
-# Wait for backend to start
+# Chờ backend khởi động
+echo "  Waiting for backend to start..."
 sleep 10
 
-# Check if backend is running
-if ps -p $(cat $BACKEND_DIR/app.pid) > /dev/null; then
-    echo "✅ Backend is running!"
+# Kiểm tra backend
+if ps -p "$(cat "$BACKEND_DIR/app.pid")" > /dev/null; then
+    echo "  ✅ Backend is running!"
 else
-    echo "❌ ERROR: Backend failed to start! Check logs at $DEPLOY_DIR/logs/backend.log"
-    tail -50 $DEPLOY_DIR/logs/backend.log
+    echo "  ❌ ERROR: Backend failed to start!"
+    tail -50 "$DEPLOY_DIR/logs/backend.log"
     exit 1
 fi
 
-# Cleanup
-rm -rf $TEMP_DIR
+# ==================== RELOAD NGINX ====================
+echo ""
+echo "🔄 Reloading Nginx..."
+nginx -t && systemctl reload nginx || echo "⚠️ Nginx reload skipped (not installed or config error)"
+
+# ==================== CLEANUP ====================
+rm -f "$FRONTEND_TAR"
 
 echo ""
 echo "=========================================="
 echo "  ✅ PRODUCTION deploy completed!"
-echo "  Backend: http://43.255.120.80:$BACKEND_PORT/api"
-echo "  Frontend: http://43.255.120.80"
+echo "  Backend: http://localhost:$BACKEND_PORT/api"
+echo "  Frontend: served by Nginx"
 echo "=========================================="
