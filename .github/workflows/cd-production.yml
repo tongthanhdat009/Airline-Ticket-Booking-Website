@@ -63,8 +63,8 @@ jobs:
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
           port: ${{ secrets.PRODUCTION_PORT }}
-          source: "artifacts/frontend-dist.tar.gz"
-          target: "/tmp/"
+          source: "frontend/dist/*"
+          target: "/opt/airline-prod/frontend"
           strip_components: 2
 
       # SSH vào VPS: giải nén frontend rồi restart backend
