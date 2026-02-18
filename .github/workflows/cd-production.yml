@@ -85,6 +85,9 @@ jobs:
             mkdir -p /opt/airline-prod/frontend
             tar -xzf /tmp/frontend-dist.tar.gz -C /opt/airline-prod/frontend
 
+            # Fix line ending của deploy script (nếu bị CRLF)
+            sed -i 's/\r$//' /opt/airline/deploy-production.sh
+
             # Chạy deploy script để restart services
             /opt/airline/deploy-production.sh
 
