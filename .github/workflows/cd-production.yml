@@ -39,7 +39,21 @@ jobs:
           pnpm install --frozen-lockfile
           pnpm build
 
-      # ===== UPLOAD BACKEND =====
+      # ===== 1. PREPARE DIRECTORIES =====
+      # Phải tạo thư mục trước khi SCP bắt đầu chép file
+      - name: Prepare Server Directories
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          script: |
+            sudo mkdir -p /opt/airline-prod/backend
+            sudo mkdir -p /opt/airline-prod/frontend/dist
+            # Cấp quyền cho user hiện tại có thể upload file vào đây
+            sudo chown -R $USER:$USER /opt/airline-prod
+
+      # ===== 2. UPLOAD BACKEND =====
       - name: Upload Backend Jar
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -47,10 +61,11 @@ jobs:
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
           source: "target/*.jar"
-          target: "/opt/airline-prod/backend/app.jar"
+          target: "/opt/airline-prod/backend/"
+          strip_components: 1 # Gọt bỏ chữ "target/" khi upload
           overwrite: true
 
-      # ===== UPLOAD FRONTEND =====
+      # ===== 3. UPLOAD FRONTEND =====
       - name: Upload Frontend Dist
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -59,9 +74,10 @@ jobs:
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
           source: "frontend/dist/*"
           target: "/opt/airline-prod/frontend/dist"
+          strip_components: 2 # Gọt bỏ chữ "frontend/dist/" để lấy lõi file bên trong
           overwrite: true
 
-      # ===== RESTART SERVICE =====
+      # ===== 4. RESTART SERVICE & FIX PERMISSIONS =====
       - name: Restart Service
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -69,11 +85,15 @@ jobs:
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
           script: |
-            # Tạo thư mục nếu chưa có
-            sudo mkdir -p /opt/airline-prod/frontend/dist
+            # Đổi tên file Jar thành app.jar để script deploy chạy được
+            mv /opt/airline-prod/backend/*.jar /opt/airline-prod/backend/app.jar || true
             
-            # Sửa lỗi ký tự ^M cho script (phòng trường hợp file bị lưu dạng CRLF)
+            # Cấp quyền lại cho Nginx đọc frontend (Fix lỗi 403 Forbidden)
+            sudo chown -R www-data:www-data /opt/airline-prod/frontend
+            sudo chmod -R 755 /opt/airline-prod/frontend
+            
+            # Sửa lỗi ký tự ^M (CRLF) cho script
             sed -i 's/\r$//' /opt/airline-prod/deploy-production.sh || true
             
-            # Chạy script deploy (đảm bảo đúng đường dẫn)
+            # Chạy script deploy hệ thống
             sudo bash /opt/airline-prod/deploy-production.sh
