@@ -1,94 +1,76 @@
-name: CD Production
+name: CD-Production
 
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
-
-concurrency:
-  group: cd-production
-  cancel-in-progress: false
+    branches:
+      - main
 
 jobs:
-  # Backend + Frontend CI chạy song song (có cache nên rất nhanh)
-  ci-backend:
-    uses: ./.github/workflows/ci-backend.yml
-
-  ci-frontend:
-    uses: ./.github/workflows/ci-frontend.yml
-
-  deploy-production:
-    needs: [ci-backend, ci-frontend]
+  deploy:
     runs-on: ubuntu-latest
-    environment: production
+
     steps:
-      - name: Download backend artifact
-        uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
+
+      # ===== BUILD BACKEND =====
+      - uses: actions/setup-java@v4
         with:
-          name: backend-jar
-          path: artifacts/backend
+          distribution: temurin
+          java-version: 17
+          cache: maven
 
-      - name: Download frontend artifact
-        uses: actions/download-artifact@v4
+      - name: Build Backend
+        run: mvn clean package -DskipTests
+
+      # ===== BUILD FRONTEND =====
+      - uses: pnpm/action-setup@v3
         with:
-          name: frontend-dist
-          path: artifacts/frontend
+          version: 8
 
-      # Đổi tên JAR thành app.jar để deploy script không cần quan tâm tên phiên bản
-      - name: Rename JAR to app.jar
-        run: mv artifacts/backend/*.jar artifacts/backend/app.jar
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
 
-      # Đóng gói frontend thành 1 file tar để SCP 1 lần duy nhất (nhanh hơn upload nhiều file)
-      - name: Package frontend dist
-        run: tar -czf artifacts/frontend-dist.tar.gz -C artifacts/frontend .
+      - name: Build Frontend
+        working-directory: frontend
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
 
-      # Upload JAR trực tiếp vào thư mục backend trên VPS
-      # strip_components: 2 → bỏ prefix "artifacts/backend/" → file nằm ngay trong target dir
-      - name: Upload JAR to VPS
+      # ===== UPLOAD BACKEND =====
+      - name: Upload Backend Jar
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.PRODUCTION_HOST }}
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
-          port: ${{ secrets.PRODUCTION_PORT }}
-          source: "artifacts/backend/app.jar"
-          target: "/opt/airline-prod/backend/"
-          strip_components: 2
+          source: "target/*.jar"
+          target: "/opt/airline-prod/backend/app.jar"
+          overwrite: true
 
-      # Upload frontend tar vào /tmp để deploy script giải nén
-      - name: Upload frontend dist to VPS
+      # ===== UPLOAD FRONTEND =====
+      - name: Upload Frontend Dist
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.PRODUCTION_HOST }}
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
-          port: ${{ secrets.PRODUCTION_PORT }}
-          source: "artifacts/frontend-dist.tar.gz"
-          target: "/tmp/"
-          strip_components: 1
+          source: "frontend/dist/*"
+          target: "/opt/airline-prod/frontend/"
+          overwrite: true
 
-      # SSH vào VPS: giải nén frontend rồi restart backend
-      - name: Restart services via SSH
+      # ===== RESTART SERVICE =====
+      - name: Restart Service
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.PRODUCTION_HOST }}
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
-          port: ${{ secrets.PRODUCTION_PORT }}
           script_stop: true
           script: |
-            echo "=== Production Deploy ==="
-            echo "Commit: ${{ github.sha }}"
-            echo "Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-
-            # Giải nén frontend vào thư mục đích
-            mkdir -p /opt/airline-prod/frontend
-            tar -xzf /tmp/frontend-dist.tar.gz -C /opt/airline-prod/frontend
-
-            # Fix line ending của deploy script (nếu bị CRLF)
-            sed -i 's/\r$//' /opt/airline/deploy-production.sh
-
-            # Chạy deploy script bằng bash trực tiếp (tránh lỗi interpreter)
-            bash /opt/airline/deploy-production.sh
-
-            echo "Deploy completed successfully"
+            sudo systemctl restart airline
+            sudo systemctl is-active --quiet airline
+            sudo systemctl reload nginx
+            echo "Production deployed successfully"

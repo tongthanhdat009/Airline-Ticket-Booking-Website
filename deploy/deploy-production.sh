@@ -7,27 +7,20 @@ set -e
 
 DEPLOY_DIR="/opt/airline-prod"
 BACKEND_DIR="$DEPLOY_DIR/backend"
-FRONTEND_DIR="$DEPLOY_DIR/frontend"
 SERVICE_NAME="airline"
 
 echo "=========================================="
-echo "  Deploying PRODUCTION (systemd mode)"
+echo "  Deploying PRODUCTION"
 echo "  Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo "=========================================="
 
-# ==================== CHECK ARTIFACTS ====================
+# ==================== CHECK BACKEND ====================
 if [ ! -f "$BACKEND_DIR/app.jar" ]; then
     echo "❌ ERROR: JAR not found at $BACKEND_DIR/app.jar"
     exit 1
 fi
 
-# ==================== DEPLOY FRONTEND ====================
-echo ""
-echo "🎨 Deploying frontend..."
-
-mkdir -p "$FRONTEND_DIR"
-rm -rf "${FRONTEND_DIR:?}"/*
-echo "  ✅ Frontend extracted"
+echo "  ✅ Backend artifact found"
 
 # ==================== RESTART BACKEND ====================
 echo ""
@@ -55,6 +48,4 @@ sudo systemctl reload nginx
 echo ""
 echo "=========================================="
 echo "  ✅ PRODUCTION deploy completed!"
-echo "  Backend: managed by systemd"
-echo "  Frontend: served by Nginx"
 echo "=========================================="
