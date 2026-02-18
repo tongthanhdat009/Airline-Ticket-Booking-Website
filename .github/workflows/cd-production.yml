@@ -58,7 +58,7 @@ jobs:
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
           source: "frontend/dist/*"
-          target: "/opt/airline-prod/frontend/"
+          target: "/opt/airline-prod/frontend/dist"
           overwrite: true
 
       # ===== RESTART SERVICE =====
