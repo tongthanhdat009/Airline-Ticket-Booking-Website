@@ -43,6 +43,12 @@ jobs:
 
       # ===== 1. PREPARE DIRECTORIES =====
       # Phải tạo thư mục trước khi SCP bắt đầu chép file
+      - name: Debug Secrets
+        run: |
+          echo "PRODUCTION_HOST is set: ${{ secrets.PRODUCTION_HOST != '' }}"
+          echo "PRODUCTION_USER is set: ${{ secrets.PRODUCTION_USER != '' }}"
+          echo "PRODUCTION_SSH_KEY is set: ${{ secrets.PRODUCTION_SSH_KEY != '' }}"
+
       - name: Prepare Server Directories
         uses: appleboy/ssh-action@v1.0.3
         with:
