@@ -1,21 +1,21 @@
 name: CI Backend
 
 on:
-  pull_request:
-    branches: [main, develop]
+  push:
+    branches: [staging]
     paths:
       - 'J2EE-Backend/**'
       - '.github/workflows/ci-backend.yml'
-  push:
-    branches: [main, develop]
+  pull_request:
+    branches: [main]
     paths:
       - 'J2EE-Backend/**'
       - '.github/workflows/ci-backend.yml'
   workflow_call:
 
 concurrency:
-  group: ci-backend-${{ github.ref }}-${{ github.run_id }}
-  cancel-in-progress: false
+  group: ci-backend-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   backend-test-build:
@@ -40,13 +40,13 @@ jobs:
       - name: Run tests
         run: ./mvnw -B -ntp test
 
-      - name: Build backend
-        run: ./mvnw -B -ntp clean package -DskipTests
+      - name: Build JAR (skip tests)
+        run: ./mvnw -B -ntp package -DskipTests
 
       - name: Upload backend artifact
         uses: actions/upload-artifact@v4
         with:
-          name: backend-jar-${{ github.sha }}
+          name: backend-jar
           path: J2EE-Backend/target/*.jar
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 7

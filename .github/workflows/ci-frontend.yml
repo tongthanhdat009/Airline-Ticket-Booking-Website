@@ -1,21 +1,21 @@
 name: CI Frontend
 
 on:
-  pull_request:
-    branches: [main, develop]
+  push:
+    branches: [staging]
     paths:
       - 'J2EE-Frontend/**'
       - '.github/workflows/ci-frontend.yml'
-  push:
-    branches: [main, develop]
+  pull_request:
+    branches: [main]
     paths:
       - 'J2EE-Frontend/**'
       - '.github/workflows/ci-frontend.yml'
   workflow_call:
 
 concurrency:
-  group: ci-frontend-${{ github.ref }}-${{ github.run_id }}
-  cancel-in-progress: false
+  group: ci-frontend-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   frontend-lint-build:
@@ -42,16 +42,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint frontend
+      - name: Lint
         run: pnpm lint
 
-      - name: Build frontend
+      - name: Build
         run: pnpm build
 
       - name: Upload frontend artifact
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-dist-${{ github.sha }}
+          name: frontend-dist
           path: J2EE-Frontend/dist
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 7

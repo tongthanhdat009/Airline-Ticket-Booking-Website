@@ -2,8 +2,7 @@ name: CD Production
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -11,7 +10,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Run CI checks before deploying
+  # Backend + Frontend CI chạy song song (có cache nên rất nhanh)
   ci-backend:
     uses: ./.github/workflows/ci-backend.yml
 
@@ -23,37 +22,52 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Deploy to production VPS via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
+      - name: Download backend artifact
+        uses: actions/download-artifact@v4
         with:
-          host: ${{ secrets.PRODUCTION_HOST }}
-          username: ${{ secrets.PRODUCTION_USER }}
-          key: ${{ secrets.PRODUCTION_SSH_KEY }}
-          port: ${{ secrets.PRODUCTION_PORT || 22 }}
-          script_stop: true
-          envs: GITHUB_TOKEN,GITHUB_REPOSITORY
-          script: |
-            set -e
-            echo "=== Production Deploy ==="
-            echo "Commit: ${{ github.sha }}"
-            echo "Ref: ${{ github.ref_name }}"
-            echo "Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            echo "Domain: https://jadt-airline.io.vn"
+          name: backend-jar
+          path: deploy/backend
 
-            # Direct URL with token (simpler than credential.helper)
-            export REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+      - name: Download frontend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: deploy/frontend
 
-            if [ ! -x /opt/airline/deploy-production.sh ]; then
-              echo "ERROR: Missing or not executable /opt/airline/deploy-production.sh"
-              exit 1
-            fi
-            /opt/airline/deploy-production.sh "$REPO_URL"
+      - name: Package artifacts for transfer
+        run: tar -czf deploy-package.tar.gz -C deploy .
 
-            echo "Production deploy completed successfully"
-            echo "Live at: https://jadt-airline.io.vn"
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PRODUCTION_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p ${{ secrets.PRODUCTION_PORT }} ${{ secrets.PRODUCTION_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Upload & Deploy to VPS
+        env:
+          SSH_HOST: ${{ secrets.PRODUCTION_HOST }}
+          SSH_USER: ${{ secrets.PRODUCTION_USER }}
+          SSH_PORT: ${{ secrets.PRODUCTION_PORT }}
+        run: |
+          SSH_CMD="ssh -i ~/.ssh/deploy_key -p ${SSH_PORT:-22} -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST}"
+          SCP_CMD="scp -i ~/.ssh/deploy_key -P ${SSH_PORT:-22} -o StrictHostKeyChecking=no"
+
+          echo "=== Production Deploy ==="
+          echo "Commit: ${{ github.sha }}"
+          echo "Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+          # Tạo thư mục staging trên VPS
+          $SSH_CMD "rm -rf /tmp/airline-deploy && mkdir -p /tmp/airline-deploy"
+
+          # Upload gói deploy (1 file tar duy nhất, nhanh hơn nhiều file)
+          $SCP_CMD deploy-package.tar.gz ${SSH_USER}@${SSH_HOST}:/tmp/airline-deploy/
+
+          # Giải nén và chạy deploy script
+          $SSH_CMD "cd /tmp/airline-deploy && tar -xzf deploy-package.tar.gz && /opt/airline/deploy-production.sh"
+
+          echo "Production deploy completed successfully"
+
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
