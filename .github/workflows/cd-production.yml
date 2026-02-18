@@ -18,8 +18,10 @@ jobs:
           distribution: temurin
           java-version: 21
           cache: maven
+          cache-dependency-path: J2EE-Backend/pom.xml
 
       - name: Build Backend
+        working-directory: J2EE-Backend
         run: mvn clean package -DskipTests
 
       # ===== BUILD FRONTEND =====
@@ -60,9 +62,9 @@ jobs:
           host: ${{ secrets.PRODUCTION_HOST }}
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
-          source: "target/*.jar"
+          source: "J2EE-Backend/target/*.jar"
           target: "/opt/airline-prod/backend/"
-          strip_components: 1 # Gọt bỏ chữ "target/" khi upload
+          strip_components: 2 # Gọt bỏ "J2EE-Backend/target/" khi upload
           overwrite: true
 
       # ===== 3. PACKAGE FRONTEND =====
