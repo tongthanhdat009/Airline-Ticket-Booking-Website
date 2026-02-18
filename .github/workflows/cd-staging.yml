@@ -43,6 +43,7 @@ jobs:
             echo "Commit: ${{ github.sha }}"
             echo "Branch: ${{ github.ref_name }}"
             echo "Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "Domain: https://staging.jadt-airline.io.vn"
 
             # Direct URL with token (simpler than credential.helper)
             export REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
@@ -54,3 +55,4 @@ jobs:
             /opt/airline/deploy-staging.sh "$REPO_URL"
 
             echo "Staging deploy completed successfully"
+            echo "Live at: https://staging.jadt-airline.io.vn"

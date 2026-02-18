@@ -153,6 +153,6 @@ rm -rf $TEMP_DIR
 echo ""
 echo "=========================================="
 echo "  ✅ STAGING deploy completed!"
-echo "  Backend: http://43.255.120.80:$BACKEND_PORT/api"
-echo "  Frontend: http://43.255.120.80:$BACKEND_PORT"
+echo "  Backend:  https://staging.jadt-airline.io.vn/api"
+echo "  Frontend: https://staging.jadt-airline.io.vn"
 echo "=========================================="
