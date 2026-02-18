@@ -16,3 +16,4 @@ logs/security/
 # Environment variables
 .env
 /deploy
+J2EE-Frontend/.env.production
