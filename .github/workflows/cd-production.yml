@@ -16,25 +16,25 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
           cache: maven
 
       - name: Build Backend
         run: mvn clean package -DskipTests
 
       # ===== BUILD FRONTEND =====
-      - uses: pnpm/action-setup@v3
+      - uses: pnpm/action-setup@v4
         with:
-          version: 8
+          version: 9
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: pnpm
-          cache-dependency-path: frontend/pnpm-lock.yaml
+          cache-dependency-path: J2EE-Frontend/pnpm-lock.yaml
 
       - name: Build Frontend
-        working-directory: frontend
+        working-directory: J2EE-Frontend
         run: |
           pnpm install --frozen-lockfile
           pnpm build
@@ -72,7 +72,7 @@ jobs:
           host: ${{ secrets.PRODUCTION_HOST }}
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
-          source: "J2EE-Frontend/dist"
+          source: "J2EE-Frontend/dist/*"
           target: "/opt/airline-prod/frontend/dist"
           strip_components: 2 # Gọt bỏ chữ "frontend/dist/" để lấy lõi file bên trong
           overwrite: true
