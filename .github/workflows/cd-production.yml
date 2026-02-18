@@ -72,7 +72,7 @@ jobs:
           host: ${{ secrets.PRODUCTION_HOST }}
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
-          source: "frontend/dist/*"
+          source: "J2EE-Frontend/dist"
           target: "/opt/airline-prod/frontend/dist"
           strip_components: 2 # Gọt bỏ chữ "frontend/dist/" để lấy lõi file bên trong
           overwrite: true
