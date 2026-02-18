@@ -68,9 +68,12 @@ jobs:
           host: ${{ secrets.PRODUCTION_HOST }}
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
-          script_stop: true
           script: |
-            sudo systemctl restart airline
-            sudo systemctl is-active --quiet airline
-            sudo systemctl reload nginx
-            echo "Production deployed successfully"
+            # Tạo thư mục nếu chưa có
+            sudo mkdir -p /opt/airline-prod/frontend/dist
+            
+            # Sửa lỗi ký tự ^M cho script (phòng trường hợp file bị lưu dạng CRLF)
+            sed -i 's/\r$//' /opt/airline-prod/deploy-production.sh || true
+            
+            # Chạy script deploy (đảm bảo đúng đường dẫn)
+            sudo bash /opt/airline-prod/deploy-production.sh
