@@ -63,9 +63,9 @@ jobs:
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
           port: ${{ secrets.PRODUCTION_PORT }}
-          source: "frontend/dist/*"
-          target: "/opt/airline-prod/frontend"
-          strip_components: 2
+          source: "artifacts/frontend-dist.tar.gz"
+          target: "/tmp/"
+          strip_components: 1
 
       # SSH vào VPS: giải nén frontend rồi restart backend
       - name: Restart services via SSH
@@ -80,5 +80,12 @@ jobs:
             echo "=== Production Deploy ==="
             echo "Commit: ${{ github.sha }}"
             echo "Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+            # Giải nén frontend vào thư mục đích
+            mkdir -p /opt/airline-prod/frontend
+            tar -xzf /tmp/frontend-dist.tar.gz -C /opt/airline-prod/frontend
+
+            # Chạy deploy script để restart services
             /opt/airline/deploy-production.sh
+
             echo "Deploy completed successfully"
