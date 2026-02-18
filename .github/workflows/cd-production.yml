@@ -58,8 +58,12 @@ jobs:
           script: |
             sudo mkdir -p /opt/airline-prod/backend
             sudo mkdir -p /opt/airline-prod/frontend/dist
+            sudo mkdir -p /opt/airline-deploy
+            # Xóa file deploy cũ nếu có (tránh lỗi permission)
+            sudo rm -f /opt/airline-deploy/frontend-dist.tar.gz
             # Cấp quyền cho user hiện tại có thể upload file vào đây
             sudo chown -R $USER:$USER /opt/airline-prod
+            sudo chown -R $USER:$USER /opt/airline-deploy
 
       # ===== 2. UPLOAD BACKEND =====
       - name: Upload Backend Jar
@@ -85,7 +89,7 @@ jobs:
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
           source: "frontend-dist.tar.gz"
-          target: "/tmp/"
+          target: "/opt/airline-deploy/"
           overwrite: true
 
       # ===== 5. RESTART SERVICE & FIX PERMISSIONS =====
@@ -101,7 +105,7 @@ jobs:
 
             # Giải nén frontend vào thư mục đích
             mkdir -p /opt/airline-prod/frontend/dist
-            tar -xzf /tmp/frontend-dist.tar.gz -C /opt/airline-prod/frontend/dist
+            tar -xzf /opt/airline-deploy/frontend-dist.tar.gz -C /opt/airline-prod/frontend/dist
 
             # Cấp quyền lại cho Nginx đọc frontend (Fix lỗi 403 Forbidden)
             sudo chown -R www-data:www-data /opt/airline-prod/frontend
