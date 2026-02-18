@@ -4,18 +4,15 @@ set -e
 # ==========================================
 # PRODUCTION DEPLOY SCRIPT
 # ==========================================
-# Script này KHÔNG build - chỉ nhận artifacts đã build sẵn
-# từ CI/CD pipeline và deploy lên VPS.
-#
-# Artifacts được upload vào /tmp/airline-deploy/:
-#   /tmp/airline-deploy/backend/*.jar   (Spring Boot JAR)
-#   /tmp/airline-deploy/frontend/*      (React build)
+# Script này KHÔNG build - chỉ nhận artifacts đã upload bởi CI/CD:
+#   JAR đã nằm sẵn tại : /opt/airline-prod/backend/app.jar
+#   Frontend tar tại   : /tmp/frontend-dist.tar.gz
 # ==========================================
 
 DEPLOY_DIR="/opt/airline-prod"
 BACKEND_DIR="$DEPLOY_DIR/backend"
 FRONTEND_DIR="$DEPLOY_DIR/frontend"
-STAGING_DIR="/tmp/airline-deploy"
+FRONTEND_TAR="/tmp/frontend-dist.tar.gz"
 BACKEND_PORT=8080
 
 echo "=========================================="
@@ -24,15 +21,24 @@ echo "  Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo "=========================================="
 
 # Kiểm tra artifacts có tồn tại
-if [ ! -d "$STAGING_DIR/backend" ] || [ -z "$(ls -A $STAGING_DIR/backend/*.jar 2>/dev/null)" ]; then
-    echo "❌ ERROR: No backend JAR found in $STAGING_DIR/backend/"
+if [ ! -f "$BACKEND_DIR/app.jar" ]; then
+    echo "❌ ERROR: JAR not found at $BACKEND_DIR/app.jar"
     exit 1
 fi
 
-if [ ! -d "$STAGING_DIR/frontend" ] || [ -z "$(ls -A $STAGING_DIR/frontend/ 2>/dev/null)" ]; then
-    echo "❌ ERROR: No frontend files found in $STAGING_DIR/frontend/"
+if [ ! -f "$FRONTEND_TAR" ]; then
+    echo "❌ ERROR: Frontend tar not found at $FRONTEND_TAR"
     exit 1
 fi
+
+# ==================== DEPLOY FRONTEND ====================
+echo ""
+echo "🎨 Deploying frontend..."
+
+mkdir -p "$FRONTEND_DIR" "$DEPLOY_DIR/logs"
+rm -rf "${FRONTEND_DIR:?}"/*
+tar -xzf "$FRONTEND_TAR" -C "$FRONTEND_DIR"
+echo "  ✅ Frontend extracted to $FRONTEND_DIR"
 
 # ==================== STOP BACKEND ====================
 echo ""
@@ -45,35 +51,12 @@ if [ -f "$BACKEND_DIR/app.pid" ]; then
         kill "$PID"
         sleep 5
     fi
+    rm -f "$BACKEND_DIR/app.pid"
 fi
 
-# Kill process trên backend port (phòng trường hợp PID file sai)
+# Kill process còn sót trên port
 fuser -k ${BACKEND_PORT}/tcp 2>/dev/null || true
 sleep 2
-
-# ==================== BACKUP ====================
-echo ""
-echo "💾 Backing up current version..."
-
-if [ -f "$BACKEND_DIR/app.jar" ]; then
-    cp "$BACKEND_DIR/app.jar" "$BACKEND_DIR/app.jar.bak"
-    echo "  Backend JAR backed up"
-fi
-
-# ==================== DEPLOY FILES ====================
-echo ""
-echo "📦 Deploying new files..."
-
-mkdir -p "$BACKEND_DIR" "$FRONTEND_DIR" "$DEPLOY_DIR/logs"
-
-# Copy JAR
-cp "$STAGING_DIR/backend/"*.jar "$BACKEND_DIR/app.jar"
-echo "  ✅ Backend JAR deployed"
-
-# Copy frontend (xóa cũ, copy mới)
-rm -rf "${FRONTEND_DIR:?}"/*
-cp -r "$STAGING_DIR/frontend/"* "$FRONTEND_DIR/"
-echo "  ✅ Frontend deployed"
 
 # ==================== START BACKEND ====================
 echo ""
@@ -116,7 +99,7 @@ echo "🔄 Reloading Nginx..."
 nginx -t && systemctl reload nginx || echo "⚠️ Nginx reload skipped (not installed or config error)"
 
 # ==================== CLEANUP ====================
-rm -rf "$STAGING_DIR"
+rm -f "$FRONTEND_TAR"
 
 echo ""
 echo "=========================================="
