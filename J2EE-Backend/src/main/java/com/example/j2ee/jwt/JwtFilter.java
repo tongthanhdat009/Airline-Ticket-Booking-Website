@@ -70,9 +70,13 @@ public class JwtFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) return true; // preflight CORS
         String path = request.getRequestURI();
+        System.out.println("=== JwtFilter checking path: " + path + " ===");
         // skip by prefix
         for (String p : SKIP_PREFIXES) {
-            if (path.equals(p) || path.startsWith(p)) return true;
+            if (path.equals(p) || path.startsWith(p)) {
+                System.out.println("=== JwtFilter SKIP path: " + path + " matched: " + p + " ===");
+                return true;
+            }
         }
         // skip common static extensions
         String lower = path.toLowerCase();
@@ -81,6 +85,7 @@ public class JwtFilter extends OncePerRequestFilter {
         }
         // OPTIONS preflight
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) return true;
+        System.out.println("=== JwtFilter NOT SKIP path: " + path + " ===");
         return false;
     }
 
