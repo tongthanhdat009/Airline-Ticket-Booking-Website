@@ -11,7 +11,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    @Value("${app.cors.allowed-origins:http://localhost:5173,http://localhost:3000}")
+    @Value("${app.cors.allowed-origins:https://jadt-airline.io.vn,https://www.jadt-airline.io.vn,http://localhost:5173,http://localhost:3000}")
     private String[] allowedOrigins;
 
     @Override

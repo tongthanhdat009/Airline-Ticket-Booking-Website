@@ -40,7 +40,7 @@ public class SecurityConfig {
     private final DynamicAdminAuthorizationManager dynamicAdminAuthManager;
 
     // Đọc danh sách allowed origins từ properties, hỗ trợ cả dev và production
-    @org.springframework.beans.factory.annotation.Value("${app.cors.allowed-origins:http://localhost:5173,http://localhost:3000}")
+    @org.springframework.beans.factory.annotation.Value("${app.cors.allowed-origins:https://jadt-airline.io.vn,https://www.jadt-airline.io.vn,http://localhost:5173,http://localhost:3000}")
     private String[] corsAllowedOrigins;
 
     public SecurityConfig(
