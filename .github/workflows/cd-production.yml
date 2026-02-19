@@ -96,6 +96,17 @@ jobs:
           target: "/opt/airline-deploy/"
           overwrite: true
 
+      # ===== 4.5 UPLOAD NGINX CONFIG =====
+      - name: Upload Nginx Config
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          source: "deploy/nginx/airline.conf"
+          target: "/tmp/"
+          overwrite: true
+
       # ===== 5. RESTART SERVICE & FIX PERMISSIONS =====
       - name: Restart Service
         uses: appleboy/ssh-action@v1.0.3
@@ -117,6 +128,15 @@ jobs:
 
             # Sửa lỗi ký tự ^M (CRLF) cho script
             sed -i 's/\r$//' /opt/airline-prod/deploy-production.sh || true
+
+            # Cập nhật Nginx config
+            sudo cp /tmp/airline.conf /etc/nginx/sites-available/airline.conf
+            # Tạo symbolic link nếu chưa có
+            sudo ln -sf /etc/nginx/sites-available/airline.conf /etc/nginx/sites-enabled/airline.conf
+            # Test nginx config
+            sudo nginx -t
+            # Reload nginx
+            sudo systemctl reload nginx
 
             # Chạy script deploy hệ thống
             sudo bash /opt/airline-prod/deploy-production.sh
