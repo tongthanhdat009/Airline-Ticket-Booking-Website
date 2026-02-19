@@ -11,19 +11,20 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class OpenRouterConfig {
 
-    // DELETE or Keep WebClient.Builder (it is NOT used by ChatModel)
+    @org.springframework.beans.factory.annotation.Value("${app.frontend.url:http://localhost:5173}")
+    private String frontendUrl;
+
     @Bean
     public WebClient.Builder webClientBuilder() {
         return WebClient.builder()
-                .defaultHeader("HTTP-Referer", "http://localhost:8080")
+                .defaultHeader("HTTP-Referer", frontendUrl)
                 .defaultHeader("X-Title", "chat bot máy bay");
     }
 
-    // ADD THIS BEAN to configure RestClient for ChatModel
     @Bean
     public RestClientCustomizer restClientCustomizer() {
         return restClientBuilder -> restClientBuilder
-                .defaultHeader("HTTP-Referer", "http://localhost:8080")
+                .defaultHeader("HTTP-Referer", frontendUrl)
                 .defaultHeader("X-Title", "chat bot máy bay");
     }
 

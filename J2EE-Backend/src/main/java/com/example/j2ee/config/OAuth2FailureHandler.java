@@ -13,11 +13,14 @@ import java.io.IOException;
 @Component
 public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
+    @org.springframework.beans.factory.annotation.Value("${app.frontend.url}")
+    private String frontendUrl;
+
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) throws IOException, ServletException {
-        // Redirect về frontend với error message
-        String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:5173/dang-nhap")
+        // Redirect về frontend với error message (hỗ trợ cả dev và production)
+        String targetUrl = UriComponentsBuilder.fromUriString(frontendUrl + "/dang-nhap")
                 .queryParam("error", "oauth2_failed")
                 .queryParam("message", exception.getMessage())
                 .build().toUriString();

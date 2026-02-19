@@ -26,6 +26,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -37,6 +38,10 @@ public class SecurityConfig {
     private final OAuth2FailureHandler oAuth2FailureHandler;
     private final PasswordEncoder passwordEncoder;
     private final DynamicAdminAuthorizationManager dynamicAdminAuthManager;
+
+    // Đọc danh sách allowed origins từ properties, hỗ trợ cả dev và production
+    @org.springframework.beans.factory.annotation.Value("${app.cors.allowed-origins:http://localhost:5173,http://localhost:3000}")
+    private String[] corsAllowedOrigins;
 
     public SecurityConfig(
             @Lazy JwtFilter jwtFilter,
@@ -59,14 +64,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Cho phép các domain production và development
-        // Dùng setAllowedOrigins thay vì setAllowedOriginPatterns để match chính xác origin
-        configuration.setAllowedOrigins(Arrays.asList(
-            "https://jadt-airline.io.vn",
-            "https://www.jadt-airline.io.vn",
-            "http://localhost:5173",
-            "http://localhost:3000"
-        ));
+        // Đọc allowed origins từ config (app.cors.allowed-origins)
+        // Production: https://jadt-airline.io.vn,https://www.jadt-airline.io.vn
+        // Development: http://localhost:5173,http://localhost:3000
+        configuration.setAllowedOrigins(List.of(corsAllowedOrigins));
         // Cho phép localhost với bất kỳ port nào (cho development)
         configuration.addAllowedOriginPattern("http://localhost:*");
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));

@@ -16,6 +16,9 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
+    @org.springframework.beans.factory.annotation.Value("${app.frontend.url:http://localhost:5173}")
+    private String frontendUrl;
+
     public void sendOTPEmail(String toEmail, String otp) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -174,7 +177,7 @@ public class EmailService {
                             </div>
                             
                             <div style="text-align: center; margin: 30px 0;">
-                                <a href="http://localhost:5173" class="button">BẮT ĐẦU ĐẶT VÉ NGAY</a>
+                                <a href="%s" class="button">BẮT ĐẦU ĐẶT VÉ NGAY</a>
                             </div>
                             
                             <p style="background: #dbeafe; padding: 15px; border-radius: 8px; border-left: 4px solid #3b82f6;">
@@ -199,7 +202,7 @@ public class EmailService {
                     </div>
                 </body>
                 </html>
-                """, name);
+                """, name, frontendUrl);
             
             helper.setText(htmlContent, true);
             mailSender.send(message);
@@ -369,7 +372,7 @@ public class EmailService {
                             </div>
                             
                             <div style="text-align: center; margin: 30px 0;">
-                                <a href="http://localhost:5173" class="button">QUẢN LÝ ĐẶT CHỖ</a>
+                                <a href="%s" class="button">QUẢN LÝ ĐẶT CHỖ</a>
                             </div>
                             
                             <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ:</p>
@@ -397,7 +400,7 @@ public class EmailService {
                     </div>
                 </body>
                 </html>
-                """, passengerName, bookingCode, flightNumber, route);
+                """, passengerName, bookingCode, flightNumber, route, frontendUrl);
             
             helper.setText(htmlContent, true);
             
@@ -516,7 +519,7 @@ public class EmailService {
                             </div>
                             
                             <div style="text-align: center; margin: 30px 0;">
-                                <a href="http://localhost:5173" class="button">QUẢN LÝ ĐẶT CHỖ</a>
+                                <a href="%s" class="button">QUẢN LÝ ĐẶT CHỖ</a>
                             </div>
                             
                             <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ:</p>
@@ -555,7 +558,8 @@ public class EmailService {
                     "Tất cả vé điện tử (chiều đi và chiều về) của bạn đã được đính kèm trong email này. " : 
                     "Vé điện tử của bạn đã được đính kèm trong email này. ",
                 ticketCount > 1 ? 
-                    "<li>Lưu ý kiểm tra cả 2 vé (chiều đi và chiều về)</li>" : ""
+                    "<li>Lưu ý kiểm tra cả 2 vé (chiều đi và chiều về)</li>" : "",
+                frontendUrl
             );
             
             helper.setText(htmlContent, true);

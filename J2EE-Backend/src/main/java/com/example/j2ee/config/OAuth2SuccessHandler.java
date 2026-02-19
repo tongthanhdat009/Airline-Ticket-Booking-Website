@@ -32,6 +32,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
 
+    @org.springframework.beans.factory.annotation.Value("${app.frontend.url}")
+    private String frontendUrl;
+
     public OAuth2SuccessHandler(JwtUtil jwtUtil,
                                 TaiKhoanRepository taiKhoanRepository,
                                 HanhKhachRepository hanhKhachRepository,
@@ -92,8 +95,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         RefreshToken refreshTokenEntity = refreshTokenService.createRefreshTokenForCustomer(email);
         String refreshToken = refreshTokenEntity.getToken();
         
-        // Redirect về frontend với tokens
-        String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:5173/oauth2/callback")
+        // Redirect về frontend với tokens (hỗ trợ cả dev và production)
+        String targetUrl = UriComponentsBuilder.fromUriString(frontendUrl + "/oauth2/callback")
                 .queryParam("accessToken", accessToken)
                 .queryParam("refreshToken", refreshToken)
                 .queryParam("email", email)

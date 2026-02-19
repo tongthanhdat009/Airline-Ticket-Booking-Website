@@ -23,6 +23,9 @@ public class EmailVerificationService {
     private final EmailVerificationTokenRepository tokenRepository;
     private final JavaMailSender mailSender;
 
+    @org.springframework.beans.factory.annotation.Value("${app.frontend.url:http://localhost:5173}")
+    private String frontendUrl;
+
     @Transactional
     public void sendVerificationEmail(String email) {
         // Check if email exists
@@ -91,8 +94,8 @@ public class EmailVerificationService {
             helper.setTo(toEmail);
             helper.setSubject("Xác thực tài khoản SGU Airline");
             
-            // Create verification URL
-            String verificationUrl = "http://localhost:5173/verify-email?token=" + token;
+            // Create verification URL (hỗ trợ cả dev và production)
+            String verificationUrl = frontendUrl + "/verify-email?token=" + token;
             
             String htmlContent = String.format("""
                 <!DOCTYPE html>
