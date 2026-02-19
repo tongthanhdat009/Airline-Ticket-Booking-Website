@@ -60,13 +60,15 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // Cho phép các domain production và development
-        configuration.setAllowedOriginPatterns(Arrays.asList(
+        // Dùng setAllowedOrigins thay vì setAllowedOriginPatterns để match chính xác origin
+        configuration.setAllowedOrigins(Arrays.asList(
             "https://jadt-airline.io.vn",
             "https://www.jadt-airline.io.vn",
             "http://localhost:5173",
-            "http://localhost:3000",
-            "http://localhost:*"
+            "http://localhost:3000"
         ));
+        // Cho phép localhost với bất kỳ port nào (cho development)
+        configuration.addAllowedOriginPattern("http://localhost:*");
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
