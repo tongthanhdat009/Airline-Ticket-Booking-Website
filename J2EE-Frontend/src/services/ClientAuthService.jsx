@@ -1,4 +1,4 @@
-import apiClient, { loginAndSetTokens, getRefreshToken } from './apiClient';
+import apiClient, { loginAndSetTokens } from './apiClient';
 import { setClientUserEmail, clearClientAuthCookies, getClientAccessToken } from '../utils/cookieUtils';
 
 // Lấy thông tin khách hàng hiện tại từ backend
@@ -36,22 +36,12 @@ export const loginClient = async (email, matKhau) => {
 // Đăng xuất khách hàng
 export const logoutClient = async () => {
     try {
-        // Lấy refresh token từ memory
-        const refreshToken = getRefreshToken('customer');
-
-        // Nếu có refresh token trong memory, gửi để revoke
-        if (refreshToken) {
-            await apiClient.post('/dangxuat', { refreshToken });
-        } else {
-            // Nếu không có refresh token (bị mất khi refresh trang), 
-            // gọi logout all để revoke tất cả tokens dựa vào access token
-            console.log('Refresh token không có trong memory, sử dụng logout all');
-            await apiClient.post('/dangxuat/all');
-        }
+        // Backend quản lý refresh token trong httpOnly cookie, gọi logout all để revoke
+        await apiClient.post('/dangxuat/all');
     } catch (error) {
         console.error("Error calling logout API:", error);
     } finally {
-        // Luôn xóa local cookies và memory ngay cả khi API fail
+        // Luôn xóa local cookies ngay cả khi API fail
         clearClientAuthCookies();
     }
 };

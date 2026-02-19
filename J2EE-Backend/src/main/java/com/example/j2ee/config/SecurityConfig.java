@@ -11,7 +11,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,7 +24,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -38,10 +36,6 @@ public class SecurityConfig {
     private final OAuth2FailureHandler oAuth2FailureHandler;
     private final PasswordEncoder passwordEncoder;
     private final DynamicAdminAuthorizationManager dynamicAdminAuthManager;
-
-    // Đọc danh sách allowed origins từ properties
-    @org.springframework.beans.factory.annotation.Value("${app.cors.allowed-origins:http://localhost:5173,http://localhost:3000}")
-    private String[] corsAllowedOrigins;
 
     public SecurityConfig(
             @Lazy JwtFilter jwtFilter,
@@ -64,13 +58,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Đọc allowed origins từ config (app.cors.allowed-origins)
-        configuration.setAllowedOrigins(List.of(corsAllowedOrigins));
-        // Cho phép localhost với bất kỳ port nào (cho development)
-        configuration.addAllowedOriginPattern("http://localhost:*");
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        configuration.setAllowedOriginPatterns(List.of("http://localhost:*"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
@@ -87,57 +78,33 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-                        // CORS preflight OPTIONS - phải permitAll để tránh lỗi CORS
+                        // CORS preflight OPTIONS
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // public endpoints - đặt trước tất cả
-                        .requestMatchers("/dangky", "/dangnhap", "/dangnhap/**").permitAll()
-                        .requestMatchers("/api/dangky", "/api/dangnhap", "/api/dangnhap/**").permitAll()
-                        .requestMatchers("/admin/dangnhap", "/admin/dangnhap/**", "/api/admin/dangnhap", "/api/admin/dangnhap/**").permitAll()
-                        .requestMatchers("/admin/current-user", "/api/admin/current-user").permitAll()
-                        .requestMatchers("/forgot-password/**", "/api/forgot-password/**").permitAll()
-                        .requestMatchers("/auth/**", "/api/auth/**").permitAll()
-                        .requestMatchers("/oauth2/**", "/login/oauth2/**", "/api/oauth2/**", "/api/login/oauth2/**").permitAll()
-                        .requestMatchers("/error", "/api/error").permitAll()
-                        // VNPay callback endpoint - không yêu cầu authentication
-                        .requestMatchers("/vnpay/payment-callback", "/api/vnpay/payment-callback").permitAll()
-                        // Online Check-in API - không yêu cầu authentication
-                        .requestMatchers("/checkin/**", "/api/checkin/**").permitAll()
-                        // Booking API - cho phép khách vãng lai đặt vé
-                        .requestMatchers("/client/datcho/**", "/api/client/datcho/**").permitAll()
-                        // static resources
-                        .requestMatchers("/ai/**", "/api/ai/**").permitAll()
-                        .requestMatchers("/static/**", "/AnhDichVuCungCap/**").permitAll()
-                        .requestMatchers("/admin/dashboard/dichvu/anh/**", "/api/admin/dashboard/dichvu/anh/**").permitAll()
-                        .requestMatchers("/admin/dashboard/dichvu/luachon/anh/**", "/api/admin/dashboard/dichvu/luachon/anh/**").permitAll()
-                        // Allow fetching flight services images and service list for public client
-                        .requestMatchers("/admin/dashboard/chuyenbay/**", "/api/admin/dashboard/chuyenbay/**").permitAll()
-                        .requestMatchers("/ws/**", "/api/ws/**").permitAll()
-                        .requestMatchers("/countries", "/api/countries").permitAll()
-                        // ================== ADMIN DASHBOARD ENDPOINTS ==================
-                        // Sử dụng Dynamic Admin Authorization Manager
-                        // Kiểm tra user có vai trò admin hợp lệ từ database không
-                        // Các vai trò được định nghĩa trong database: SUPER_ADMIN, QUAN_LY, NHAN_VIEN_VE, KE_TOAN, VAN_HANH
-                        //
-                        // Backend chỉ kiểm tra role级别的访问权限
-                        // Chi tiết permissions (VIEW, CREATE, UPDATE, DELETE) được xử lý bởi frontend
-                        //
-                        // Lợi ích:
-                        // 1. Giảm độ trễ - không cần query database mỗi request
-                        // 2. Đơn giản - chỉ check role, không check từng endpoint
-                        // 3. Hiệu suất - roles được cache trong JWT token
-                        // 4. Flexible - frontend ẩn/hiện UI dựa trên permissions
-                        .requestMatchers("/admin/dashboard/**", "/api/admin/dashboard/**").access(dynamicAdminAuthManager)
-                        // Tất cả admin endpoints khác (auth endpoints đã được permitAll ở trên)
-                        .requestMatchers("/admin/datcho/**", "/api/admin/datcho/**").access(dynamicAdminAuthManager)
-                        .requestMatchers("/admin/audit-logs/**", "/api/admin/audit-logs/**").access(dynamicAdminAuthManager)
-                        .requestMatchers("/admin/dangxuat/all", "/api/admin/dangxuat/all").access(dynamicAdminAuthManager)
-                        // rest yêu cầu authentication
-                        .requestMatchers("/sanbay/**", "/api/sanbay/**").permitAll()
-                        .requestMatchers("/AnhDichVuCungCap/**").permitAll()
+                        // Public endpoints
+                        .requestMatchers("/api/dangky", "/api/dangnhap/**", "/api/admin/dangnhap/**", "/api/admin/current-user").permitAll()
+                        .requestMatchers("/api/forgot-password/**", "/api/auth/**").permitAll()
+                        .requestMatchers("/api/oauth2/**", "/api/login/oauth2/**").permitAll()
+                        .requestMatchers("/api/error").permitAll()
+                        // OAuth2 callbacks (không có /api prefix - được gọi trực tiếp từ OAuth provider)
+                        .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
+                        // VNPay, Check-in, Booking endpoints
+                        .requestMatchers("/api/vnpay/payment-callback", "/api/checkin/**", "/api/client/datcho/**").permitAll()
+                        // Static resources
+                        .requestMatchers("/api/ai/**", "/static/**").permitAll()
+                        .requestMatchers("/api/admin/dashboard/dichvu/anh/**", "/api/admin/dashboard/dichvu/luachon/anh/**").permitAll()
+                        .requestMatchers("/api/admin/dashboard/chuyenbay/**").permitAll()
+                        .requestMatchers("/api/ws/**", "/api/countries").permitAll()
+                        // Direct static resources (không có /api - được gọi trực tiếp từ browser/img tags)
+                        .requestMatchers("/ai/**", "/AnhDichVuCungCap/**", "/admin/dashboard/dichvu/anh/**").permitAll()
+                        .requestMatchers("/admin/dashboard/dichvu/luachon/anh/**", "/admin/dashboard/chuyenbay/**").permitAll()
+                        .requestMatchers("/ws/**", "/countries").permitAll()
+                        // Admin endpoints (dynamic authorization based on roles in JWT)
+                        .requestMatchers("/api/admin/dashboard/**", "/api/admin/datcho/**").access(dynamicAdminAuthManager)
+                        .requestMatchers("/api/admin/audit-logs/**", "/api/admin/dangxuat/all").access(dynamicAdminAuthManager)
+                        .requestMatchers("/api/sanbay/**").permitAll()
                         .anyRequest().authenticated()
                 )
 
-                // Phân biệt 401 (chưa xác thực/hết hạn) và 403 (thiếu quyền)
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(restAuthEntryPoint())
                         .accessDeniedHandler(restAccessDeniedHandler())
@@ -145,8 +112,6 @@ public class SecurityConfig {
 
                 .httpBasic(h -> h.disable())
                 .formLogin(f -> f.disable())
-                
-                // OAuth2 Login Configuration
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2SuccessHandler)
                         .failureHandler(oAuth2FailureHandler)

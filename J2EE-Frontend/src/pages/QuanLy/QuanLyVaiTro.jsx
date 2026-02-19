@@ -7,6 +7,7 @@ import ResponsiveTable from '../../components/common/ResponsiveTable';
 import { useViewToggle } from '../../hooks/useViewToggle';
 import VaiTroCard from '../../components/QuanLy/QuanLyVaiTro/VaiTroCard';
 import Card from '../../components/QuanLy/CardChucNang';
+import apiClient from '../../services/apiClient';
 import {
     getAllVaiTro,
     createVaiTro,
@@ -39,17 +40,10 @@ const QuanLyVaiTro = () => {
                 const rolesWithAdminCount = await Promise.all(
                     response.data.map(async (role) => {
                         try {
-                            // Lấy số admin từ API count-admin
-                            const countResponse = await fetch(`http://localhost:8080/admin/dashboard/vai-tro/${role.maVaiTro}/count-admin`, {
-                                headers: {
-                                    'Authorization': `Bearer ${localStorage.getItem('admin_access_token') || document.cookie.match(/admin_access_token=([^;]+)/)?.[1]}`,
-                                    'Content-Type': 'application/json'
-                                }
-                            });
-                            const countData = await countResponse.json();
+                            const countResponse = await apiClient.get(`/admin/dashboard/vai-tro/${role.maVaiTro}/count-admin`);
                             return {
                                 ...role,
-                                soAdmin: countData.data || 0,
+                                soAdmin: countResponse.data.data || 0,
                                 createdAt: role.createdAt || new Date().toISOString().split('T')[0]
                             };
                         } catch (error) {

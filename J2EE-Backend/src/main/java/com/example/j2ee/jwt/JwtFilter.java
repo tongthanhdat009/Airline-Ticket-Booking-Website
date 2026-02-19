@@ -1,11 +1,12 @@
 package com.example.j2ee.jwt;
 
 import com.example.j2ee.security.AdminUserDetails;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,12 +16,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -39,54 +37,25 @@ public class JwtFilter extends OncePerRequestFilter {
         this.adminService = adminService;
     }
 
-    // [ADDED] Bỏ qua filter cho các endpoint public (login/refresh) và tài nguyên tĩnh
-    private static final List<String> SKIP_PREFIXES = Arrays.asList(
-            "/dangnhap",
-            "/dangnhap/refresh",
-            "/dangky",
-            "/admin/dangnhap",
-            "/admin/dangnhap/refresh",
-            "/ai/",
-            "/AnhDichVuCungCap/",
-            "/static/",
-            "/admin/dashboard/dichvu/anh/",
-            "/admin/dashboard/dichvu/luachon/anh/",
-            // Với /api prefix (khi Nginx proxy)
-            "/api/dangnhap",
-            "/api/dangnhap/refresh",
-            "/api/dangky",
-            "/api/admin/dangnhap",
-            "/api/admin/dangnhap/refresh",
-            "/api/admin/current-user",
-            "/api/ai/",
-            "/api/AnhDichVuCungCap/",
-            "/api/static/"
+    // Skip filter cho public endpoints và static resources
+    private static final List<String> SKIP_PREFIXES = List.of(
+            "/dangnhap", "/dangky", "/admin/dangnhap",
+            "/ai/", "/AnhDichVuCungCap/", "/static/",
+            "/admin/dashboard/dichvu/anh/", "/admin/dashboard/dichvu/luachon/anh/",
+            "/api/dangnhap", "/api/dangky", "/api/admin/dangnhap", "/api/admin/current-user",
+            "/api/ai/", "/api/AnhDichVuCungCap/", "/api/static/"
     );
-    // // Bỏ qua filter cho login/refresh và preflight
-    // private static final List<String> SKIP_PATHS = List.of("/dangnhap", "/dangnhap/refresh", "/dangky",
-    //         "/admin/dangnhap", "/admin/dangnhap/refresh");
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) return true; // preflight CORS
-        String path = request.getRequestURI();
-        System.out.println("=== JwtFilter checking path: " + path + " ===");
-        // skip by prefix
-        for (String p : SKIP_PREFIXES) {
-            if (path.equals(p) || path.startsWith(p)) {
-                System.out.println("=== JwtFilter SKIP path: " + path + " matched: " + p + " ===");
-                return true;
-            }
-        }
-        // skip common static extensions
-        String lower = path.toLowerCase();
-        if (lower.endsWith(".svg") || lower.endsWith(".png") || lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".gif")) {
-            return true;
-        }
-        // OPTIONS preflight
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) return true;
-        System.out.println("=== JwtFilter NOT SKIP path: " + path + " ===");
-        return false;
+        String path = request.getRequestURI();
+        for (String prefix : SKIP_PREFIXES) {
+            if (path.equals(prefix) || path.startsWith(prefix)) return true;
+        }
+        String lower = path.toLowerCase();
+        return lower.endsWith(".svg") || lower.endsWith(".png") || lower.endsWith(".jpg")
+                || lower.endsWith(".jpeg") || lower.endsWith(".gif");
     }
 
     @Override
@@ -156,23 +125,15 @@ public class JwtFilter extends OncePerRequestFilter {
 
     /** Lấy token: ưu tiên Authorization header, fallback cookie */
     private String resolveToken(HttpServletRequest request) {
-        // 1. Ưu tiên Authorization header (frontend gửi token chính xác theo user type)
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             return authHeader.substring(7).trim();
         }
-        // 2. Fallback: đọc từ cookie (admin_access_token hoặc accessToken)
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
-            // Kiểm tra admin cookie trước
             for (Cookie c : cookies) {
-                if ("admin_access_token".equals(c.getName())) {
-                    return c.getValue();
-                }
-            }
-            // Fallback customer cookie
-            for (Cookie c : cookies) {
-                if ("accessToken".equals(c.getName())) {
+                String name = c.getName();
+                if ("admin_access_token".equals(name) || "accessToken".equals(name)) {
                     return c.getValue();
                 }
             }
