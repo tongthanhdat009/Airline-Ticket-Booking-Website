@@ -3,8 +3,6 @@ package com.example.j2ee.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig {
@@ -14,24 +12,6 @@ public class WebConfig {
         return new RestTemplate();
     }
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**") // Áp dụng cho tất cả các path
-                        .allowedOriginPatterns(
-                            "http://localhost:5173",
-                            "http://localhost:*",
-                            "https://jadt-airline.io.vn",
-                            "https://www.jadt-airline.io.vn"
-                        )
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
-                        .allowedHeaders("*")
-                        .exposedHeaders("Authorization")
-                        .allowCredentials(true)
-                        .maxAge(3600);
-            }
-        };
-    }
+    // CORS được cấu hình tập trung trong SecurityConfig.corsConfigurationSource()
+    // KHÔNG cấu hình CORS ở đây để tránh xung đột giữa Spring Security và Spring MVC
 }
