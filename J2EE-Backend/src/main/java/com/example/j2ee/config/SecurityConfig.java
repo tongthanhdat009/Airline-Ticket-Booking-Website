@@ -62,6 +62,7 @@ public class SecurityConfig {
                         .requestMatchers("/dangky", "/dangnhap", "/dangnhap/**").permitAll()
                         .requestMatchers("/api/dangky", "/api/dangnhap", "/api/dangnhap/**").permitAll()
                         .requestMatchers("/admin/dangnhap", "/admin/dangnhap/**", "/api/admin/dangnhap", "/api/admin/dangnhap/**").permitAll()
+                        .requestMatchers("/admin/current-user", "/api/admin/current-user").permitAll()
                         .requestMatchers("/forgot-password/**", "/api/forgot-password/**").permitAll()
                         .requestMatchers("/auth/**", "/api/auth/**").permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**", "/api/oauth2/**", "/api/login/oauth2/**").permitAll()
@@ -95,7 +96,10 @@ public class SecurityConfig {
                         // 3. Hiệu suất - roles được cache trong JWT token
                         // 4. Flexible - frontend ẩn/hiện UI dựa trên permissions
                         .requestMatchers("/admin/dashboard/**", "/api/admin/dashboard/**").access(dynamicAdminAuthManager)
-                        .requestMatchers("/admin/**", "/api/admin/**").access(dynamicAdminAuthManager)
+                        // Tất cả admin endpoints khác (auth endpoints đã được permitAll ở trên)
+                        .requestMatchers("/admin/datcho/**", "/api/admin/datcho/**").access(dynamicAdminAuthManager)
+                        .requestMatchers("/admin/audit-logs/**", "/api/admin/audit-logs/**").access(dynamicAdminAuthManager)
+                        .requestMatchers("/admin/dangxuat/all", "/api/admin/dangxuat/all").access(dynamicAdminAuthManager)
                         // rest yêu cầu authentication
                         .requestMatchers("/sanbay/**", "/api/sanbay/**").permitAll()
                         .requestMatchers("/AnhDichVuCungCap/**").permitAll()
