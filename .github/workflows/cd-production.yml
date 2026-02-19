@@ -115,6 +115,18 @@ jobs:
             sudo chown -R www-data:www-data /opt/airline-prod/frontend
             sudo chmod -R 755 /opt/airline-prod/frontend
 
+            # Cập nhật Nginx config
+            sudo cp /tmp/airline.conf /etc/nginx/sites-available/airline.conf
+            # Xóa symlink cũ nếu có
+            sudo rm -f /etc/nginx/sites-enabled/airline.conf
+            sudo rm -f /etc/nginx/sites-enabled/airline
+            # Tạo symbolic link mới
+            sudo ln -s /etc/nginx/sites-available/airline.conf /etc/nginx/sites-enabled/airline.conf
+            # Test nginx config
+            sudo nginx -t
+            # Reload nginx
+            sudo systemctl reload nginx
+
             # Sửa lỗi ký tự ^M (CRLF) cho script
             sed -i 's/\r$//' /opt/airline-prod/deploy-production.sh || true
 
