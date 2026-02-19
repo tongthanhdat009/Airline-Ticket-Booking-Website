@@ -39,8 +39,8 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
     private final DynamicAdminAuthorizationManager dynamicAdminAuthManager;
 
-    // Đọc danh sách allowed origins từ properties, hỗ trợ cả dev và production
-    @org.springframework.beans.factory.annotation.Value("${app.cors.allowed-origins:https://jadt-airline.io.vn,https://www.jadt-airline.io.vn,http://localhost:5173,http://localhost:3000}")
+    // Đọc danh sách allowed origins từ properties
+    @org.springframework.beans.factory.annotation.Value("${app.cors.allowed-origins:http://localhost:5173,http://localhost:3000}")
     private String[] corsAllowedOrigins;
 
     public SecurityConfig(
@@ -65,8 +65,6 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // Đọc allowed origins từ config (app.cors.allowed-origins)
-        // Production: https://jadt-airline.io.vn,https://www.jadt-airline.io.vn
-        // Development: http://localhost:5173,http://localhost:3000
         configuration.setAllowedOrigins(List.of(corsAllowedOrigins));
         // Cho phép localhost với bất kỳ port nào (cho development)
         configuration.addAllowedOriginPattern("http://localhost:*");
