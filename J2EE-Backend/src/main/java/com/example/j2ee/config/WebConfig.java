@@ -20,7 +20,12 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // Áp dụng cho tất cả các path
-                        .allowedOriginPatterns("http://localhost:5173", "http://localhost:*") // Sử dụng patterns thay vì origins khi có allowCredentials
+                        .allowedOriginPatterns(
+                            "http://localhost:5173",
+                            "http://localhost:*",
+                            "https://jadt-airline.io.vn",
+                            "https://www.jadt-airline.io.vn"
+                        )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
                         .allowedHeaders("*")
                         .exposedHeaders("Authorization")
