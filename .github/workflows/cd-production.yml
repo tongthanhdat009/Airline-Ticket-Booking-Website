@@ -6,47 +6,101 @@ on:
       - main
 
 jobs:
+  # ===== CI BACKEND =====
+  ci-backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: J2EE-Backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Grant execute permission for mvnw
+        run: chmod +x mvnw
+
+      - name: Run tests
+        run: ./mvnw -B -ntp test
+
+      - name: Build JAR (skip tests)
+        run: ./mvnw -B -ntp package -DskipTests
+
+      - name: Upload backend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-jar
+          path: J2EE-Backend/target/*.jar
+          if-no-files-found: error
+          retention-days: 7
+
+  # ===== CI FRONTEND =====
+  ci-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: J2EE-Frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+          cache-dependency-path: J2EE-Frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build
+
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: J2EE-Frontend/dist
+          if-no-files-found: error
+          retention-days: 7
+
+  # ===== DEPLOY PRODUCTION =====
   deploy:
+    needs: [ci-backend, ci-frontend]
     runs-on: ubuntu-latest
     environment: production
     steps:
       - uses: actions/checkout@v4
 
-      # ===== BUILD BACKEND =====
-      - uses: actions/setup-java@v4
+      # ===== DOWNLOAD ARTIFACTS FROM CI =====
+      - name: Download Backend Artifact
+        uses: actions/download-artifact@v4
         with:
-          distribution: temurin
-          java-version: 21
-          cache: maven
-          cache-dependency-path: J2EE-Backend/pom.xml
+          name: backend-jar
+          path: J2EE-Backend/target/
 
-      - name: Build Backend
-        working-directory: J2EE-Backend
-        run: mvn clean package -DskipTests
-
-      # ===== BUILD FRONTEND =====
-      - uses: pnpm/action-setup@v4
+      - name: Download Frontend Artifact
+        uses: actions/download-artifact@v4
         with:
-          version: 9
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-          cache-dependency-path: J2EE-Frontend/pnpm-lock.yaml
-
-      - name: Build Frontend
-        working-directory: J2EE-Frontend
-        run: |
-          pnpm install --frozen-lockfile
-          pnpm build
-        env:
-          VITE_API_BASE_URL: /api
-          VITE_WS_BASE_URL: /ws
-          VITE_APP_ENV: production
+          name: frontend-dist
+          path: J2EE-Frontend/dist/
 
       # ===== 1. PREPARE DIRECTORIES =====
-      # Phải tạo thư mục trước khi SCP bắt đầu chép file
       - name: Debug Secrets
         run: |
           echo "PRODUCTION_HOST is set: ${{ secrets.PRODUCTION_HOST != '' }}"
@@ -63,9 +117,7 @@ jobs:
             sudo mkdir -p /opt/airline-prod/backend
             sudo mkdir -p /opt/airline-prod/frontend/dist
             sudo mkdir -p /opt/airline-deploy
-            # Xóa file deploy cũ nếu có (tránh lỗi permission)
             sudo rm -f /opt/airline-deploy/frontend-dist.tar.gz
-            # Cấp quyền cho user hiện tại có thể upload file vào đây
             sudo chown -R $USER:$USER /opt/airline-prod
             sudo chown -R $USER:$USER /opt/airline-deploy
 
@@ -78,7 +130,7 @@ jobs:
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
           source: "J2EE-Backend/target/*.jar"
           target: "/opt/airline-prod/backend/"
-          strip_components: 2 # Gọt bỏ "J2EE-Backend/target/" khi upload
+          strip_components: 2
           overwrite: true
 
       # ===== 3. PACKAGE FRONTEND =====
@@ -104,31 +156,20 @@ jobs:
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
           script: |
-            # Đổi tên file Jar thành app.jar để script deploy chạy được
             mv /opt/airline-prod/backend/*.jar /opt/airline-prod/backend/app.jar || true
 
-            # Giải nén frontend vào thư mục đích
             mkdir -p /opt/airline-prod/frontend/dist
             tar -xzf /opt/airline-deploy/frontend-dist.tar.gz -C /opt/airline-prod/frontend/dist
 
-            # Cấp quyền lại cho Nginx đọc frontend (Fix lỗi 403 Forbidden)
             sudo chown -R www-data:www-data /opt/airline-prod/frontend
             sudo chmod -R 755 /opt/airline-prod/frontend
 
-            # Cập nhật Nginx config
             sudo cp /tmp/airline.conf /etc/nginx/sites-available/airline.conf
-            # Xóa symlink cũ nếu có
             sudo rm -f /etc/nginx/sites-enabled/airline.conf
             sudo rm -f /etc/nginx/sites-enabled/airline
-            # Tạo symbolic link mới
             sudo ln -s /etc/nginx/sites-available/airline.conf /etc/nginx/sites-enabled/airline.conf
-            # Test nginx config
             sudo nginx -t
-            # Reload nginx
             sudo systemctl reload nginx
 
-            # Sửa lỗi ký tự ^M (CRLF) cho script
             sed -i 's/\r$//' /opt/airline-prod/deploy-production.sh || true
-
-            # Chạy script deploy hệ thống
             sudo bash /opt/airline-prod/deploy-production.sh

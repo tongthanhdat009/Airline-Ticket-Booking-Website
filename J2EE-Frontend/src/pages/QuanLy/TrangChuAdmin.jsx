@@ -4,7 +4,6 @@ import { FaSignOutAlt, FaBars, FaTimes, FaUserCircle, FaChevronDown, FaChevronRi
 import { logout } from '../../services/AuthService';
 import { getUserInfo, isAuthenticated, getAdminUserInfo } from '../../utils/cookieUtils';
 import { getMenuItemsGroupedByPermissions } from '../../data/adminMenuData';
-import useTitle from '../../hooks/useTitle';
 
 // Context cho expanded groups state
 const AdminSidebarContext = createContext();

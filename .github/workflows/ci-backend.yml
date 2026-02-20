@@ -12,6 +12,10 @@ on:
       - 'J2EE-Backend/**'
       - '.github/workflows/ci-backend.yml'
   workflow_call:
+    outputs:
+      artifact-name:
+        description: "Name of the backend artifact"
+        value: backend-jar
 
 concurrency:
   group: ci-backend-${{ github.ref }}

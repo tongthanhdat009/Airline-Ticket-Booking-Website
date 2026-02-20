@@ -12,6 +12,10 @@ on:
       - 'J2EE-Frontend/**'
       - '.github/workflows/ci-frontend.yml'
   workflow_call:
+    outputs:
+      artifact-name:
+        description: "Name of the frontend artifact"
+        value: frontend-dist
 
 concurrency:
   group: ci-frontend-${{ github.ref }}
