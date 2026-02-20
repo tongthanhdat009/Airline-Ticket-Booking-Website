@@ -11,8 +11,10 @@ import TaiKhoanService from "../../../services/TaiKhoanService";
 import { getClientUserEmail } from "../../../utils/cookieUtils";
 
 import { useTranslation } from 'react-i18next'
+import useTitle from '../../../hooks/useTitle';
 
 function NhapThongTin() {
+    useTitle('Thông tin hành khách - Đặt vé máy bay | Airline Booking');
     const { t } = useTranslation()
     const location = useLocation();
     const navigate = useNavigate();

@@ -6,9 +6,11 @@ import DatChoService from '../../services/DatChoService';
 import { getClientUserEmail, getClientAccessToken } from '../../utils/cookieUtils';
 import useWebSocket from '../../hooks/useWebSocket';
 import ProfileCard from './CaNhan/ProfileCard';
+import useTitle from '../../hooks/useTitle';
 
 function QuanLyChuyenBay() {
   const navigate = useNavigate();
+  useTitle('Chuyến bay của tôi - Airline Booking');
   const [loading, setLoading] = useState(true);
   const [accountInfo, setAccountInfo] = useState(null);
   const [flights, setFlights] = useState([]);

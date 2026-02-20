@@ -5,9 +5,11 @@ import { DangKyClientServices } from "../../services/DangKyClientServices";
 import { EmailVerificationService } from "../../services/EmailVerificationService";
 import { getClientAccessToken } from "../../utils/cookieUtils";
 import { getOAuthUrl } from "../../config/api.config";
+import useTitle from '../../hooks/useTitle';
 
 function DangKy() {
   const { t } = useTranslation()
+  useTitle('Đăng ký tài khoản - Airline Booking');
   const navigate = useNavigate();
   const [showPass, setShowPass] = React.useState(false);
   const [hoVaTen, setHoVaTen] = React.useState("");

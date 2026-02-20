@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TaiKhoanService from '../../services/TaiKhoanService';
 import { getClientAccessToken, getClientUserEmail } from '../../utils/cookieUtils';
+import useTitle from '../../hooks/useTitle';
 
 function HoanThienThongTin() {
   const navigate = useNavigate();
+  useTitle('Hoàn thiện thông tin - Airline Booking');
   const [isLoading, setIsLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
   const [error, setError] = useState('');

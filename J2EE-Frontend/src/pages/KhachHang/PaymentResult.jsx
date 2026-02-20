@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Footer from '../../components/common/Footer';
+import useTitle from '../../hooks/useTitle';
 
 function PaymentResult() {
   const location = useLocation();
+  useTitle('Kết quả thanh toán - Airline Booking');
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState(null);

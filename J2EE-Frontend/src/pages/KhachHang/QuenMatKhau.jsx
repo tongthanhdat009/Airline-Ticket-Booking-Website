@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ForgotPasswordService } from "../../services/ForgotPasswordService";
 import { getClientAccessToken } from "../../utils/cookieUtils";
+import useTitle from '../../hooks/useTitle';
 
 function QuenMatKhau() {
   const navigate = useNavigate();
+  useTitle('Quên mật khẩu - Airline Booking');
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);

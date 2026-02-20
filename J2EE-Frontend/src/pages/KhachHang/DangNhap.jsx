@@ -5,9 +5,11 @@ import { DangNhapClientServices } from "../../services/DangNhapClientServices";
 import { getClientAccessToken, setClientUserEmail } from "../../utils/cookieUtils";
 import { loginAndSetTokens } from "../../services/apiClient";
 import { getOAuthUrl } from "../../config/api.config";
+import useTitle from '../../hooks/useTitle';
 
 function DangNhap() {
   const { t } = useTranslation()
+  useTitle('Đăng nhập - Airline Booking');
   const [showPass, setShowPass] = React.useState(false);
   const navigate = useNavigate();
 

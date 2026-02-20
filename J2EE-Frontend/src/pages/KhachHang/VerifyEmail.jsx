@@ -2,9 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Footer from "../../components/common/Footer";
 import { EmailVerificationService } from "../../services/EmailVerificationService";
+import useTitle from '../../hooks/useTitle';
 
 function VerifyEmail() {
   const navigate = useNavigate();
+  useTitle('Xác thực email - Airline Booking');
   const [searchParams] = useSearchParams();
   const [status, setStatus] = useState("verifying"); // verifying, success, error
   const [message, setMessage] = useState("");

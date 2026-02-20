@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import DatChoService from "../../services/DatChoService";
+import useTitle from '../../hooks/useTitle';
 
 function TraCuuChuyenBay() {
+  useTitle('Tra cứu chuyến bay - Airline Booking');
   const [bookingCode, setBookingCode] = useState("");
   const [passengerName, setPassengerName] = useState("");
   const { t } = useTranslation();

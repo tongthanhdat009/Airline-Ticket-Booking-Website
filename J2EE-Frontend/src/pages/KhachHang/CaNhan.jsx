@@ -7,9 +7,11 @@ import { getClientUserEmail, getClientAccessToken } from '../../utils/cookieUtil
 import ProfileCard from './CaNhan/ProfileCard';
 import PersonalInfoTab from './CaNhan/PersonalInfoTab';
 import SecurityTab from './CaNhan/SecurityTab';
+import useTitle from '../../hooks/useTitle';
 
 function CaNhan() {
   const navigate = useNavigate();
+  useTitle('Trang cá nhân - Airline Booking');
   const [loading, setLoading] = useState(true);
   const [accountInfo, setAccountInfo] = useState(null);
   const [activeTab, setActiveTab] = useState('personal');

@@ -10,9 +10,11 @@ import VNPayService from '../../services/VNPayService';
 import { getClientUserEmail, getClientAccessToken } from '../../utils/cookieUtils';
 import { getPdfUrl } from '../../config/api.config';
 import ProfileCard from './CaNhan/ProfileCard';
+import useTitle from '../../hooks/useTitle';
 
 function LichSuGiaoDich() {
   const navigate = useNavigate();
+  useTitle('Lịch sử giao dịch - Airline Booking');
   const [loading, setLoading] = useState(true);
   const [accountInfo, setAccountInfo] = useState(null);
   const [paymentHistory, setPaymentHistory] = useState([]);

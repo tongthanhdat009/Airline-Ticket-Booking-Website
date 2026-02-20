@@ -1,10 +1,12 @@
 // src/pages/KhachHang/DichVuKhac.jsx
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import useTitle from '../../hooks/useTitle';
 
 
 function DichVuKhac() {
   const { t } = useTranslation();
+  useTitle('Dịch vụ khác - Airline Booking');
   const otherServices = [
     { icon: "🏨", key: 'hotel', link: '#' },
     { icon: "🚗", key: 'car', link: '#' },

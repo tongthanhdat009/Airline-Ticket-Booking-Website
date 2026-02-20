@@ -3,9 +3,11 @@ import { useTranslation } from 'react-i18next';
 
 import ClientDichVuService from "../../services/ClientDichVuService";
 import { getAssetUrl } from "../../config/api.config";
+import useTitle from '../../hooks/useTitle';
 
 function DichVuChuyenBay() {
   const { t } = useTranslation();
+  useTitle('Dịch vụ chuyến bay - Airline Booking');
   const [maDatCho, setMaDatCho] = useState("");
   const [loading, setLoading] = useState(false);
   const [availableServices, setAvailableServices] = useState([]);

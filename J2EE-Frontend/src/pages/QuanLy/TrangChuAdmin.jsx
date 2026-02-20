@@ -4,6 +4,7 @@ import { FaSignOutAlt, FaBars, FaTimes, FaUserCircle, FaChevronDown, FaChevronRi
 import { logout } from '../../services/AuthService';
 import { getUserInfo, isAuthenticated, getAdminUserInfo } from '../../utils/cookieUtils';
 import { getMenuItemsGroupedByPermissions } from '../../data/adminMenuData';
+import useTitle from '../../hooks/useTitle';
 
 // Context cho expanded groups state
 const AdminSidebarContext = createContext();
@@ -45,7 +46,41 @@ function TrangChuAdmin() {
     const [userInfo, setUserInfo] = useState(null);
     const [groupedMenuItems, setGroupedMenuItems] = useState({});
 
-    // Kiểm tra xác thực khi component mount và load menu theo permission
+    // Set document title based on current path
+    useEffect(() => {
+        const pathTitles = {
+            '/admin/dashboard': 'Dashboard - Airline Booking Admin',
+            '/admin/dashboard/KhachHang': 'Quản lý khách hàng - Airline Booking Admin',
+            '/admin/dashboard/TuyenBay': 'Quản lý tuyến bay - Airline Booking Admin',
+            '/admin/dashboard/ChuyenBay': 'Quản lý chuyến bay - Airline Booking Admin',
+            '/admin/dashboard/DichVu': 'Quản lý dịch vụ - Airline Booking Admin',
+            '/admin/dashboard/ThongKe': 'Thống kê doanh thu - Airline Booking Admin',
+            '/admin/dashboard/SanBay': 'Quản lý sân bay - Airline Booking Admin',
+            '/admin/dashboard/QuanLyTKAdmin': 'Quản lý tài khoản admin - Airline Booking Admin',
+            '/admin/dashboard/GiaBay': 'Quản lý giá vé - Airline Booking Admin',
+            '/admin/dashboard/KhuyenMai': 'Quản lý khuyến mãi - Airline Booking Admin',
+            '/admin/dashboard/MayBay': 'Quản lý máy bay - Airline Booking Admin',
+            '/admin/dashboard/DonHang': 'Quản lý đơn hàng - Airline Booking Admin',
+            '/admin/dashboard/DatCho': 'Quản lý đặt chỗ - Airline Booking Admin',
+            '/admin/dashboard/HoaDon': 'Quản lý hóa đơn - Airline Booking Admin',
+            '/admin/dashboard/HoanTien': 'Quản lý hoàn tiền - Airline Booking Admin',
+            '/admin/dashboard/LichSuThaoTac': 'Lịch sử thao tác - Airline Booking Admin',
+            '/admin/dashboard/VaiTro': 'Quản lý vai trò - Airline Booking Admin',
+            '/admin/dashboard/PhanQuyen': 'Quản lý quyền hạn - Airline Booking Admin',
+            '/admin/dashboard/HangVe': 'Quản lý hạng vé - Airline Booking Admin',
+        };
+
+        const getTitle = (pathname) => {
+            for (const [path, title] of Object.entries(pathTitles)) {
+                if (pathname === path || pathname.startsWith(path + '/')) {
+                    return title;
+                }
+            }
+            return 'Dashboard - Airline Booking Admin';
+        };
+
+        document.title = getTitle(location.pathname);
+    }, [location.pathname]);
     useEffect(() => {
         if (!isAuthenticated()) {
             navigate('/admin/login');

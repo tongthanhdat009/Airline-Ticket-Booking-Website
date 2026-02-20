@@ -10,9 +10,11 @@ import { getDichVuByChuyenBay } from "../../../services/QLDichVuChuyenBayService
 import SlidePanel from "../../../components/KhachHang/SlidePanel";
 import ThongTinThanhToan from "../../../components/KhachHang/ThongTinThanhToan";
 import HeaderTimKiemChuyen from "../../../components/KhachHang/HeaderTimKiemChuyen";
+import useTitle from '../../../hooks/useTitle';
 
 function ChonDichVu() {
     const { t } = useTranslation();
+    useTitle('Chọn dịch vụ bổ sung - Đặt vé máy bay | Airline Booking');
     const location = useLocation();
     const formData = location.state || {};
     const navigate = useNavigate();

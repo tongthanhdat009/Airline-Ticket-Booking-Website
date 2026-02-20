@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { FaUser, FaLock, FaPlaneDeparture } from 'react-icons/fa';
 import { loginAdmin } from '../../services/AuthService';
 import { isAuthenticated } from '../../services/apiClient';
+import useTitle from '../../hooks/useTitle';
 
 function DangNhapAdmin() {
     const navigate = useNavigate();
+    useTitle('Đăng nhập quản trị - Airline Booking Admin');
     const [formData, setFormData] = useState({
         username: '',
         password: ''

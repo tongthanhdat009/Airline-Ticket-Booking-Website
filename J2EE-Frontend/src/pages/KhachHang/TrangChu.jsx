@@ -4,9 +4,11 @@ import Footer from "../../components/common/Footer";
 import Chatbot from "../../components/common/Chatbot";
 import ProfileCompleteBanner from "../../components/common/ProfileCompleteBanner";
 import TimChuyenBayForm from '../../components/KhachHang/TimChuyenBayForm'
+import useTitle from '../../hooks/useTitle';
 
 function TrangChu() {
   const { t } = useTranslation();
+  useTitle('Trang chủ - Đặt vé máy bay trực tuyến | Airline Booking');
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showBanner, setShowBanner] = useState(true);
 

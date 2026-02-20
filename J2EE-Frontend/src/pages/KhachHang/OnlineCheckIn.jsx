@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import CheckInService from '../../services/CheckInService';
+import useTitle from '../../hooks/useTitle';
 
 function OnlineCheckIn() {
   const { t } = useTranslation();
+  useTitle('Online Check-in - Airline Booking');
   const [bookingCode, setBookingCode] = useState("");
   const [lastName, setLastName] = useState("");
   const [loading, setLoading] = useState(false);

@@ -2,9 +2,11 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import Footer from '../../components/common/Footer'
 import Chatbot from '../../components/common/Chatbot'
+import useTitle from '../../hooks/useTitle';
 
 function HoTro() {
   const { t } = useTranslation()
+  useTitle('Hỗ trợ - Airline Booking')
   return (
     <div className="min-h-screen bg-linear-to-br from-[#F5F7FA] to-[#E3F2FD]">
       <div className="container mx-auto px-4 lg:px-20 py-16">

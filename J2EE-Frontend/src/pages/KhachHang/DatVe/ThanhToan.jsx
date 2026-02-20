@@ -7,9 +7,11 @@ import { formatCurrencyWithCommas, formatTime, formatDate } from '../../../servi
 import VNPayService from '../../../services/VNPayService';
 import apiClient from '../../../services/apiClient';
 import { getClientAccessToken } from '../../../utils/cookieUtils';
+import useTitle from '../../../hooks/useTitle';
 
 function ThanhToan() {
     const { t } = useTranslation()
+    useTitle('Thanh toán - Đặt vé máy bay | Airline Booking');
     const location = useLocation();
     const navigate = useNavigate();
     const formData = useMemo(() => location.state || {}, [location.state]);

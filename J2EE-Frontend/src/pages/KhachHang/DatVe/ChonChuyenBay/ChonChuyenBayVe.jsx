@@ -10,9 +10,11 @@ import ThongTinThanhToan from "../../../../components/KhachHang/ThongTinThanhToa
 import DanhSachNgayBay from "../../../../components/KhachHang/DanhSachNgayBay";
 import FlightCard from "../../../../components/KhachHang/FlightCard/FlightCard";
 import { useTranslation } from 'react-i18next';
+import useTitle from '../../../../hooks/useTitle';
 
 function ChonChuyenBayVe() {
     const { t } = useTranslation();
+    useTitle('Chọn chuyến bay về - Đặt vé máy bay | Airline Booking');
     const location = useLocation();
     const [formData, setFormData] = useState(location.state);
     const navigate = useNavigate();
