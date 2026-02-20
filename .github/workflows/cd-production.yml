@@ -80,11 +80,31 @@ jobs:
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
           script: |
             set -e
-
             # ===== 1. PREPARE BUILD DIRECTORY =====
             BUILD_DIR="/tmp/airline-build-$(date +%s)"
             mkdir -p "$BUILD_DIR"
             cd "$BUILD_DIR"
+      # ===== 2. UPLOAD BACKEND =====
+      - name: Upload Backend Jar
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          source: "J2EE-Backend/target/*.jar"
+          target: "/opt/airline-prod/backend/"
+          strip_components: 2
+          overwrite: true
+      - name: Upload Backend Jar
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          source: "J2EE-Backend/target/*.jar"
+          target: "/opt/airline-prod/backend/"
+          strip_components: 2
+          overwrite: true
 
             # ===== 2. INSTALL DEPENDENCIES (IF NEEDED) =====
             # Java 21
