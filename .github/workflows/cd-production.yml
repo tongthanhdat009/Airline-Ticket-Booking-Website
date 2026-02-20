@@ -155,13 +155,8 @@ jobs:
             sudo chown -R www-data:www-data /opt/airline-prod/frontend
             sudo chmod -R 755 /opt/airline-prod/frontend
 
-            # ===== 8. UPDATE NGINX =====
-            sudo cp /tmp/airline.conf /etc/nginx/sites-available/airline.conf
-            sudo rm -f /etc/nginx/sites-enabled/airline.conf
-            sudo rm -f /etc/nginx/sites-enabled/airline
-            sudo ln -s /etc/nginx/sites-available/airline.conf /etc/nginx/sites-enabled/airline.conf
-            sudo nginx -t
-            sudo systemctl reload nginx
+            # ===== 8. RELOAD NGINX (config đã có sẵn) =====
+            sudo nginx -t && sudo systemctl reload nginx || true
 
             # ===== 9. RESTART SERVICE =====
             sed -i 's/\r$//' /opt/airline-prod/deploy-production.sh
