@@ -23,7 +23,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.core.env.Environment;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -36,6 +38,7 @@ public class SecurityConfig {
     private final OAuth2FailureHandler oAuth2FailureHandler;
     private final PasswordEncoder passwordEncoder;
     private final DynamicAdminAuthorizationManager dynamicAdminAuthManager;
+    private final Environment environment;
 
     public SecurityConfig(
             @Lazy JwtFilter jwtFilter,
@@ -44,7 +47,8 @@ public class SecurityConfig {
             OAuth2SuccessHandler oAuth2SuccessHandler,
             OAuth2FailureHandler oAuth2FailureHandler,
             PasswordEncoder passwordEncoder,
-            DynamicAdminAuthorizationManager dynamicAdminAuthManager
+            DynamicAdminAuthorizationManager dynamicAdminAuthManager,
+            Environment environment
     ) {
         this.jwtFilter = jwtFilter;
         this.userDetailsService = userDetailsService;
@@ -53,12 +57,20 @@ public class SecurityConfig {
         this.oAuth2FailureHandler = oAuth2FailureHandler;
         this.passwordEncoder = passwordEncoder;
         this.dynamicAdminAuthManager = dynamicAdminAuthManager;
+        this.environment = environment;
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("http://localhost:*"));
+
+        // Đọc danh sách allowed origins từ biến môi trường
+        // Mặc định: localhost + production domains
+        String corsOrigins = environment.getProperty("CORS_ALLOWED_ORIGINS",
+                "http://localhost:3000,http://localhost:5173,https://jadt-airline.io.vn,https://www.jadt-airline.io.vn");
+
+        List<String> allowedOrigins = Arrays.asList(corsOrigins.split(","));
+        configuration.setAllowedOriginPatterns(allowedOrigins);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(List.of("Authorization"));
