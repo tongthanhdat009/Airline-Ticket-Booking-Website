@@ -32,6 +32,14 @@ jobs:
       - name: Build JAR (skip tests)
         run: ./mvnw -B -ntp package -DskipTests
 
+      - name: Upload backend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-jar
+          path: J2EE-Backend/target/*.jar
+          if-no-files-found: error
+          retention-days: 7
+
   # ===== CI FRONTEND =====
   ci-frontend:
     runs-on: ubuntu-latest
@@ -63,6 +71,14 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: J2EE-Frontend/dist
+          if-no-files-found: error
+          retention-days: 7
+
   # ===== DEPLOY PRODUCTION =====
   deploy:
     needs: [ci-backend, ci-frontend]
@@ -71,7 +87,71 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # ===== DEPLOY BY BUILDING ON SERVER (NO UPLOAD) =====
+      # ===== DOWNLOAD ARTIFACTS FROM CI =====
+      - name: Download Backend Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-jar
+          path: J2EE-Backend/target/
+
+      - name: Download Frontend Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: J2EE-Frontend/dist/
+
+      # ===== 1. PREPARE SERVER DIRECTORIES =====
+      - name: Prepare Server Directories
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          script: |
+            sudo mkdir -p /opt/airline-prod/backend
+            sudo mkdir -p /opt/airline-prod/frontend/dist
+            sudo mkdir -p /opt/airline-deploy
+            sudo chown -R $USER:$USER /opt/airline-prod
+            sudo chown -R $USER:$USER /opt/airline-deploy
+
+      # ===== 2. UPLOAD DEPLOY SCRIPT =====
+      - name: Upload Deploy Script
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          source: "deploy/deploy-production.sh"
+          target: "/opt/airline-prod/"
+          overwrite: true
+
+      # ===== 3. UPLOAD BACKEND JAR =====
+      - name: Upload Backend JAR
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          source: "J2EE-Backend/target/*.jar"
+          target: "/opt/airline-prod/backend/"
+          strip_components: 2
+          overwrite: true
+
+      # ===== 4. PACKAGE & UPLOAD FRONTEND =====
+      - name: Package Frontend
+        run: tar -czf frontend-dist.tar.gz -C J2EE-Frontend/dist .
+
+      - name: Upload Frontend Dist
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          source: "frontend-dist.tar.gz"
+          target: "/opt/airline-deploy/"
+          overwrite: true
+
+      # ===== 5. DEPLOY & RESTART SERVICES =====
       - name: Deploy to Production
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -80,112 +160,18 @@ jobs:
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
           script: |
             set -e
-            # ===== 1. PREPARE BUILD DIRECTORY =====
-            BUILD_DIR="/tmp/airline-build-$(date +%s)"
-            mkdir -p "$BUILD_DIR"
-            cd "$BUILD_DIR"
-      # ===== 2. UPLOAD BACKEND =====
-      - name: Upload Backend Jar
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.PRODUCTION_HOST }}
-          username: ${{ secrets.PRODUCTION_USER }}
-          key: ${{ secrets.PRODUCTION_SSH_KEY }}
-          source: "J2EE-Backend/target/*.jar"
-          target: "/opt/airline-prod/backend/"
-          strip_components: 2
-          overwrite: true
-      - name: Upload Backend Jar
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.PRODUCTION_HOST }}
-          username: ${{ secrets.PRODUCTION_USER }}
-          key: ${{ secrets.PRODUCTION_SSH_KEY }}
-          source: "J2EE-Backend/target/*.jar"
-          target: "/opt/airline-prod/backend/"
-          strip_components: 2
-          overwrite: true
 
-            # ===== 2. INSTALL DEPENDENCIES (IF NEEDED) =====
-            # Java 21
-            if ! command -v java &> /dev/null; then
-              sudo apt update
-              sudo apt install -y openjdk-21-jdk
-            fi
+            # Move JAR to app.jar
+            mv /opt/airline-prod/backend/*.jar /opt/airline-prod/backend/app.jar || true
 
-            # Maven
-            if ! command -v mvn &> /dev/null; then
-              sudo apt install -y maven
-            fi
+            # Extract frontend
+            mkdir -p /opt/airline-prod/frontend/dist
+            tar -xzf /opt/airline-deploy/frontend-dist.tar.gz -C /opt/airline-prod/frontend/dist
 
-            # Node.js 20
-            if ! command -v node &> /dev/null; then
-              curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-              sudo apt install -y nodejs
-            fi
-
-            # pnpm
-            if ! command -v pnpm &> /dev/null; then
-              npm install -g pnpm@9
-            fi
-
-            # Git
-            if ! command -v git &> /dev/null; then
-              sudo apt install -y git
-            fi
-
-            # ===== 3. CLONE REPO (SHALLOW CLONE FOR SPEED) =====
-            git clone --depth 1 --branch main https://github.com/${{ github.repository }}.git repo
-            cd repo
-
-            # ===== 4. BUILD BACKEND =====
-            echo "=== Building Backend ==="
-            cd J2EE-Backend
-            mvn clean package -DskipTests -q
-            sudo mv target/*.jar /opt/airline-prod/backend/app.jar
-
-            # ===== 5. BUILD FRONTEND =====
-            echo "=== Building Frontend ==="
-            cd ../J2EE-Frontend
-
-            # Setup Node.js if not exists
-            if ! command -v pnpm &> /dev/null; then
-              npm install -g pnpm@9
-            fi
-
-            # Set environment variables for production build
-            export VITE_API_BASE_URL="${{ secrets.VITE_API_BASE_URL || '/api' }}"
-            export VITE_WS_BASE_URL="${{ secrets.VITE_WS_BASE_URL || '/ws' }}"
-            export VITE_APP_ENV="production"
-            export VITE_APP_VERSION="${{ github.sha }}"
-
-            echo "Building with:"
-            echo "  API_URL: $VITE_API_BASE_URL"
-            echo "  WS_URL: $VITE_WS_BASE_URL"
-            echo "  ENV: $VITE_APP_ENV"
-
-            pnpm install --frozen-lockfile
-            pnpm build
-
-            # ===== 6. DEPLOY FRONTEND =====
-            sudo rm -rf /opt/airline-prod/frontend/dist/*
-            sudo cp -r dist/* /opt/airline-prod/frontend/dist/
-
-            # ===== 7. FIX PERMISSIONS =====
+            # Fix permissions
             sudo chown -R www-data:www-data /opt/airline-prod/frontend
             sudo chmod -R 755 /opt/airline-prod/frontend
 
-            # ===== 8. RELOAD NGINX (config đã có sẵn) =====
-            sudo nginx -t && sudo systemctl reload nginx || true
-
-            # ===== 9. RESTART SERVICE =====
-            sed -i 's/\r$//' /opt/airline-prod/deploy-production.sh
+            # Make deploy script executable and run it
+            chmod +x /opt/airline-prod/deploy-production.sh
             sudo bash /opt/airline-prod/deploy-production.sh
-
-            # ===== 10. CLEANUP =====
-            cd /
-            rm -rf "$BUILD_DIR"
-
-            echo "=== Deploy completed successfully ==="
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
