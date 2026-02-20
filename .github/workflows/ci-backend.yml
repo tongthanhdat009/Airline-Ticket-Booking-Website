@@ -1,0 +1,52 @@
+name: CI Backend
+
+on:
+  push:
+    branches: [staging]
+    paths:
+      - 'J2EE-Backend/**'
+      - '.github/workflows/ci-backend.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'J2EE-Backend/**'
+      - '.github/workflows/ci-backend.yml'
+  workflow_call:
+
+concurrency:
+  group: ci-backend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-test-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: J2EE-Backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Grant execute permission for mvnw
+        run: chmod +x mvnw
+
+      - name: Run tests
+        run: ./mvnw -B -ntp test
+
+      - name: Build JAR (skip tests)
+        run: ./mvnw -B -ntp package -DskipTests
+
+      - name: Upload backend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-jar
+          path: J2EE-Backend/target/*.jar
+          if-no-files-found: error
+          retention-days: 7

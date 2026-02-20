@@ -1,0 +1,134 @@
+name: CD-Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      # ===== BUILD BACKEND =====
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+          cache-dependency-path: J2EE-Backend/pom.xml
+
+      - name: Build Backend
+        working-directory: J2EE-Backend
+        run: mvn clean package -DskipTests
+
+      # ===== BUILD FRONTEND =====
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: J2EE-Frontend/pnpm-lock.yaml
+
+      - name: Build Frontend
+        working-directory: J2EE-Frontend
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+        env:
+          VITE_API_BASE_URL: /api
+          VITE_WS_BASE_URL: /ws
+          VITE_APP_ENV: production
+
+      # ===== 1. PREPARE DIRECTORIES =====
+      # Phải tạo thư mục trước khi SCP bắt đầu chép file
+      - name: Debug Secrets
+        run: |
+          echo "PRODUCTION_HOST is set: ${{ secrets.PRODUCTION_HOST != '' }}"
+          echo "PRODUCTION_USER is set: ${{ secrets.PRODUCTION_USER != '' }}"
+          echo "PRODUCTION_SSH_KEY is set: ${{ secrets.PRODUCTION_SSH_KEY != '' }}"
+
+      - name: Prepare Server Directories
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          script: |
+            sudo mkdir -p /opt/airline-prod/backend
+            sudo mkdir -p /opt/airline-prod/frontend/dist
+            sudo mkdir -p /opt/airline-deploy
+            # Xóa file deploy cũ nếu có (tránh lỗi permission)
+            sudo rm -f /opt/airline-deploy/frontend-dist.tar.gz
+            # Cấp quyền cho user hiện tại có thể upload file vào đây
+            sudo chown -R $USER:$USER /opt/airline-prod
+            sudo chown -R $USER:$USER /opt/airline-deploy
+
+      # ===== 2. UPLOAD BACKEND =====
+      - name: Upload Backend Jar
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          source: "J2EE-Backend/target/*.jar"
+          target: "/opt/airline-prod/backend/"
+          strip_components: 2 # Gọt bỏ "J2EE-Backend/target/" khi upload
+          overwrite: true
+
+      # ===== 3. PACKAGE FRONTEND =====
+      - name: Package Frontend
+        run: tar -czf frontend-dist.tar.gz -C J2EE-Frontend/dist .
+
+      # ===== 4. UPLOAD FRONTEND =====
+      - name: Upload Frontend Dist
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          source: "frontend-dist.tar.gz"
+          target: "/opt/airline-deploy/"
+          overwrite: true
+
+      # ===== 5. RESTART SERVICE & FIX PERMISSIONS =====
+      - name: Restart Service
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          script: |
+            # Đổi tên file Jar thành app.jar để script deploy chạy được
+            mv /opt/airline-prod/backend/*.jar /opt/airline-prod/backend/app.jar || true
+
+            # Giải nén frontend vào thư mục đích
+            mkdir -p /opt/airline-prod/frontend/dist
+            tar -xzf /opt/airline-deploy/frontend-dist.tar.gz -C /opt/airline-prod/frontend/dist
+
+            # Cấp quyền lại cho Nginx đọc frontend (Fix lỗi 403 Forbidden)
+            sudo chown -R www-data:www-data /opt/airline-prod/frontend
+            sudo chmod -R 755 /opt/airline-prod/frontend
+
+            # Cập nhật Nginx config
+            sudo cp /tmp/airline.conf /etc/nginx/sites-available/airline.conf
+            # Xóa symlink cũ nếu có
+            sudo rm -f /etc/nginx/sites-enabled/airline.conf
+            sudo rm -f /etc/nginx/sites-enabled/airline
+            # Tạo symbolic link mới
+            sudo ln -s /etc/nginx/sites-available/airline.conf /etc/nginx/sites-enabled/airline.conf
+            # Test nginx config
+            sudo nginx -t
+            # Reload nginx
+            sudo systemctl reload nginx
+
+            # Sửa lỗi ký tự ^M (CRLF) cho script
+            sed -i 's/\r$//' /opt/airline-prod/deploy-production.sh || true
+
+            # Chạy script deploy hệ thống
+            sudo bash /opt/airline-prod/deploy-production.sh
