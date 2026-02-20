@@ -13,10 +13,11 @@ export const CLIENT_COOKIE_KEYS = {
 };
 
 // Cấu hình cookie mặc định
+const isProduction = import.meta.env.VITE_APP_ENV === 'production' || window.location.protocol === 'https:';
 const cookieConfig = {
   path: "/",
-  sameSite: "strict",
-  secure: false, // Set true nếu dùng HTTPS
+  sameSite: isProduction ? "none" : "strict", // "none" cho cross-origin production
+  secure: isProduction, // Tự động true nếu dùng HTTPS
 };
 
 // ==================== ADMIN FUNCTIONS ====================

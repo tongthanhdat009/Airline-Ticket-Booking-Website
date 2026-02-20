@@ -5,6 +5,8 @@ import com.example.j2ee.service.PermissionService;
 import com.example.j2ee.service.RefreshTokenService;
 import com.example.j2ee.jwt.JwtUtil;
 import com.example.j2ee.security.AdminUserDetails;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,6 +27,7 @@ public class DangNhapAdminController {
     private final RefreshTokenService refreshTokenService;
     private final PermissionService permissionService;
     private final UserDetailsService adminDetailsService;
+    private final Environment environment;
 
     // Cookie settings cho httpOnly refresh token
     private static final String REFRESH_COOKIE_NAME = "admin_refresh_token";
@@ -35,13 +38,32 @@ public class DangNhapAdminController {
             JwtUtil jwtUtil,
             RefreshTokenService refreshTokenService,
             PermissionService permissionService,
-            @Qualifier("adminAccountDetailsService") UserDetailsService adminDetailsService
+            @Qualifier("adminAccountDetailsService") UserDetailsService adminDetailsService,
+            Environment environment
     ) {
         this.dangNhapAdminService = dangNhapAdminService;
         this.jwtUtil = jwtUtil;
         this.refreshTokenService = refreshTokenService;
         this.permissionService = permissionService;
         this.adminDetailsService = adminDetailsService;
+        this.environment = environment;
+    }
+
+    /**
+     * Lấy cookie attributes dựa trên environment
+     * Production: SameSite=None; Secure
+     * Development: SameSite=Strict
+     */
+    private String getCookieAttributes() {
+        String profile = environment.getProperty("spring.profiles.active", "dev");
+        boolean isProduction = "production".equalsIgnoreCase(profile) ||
+                              "prod".equalsIgnoreCase(profile);
+
+        if (isProduction) {
+            return "Path=/; Max-Age=%d; HttpOnly; SameSite=None; Secure";
+        } else {
+            return "Path=/; Max-Age=%d; HttpOnly; SameSite=Strict";
+        }
     }
 
     @PostMapping("/dangnhap")
@@ -74,9 +96,11 @@ public class DangNhapAdminController {
 
             // === SECURITY: Lưu refresh token vào httpOnly cookie ===
             // Sử dụng Set-Cookie header để có SameSite attribute
+            // Production: SameSite=None; Secure, Development: SameSite=Strict
+            String cookieAttributes = String.format(getCookieAttributes(), REFRESH_COOKIE_MAX_AGE);
             String setCookieHeader = String.format(
-                "%s=%s; Path=/; Max-Age=%d; HttpOnly; SameSite=Strict",
-                REFRESH_COOKIE_NAME, refreshToken, REFRESH_COOKIE_MAX_AGE
+                "%s=%s; %s",
+                REFRESH_COOKIE_NAME, refreshToken, cookieAttributes
             );
             response.addHeader("Set-Cookie", setCookieHeader);
 
@@ -197,9 +221,10 @@ public class DangNhapAdminController {
             }
 
             // Xóa cookie bằng Set-Cookie header với Max-Age=0
+            String cookieAttributes = getCookieAttributes().replace("Max-Age=%d", "Max-Age=0");
             String deleteCookieHeader = String.format(
-                "%s=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict",
-                REFRESH_COOKIE_NAME
+                "%s=; %s",
+                REFRESH_COOKIE_NAME, cookieAttributes
             );
             response.addHeader("Set-Cookie", deleteCookieHeader);
 

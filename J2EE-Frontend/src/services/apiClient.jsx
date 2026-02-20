@@ -4,6 +4,16 @@ import Cookies from "js-cookie";
 // Lấy BASE_URL từ biến môi trường, fallback về localhost khi phát triển
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
+// Detect production environment
+const isProduction = import.meta.env.VITE_APP_ENV === 'production' || typeof window !== 'undefined' && window.location.protocol === 'https:';
+
+// Cookie config cho production
+const getCookieConfig = () => ({
+  secure: isProduction,
+  sameSite: isProduction ? 'none' : 'strict',
+  path: '/'
+});
+
 // Tạo một axios instance dùng chung
 const apiClient = axios.create({
   baseURL: BASE_URL,
@@ -68,10 +78,11 @@ const getAccessTokenByType = (userType) => {
  * Refresh token đã được backend set vào httpOnly cookie, frontend không cần quản lý
  */
 const setAccessTokenByType = (userType, accessToken) => {
+  const cookieConfig = getCookieConfig();
   if (userType === 'admin') {
-    Cookies.set('admin_access_token', accessToken, { expires: 1, sameSite: 'strict' }); // 1 day
+    Cookies.set('admin_access_token', accessToken, { ...cookieConfig, expires: 1 }); // 1 day
   } else if (userType === 'customer') {
-    Cookies.set('accessToken', accessToken, { expires: 7, path: '/', sameSite: 'strict' }); // 7 days
+    Cookies.set('accessToken', accessToken, { ...cookieConfig, expires: 7 }); // 7 days
   }
 };
 
@@ -79,10 +90,11 @@ const setAccessTokenByType = (userType, accessToken) => {
  * Xóa access token (refresh token ở httpOnly cookie sẽ được backend xóa khi logout)
  */
 const clearAccessTokenByType = (userType) => {
+  const cookieConfig = getCookieConfig();
   if (userType === 'admin') {
-    Cookies.remove('admin_access_token');
+    Cookies.remove('admin_access_token', cookieConfig);
   } else if (userType === 'customer') {
-    Cookies.remove('accessToken', { path: '/' });
+    Cookies.remove('accessToken', cookieConfig);
   }
 };
 
@@ -237,7 +249,8 @@ apiClient.interceptors.response.use(
               const userInfo = JSON.parse(userInfoCookie);
               userInfo.roles = data.roles || userInfo.roles || [];
               userInfo.permissions = data.permissions || userInfo.permissions || [];
-              Cookies.set('admin_user_info', JSON.stringify(userInfo), { expires: 1 });
+              const cookieConfig = getCookieConfig();
+              Cookies.set('admin_user_info', JSON.stringify(userInfo), { ...cookieConfig, expires: 1 });
             } catch (e) {
               console.error("Error updating user info in cookie:", e);
             }

@@ -132,6 +132,16 @@ jobs:
           target: "/opt/airline-prod/backend/"
           strip_components: 2
           overwrite: true
+      - name: Upload Backend Jar
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          source: "J2EE-Backend/target/*.jar"
+          target: "/opt/airline-prod/backend/"
+          strip_components: 2
+          overwrite: true
 
       # ===== 3. PACKAGE FRONTEND =====
       - name: Package Frontend
