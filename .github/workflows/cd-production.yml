@@ -114,17 +114,6 @@ jobs:
             sudo chown -R $USER:$USER /opt/airline-prod
             sudo chown -R $USER:$USER /opt/airline-deploy
 
-      # ===== 2. UPLOAD DEPLOY SCRIPT =====
-      - name: Upload Deploy Script
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.PRODUCTION_HOST }}
-          username: ${{ secrets.PRODUCTION_USER }}
-          key: ${{ secrets.PRODUCTION_SSH_KEY }}
-          source: "deploy/deploy-production.sh"
-          target: "/opt/airline-prod/"
-          overwrite: true
-
       # ===== 3. UPLOAD BACKEND JAR =====
       - name: Upload Backend JAR
         uses: appleboy/scp-action@v0.1.7
