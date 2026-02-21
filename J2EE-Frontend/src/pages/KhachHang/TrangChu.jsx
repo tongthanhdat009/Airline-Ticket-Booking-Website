@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from 'framer-motion';
 import Footer from "../../components/common/Footer";
 import Chatbot from "../../components/common/Chatbot";
 import ProfileCompleteBanner from "../../components/common/ProfileCompleteBanner";
@@ -11,575 +12,491 @@ function TrangChu() {
   useTitle('Trang chủ - Đặt vé máy bay trực tuyến | Airline Booking');
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showBanner, setShowBanner] = useState(true);
+  const [activeFaq, setActiveFaq] = useState(null);
 
   const slides = [
     {
       id: 1,
       image: "/banner/1topbannerpc-1756961025580.jpg",
+      title: "Khám phá thế giới",
+      subtitle: "Cùng SGU Airline"
     },
     {
       id: 2,
       image: "/banner/1websitetopbanner1920x960saleskybossvn-1761643850128.jpg",
+      title: "Trải nghiệm đẳng cấp",
+      subtitle: "Dịch vụ SkyBoss"
     },
     {
       id: 3,
       image: "/banner/4websitetopbanner1920x960salephilipinesob-1762138731074.jpg",
+      title: "Bay xa hơn nữa",
+      subtitle: "Ưu đãi ngập tràn"
     }
   ];
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
+    }, 6000);
     return () => clearInterval(timer);
   }, []);
 
+  const toggleFaq = (index) => {
+    setActiveFaq(activeFaq === index ? null : index);
+  };
+
+  // Animation variants
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2
+      }
+    }
+  };
 
   return (
-    <>
+    <div className="bg-[#F8FAFC] overflow-hidden">
       {/* Profile Complete Banner */}
       <ProfileCompleteBanner />
       
-      {/* Announcement Banner */}
-      {showBanner && (
-        <div className="relative isolate flex items-center gap-x-6 overflow-hidden bg-linear-to-r from-[#1E88E5] via-[#1976D2] to-[#1E88E5] px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
-          <div className="absolute left-[max(-7rem,calc(50%-52rem))] top-1/2 -z-10 -translate-y-1/2 transform-gpu blur-2xl" aria-hidden="true">
-            <div className="aspect-[577/310] w-[36.0625rem] bg-linear-to-r from-[#64B5F6] to-[#1976D2] opacity-30" style={{ clipPath: 'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)' }}></div>
-          </div>
-          <div className="absolute left-[max(45rem,calc(50%+8rem))] top-1/2 -z-10 -translate-y-1/2 transform-gpu blur-2xl" aria-hidden="true">
-            <div className="aspect-[577/310] w-[36.0625rem] bg-linear-to-r from-[#64B5F6] to-[#FF7043] opacity-30" style={{ clipPath: 'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)' }}></div>
-          </div>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <p className="text-sm leading-6 text-white">
-              <strong className="font-semibold">{t('home_page.announcement_title')}</strong>
-              <svg viewBox="0 0 2 2" className="mx-2 inline h-0.5 w-0.5 fill-current" aria-hidden="true"><circle cx="1" cy="1" r="1" /></svg>
-              {t('home_page.announcement_desc')}
-            </p>
-            <a href="/" className="flex-none rounded-full bg-[#FF7043] px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-[#F4511E] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF7043] transition-all">
-              {t('home_page.book_now')} <span aria-hidden="true">&rarr;</span>
-            </a>
-          </div>
-          <div className="flex flex-1 justify-end">
-            <button type="button" onClick={() => setShowBanner(false)} className="-m-3 p-3 focus-visible:outline-offset-[-4px]">
-              <span className="sr-only">{t('home_page.close')}</span>
-              <svg className="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
-              </svg>
-            </button>
-          </div>
+      {/* Announcement Banner - Modernized */}
+      <AnimatePresence>
+        {showBanner && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="relative isolate flex items-center gap-x-6 overflow-hidden bg-linear-to-r from-indigo-600 via-blue-600 to-indigo-600 px-6 py-3 sm:px-3.5 sm:before:flex-1 shadow-md z-50"
+          >
+            <div className="absolute left-[max(-7rem,calc(50%-52rem))] top-1/2 -z-10 -translate-y-1/2 transform-gpu blur-2xl" aria-hidden="true">
+              <div className="aspect-[577/310] w-[36.0625rem] bg-linear-to-r from-cyan-400 to-blue-500 opacity-40" style={{ clipPath: 'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)' }}></div>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <p className="text-sm leading-6 text-white flex items-center gap-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">✨</span>
+                <strong className="font-semibold">{t('home_page.announcement_title')}</strong>
+                <span className="hidden md:inline">&bull;</span>
+                <span className="opacity-90">{t('home_page.announcement_desc')}</span>
+              </p>
+              <a href="/" className="flex-none rounded-full bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-white hover:text-blue-600 transition-all duration-300">
+                {t('home_page.book_now')} <span aria-hidden="true">&rarr;</span>
+              </a>
+            </div>
+            <div className="flex flex-1 justify-end">
+              <button type="button" onClick={() => setShowBanner(false)} className="-m-3 p-3 focus-visible:outline-offset-[-4px] hover:rotate-90 transition-transform duration-300">
+                <span className="sr-only">{t('home_page.close')}</span>
+                <svg className="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                </svg>
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Hero Section - Phá cách với Split Layout & Glassmorphism */}
+      <div className="relative min-h-[90vh] flex items-center justify-center pt-10 pb-20 lg:pt-0 lg:pb-0">
+        {/* Dynamic Background Slider */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0, scale: 1.1 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.5 }}
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+              style={{ backgroundImage: `url(${slides[currentSlide].image})` }}
+            />
+          </AnimatePresence>
+          {/* Gradient Overlay for better readability */}
+          <div className="absolute inset-0 bg-linear-to-r from-slate-900/80 via-slate-900/50 to-transparent"></div>
+          <div className="absolute inset-0 bg-linear-to-t from-[#F8FAFC] via-transparent to-transparent h-full"></div>
         </div>
-      )}
 
-      <div 
-        className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed relative"
-        style={{ backgroundImage: 'url(/background/home/bgBannerHomePage.72a61446.webp)' }}
-      >
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-linear-to-br from-white/70 via-blue-50/60 to-[#F5F7FA]/60"></div>
-        
-        {/* Content wrapper */}
-        <div className="relative z-10">
-          {/* Hero Section with Slider - FORM BÊN DƯỚI */}
-          <div className="relative overflow-hidden">
-            {/* Slider Images */}
-            {slides.map((slide, index) => (
-              <div
-                key={slide.id}
-                className={`transition-opacity duration-1000 ease-in-out ${
-                  index === currentSlide ? 'opacity-100' : 'opacity-0 absolute inset-0'
-                }`}
-              >
-                <div 
-                  className="h-[500px] bg-cover bg-center bg-no-repeat relative"
-                  style={{ backgroundImage: `url(${slide.image})` }}
+        <div className="container mx-auto px-4 lg:px-8 relative z-10 h-full flex flex-col lg:flex-row items-center gap-12 mt-10 lg:mt-0">
+          {/* Left Content - Typography */}
+          <motion.div 
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, delay: 0.2 }}
+            className="w-full lg:w-5/12 text-white space-y-6"
+          >
+            <div className="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-sm font-medium tracking-wider mb-2">
+              ✈️ JadT AIRLINE 2026
+            </div>
+            <h1 className="text-5xl lg:text-7xl font-extrabold leading-tight tracking-tight">
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={currentSlide}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5 }}
+                  className="block text-blue-100 drop-shadow-[0_2px_10px_rgba(15,23,42,0.35)]"
                 >
-                  <div className="absolute inset-0 bg-linear-to-b from-black/20 via-transparent to-black/30"></div>
-                </div>
-              </div>
-            ))}
-
-            {/* Slider Indicators */}
-            <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+                  {slides[currentSlide].title}
+                </motion.span>
+              </AnimatePresence>
+              <span className="block mt-2">{slides[currentSlide].subtitle}</span>
+            </h1>
+            <p className="text-lg text-slate-300 max-w-md leading-relaxed">
+              Trải nghiệm hành trình tuyệt vời với dịch vụ đẳng cấp, giá vé ưu đãi và hàng ngàn điểm đến hấp dẫn đang chờ đón bạn.
+            </p>
+            
+            {/* Custom Slider Controls */}
+            <div className="flex gap-3 pt-8">
               {slides.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentSlide(index)}
-                  className={`h-3 rounded-full transition-all ${
+                  className={`h-2 rounded-full transition-all duration-500 ${
                     index === currentSlide
-                      ? "w-8 bg-[#FF7043] shadow-lg"
-                      : "w-3 bg-white/60 hover:bg-white/80"
+                      ? "w-12 bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.8)]"
+                      : "w-4 bg-white/30 hover:bg-white/60"
                   }`}
                 />
               ))}
             </div>
-          </div>
+          </motion.div>
 
-          {/* Hero Content & Booking Form - BÊN DƯỚI SLIDER */}
-          <div className="container mx-auto px-4 lg:px-20 -mt-20 relative z-20">
-            <div className="w-full">
-              <div className="bg-white rounded-3xl shadow-2xl p-10 border border-gray-100">
+          {/* Right Content - Glassmorphism Booking Form */}
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.4 }}
+            className="w-full lg:w-7/12"
+          >
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2.5rem] p-6 lg:p-8 shadow-2xl relative overflow-hidden">
+              {/* Decorative blur blobs inside form */}
+              <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/30 rounded-full blur-3xl"></div>
+              <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-cyan-500/30 rounded-full blur-3xl"></div>
+              
+              <div className="relative z-10 bg-white rounded-[2rem] p-2 shadow-inner">
                 <TimChuyenBayForm />
               </div>
             </div>
-          </div>
+          </motion.div>
+        </div>
+      </div>
 
-          {/* Hotel Banner Section - THÊM MỚI GIỐNG ẢNH 2 */}
-          <div className="container mx-auto px-4 lg:px-20 py-8">
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Banner 1 - Quy định thủ tục bay quốc tế */}
-              <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 group">
-                <img src="/artboard/1200x600vn1647922449867-1695094342588.webp" alt="..." className="inset-0 -z-10 h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              </div>
-
-              {/* Banner 2 - Khách sạn */}
-              <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 group">
-                <img src="/artboard/artboard216418031278341695094349731-1715833806513.webp" alt="..." className="inset-0 -z-10 h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Features Section */}
-          <div className="container mx-auto px-4 lg:px-20 py-5">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-gray-800 mb-4">
-                {t('home_page.why_choose')} <span className="bg-linear-to-r from-[#1E88E5] to-[#1976D2] bg-clip-text text-transparent text-4xl">SGU Airline?</span>
-              </h2>
-              <p className="text-lg text-gray-600 max-w-1xl mx-auto">
-                {t('home_page.why_choose_desc')}
-              </p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 border-t-4 border-[#1E88E5]">
-                <div className="text-5xl mb-4">💰</div>
-                <h3 className="text-xl font-bold text-gray-800 mb-3">{t('home_page.best_price')}</h3>
-                <p className="text-gray-600">{t('home_page.best_price_desc')}</p>
-              </div>
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 border-t-4 border-[#64B5F6]">
-                <div className="text-5xl mb-4">⚡</div>
-                <h3 className="text-xl font-bold text-gray-800 mb-3">{t('home_page.fast_booking')}</h3>
-                <p className="text-gray-600">{t('home_page.fast_booking_desc')}</p>
-              </div>
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 border-t-4 border-[#FF7043]">
-                <div className="text-5xl mb-4">🎯</div>
-                <h3 className="text-xl font-bold text-gray-800 mb-3">{t('home_page.support_247')}</h3>
-                <p className="text-gray-600">{t('home_page.support_247_desc')}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Services Section - SỬA ICON */}
-          <div className="bg-white/90 backdrop-blur-sm py-16">
-            <div className="container mx-auto px-4 lg:px-20">
-              <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
-                {t('home_page.quick_services')}
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                {/* Đặt chuyến bay */}
-                <a href="/" className="flex flex-col items-center p-6 bg-linear-to-br from-[#1E88E5] to-[#1565C0] rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
-                  <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 p-3">
-                    <img src="/service/booking-1634319183743.svg" alt="Booking" className="w-full h-full" />
+      {/* Quick Services - Floating Cards Layout */}
+      <div className="relative z-20 -mt-10 mb-20">
+        <div className="container mx-auto px-4 lg:px-8">
+          <motion.div 
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6"
+          >
+            {[
+              { icon: "booking-1634319183743.svg", title: t('home_page.service_booking'), link: "/", color: "from-blue-500 to-indigo-600" },
+              { icon: "buymore-1634319183745.svg", title: t('home_page.service_buy_more'), link: "/dich-vu-chuyen-bay", color: "from-orange-400 to-red-500" },
+              { icon: "checkin-1634319183747.svg", title: t('home_page.service_checkin'), link: "/online-check-in", color: "from-emerald-400 to-teal-600" },
+              { icon: "hotelbus-1634319183749.svg", title: t('home_page.service_hotel_car'), link: "/dich-vu-khac", color: "from-purple-500 to-fuchsia-600" }
+            ].map((service, idx) => (
+              <motion.a 
+                key={idx}
+                variants={fadeInUp}
+                href={service.link} 
+                className={`group relative overflow-hidden rounded-3xl p-6 bg-linear-to-br ${service.color} shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2`}
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-white/20 transition-all"></div>
+                <div className="relative z-10 flex flex-col items-center text-center gap-4">
+                  <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center p-3 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 border border-white/30 shadow-inner">
+                    <img src={`/service/${service.icon}`} alt={service.title} className="w-full h-full drop-shadow-md" />
                   </div>
-                  <span className="text-white font-bold text-center text-sm">{t('home_page.service_booking')}</span>
-                </a>
-
-                {/* Mua thêm */}
-                <a href="/dich-vu-chuyen-bay" className="flex flex-col items-center p-6 bg-linear-to-br from-[#FF7043] to-[#F4511E] rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
-                  <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 p-3">
-                    <img src="/service/buymore-1634319183745.svg" alt="Buy more" className="w-full h-full" />
-                  </div>
-                  <span className="text-white font-bold text-center text-sm">{t('home_page.service_buy_more')}</span>
-                </a>
-
-                {/* Check-in */}
-                <a href="/online-check-in" className="flex flex-col items-center p-6 bg-linear-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
-                  <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 p-3">
-                    <img src="/service/checkin-1634319183747.svg" alt="Check-in" className="w-full h-full" />
-                  </div>
-                  <span className="text-white font-bold text-center text-sm">{t('home_page.service_checkin')}</span>
-                </a>
-
-                {/* Khách sạn & xe */}
-                <a href="/dich-vu-khac" className="flex flex-col items-center p-6 bg-linear-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
-                  <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 p-3">
-                    <img src="/service/hotelbus-1634319183749.svg" alt="Hotel" className="w-full h-full" />
-                  </div>
-                  <span className="text-white font-bold text-center text-sm">{t('home_page.service_hotel_car')}</span>
-                </a>
-
-                {/* Bảo hiểm */}
-                <a href="/dich-vu-khac" className="flex flex-col items-center p-6 bg-linear-to-br from-[#1E88E5] to-[#1565C0] rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all">
-                  <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 p-3">
-                    <img src="/service/insurance-1634319183751.svg" alt="Insurance" className="w-full h-full" />
-                  </div>
-                  <span className="text-white font-bold text-center text-sm">{t('home_page.service_insurance')}</span>
-                </a>
-              </div>
-            </div>
-          </div>
-
-          {/* Promotions Banner Section - THÊM ẢNH NỀN */}
-          <div className="container mx-auto px-4 lg:px-20 py-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-center text-gray-800 mb-12">
-              {t('home_page.promotions_title')}
-            </h2>
-            <div className="grid md:grid-cols-3 gap-6">
-              {/* Card 1 - Với ảnh nền */}
-              <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all h-[280px] group">
-                <img src="/artboard/1200x600vn1647922449867-1695094342588.webp" alt="Vé SGU Airline" className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-linear-to-br from-[#1E88E5]/90 to-[#1565C0]/90 group-hover:from-[#1E88E5]/80 group-hover:to-[#1565C0]/80 transition-all"></div>
-                <div className="relative h-full p-6 text-white flex flex-col justify-between">
-                  <div>
-                    <div className="text-4xl mb-3">🎟️</div>
-                    <h3 className="text-xl font-bold mb-2">{t('home_page.promo_airline_title')}</h3>
-                    <p className="text-sm mb-4">{t('home_page.promo_airline_desc')}</p>
-                  </div>
-                  <button className="px-6 py-2 bg-[#FF7043] text-white rounded-xl font-bold hover:bg-[#F4511E] transition-colors w-full">
-                    {t('home_page.view_now')}
-                  </button>
+                  <span className="text-white font-bold text-sm lg:text-base tracking-wide">{service.title}</span>
                 </div>
-              </div>
+              </motion.a>
+            ))}
+          </motion.div>
+        </div>
+      </div>
 
-              {/* Card 2 - Với ảnh nền */}
-              <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all h-[280px] group">
-                <img src="/artboard/swift2471592284169014-1695094650429.webp" alt="Gói hàng nhanh" className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-linear-to-br from-blue-500/90 to-cyan-600/90 group-hover:from-blue-500/80 group-hover:to-cyan-600/80 transition-all"></div>
-                <div className="relative h-full p-6 text-white flex flex-col justify-between">
-                  <div>
-                    <div className="text-4xl mb-3">💳</div>
-                    <h3 className="text-xl font-bold mb-2">{t('home_page.promo_fast_title')}</h3>
-                    <p className="text-sm mb-4">{t('home_page.promo_fast_desc')}</p>
-                  </div>
-                  <button className="px-6 py-2 bg-[#FF7043] text-white rounded-xl font-bold hover:bg-[#F4511E] transition-colors w-full">
-                    {t('home_page.buy_now')}
-                  </button>
-                </div>
-              </div>
-
-              {/* Card 3 - Với ảnh nền */}
-              <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all h-[280px] group">
-                <img src="/artboard/anhviber20240917110241588-1727233373363.jpg" alt="Thẻ HiBank" className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-linear-to-br from-purple-500/90 to-pink-600/90 group-hover:from-purple-500/80 group-hover:to-pink-600/80 transition-all"></div>
-                <div className="relative h-full p-6 text-white flex flex-col justify-between">
-                  <div>
-                    <div className="text-4xl mb-3">🎁</div>
-                    <h3 className="text-xl font-bold mb-2">{t('home_page.promo_card_title')}</h3>
-                    <p className="text-sm mb-4">{t('home_page.promo_card_desc')}</p>
-                  </div>
-                  <button className="px-6 py-2 bg-[#FF7043] text-white rounded-xl font-bold hover:bg-[#F4511E] transition-colors w-full">
-                    {t('home_page.register_card')}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Popular Destinations - CẬP NHẬT VỚI ẢNH TỪ THỦ MỤC DESTINATION */}
-          <div className="bg-linear-to-br from-blue-50 to-[#F5F7FA] py-24 sm:py-32">
-            <div className="mx-auto max-w-7xl px-6 lg:px-8">
-              <div className="mx-auto max-w-2xl text-center">
-                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 mb-4">
-                  {t('home_page.popular_destinations')} <span className="bg-linear-to-r from-[#1E88E5] to-[#1976D2] bg-clip-text text-transparent">{t('home_page.popular_destinations_highlight')}</span>
-                </h2>
-                <p className="text-xl leading-8 text-gray-600">
-                  {t('home_page.popular_destinations_desc')}
-                </p>
-              </div>
-              <div className="mx-auto mt-16 grid max-w-2xl auto-rows-fr grid-cols-1 gap-8 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-                {/* Destination 1 - TP. Hồ Chí Minh */}
-                <article className="relative isolate flex flex-col justify-end overflow-hidden rounded-2xl bg-gray-900 px-8 pb-8 pt-80 sm:pt-48 lg:pt-80 hover:scale-105 transition-transform duration-300">
-                  <img src="/destination/tphcm.jpg" alt={t('home_page.destinations.tphcm.title')} className="absolute inset-0 -z-10 h-full w-full object-cover" />
-                  <div className="absolute inset-0 -z-10 bg-linear-to-t from-gray-900 via-gray-900/40"></div>
-                  <div className="absolute inset-0 -z-10 rounded-2xl ring-1 ring-inset ring-gray-900/10"></div>
-
-                  <div className="flex flex-wrap items-center gap-y-1 overflow-hidden text-sm leading-6 text-gray-300">
-                    <time dateTime="2024-01-01" className="mr-8">{t('destinations.tphcm.price')}</time>
-                    <div className="-ml-4 flex items-center gap-x-4">
-                      <svg viewBox="0 0 2 2" className="-ml-0.5 h-0.5 w-0.5 flex-none fill-white/50">
-                        <circle cx="1" cy="1" r="1" />
-                      </svg>
-                      <div className="flex gap-x-2.5">
-                        <span className="px-3 py-1 bg-[#1E88E5] rounded-full text-xs font-semibold">HOT</span>
-                      </div>
-                    </div>
-                  </div>
-                  <h3 className="mt-3 text-3xl font-semibold leading-6 text-white">
-                    <span className="absolute inset-0"></span>
-                    {t('destinations.tphcm.title')}
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-gray-300">
-                    {t('destinations.tphcm.desc')}
-                  </p>
-                </article>
-
-                {/* Destination 2 - Hà Nội */}
-                <article className="relative isolate flex flex-col justify-end overflow-hidden rounded-2xl bg-gray-900 px-8 pb-8 pt-80 sm:pt-48 lg:pt-80 hover:scale-105 transition-transform duration-300">
-                  <img src="/destination/hanoi.jpg" alt={t('home_page.destinations.hanoi.title')} className="absolute inset-0 -z-10 h-full w-full object-cover" />
-                  <div className="absolute inset-0 -z-10 bg-linear-to-t from-gray-900 via-gray-900/40"></div>
-                  <div className="absolute inset-0 -z-10 rounded-2xl ring-1 ring-inset ring-gray-900/10"></div>
-
-                  <div className="flex flex-wrap items-center gap-y-1 overflow-hidden text-sm leading-6 text-gray-300">
-                    <time dateTime="2024-01-01" className="mr-8">{t('destinations.hanoi.price')}</time>
-                    <div className="-ml-4 flex items-center gap-x-4">
-                      <svg viewBox="0 0 2 2" className="-ml-0.5 h-0.5 w-0.5 flex-none fill-white/50">
-                        <circle cx="1" cy="1" r="1" />
-                      </svg>
-                      <div className="flex gap-x-2.5">
-                        <span className="px-3 py-1 bg-[#FF7043] text-white rounded-full text-xs font-semibold">SALE</span>
-                      </div>
-                    </div>
-                  </div>
-                  <h3 className="mt-3 text-3xl font-semibold leading-6 text-white">
-                    <span className="absolute inset-0"></span>
-                    {t('destinations.hanoi.title')}
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-gray-300">
-                    {t('destinations.hanoi.desc')}
-                  </p>
-                </article>
-
-                {/* Destination 3 - Đà Nẵng */}
-                <article className="relative isolate flex flex-col justify-end overflow-hidden rounded-2xl bg-gray-900 px-8 pb-8 pt-80 sm:pt-48 lg:pt-80 hover:scale-105 transition-transform duration-300">
-                  <img src="/destination/danang.jpg" alt={t('home_page.destinations.danang.title')} className="absolute inset-0 -z-10 h-full w-full object-cover" />
-                  <div className="absolute inset-0 -z-10 bg-linear-to-t from-gray-900 via-gray-900/40"></div>
-                  <div className="absolute inset-0 -z-10 rounded-2xl ring-1 ring-inset ring-gray-900/10"></div>
-
-                  <div className="flex flex-wrap items-center gap-y-1 overflow-hidden text-sm leading-6 text-gray-300">
-                    <time dateTime="2024-01-01" className="mr-8">{t('destinations.danang.price')}</time>
-                    <div className="-ml-4 flex items-center gap-x-4">
-                      <svg viewBox="0 0 2 2" className="-ml-0.5 h-0.5 w-0.5 flex-none fill-white/50">
-                        <circle cx="1" cy="1" r="1" />
-                      </svg>
-                      <div className="flex gap-x-2.5">
-                        <span className="px-3 py-1 bg-[#64B5F6] rounded-full text-xs font-semibold">NEW</span>
-                      </div>
-                    </div>
-                  </div>
-                  <h3 className="mt-3 text-3xl font-semibold leading-6 text-white">
-                    <span className="absolute inset-0"></span>
-                    {t('destinations.danang.title')}
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-gray-300">
-                    {t('destinations.danang.desc')}
-                  </p>
-                </article>
-
-                {/* Destination 4 - Phú Quốc */}
-                <article className="relative isolate flex flex-col justify-end overflow-hidden rounded-2xl bg-gray-900 px-8 pb-8 pt-80 sm:pt-48 lg:pt-80 hover:scale-105 transition-transform duration-300">
-                  <img src="/destination/phuquoc.jpeg" alt={t('home_page.destinations.phuquoc.title')} className="absolute inset-0 -z-10 h-full w-full object-cover" />
-                  <div className="absolute inset-0 -z-10 bg-linear-to-t from-gray-900 via-gray-900/40"></div>
-                  <div className="absolute inset-0 -z-10 rounded-2xl ring-1 ring-inset ring-gray-900/10"></div>
-
-                  <div className="flex flex-wrap items-center gap-y-1 overflow-hidden text-sm leading-6 text-gray-300">
-                    <time dateTime="2024-01-01" className="mr-8">{t('destinations.phuquoc.price')}</time>
-                    <div className="-ml-4 flex items-center gap-x-4">
-                      <svg viewBox="0 0 2 2" className="-ml-0.5 h-0.5 w-0.5 flex-none fill-white/50">
-                        <circle cx="1" cy="1" r="1" />
-                      </svg>
-                      <div className="flex gap-x-2.5">
-                        <span className="px-3 py-1 bg-orange-500 rounded-full text-xs font-semibold">🏝️</span>
-                      </div>
-                    </div>
-                  </div>
-                  <h3 className="mt-3 text-3xl font-semibold leading-6 text-white">
-                    <span className="absolute inset-0"></span>
-                    {t('destinations.phuquoc.title')}
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-gray-300">
-                    {t('destinations.phuquoc.desc')}
-                  </p>
-                </article>
-
-                {/* Destination 5 - Nha Trang */}
-                <article className="relative isolate flex flex-col justify-end overflow-hidden rounded-2xl bg-gray-900 px-8 pb-8 pt-80 sm:pt-48 lg:pt-80 hover:scale-105 transition-transform duration-300">
-                  <img src="/destination/nha-trang.png" alt={t('home_page.destinations.nhatrang.title')} className="absolute inset-0 -z-10 h-full w-full object-cover" />
-                  <div className="absolute inset-0 -z-10 bg-linear-to-t from-gray-900 via-gray-900/40"></div>
-                  <div className="absolute inset-0 -z-10 rounded-2xl ring-1 ring-inset ring-gray-900/10"></div>
-
-                  <div className="flex flex-wrap items-center gap-y-1 overflow-hidden text-sm leading-6 text-gray-300">
-                    <time dateTime="2024-01-01" className="mr-8">{t('destinations.nhatrang.price')}</time>
-                    <div className="-ml-4 flex items-center gap-x-4">
-                      <svg viewBox="0 0 2 2" className="-ml-0.5 h-0.5 w-0.5 flex-none fill-white/50">
-                        <circle cx="1" cy="1" r="1" />
-                      </svg>
-                      <div className="flex gap-x-2.5">
-                        <span className="px-3 py-1 bg-blue-500 rounded-full text-xs font-semibold">🌊</span>
-                      </div>
-                    </div>
-                  </div>
-                  <h3 className="mt-3 text-3xl font-semibold leading-6 text-white">
-                    <span className="absolute inset-0"></span>
-                    {t('destinations.nhatrang.title')}
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-gray-300">
-                    {t('destinations.nhatrang.desc')}
-                  </p>
-                </article>
-
-                {/* Destination 6 - Đà Lạt */}
-                <article className="relative isolate flex flex-col justify-end overflow-hidden rounded-2xl bg-gray-900 px-8 pb-8 pt-80 sm:pt-48 lg:pt-80 hover:scale-105 transition-transform duration-300">
-                  <img src="/destination/dalat.jpg" alt={t('home_page.destinations.dalat.title')} className="absolute inset-0 -z-10 h-full w-full object-cover" />
-                  <div className="absolute inset-0 -z-10 bg-linear-to-t from-gray-900 via-gray-900/40"></div>
-                  <div className="absolute inset-0 -z-10 rounded-2xl ring-1 ring-inset ring-gray-900/10"></div>
-
-                  <div className="flex flex-wrap items-center gap-y-1 overflow-hidden text-sm leading-6 text-gray-300">
-                    <time dateTime="2024-01-01" className="mr-8">{t('destinations.dalat.price')}</time>
-                    <div className="-ml-4 flex items-center gap-x-4">
-                      <svg viewBox="0 0 2 2" className="-ml-0.5 h-0.5 w-0.5 flex-none fill-white/50">
-                        <circle cx="1" cy="1" r="1" />
-                      </svg>
-                      <div className="flex gap-x-2.5">
-                        <span className="px-3 py-1 bg-green-600 rounded-full text-xs font-semibold">🌸</span>
-                      </div>
-                    </div>
-                  </div>
-                  <h3 className="mt-3 text-3xl font-semibold leading-6 text-white">
-                    <span className="absolute inset-0"></span>
-                    {t('destinations.dalat.title')}
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-gray-300">
-                    {t('destinations.dalat.desc')}
-                  </p>
-                </article>
-              </div>
-            </div>
-          </div>
-
-          {/* FAQ Section */}
-          <div className="bg-white">
-            <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8 lg:py-16">
-              <div className="mx-auto max-w-4xl divide-y divide-gray-900/10">
-                <div className="lg:grid lg:grid-cols-12 lg:gap-8">
-                  <div className="lg:col-span-5">
-                    <h2 className="text-3xl font-bold leading-10 tracking-tight text-gray-900">
-                      {t('home_page.faq_title')} <span className="bg-linear-to-r from-[#1E88E5] to-[#1976D2] bg-clip-text text-transparent">{t('home_page.faq_highlight')}</span>
-                    </h2>
-                    <p className="mt-4 text-base leading-7 text-gray-600">
-                      {t('home_page.faq_contact')}{' '}
-                      <a href="/ho-tro" className="font-semibold text-[#1E88E5] hover:text-[#1565C0]">
-                        {t('home_page.faq_contact_team')}
-                      </a>{' '}
-                      {t('home_page.faq_contact_help')}
-                    </p>
-                  </div>
-                  <div className="mt-10 lg:col-span-7 lg:mt-0">
-                    <dl className="space-y-6">
-                      <div className="pt-6 pb-6 border-b border-gray-200">
-                        <dt>
-                          <button className="group flex w-full items-start justify-between text-left text-gray-900">
-                            <span className="text-base font-semibold leading-7">
-                              {t('home_page.faq_q1')}
-                            </span>
-                            <span className="ml-6 flex h-7 items-center">
-                              <svg className="h-6 w-6 text-[#1E88E5]" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
-                              </svg>
-                            </span>
-                          </button>
-                        </dt>
-                        <dd className="mt-2 pr-12">
-                          <p className="text-base leading-7 text-gray-600">
-                            {t('home_page.faq_a1')}
-                          </p>
-                        </dd>
-                      </div>
-
-                      <div className="pt-6 pb-6 border-b border-gray-200">
-                        <dt>
-                          <button className="group flex w-full items-start justify-between text-left text-gray-900">
-                            <span className="text-base font-semibold leading-7">
-                              {t('home_page.faq_q2')}
-                            </span>
-                            <span className="ml-6 flex h-7 items-center">
-                              <svg className="h-6 w-6 text-[#1E88E5]" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
-                              </svg>
-                            </span>
-                          </button>
-                        </dt>
-                        <dd className="mt-2 pr-12">
-                          <p className="text-base leading-7 text-gray-600">
-                            {t('home_page.faq_a2')}
-                          </p>
-                        </dd>
-                      </div>
-
-                      <div className="pt-6 pb-6 border-b border-gray-200">
-                        <dt>
-                          <button className="group flex w-full items-start justify-between text-left text-gray-900">
-                            <span className="text-base font-semibold leading-7">
-                              {t('home_page.faq_q3')}
-                            </span>
-                            <span className="ml-6 flex h-7 items-center">
-                              <svg className="h-6 w-6 text-[#1E88E5]" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
-                              </svg>
-                            </span>
-                          </button>
-                        </dt>
-                        <dd className="mt-2 pr-12">
-                          <p className="text-base leading-7 text-gray-600">
-                            {t('home_page.faq_a3')}
-                          </p>
-                        </dd>
-                      </div>
-
-                      <div className="pt-6 pb-6 border-b border-gray-200">
-                        <dt>
-                          <button className="group flex w-full items-start justify-between text-left text-gray-900">
-                            <span className="text-base font-semibold leading-7">
-                              {t('home_page.faq_q4')}
-                            </span>
-                            <span className="ml-6 flex h-7 items-center">
-                              <svg className="h-6 w-6 text-[#1E88E5]" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
-                              </svg>
-                            </span>
-                          </button>
-                        </dt>
-                        <dd className="mt-2 pr-12">
-                          <p className="text-base leading-7 text-gray-600">
-                            {t('home_page.faq_a4')}
-                          </p>
-                        </dd>
-                      </div>
-
-                      <div className="pt-6 pb-6">
-                        <dt>
-                          <button className="group flex w-full items-start justify-between text-left text-gray-900">
-                            <span className="text-base font-semibold leading-7">
-                              {t('home_page.faq_q5')}
-                            </span>
-                            <span className="ml-6 flex h-7 items-center">
-                              <svg className="h-6 w-6 text-[#1E88E5]" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
-                              </svg>
-                            </span>
-                          </button>
-                        </dt>
-                        <dd className="mt-2 pr-12">
-                          <p className="text-base leading-7 text-gray-600">
-                            {t('home_page.faq_a5')}
-                          </p>
-                        </dd>
-                      </div>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+      {/* Bento Grid - Promotions & Banners */}
+      <motion.div 
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={staggerContainer}
+        className="container mx-auto px-4 lg:px-8 py-16"
+      >
+        <div className="text-center mb-12">
+          <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-black text-slate-800 mb-4 tracking-tight">
+            Ưu đãi <span className="text-blue-600">Độc Quyền</span>
+          </motion.h2>
+          <motion.p variants={fadeInUp} className="text-slate-500 text-lg max-w-2xl mx-auto">Khám phá những chương trình khuyến mãi hấp dẫn nhất chỉ có tại SGU Airline.</motion.p>
         </div>
 
-        {/* Chatbot Component */}
-        <Chatbot />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[280px]">
+          {/* Large Banner - Spans 2 columns on desktop */}
+          <motion.div variants={fadeInUp} className="md:col-span-2 relative rounded-[2rem] overflow-hidden shadow-lg group">
+            <img src="/artboard/1200x600vn1647922449867-1695094342588.webp" alt="Promo" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-linear-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 p-8 w-full">
+              <div className="inline-block px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full mb-3 uppercase tracking-wider">Hot Deal</div>
+              <h3 className="text-3xl font-bold text-white mb-2">{t('home_page.promo_airline_title')}</h3>
+              <p className="text-slate-200 mb-4 max-w-md">{t('home_page.promo_airline_desc')}</p>
+              <button className="px-6 py-2.5 bg-white text-slate-900 rounded-full font-bold hover:bg-blue-50 transition-colors shadow-lg">
+                {t('home_page.view_now')}
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Small Banner 1 */}
+          <motion.div variants={fadeInUp} className="relative rounded-[2rem] overflow-hidden shadow-lg group">
+            <img src="/artboard/swift2471592284169014-1695094650429.webp" alt="Fast" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-linear-to-t from-blue-900/90 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 p-6 w-full">
+              <h3 className="text-xl font-bold text-white mb-2">{t('home_page.promo_fast_title')}</h3>
+              <button className="mt-2 text-sm font-bold text-blue-300 hover:text-white transition-colors flex items-center gap-1">
+                {t('home_page.buy_now')} <span aria-hidden="true">&rarr;</span>
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Small Banner 2 */}
+          <motion.div variants={fadeInUp} className="relative rounded-[2rem] overflow-hidden shadow-lg group">
+            <img src="/artboard/anhviber20240917110241588-1727233373363.jpg" alt="Card" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-linear-to-t from-purple-900/90 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 p-6 w-full">
+              <h3 className="text-xl font-bold text-white mb-2">{t('home_page.promo_card_title')}</h3>
+              <button className="mt-2 text-sm font-bold text-purple-300 hover:text-white transition-colors flex items-center gap-1">
+                {t('home_page.register_card')} <span aria-hidden="true">&rarr;</span>
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Small Banner 3 */}
+          <motion.div variants={fadeInUp} className="md:col-span-2 relative rounded-[2rem] overflow-hidden shadow-lg group">
+            <img src="/artboard/artboard216418031278341695094349731-1715833806513.webp" alt="Hotel" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-linear-to-r from-slate-900/80 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 p-8 w-full h-full flex flex-col justify-center">
+              <h3 className="text-3xl font-bold text-white mb-2">Combo Khách Sạn & Vé Máy Bay</h3>
+              <p className="text-slate-200 mb-4 max-w-sm">Tiết kiệm lên đến 30% khi đặt trọn gói hành trình của bạn.</p>
+              <button className="w-fit px-6 py-2.5 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-colors shadow-lg">
+                Khám phá ngay
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Why Choose Us - Modern Cards */}
+      <div className="bg-white py-24 relative overflow-hidden">
+        {/* Decorative background elements */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+          <div className="absolute -top-[20%] -right-[10%] w-[50%] h-[50%] rounded-full bg-blue-50/50 blur-3xl"></div>
+          <div className="absolute top-[60%] -left-[10%] w-[40%] h-[40%] rounded-full bg-cyan-50/50 blur-3xl"></div>
+        </div>
+
+        <div className="container mx-auto px-4 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-4xl md:text-5xl font-black text-slate-800 mb-4"
+            >
+              {t('home_page.why_choose')} <span className="text-blue-600">JadT Airline?</span>
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-lg text-slate-500 max-w-2xl mx-auto"
+            >
+              {t('home_page.why_choose_desc')}
+            </motion.p>
+          </div>
+
+          <motion.div 
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="grid md:grid-cols-3 gap-8"
+          >
+            {[
+              { icon: "💰", title: t('home_page.best_price'), desc: t('home_page.best_price_desc'), color: "bg-blue-50 text-blue-600" },
+              { icon: "⚡", title: t('home_page.fast_booking'), desc: t('home_page.fast_booking_desc'), color: "bg-cyan-50 text-cyan-600" },
+              { icon: "🎯", title: t('home_page.support_247'), desc: t('home_page.support_247_desc'), color: "bg-indigo-50 text-indigo-600" }
+            ].map((feature, idx) => (
+              <motion.div 
+                key={idx}
+                variants={fadeInUp}
+                className="bg-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 border border-slate-100 hover:-translate-y-1 group"
+              >
+                <div className={`w-16 h-16 rounded-2xl ${feature.color} flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-3">{feature.title}</h3>
+                <p className="text-slate-500 leading-relaxed">{feature.desc}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
       </div>
+
+      {/* Popular Destinations - Masonry Style */}
+      <div className="bg-slate-900 py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/background/home/bgBannerHomePage.72a61446.webp')] opacity-10 bg-cover bg-center bg-fixed"></div>
+        
+        <div className="container mx-auto px-4 lg:px-8 relative z-10">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+            <motion.div 
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="max-w-2xl"
+            >
+              <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
+                {t('home_page.popular_destinations')} <span className="text-blue-300">{t('home_page.popular_destinations_highlight')}</span>
+              </h2>
+              <p className="text-lg text-slate-400">
+                {t('home_page.popular_destinations_desc')}
+              </p>
+            </motion.div>
+            <motion.button 
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="px-6 py-3 rounded-full border border-slate-700 text-white hover:bg-white hover:text-slate-900 transition-colors font-medium whitespace-nowrap"
+            >
+              Xem tất cả điểm đến
+            </motion.button>
+          </div>
+
+          <motion.div 
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            {[
+              { id: 'tphcm', img: 'tphcm.jpg', tag: 'HOT', tagColor: 'bg-red-500', span: 'md:col-span-2 lg:col-span-2 lg:row-span-2' },
+              { id: 'hanoi', img: 'hanoi.jpg', tag: 'SALE', tagColor: 'bg-orange-500', span: '' },
+              { id: 'danang', img: 'danang.jpg', tag: 'NEW', tagColor: 'bg-blue-500', span: '' },
+              { id: 'phuquoc', img: 'phuquoc.jpeg', tag: '🏝️', tagColor: 'bg-emerald-500', span: '' },
+              { id: 'nhatrang', img: 'nha-trang.png', tag: '🌊', tagColor: 'bg-cyan-500', span: 'md:col-span-2 lg:col-span-2' }
+            ].map((dest, idx) => (
+              <motion.article 
+                key={idx}
+                variants={fadeInUp}
+                className={`relative isolate flex flex-col justify-end overflow-hidden rounded-[2rem] bg-slate-800 group ${dest.span} min-h-[300px] lg:min-h-[400px]`}
+              >
+                <img src={`/destination/${dest.img}`} alt={t(`home_page.destinations.${dest.id}.title`)} className="absolute inset-0 -z-10 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                <div className="absolute inset-0 -z-10 bg-linear-to-t from-slate-900 via-slate-900/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
+                
+                <div className="absolute top-6 left-6">
+                  <span className={`px-4 py-1.5 ${dest.tagColor} text-white rounded-full text-xs font-bold tracking-wider shadow-lg`}>
+                    {dest.tag}
+                  </span>
+                </div>
+
+                <div className="p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                  <div className="flex items-center gap-4 text-sm text-slate-300 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
+                    <span className="font-medium text-white">{t(`destinations.${dest.id}.price`)}</span>
+                    <span className="w-1 h-1 rounded-full bg-slate-500"></span>
+                    <span>Khứ hồi</span>
+                  </div>
+                  <h3 className="text-3xl font-bold text-white mb-2">
+                    {t(`destinations.${dest.id}.title`)}
+                  </h3>
+                  <p className="text-slate-300 line-clamp-2 text-sm">
+                    {t(`destinations.${dest.id}.desc`)}
+                  </p>
+                </div>
+              </motion.article>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Modern FAQ Section */}
+      <div className="bg-[#F8FAFC] py-24">
+        <div className="container mx-auto px-4 lg:px-8 max-w-4xl">
+          <div className="text-center mb-16">
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-3xl md:text-4xl font-black text-slate-800 mb-4"
+            >
+              {t('home_page.faq_title')} <span className="text-blue-600">{t('home_page.faq_highlight')}</span>
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-slate-500"
+            >
+              {t('home_page.faq_contact')} <a href="/ho-tro" className="text-blue-600 font-semibold hover:underline">{t('home_page.faq_contact_team')}</a> {t('home_page.faq_contact_help')}
+            </motion.p>
+          </div>
+
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5].map((num, idx) => (
+              <motion.div 
+                key={num}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1 }}
+                className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden"
+              >
+                <button 
+                  onClick={() => toggleFaq(num)}
+                  className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none"
+                >
+                  <span className="font-bold text-slate-800 pr-8">{t(`home_page.faq_q${num}`)}</span>
+                  <span className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors ${activeFaq === num ? 'bg-blue-100 text-blue-600' : 'bg-slate-50 text-slate-400'}`}>
+                    <svg className={`w-5 h-5 transition-transform duration-300 ${activeFaq === num ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </span>
+                </button>
+                <AnimatePresence>
+                  {activeFaq === num && (
+                    <motion.div 
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="px-6 pb-5 text-slate-600 leading-relaxed border-t border-slate-50 pt-4">
+                        {t(`home_page.faq_a${num}`)}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Chatbot Component */}
+      <Chatbot />
 
       {/* Footer */}
       <Footer />
-    </>
+    </div>
   )
 }
 
 export default TrangChu
+

@@ -82,8 +82,8 @@ const mockBanners = [
 const mockTinTuc = [
   {
     id: 1,
-    tieuDe: 'SGU Airlines khai trương đường bay mới Hà Nội - Phú Quốc',
-    tomTat: 'Từ ngày 15/03/2026, SGU Airlines chính thức khai thác đường bay thẳng Hà Nội - Phú Quốc với tần suất 2 chuyến/ngày.',
+    tieuDe: 'JadT Airlines khai trương đường bay mới Hà Nội - Phú Quốc',
+    tomTat: 'Từ ngày 15/03/2026, JadT Airlines chính thức khai thác đường bay thẳng Hà Nội - Phú Quốc với tần suất 2 chuyến/ngày.',
     noiDung: 'Nội dung chi tiết bài viết...',
     hinhAnh: 'https://placehold.co/800x400/0ea5e9/ffffff?text=Duong+Bay+Moi',
     danhMuc: 'Tin tức',
@@ -106,10 +106,10 @@ const mockTinTuc = [
   },
   {
     id: 3,
-    tieuDe: 'Chương trình thành viên SGU Rewards ra mắt',
+    tieuDe: 'Chương trình thành viên JadT Rewards ra mắt',
     tomTat: 'Tích điểm mỗi chuyến bay, đổi vé miễn phí và nhận nhiều ưu đãi hấp dẫn.',
     noiDung: 'Nội dung chi tiết bài viết...',
-    hinhAnh: 'https://placehold.co/800x400/8b5cf6/ffffff?text=SGU+Rewards',
+    hinhAnh: 'https://placehold.co/800x400/8b5cf6/ffffff?text=JadT+Rewards',
     danhMuc: 'Khuyến mãi',
     trangThai: 'ban_nhap',
     ngayDang: null,

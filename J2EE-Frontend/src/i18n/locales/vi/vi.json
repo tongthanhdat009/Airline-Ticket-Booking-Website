@@ -19,11 +19,11 @@
     "service_hotel_car": "Khách sạn & Xe",
     "service_insurance": "Bảo hiểm",
     "promotions_title": "Khuyến mãi & Ưu đãi",
-    "promo_airline_title": "CHỌN MUA VÉ SGU AIRLINE",
+    "promo_airline_title": "CHỌN MUA VÉ JadT AIRLINE",
     "promo_airline_desc": "Đã bao gồm bảo hiểm KH và 7KG hành lý xách tay",
     "promo_fast_title": "Gói hàng nhanh",
     "promo_fast_desc": "Vận chuyển Bắc - Trung - Nam siêu tốc, ưu đãi 24/7",
-    "promo_card_title": "Thẻ HiBank SGU Airline",
+    "promo_card_title": "Thẻ HiBank JadT Airline",
     "promo_card_desc": "Ưu đãi cả tháng khi bay và mua sắm với thẻ",
     "view_now": "Xem ngay",
     "buy_now": "Mua ngay",
@@ -117,13 +117,13 @@
     "my_flights": "Chuyến bay của tôi"
   },
   "footer": {
-    "about_us": "Về SGU Airline",
+    "about_us": "Về JadT Airline",
     "contact": "Liên hệ",
     "policy": "Điều khoản & Chính sách",
     "follow_us": "Kết nối với chúng tôi",
     "download_app": "Tải ứng dụng"
   ,
-    "download_app_desc": "Tải ứng dụng di động SGU Airline để đặt chuyến và thanh toán nhanh chóng",
+    "download_app_desc": "Tải ứng dụng di động JadT Airline để đặt chuyến và thanh toán nhanh chóng",
     "payment_help_title": "Hướng dẫn thanh toán",
     "payment_help_desc": "Thanh toán dễ dàng, an toàn với nhiều phương thức"
   },
@@ -150,7 +150,7 @@
   "home": {
     "banner_title": "Mở bán vé Tết 2026",
     "banner_subtitle": "Mua vé sớm, bay siêu tiết kiệm!",
-    "why_choose_us": "Tại sao chọn SGU Airline?",
+    "why_choose_us": "Tại sao chọn JadT Airline?",
     "reason_price": "Giá vé ưu đãi",
     "reason_fast": "Đặt vé nhanh chóng",
     "reason_support": "Hỗ trợ 24/7",
@@ -281,7 +281,7 @@
   ,
   "support_page": {
     "title": "Hỗ trợ khách hàng",
-    "subtitle": "Chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7. Chọn một phương thức để liên hệ với đội ngũ hỗ trợ của SGU Airline.",
+    "subtitle": "Chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7. Chọn một phương thức để liên hệ với đội ngũ hỗ trợ của JadT Airline.",
     "phone_title": "Tổng đài",
     "phone_desc": "Gọi ngay để được hỗ trợ nhanh chóng về vé, thay đổi hay hoàn vé.",
     "phone_cta": "Gọi: 0123 456 789",

@@ -78,75 +78,75 @@ function Navbar() {
   };
 
   return (
-    <nav className="bg-linear-to-r from-[#1E88E5] to-[#1565C0] shadow-lg sticky top-0 z-[1000]">
+    <nav className="bg-white/80 backdrop-blur-xl shadow-[0_4px_30px_rgb(0,0,0,0.05)] sticky top-0 z-[1000] border-b border-white/20 transition-all duration-300">
       {/* Top Bar - Right aligned items */}
-      <div className="bg-[#1565C0]/50 border-b border-[#0D47A1]/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-1.5 flex justify-end items-center gap-4 text-xs">
-          <Link to="/ho-tro" className="text-white hover:text-[#64B5F6] transition-colors flex items-center gap-1">
-            <span>🏠</span>
+      <div className="bg-slate-900 text-slate-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-2 flex justify-end items-center gap-4 text-xs font-medium tracking-wide">
+          <Link to="/ho-tro" className="hover:text-white transition-colors flex items-center gap-1.5">
+            <span className="text-blue-400">🏠</span>
             <span>{t('common.support')}</span>
           </Link>
           
           {isLoggedIn ? (
             <>
-              <span className="text-white/80">|</span>
+              <span className="text-slate-600">|</span>
               <Link 
                 to="/ca-nhan" 
-                className="text-white hover:text-[#64B5F6] transition-colors flex items-center gap-1"
+                className="hover:text-white transition-colors flex items-center gap-1.5"
               >
-                <span>👤</span>
-                <span className="font-medium">{userName}</span>
+                <span className="text-blue-400">👤</span>
+                <span className="font-semibold text-white">{userName}</span>
               </Link>
-              <span className="text-white/80">|</span>
+              <span className="text-slate-600">|</span>
               <button 
                 onClick={handleLogout}
-                className="text-white hover:text-[#64B5F6] transition-colors font-medium"
+                className="hover:text-red-400 transition-colors font-semibold"
               >
                 {t('common.logout')}
               </button>
             </>
           ) : (
             <>
-              <span className="text-white/80">|</span>
+              <span className="text-slate-600">|</span>
               <Link 
                 to="/dang-ky-client"
-                className="text-white hover:text-[#64B5F6] transition-colors font-medium"
+                className="hover:text-white transition-colors font-semibold"
               >
                 {t('common.register')}
               </Link>
-              <span className="text-white/80">|</span>
+              <span className="text-slate-600">|</span>
               <Link 
                 to="/dang-nhap-client"
-                className="text-white hover:text-[#64B5F6] transition-colors font-medium"
+                className="hover:text-white transition-colors font-semibold"
               >
                 {t('common.login')}
               </Link>
             </>
           )}
           
-          <span className="text-white/80">|</span>
-          <div className="flex items-center gap-1">
-            <span className="text-white">🌐</span>
+          <span className="text-slate-600">|</span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-blue-400">🌐</span>
             <select 
               value={currentLanguage}
               onChange={handleLanguageChange}
-              className="bg-transparent text-white text-xs border border-white/30 rounded px-2 py-0.5 focus:outline-none focus:border-[#64B5F6] cursor-pointer"
+              className="bg-transparent text-slate-300 text-xs border border-slate-700 rounded-md px-2 py-1 focus:outline-none focus:border-blue-500 cursor-pointer hover:text-white transition-colors"
             >
-              <option value="vi" className="bg-[#1565C0]">Tiếng Việt</option>
-              <option value="en" className="bg-[#1565C0]">English</option>
+              <option value="vi" className="bg-slate-800">Tiếng Việt</option>
+              <option value="en" className="bg-slate-800">English</option>
             </select>
           </div>
         </div>
       </div>
 
       {/* Main Navigation */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-2 flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-3 flex justify-between items-center">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5" onClick={closeMobileMenu}>
-          <img 
-            src="/logo/white.png" 
-            alt="SGU Airline Logo" 
-            className="h-50 sm:h-12 w-auto object-contain"
+        <Link to="/" className="flex items-center gap-2.5 group" onClick={closeMobileMenu}>
+          <img
+            src="/logo/jadt-logo.svg"
+            alt="JadT Airline Logo"
+            className="h-10 sm:h-12 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
           />
         </Link>
         
@@ -155,7 +155,7 @@ function Navbar() {
           <li>
             <Link 
               to="/tra-cuu-chuyen-bay" 
-              className="text-white no-underline font-semibold text-sm uppercase tracking-wide hover:text-[#64B5F6] transition-colors"
+              className="text-slate-700 no-underline font-bold text-sm uppercase tracking-wider hover:text-blue-600 transition-colors relative after:content-[''] after:absolute after:-bottom-1.5 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 hover:after:w-full after:transition-all after:duration-300"
             >
               {t('navbar.lookup_flight')}
             </Link>
@@ -163,7 +163,7 @@ function Navbar() {
           <li>
             <Link 
               to="/online-check-in" 
-              className="text-white no-underline font-semibold text-sm uppercase tracking-wide hover:text-[#64B5F6] transition-colors"
+              className="text-slate-700 no-underline font-bold text-sm uppercase tracking-wider hover:text-blue-600 transition-colors relative after:content-[''] after:absolute after:-bottom-1.5 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 hover:after:w-full after:transition-all after:duration-300"
             >
               {t('navbar.online_checkin')}
             </Link>
@@ -171,7 +171,7 @@ function Navbar() {
           <li>
             <Link 
               to="/dich-vu-chuyen-bay" 
-              className="text-white no-underline font-semibold text-sm uppercase tracking-wide hover:text-[#64B5F6] transition-colors"
+              className="text-slate-700 no-underline font-bold text-sm uppercase tracking-wider hover:text-blue-600 transition-colors relative after:content-[''] after:absolute after:-bottom-1.5 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 hover:after:w-full after:transition-all after:duration-300"
             >
               {t('navbar.flight_services')}
             </Link>
@@ -179,7 +179,7 @@ function Navbar() {
           <li>
             <Link 
               to="/dich-vu-khac" 
-              className="text-white no-underline font-semibold text-sm uppercase tracking-wide hover:text-[#64B5F6] transition-colors"
+              className="text-slate-700 no-underline font-bold text-sm uppercase tracking-wider hover:text-blue-600 transition-colors relative after:content-[''] after:absolute after:-bottom-1.5 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 hover:after:w-full after:transition-all after:duration-300"
             >
               {t('navbar.other_services')}
             </Link>
@@ -189,7 +189,7 @@ function Navbar() {
         {/* Mobile Hamburger Button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="lg:hidden text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+          className="lg:hidden text-slate-700 p-2 rounded-xl hover:bg-slate-100 transition-colors"
           aria-label="Toggle menu"
         >
           {mobileMenuOpen ? (
@@ -210,30 +210,30 @@ function Navbar() {
           mobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className="px-4 pb-4 pt-2 bg-[#1565C0]/50 backdrop-blur-sm border-t border-[#0D47A1]/30">
+        <div className="px-4 pb-4 pt-2 bg-white/95 backdrop-blur-xl border-t border-slate-100 shadow-inner">
           {/* Mobile Top Actions */}
-          <div className="mb-3 pb-3 border-b border-red-800/30">
-            <div className="flex flex-col gap-2 text-sm">
+          <div className="mb-3 pb-3 border-b border-slate-200">
+            <div className="flex flex-col gap-2 text-sm font-medium">
               <Link 
                 to="/ho-tro" 
-                className="text-white py-2 px-3 rounded hover:bg-white/10 transition-colors"
+                className="text-slate-700 py-2.5 px-4 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-colors flex items-center gap-2"
                 onClick={closeMobileMenu}
               >
-                🏠 {t('common.support')}
+                <span className="text-blue-500">🏠</span> {t('common.support')}
               </Link>
               
               {isLoggedIn ? (
                 <>
                   <Link
                     to="/ca-nhan"
-                    className="text-white py-2 px-3 bg-white/10 rounded hover:bg-white/20 transition-colors"
+                    className="text-blue-700 py-2.5 px-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors flex items-center gap-2 font-bold"
                     onClick={closeMobileMenu}
                   >
-                    👤 {userName}
+                    <span className="text-blue-500">👤</span> {userName}
                   </Link>
                   <button 
                     onClick={handleLogout}
-                    className="text-white py-2 px-3 rounded hover:bg-white/10 transition-colors text-left"
+                    className="text-red-600 py-2.5 px-4 rounded-xl hover:bg-red-50 transition-colors text-left font-bold"
                   >
                     {t('common.logout')}
                   </button>
@@ -242,14 +242,14 @@ function Navbar() {
                 <>
                   <Link 
                     to="/dang-ky-client"
-                    className="text-white py-2 px-3 rounded hover:bg-white/10 transition-colors"
+                    className="text-slate-700 py-2.5 px-4 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-colors"
                     onClick={closeMobileMenu}
                   >
                     {t('common.register')}
                   </Link>
                   <Link 
                     to="/dang-nhap-client"
-                    className="text-white py-2 px-3 rounded hover:bg-white/10 transition-colors"
+                    className="text-slate-700 py-2.5 px-4 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-colors"
                     onClick={closeMobileMenu}
                   >
                     {t('common.login')}
@@ -264,7 +264,7 @@ function Navbar() {
             <li>
               <Link 
                 to="/" 
-                className="block text-white py-2.5 px-3 rounded hover:bg-white/10 transition-colors font-semibold uppercase text-sm"
+                className="block text-slate-800 py-3 px-4 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-colors font-bold uppercase text-sm tracking-wide"
                 onClick={closeMobileMenu}
               >
                 {t('common.home')}
@@ -272,17 +272,17 @@ function Navbar() {
             </li>
             <li>
               <Link 
-                to="/chuyen-bay" 
-                className="block text-white py-2.5 px-3 rounded hover:bg-white/10 transition-colors font-semibold uppercase text-sm"
+                to="/tra-cuu-chuyen-bay" 
+                className="block text-slate-800 py-3 px-4 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-colors font-bold uppercase text-sm tracking-wide"
                 onClick={closeMobileMenu}
               >
-                {t('navbar.my_flights')}
+                {t('navbar.lookup_flight')}
               </Link>
             </li>
             <li>
               <Link 
                 to="/online-check-in" 
-                className="block text-white py-2.5 px-3 rounded hover:bg-white/10 transition-colors font-semibold uppercase text-sm"
+                className="block text-slate-800 py-3 px-4 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-colors font-bold uppercase text-sm tracking-wide"
                 onClick={closeMobileMenu}
               >
                 {t('navbar.online_checkin')}
@@ -291,7 +291,7 @@ function Navbar() {
             <li>
               <Link 
                 to="/dich-vu-chuyen-bay" 
-                className="block text-white py-2.5 px-3 rounded hover:bg-white/10 transition-colors font-semibold uppercase text-sm"
+                className="block text-slate-800 py-3 px-4 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-colors font-bold uppercase text-sm tracking-wide"
                 onClick={closeMobileMenu}
               >
                 {t('navbar.flight_services')}
@@ -300,7 +300,7 @@ function Navbar() {
             <li>
               <Link 
                 to="/dich-vu-khac" 
-                className="block text-white py-2.5 px-3 rounded hover:bg-white/10 transition-colors font-semibold uppercase text-sm"
+                className="block text-slate-800 py-3 px-4 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-colors font-bold uppercase text-sm tracking-wide"
                 onClick={closeMobileMenu}
               >
                 {t('navbar.other_services')}

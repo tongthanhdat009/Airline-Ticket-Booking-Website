@@ -1,7 +1,7 @@
-// SGU Airline Color System
+// JadT Airline Color System
 // Primary brand colors for the application
 export const COLORS = {
-    // Primary colors - SGU Airline Blue theme
+    // Primary colors - JadT Airline Blue theme
     primary: {
         50: '#E3F2FD',   // Light backgrounds
         100: '#BBDEFB',  // Subtle highlights

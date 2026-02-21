@@ -19,11 +19,11 @@
     "service_hotel_car": "Hotel & Car",
     "service_insurance": "Insurance",
     "promotions_title": "Deals & Promotions",
-    "promo_airline_title": "CHOOSE SGU AIRLINE TICKET",
+    "promo_airline_title": "CHOOSE JadT AIRLINE TICKET",
     "promo_airline_desc": "Includes passenger insurance and 7KG carry-on baggage",
     "promo_fast_title": "Express Package",
     "promo_fast_desc": "Super fast North - Central - South delivery, 24/7 deals",
-    "promo_card_title": "HiBank SGU Airline Card",
+    "promo_card_title": "HiBank JadT Airline Card",
     "promo_card_desc": "All-month deals when flying and shopping with card",
     "view_now": "View Now",
     "buy_now": "Buy Now",
@@ -117,13 +117,13 @@
     "my_flights": "My Flights"
   },
   "footer": {
-    "about_us": "About SGU Airline",
+    "about_us": "About JadT Airline",
     "contact": "Contact Us",
     "policy": "Terms & Policies",
     "follow_us": "Follow Us",
     "download_app": "Download App"
   ,
-    "download_app_desc": "Download the SGU Airline mobile app to book and pay faster",
+    "download_app_desc": "Download the JadT Airline mobile app to book and pay faster",
     "payment_help_title": "Payment Guide",
     "payment_help_desc": "Pay easily and securely with multiple methods"
   },
@@ -149,7 +149,7 @@
   "home": {
     "banner_title": "Tet 2026 Ticket Sale",
     "banner_subtitle": "Book early, save more!",
-    "why_choose_us": "Why choose SGU Airline?",
+    "why_choose_us": "Why choose JadT Airline?",
     "reason_price": "Best Prices",
     "reason_fast": "Fast Booking",
     "reason_support": "24/7 Support",
@@ -290,7 +290,7 @@
     },
     "support_page": {
       "title": "Customer Support",
-      "subtitle": "We are ready to support you 24/7. Choose a method to contact the SGU Airline support team.",
+      "subtitle": "We are ready to support you 24/7. Choose a method to contact the JadT Airline support team.",
       "phone_title": "Hotline",
       "phone_desc": "Call us for quick assistance with fares, changes or refunds.",
       "phone_cta": "Call: +84 0123 456 789",

@@ -7,7 +7,7 @@ const Chatbot = () => {
   const [messages, setMessages] = useState([
     { 
       type: 'bot', 
-      text: '👋 Xin chào! Tôi là trợ lý ảo SGU Airline. Tôi có thể giúp bạn:\n\n✈️ Tìm kiếm chuyến bay\n💰 Xem giá vé\n📅 Kiểm tra lịch bay\n📋 Tư vấn chọn chuyến bay phù hợp\n\nBạn muốn hỏi về chuyến bay nào?' 
+      text: '👋 Xin chào! Tôi là trợ lý ảo JadT Airline. Tôi có thể giúp bạn:\n\n✈️ Tìm kiếm chuyến bay\n💰 Xem giá vé\n📅 Kiểm tra lịch bay\n📋 Tư vấn chọn chuyến bay phù hợp\n\nBạn muốn hỏi về chuyến bay nào?' 
     }
   ]);
   const [inputMessage, setInputMessage] = useState('');
@@ -85,14 +85,14 @@ const Chatbot = () => {
                 <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center overflow-hidden ring-4 ring-white/30">
                   <img 
                     src="/chatbot/logo-vj.png" 
-                    alt="SGU Airline AI" 
+                    alt="JadT Airline AI" 
                     className="w-full h-full object-cover" 
                   />
                 </div>
                 <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
               </div>
               <div>
-                <h3 className="font-bold text-lg">SGU AI Assistant</h3>
+                <h3 className="font-bold text-lg">JadT AI Assistant</h3>
                 <p className="text-sm opacity-95 flex items-center gap-1">
                   <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
                   Đang hoạt động
@@ -196,7 +196,7 @@ const Chatbot = () => {
               </button>
             </div>
             <p className="text-xs text-gray-500 mt-2 text-center">
-              Powered by SGU AI • Luôn sẵn sàng hỗ trợ 24/7
+              Powered by JadT AI • Luôn sẵn sàng hỗ trợ 24/7
             </p>
           </div>
         </div>
