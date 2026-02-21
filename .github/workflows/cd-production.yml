@@ -145,33 +145,52 @@ jobs:
           target: "/opt/airline-deploy/"
           overwrite: true
 
-      # ===== 5. DEPLOY & RESTART SERVICES =====
-      - name: Deploy to Production
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.PRODUCTION_HOST }}
-          username: ${{ secrets.PRODUCTION_USER }}
-          key: ${{ secrets.PRODUCTION_SSH_KEY }}
-          script: |
-            set -e
+      # ===== FINALIZE DEPLOY =====
+        - name: Finalize Deployment
+          uses: appleboy/ssh-action@v1.0.3
+          with:
+            host: ${{ secrets.PRODUCTION_HOST }}
+            username: ${{ secrets.PRODUCTION_USER }}
+            key: ${{ secrets.PRODUCTION_SSH_KEY }}
+            script: |
+              set -e
 
-            # Move JAR to app.jar
-            mv /opt/airline-prod/backend/*.jar /opt/airline-prod/backend/app.jar || true
+              # ===== BACKEND =====
+              BACKEND_DIR="/opt/airline-prod/backend"
+              cd "$BACKEND_DIR"
 
-            # Extract frontend
-            mkdir -p /opt/airline-prod/frontend/dist
-            tar -xzf /opt/airline-deploy/frontend-dist.tar.gz -C /opt/airline-prod/frontend/dist
+              # Backup JAR cũ
+              [ -f "app.jar" ] && cp app.jar app.jar.backup || true
 
-            # Fix permissions
-            sudo chown -R www-data:www-data /opt/airline-prod/frontend
-            sudo chmod -R 755 /opt/airline-prod/frontend
+              # Tìm JAR mới nhất (không phải backup) và rename
+              NEW_JAR=$(ls -t *.jar 2>/dev/null | grep -v "backup" | head -1)
+              if [ -n "$NEW_JAR" ] && [ "$NEW_JAR" != "app.jar" ]; then
+                mv "$NEW_JAR" app.jar
+                echo "✅ New JAR deployed: $NEW_JAR"
+              else
+                echo "⚠️  No new JAR found to deploy"
+              fi
 
-            # Restart backend service
-            echo "Restarting airline service..."
-            sudo systemctl restart airline
+              # Fix permissions
+              chown airline:airline "$BACKEND_DIR/app.jar"
+              chmod 644 "$BACKEND_DIR/app.jar"
 
-            # Check service status
-            sudo systemctl status airline --no-pager
+              # ===== FRONTEND =====
+              chown -R www-data:www-data /opt/airline-prod/frontend
+              chmod -R 755 /opt/airline-prod/frontend
 
-            # Reload nginx (optional)
-            sudo systemctl reload nginx
+              # ===== RESTART =====
+              echo "🔄 Restarting airline service..."
+              sudo systemctl restart airline
+              sleep 5
+
+              if sudo systemctl is-active --quiet airline; then
+                echo "✅ Service is running!"
+              else
+                echo "❌ Service failed!"
+                sudo systemctl status airline --no-pager
+                exit 1
+              fi
+
+              sudo systemctl reload nginx
+              echo "✅ Deploy completed!"
