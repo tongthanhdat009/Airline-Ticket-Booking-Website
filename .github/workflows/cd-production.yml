@@ -121,7 +121,7 @@ jobs:
 
       # ===== 3. UPLOAD BACKEND JAR =====
       - name: Upload Backend JAR
-        uses: burnett01/rsync-deployments@5.2.3
+        uses: burnett01/rsync-deployments@v8
         with:
           switches: -avzr --delete
           path: J2EE-Backend/target/
@@ -132,7 +132,7 @@ jobs:
 
       # ===== 4. PACKAGE & UPLOAD FRONTEND =====
       - name: Upload Frontend Dist
-        uses: burnett01/rsync-deployments@5.2.3
+        uses: burnett01/rsync-deployments@v8
         with:
           switches: -avzr --delete
           path: J2EE-Frontend/dist/
