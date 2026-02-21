@@ -66,7 +66,7 @@ const iconMap = {
  */
 export const adminMenuItems = [
   {
-    path: 'ThongKe',
+    path: '/admin/dashboard/ThongKe',
     text: 'Thống kê',
     icon: FaChartBar,
     permissionKey: 'REPORT_VIEW',
@@ -77,7 +77,7 @@ export const adminMenuItems = [
     description: 'Xem báo cáo doanh thu và thống kê'
   },
   {
-    path: 'KhachHang',
+    path: '/admin/dashboard/KhachHang',
     text: 'Khách hàng',
     icon: FaUsers,
     permissionKey: 'CUSTOMER_VIEW',
@@ -88,7 +88,7 @@ export const adminMenuItems = [
     description: 'Quản lý thông tin khách hàng'
   },
   {
-    path: 'DatCho',
+    path: '/admin/dashboard/DatCho',
     text: 'Đặt chỗ',
     icon: FaCalendarCheck,
     permissionKey: 'BOOKING_VIEW',
@@ -99,7 +99,7 @@ export const adminMenuItems = [
     description: 'Quản lý đặt chỗ vé'
   },
   {
-    path: 'DonHang',
+    path: '/admin/dashboard/DonHang',
     text: 'Đơn hàng',
     icon: FaShoppingCart,
     permissionKey: 'ORDER_VIEW',
@@ -110,7 +110,7 @@ export const adminMenuItems = [
     description: 'Quản lý đơn hàng'
   },
   {
-    path: 'TuyenBay',
+    path: '/admin/dashboard/TuyenBay',
     text: 'Tuyến bay',
     icon: FaRoute,
     permissionKey: 'ROUTE_VIEW',
@@ -121,7 +121,7 @@ export const adminMenuItems = [
     description: 'Quản lý tuyến đường bay'
   },
   {
-    path: 'ChuyenBay',
+    path: '/admin/dashboard/ChuyenBay',
     text: 'Chuyến bay',
     icon: FaPlaneDeparture,
     permissionKey: 'FLIGHT_VIEW',
@@ -132,7 +132,7 @@ export const adminMenuItems = [
     description: 'Quản lý chuyến bay'
   },
   {
-    path: 'SanBay',
+    path: '/admin/dashboard/SanBay',
     text: 'Sân bay',
     icon: MdLocalAirport,
     permissionKey: 'AIRPORT_VIEW',
@@ -143,7 +143,7 @@ export const adminMenuItems = [
     description: 'Quản lý thông tin sân bay'
   },
   {
-    path: 'MayBay',
+    path: '/admin/dashboard/MayBay',
     text: 'Máy bay',
     icon: FaFighterJet,
     permissionKey: 'AIRCRAFT_VIEW',
@@ -154,7 +154,7 @@ export const adminMenuItems = [
     description: 'Quản lý đội bay'
   },
   {
-    path: 'DichVu',
+    path: '/admin/dashboard/DichVu',
     text: 'Dịch vụ',
     icon: FaConciergeBell,
     permissionKey: 'SERVICE_VIEW',
@@ -165,7 +165,7 @@ export const adminMenuItems = [
     description: 'Quản lý dịch vụ phụ trợ'
   },
   {
-    path: 'GiaBay',
+    path: '/admin/dashboard/GiaBay',
     text: 'Giá chuyến bay',
     icon: FaDollarSign,
     permissionKey: 'PRICE_VIEW',
@@ -176,7 +176,7 @@ export const adminMenuItems = [
     description: 'Quản lý giá vé các hạng vé'
   },
   {
-    path: 'HangVe',
+    path: '/admin/dashboard/HangVe',
     text: 'Hạng vé',
     icon: FaTicketAlt,
     permissionKey: 'PRICE_VIEW',
@@ -187,7 +187,7 @@ export const adminMenuItems = [
     description: 'Quản lý các hạng vé (Economy, Business, ...)'
   },
   {
-    path: 'HoaDon',
+    path: '/admin/dashboard/HoaDon',
     text: 'Hóa đơn',
     icon: FaFileInvoice,
     permissionKey: 'PAYMENT_VIEW',
@@ -198,7 +198,7 @@ export const adminMenuItems = [
     description: 'Quản lý hóa đơn và thanh toán'
   },
   {
-    path: 'HoanTien',
+    path: '/admin/dashboard/HoanTien',
     text: 'Hoàn tiền',
     icon: FaUndo,
     permissionKey: 'REFUND_VIEW',
@@ -209,7 +209,7 @@ export const adminMenuItems = [
     description: 'Xử lý yêu cầu hoàn tiền'
   },
   {
-    path: 'KhuyenMai',
+    path: '/admin/dashboard/KhuyenMai',
     text: 'Khuyến mãi',
     icon: FaTags,
     permissionKey: 'PROMOTION_VIEW',
@@ -220,7 +220,7 @@ export const adminMenuItems = [
     description: 'Quản lý chương trình khuyến mãi'
   },
   {
-    path: 'LichSuThaoTac',
+    path: '/admin/dashboard/LichSuThaoTac',
     text: 'Lịch sử thao tác',
     icon: FaHistory,
     permissionKey: 'AUDITLOG_VIEW',
@@ -231,7 +231,7 @@ export const adminMenuItems = [
     description: 'Xem log lịch sử thao tác (Audit Log)'
   },
   {
-    path: 'QuanLyTKAdmin',
+    path: '/admin/dashboard/QuanLyTKAdmin',
     text: 'Quản lý TK Admin',
     icon: FaUsers,
     permissionKey: 'USER_VIEW',
@@ -242,7 +242,7 @@ export const adminMenuItems = [
     description: 'Quản lý tài khoản admin'
   },
   {
-    path: 'VaiTro',
+    path: '/admin/dashboard/VaiTro',
     text: 'Quản lý Vai trò',
     icon: FaUserShield,
     permissionKey: 'ROLE_VIEW',
@@ -253,7 +253,7 @@ export const adminMenuItems = [
     description: 'Quản lý vai trò hệ thống'
   },
   {
-    path: 'PhanQuyen',
+    path: '/admin/dashboard/PhanQuyen',
     text: 'Phân quyền',
     icon: FaKey,
     permissionKey: 'PERMISSION_VIEW',
@@ -433,30 +433,30 @@ export const getMenuGroups = () => {
  * Helper function để check permission match với menu item
  */
 const checkPermissionMatch = (menuItem, feature, action) => {
-  // Mapping feature code với menu item
+  // Mapping feature code với menu item path (có prefix /admin/dashboard/)
   const featureMap = {
-    'REPORT': 'ThongKe',
-    'CUSTOMER': 'KhachHang',
-    'BOOKING': 'DatCho',
-    'ORDER': 'DonHang',
-    'ROUTE': 'TuyenBay',
-    'FLIGHT': 'ChuyenBay',
-    'PRICE': 'GiaBay',
-    'SERVICE': 'DichVu',
-    'AIRPORT': 'SanBay',
-    'PROMOTION': 'KhuyenMai',
-    'AIRCRAFT': 'MayBay',
-    'PAYMENT': 'HoaDon',
-    'REFUND': 'HoanTien',
-    'USER': 'QuanLyTKAdmin',
-    'ROLE': 'VaiTro',
-    'PERMISSION': 'PhanQuyen',
-    'AUDITLOG': 'LichSuThaoTac'
+    'REPORT': '/admin/dashboard/ThongKe',
+    'CUSTOMER': '/admin/dashboard/KhachHang',
+    'BOOKING': '/admin/dashboard/DatCho',
+    'ORDER': '/admin/dashboard/DonHang',
+    'ROUTE': '/admin/dashboard/TuyenBay',
+    'FLIGHT': '/admin/dashboard/ChuyenBay',
+    'PRICE': '/admin/dashboard/GiaBay',
+    'SERVICE': '/admin/dashboard/DichVu',
+    'AIRPORT': '/admin/dashboard/SanBay',
+    'PROMOTION': '/admin/dashboard/KhuyenMai',
+    'AIRCRAFT': '/admin/dashboard/MayBay',
+    'PAYMENT': '/admin/dashboard/HoaDon',
+    'REFUND': '/admin/dashboard/HoanTien',
+    'USER': '/admin/dashboard/QuanLyTKAdmin',
+    'ROLE': '/admin/dashboard/VaiTro',
+    'PERMISSION': '/admin/dashboard/PhanQuyen',
+    'AUDITLOG': '/admin/dashboard/LichSuThaoTac'
   };
 
   // Special cases
   // 1. HangVe và GiaBay dùng chung PRICE
-  if (menuItem.path === 'HangVe' && feature === 'PRICE') {
+  if (menuItem.path === '/admin/dashboard/HangVe' && feature === 'PRICE') {
     return action === 'VIEW' || action === 'MANAGE';
   }
 
@@ -644,10 +644,10 @@ export const fetchMenuItems = async () => {
     const convertedItems = apiMenuItems.map(convertMenuItemFromAPI);
 
     // Xử lý special case: HangVe (dùng chung permission với GiaBay)
-    const hasGiaBay = convertedItems.find(item => item.path === 'GiaBay');
+    const hasGiaBay = convertedItems.find(item => item.path === '/admin/dashboard/GiaBay');
     if (hasGiaBay) {
       convertedItems.push({
-        path: 'HangVe',
+        path: '/admin/dashboard/HangVe',
         text: 'Hạng vé',
         icon: FaTicketAlt,
         permissionKey: 'PRICE_VIEW',
@@ -679,10 +679,10 @@ export const fetchMenuConfig = async () => {
     const menuItems = config.menuItems.map(convertMenuItemFromAPI);
 
     // Special case: HangVe
-    const hasGiaBay = menuItems.find(item => item.path === 'GiaBay');
+    const hasGiaBay = menuItems.find(item => item.path === '/admin/dashboard/GiaBay');
     if (hasGiaBay) {
       menuItems.push({
-        path: 'HangVe',
+        path: '/admin/dashboard/HangVe',
         text: 'Hạng vé',
         icon: FaTicketAlt,
         permissionKey: 'PRICE_VIEW',

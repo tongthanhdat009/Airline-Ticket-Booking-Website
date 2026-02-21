@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
+import { getClientAccessToken, getAdminAccessToken } from "../utils/cookieUtils";
 
 // Lấy WebSocket URL từ biến môi trường, fallback về localhost khi phát triển
 const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL || "http://localhost:8080/ws";
 
-// Hàm để lấy access token từ localStorage
+// Hàm để lấy access token từ cookie (thử client trước, sau đó admin)
 const getAccessToken = () => {
-  return localStorage.getItem("accessToken") || "";
+  return getClientAccessToken() || getAdminAccessToken() || "";
 };
 
 const useWebSocket = () => {
@@ -20,8 +21,20 @@ const useWebSocket = () => {
     // Lấy token để authenticate WebSocket connection
     const token = getAccessToken();
 
+    // Không kết nối nếu không có token
+    if (!token) {
+      console.log("No access token found, skipping WebSocket connection");
+      return;
+    }
+
     // Tạo kết nối WebSocket với authentication headers
-    const socket = new SockJS(WS_BASE_URL);
+    const socket = new SockJS(WS_BASE_URL, null, {
+      // Thêm token vào request headers cho SockJS
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
     const stompClient = new Client({
       webSocketFactory: () => socket,
       connectHeaders: {
@@ -58,6 +71,11 @@ const useWebSocket = () => {
 
     stompClient.onWebSocketClose = () => {
       console.log("WebSocket connection closed");
+      setIsConnected(false);
+    };
+
+    stompClient.onWebSocketError = (error) => {
+      console.error("WebSocket error:", error);
       setIsConnected(false);
     };
 

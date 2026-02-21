@@ -92,28 +92,33 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // CORS preflight OPTIONS
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // Public endpoints
-                        .requestMatchers("/api/dangky", "/api/dangnhap/**", "/api/admin/dangnhap/**", "/api/admin/current-user").permitAll()
-                        .requestMatchers("/api/forgot-password/**", "/api/auth/**").permitAll()
-                        .requestMatchers("/api/oauth2/**", "/api/login/oauth2/**").permitAll()
-                        .requestMatchers("/api/error").permitAll()
-                        // OAuth2 callbacks (không có /api prefix - được gọi trực tiếp từ OAuth provider)
+                        // Public endpoints - KHÁCH HÀNG
+                        .requestMatchers("/dangky").permitAll()
+                        .requestMatchers("/dangnhap/**").permitAll()
+                        .requestMatchers("/current-user").permitAll()
+                        .requestMatchers("/dangxuat").permitAll()
+                        // Public endpoints - QUẢN TRỊ VIÊN
+                        .requestMatchers("/admin/dangnhap/**").permitAll()
+                        .requestMatchers("/admin/current-user").permitAll()
+                        .requestMatchers("/admin/dangxuat").permitAll()
+                        // Public endpoints - AUTH (email verification, forgot password)
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/forgot-password/**").permitAll()
+                        // OAuth2
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
+                        .requestMatchers("/error").permitAll()
                         // VNPay, Check-in, Booking endpoints
-                        .requestMatchers("/api/vnpay/payment-callback", "/api/checkin/**", "/api/client/datcho/**").permitAll()
+                        .requestMatchers("/vnpay/**", "/checkin/**", "/client/datcho/**").permitAll()
                         // Static resources
-                        .requestMatchers("/api/ai/**", "/static/**").permitAll()
-                        .requestMatchers("/api/admin/dashboard/dichvu/anh/**", "/api/admin/dashboard/dichvu/luachon/anh/**").permitAll()
-                        .requestMatchers("/api/admin/dashboard/chuyenbay/**").permitAll()
-                        .requestMatchers("/api/ws/**", "/api/countries").permitAll()
-                        // Direct static resources (không có /api - được gọi trực tiếp từ browser/img tags)
-                        .requestMatchers("/ai/**", "/AnhDichVuCungCap/**", "/admin/dashboard/dichvu/anh/**").permitAll()
-                        .requestMatchers("/admin/dashboard/dichvu/luachon/anh/**", "/admin/dashboard/chuyenbay/**").permitAll()
-                        .requestMatchers("/ws/**", "/countries").permitAll()
+                        .requestMatchers("/ai/**", "/static/**").permitAll()
+                        .requestMatchers("/admin/dashboard/dichvu/anh/**", "/admin/dashboard/dichvu/luachon/anh/**").permitAll()
+                        .requestMatchers("/admin/dashboard/chuyenbay/**").permitAll()
+                        .requestMatchers("/ws/**", "/countries/**").permitAll()
                         // Admin endpoints (dynamic authorization based on roles in JWT)
-                        .requestMatchers("/api/admin/dashboard/**", "/api/admin/datcho/**").access(dynamicAdminAuthManager)
-                        .requestMatchers("/api/admin/audit-logs/**", "/api/admin/dangxuat/all").access(dynamicAdminAuthManager)
-                        .requestMatchers("/api/sanbay/**").permitAll()
+                        .requestMatchers("/admin/dashboard/**", "/admin/datcho/**").access(dynamicAdminAuthManager)
+                        .requestMatchers("/admin/audit-logs/**", "/admin/dangxuat/all").access(dynamicAdminAuthManager)
+                        // Public API endpoints (dropdown data, no auth required)
+                        .requestMatchers("/sanbay/**").permitAll()
                         .anyRequest().authenticated()
                 )
 

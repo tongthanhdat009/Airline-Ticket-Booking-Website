@@ -10,6 +10,7 @@ export const checkProfileComplete = async () => {
     const email = getClientUserEmail();
     const token = getClientAccessToken();
 
+    // Nếu chưa đăng nhập, trả về ngay - KHÔNG gọi API để tránh 401 redirect
     if (!email || !token) {
       return {
         isComplete: false,
@@ -20,7 +21,8 @@ export const checkProfileComplete = async () => {
       };
     }
 
-    const response = await TaiKhoanService.getTaiKhoanByEmail(email);
+    // Gọi API với skipRedirect để tránh redirect khi 401
+    const response = await TaiKhoanService.getTaiKhoanByEmail(email, true);
 
     const hasPhone =
       response.data.hanhKhach?.soDienThoai &&
@@ -36,6 +38,7 @@ export const checkProfileComplete = async () => {
     };
   } catch (error) {
     console.error("Lỗi khi kiểm tra profile:", error);
+    // Khi có lỗi (401, 500, v.v.), trả về không đăng nhập
     return {
       isComplete: false,
       needsPhone: false,

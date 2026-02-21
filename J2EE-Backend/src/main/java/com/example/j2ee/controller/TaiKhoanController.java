@@ -1,6 +1,7 @@
 package com.example.j2ee.controller;
 
 import com.example.j2ee.dto.ApiResponse;
+import com.example.j2ee.dto.TaiKhoanDTO;
 import com.example.j2ee.model.TaiKhoan;
 import com.example.j2ee.repository.TaiKhoanRepository;
 import org.springframework.http.HttpStatus;
@@ -26,17 +27,43 @@ public class TaiKhoanController {
     /**
      * API lấy thông tin tài khoản theo email
      * GET /taikhoan/email/{email}
+     * Chỉ trả về thông tin công khai, không bao gồm mật khẩu và thông tin nhạy cảm
      */
     @GetMapping("/email/{email}")
-    public ResponseEntity<ApiResponse<TaiKhoan>> getTaiKhoanByEmail(@PathVariable String email) {
-        Optional<TaiKhoan> taiKhoan = taiKhoanRepository.findByEmail(email);
-        
-        if (taiKhoan.isEmpty()) {
+    public ResponseEntity<ApiResponse<TaiKhoanDTO>> getTaiKhoanByEmail(@PathVariable String email) {
+        Optional<TaiKhoan> taiKhoanOpt = taiKhoanRepository.findByEmail(email);
+
+        if (taiKhoanOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.error("Không tìm thấy tài khoản với email: " + email));
         }
-        
-        return ResponseEntity.ok(ApiResponse.success("Lấy thông tin tài khoản thành công", taiKhoan.get()));
+
+        TaiKhoan taiKhoan = taiKhoanOpt.get();
+
+        // Chỉ trả về các thông tin cần thiết, loại bỏ thông tin nhạy cảm
+        TaiKhoanDTO dto = new TaiKhoanDTO();
+        dto.setMaTaiKhoan(taiKhoan.getMaTaiKhoan());
+        dto.setEmail(taiKhoan.getEmail());
+        dto.setNgayTao(taiKhoan.getNgayTao());
+        dto.setTrangThai(taiKhoan.getTrangThai());
+        dto.setEmailVerified(taiKhoan.isEmailVerified());
+
+        // Thông tin hành khách - nested object để compatible với frontend
+        if (taiKhoan.getHanhKhach() != null) {
+            TaiKhoanDTO.HanhKhachNested hk = new TaiKhoanDTO.HanhKhachNested();
+            hk.setMaHanhKhach(taiKhoan.getHanhKhach().getMaHanhKhach());
+            hk.setHoVaTen(taiKhoan.getHanhKhach().getHoVaTen());
+            hk.setGioiTinh(taiKhoan.getHanhKhach().getGioiTinh());
+            hk.setNgaySinh(taiKhoan.getHanhKhach().getNgaySinh());
+            hk.setSoDienThoai(taiKhoan.getHanhKhach().getSoDienThoai());
+            hk.setMaDinhDanh(taiKhoan.getHanhKhach().getMaDinhDanh());
+            hk.setDiaChi(taiKhoan.getHanhKhach().getDiaChi());
+            hk.setQuocGia(taiKhoan.getHanhKhach().getQuocGia());
+            hk.setEmail(taiKhoan.getHanhKhach().getEmail());
+            dto.setHanhKhach(hk);
+        }
+
+        return ResponseEntity.ok(ApiResponse.success("Lấy thông tin tài khoản thành công", dto));
     }
 
     /**

@@ -1,8 +1,11 @@
 import apiClient from './apiClient';
 
 const TaiKhoanService = {
-  getTaiKhoanByEmail: async (email) => {
-    const response = await apiClient.get(`/taikhoan/email/${email}`);
+  getTaiKhoanByEmail: async (email, skipRedirect = false) => {
+    const response = await apiClient.get(`/taikhoan/email/${email}`, {
+      // Thêm config để tránh redirect khi 401
+      skipRedirect: skipRedirect
+    });
     return response.data;
   },
 

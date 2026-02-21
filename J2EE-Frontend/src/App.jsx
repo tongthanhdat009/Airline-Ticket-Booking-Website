@@ -1,10 +1,8 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom"
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom"
 import Home from "./pages/KhachHang/TrangChu"
 import Admin, { AdminSidebarProvider } from "./pages/QuanLy/TrangChuAdmin"
 import LoginAdmin from "./pages/QuanLy/DangNhap"
 import LoginClient from "./pages/KhachHang/DangNhap"
-// import SignupClient from "./pages/KhachHang/DangKy"
-import TestAPI from "./testAPI";
 import ProtectedRoute, { AdminProtectedRoute } from "./components/common/ProtectedRoute"
 
 import ThongKeDoanhThu from './pages/QuanLy/ThongKeDoanhThu';
@@ -47,7 +45,6 @@ import RequireCompleteProfile from "./components/common/RequireCompleteProfile"
 import ChonChuyenBay from "./pages/KhachHang/DatVe/ChonChuyenBay/ChonChuyenBayDi"
 import ChonChuyenBayVe from "./pages/KhachHang/DatVe/ChonChuyenBay/ChonChuyenBayVe"
 import NhapThongTin from "./pages/KhachHang/DatVe/NhapThongTin"
-// import ThongTinHanhKhach from "./pages/KhachHang/DatVe/ThongTinHanhKhach"
 import ChonDichVu from "./pages/KhachHang/DatVe/ChonDichVu"
 import ThanhToan from "./pages/KhachHang/DatVe/ThanhToan"
 import VNPayCallback from "./pages/KhachHang/DatVe/VNPayCallback"
@@ -63,6 +60,7 @@ function AppContent() {
         <Routes>
           {/*public Routes */}
           <Route path="/" element={<Home />} />
+          <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="/admin/login" element={<LoginAdmin/>}/>
           <Route path="/dang-nhap-admin" element={<LoginAdmin/>}/>
           <Route path="/dang-nhap-client" element={<LoginClient/>}/>
@@ -114,9 +112,6 @@ function AppContent() {
           <Route path="/chon-dich-vu" element={<ChonDichVu/>}/>
           <Route path="/thanh-toan" element={<ThanhToan/>}/>
           <Route path="/vnpay-callback" element={<VNPayCallback/>}/>
-          
-          {/*test api*/}
-          <Route path="/test-api" element={<TestAPI/>}/>
 
           {/* Admin Routes - Bảo vệ bằng ProtectedRoute */}
           <Route path="/admin/dashboard" element={
@@ -124,6 +119,7 @@ function AppContent() {
               <AdminProtectedRoute><Admin /></AdminProtectedRoute>
             </AdminSidebarProvider>
           }>
+            <Route index element={<ThongKeDoanhThu />} />
             <Route path="KhachHang" element={<QuanLyKhachHang />} />
             <Route path="TuyenBay" element={<QuanLyTuyenBay />} />
             <Route path="ChuyenBay" element={<QuanLyChuyenBay />} />
@@ -145,34 +141,6 @@ function AppContent() {
             <Route path="PhanQuyen" element={<QuanLyPhanQuyen />} />
             <Route path="HangVe" element={<QuanLyHangVe />} />
             <Route path="MayBay/:maMayBay/ghe" element={<ChinhSuaSoDoGhe />} />
-          </Route>
-
-          {/* Backward compatibility - redirect old routes */}
-          <Route path="/admin" element={
-            <AdminSidebarProvider>
-              <AdminProtectedRoute><Admin /></AdminProtectedRoute>
-            </AdminSidebarProvider>
-          }>
-            <Route path="KhachHang" element={<QuanLyKhachHang />} />
-            <Route path="TuyenBay" element={<QuanLyTuyenBay />} />
-            <Route path="ChuyenBay" element={<QuanLyChuyenBay />} />
-            <Route path="ChuyenBay/them" element={<ThemChuyenBay />} />
-            <Route path="ChuyenBay/:id/sua" element={<SuaChuyenBay />} />
-            <Route path="DichVu" element={<QuanLyDichVu />} />
-            <Route path="ThongKe" element={<ThongKeDoanhThu />} />
-            <Route path="SanBay" element={<QuanLySanBay />} />
-            <Route path="QuanLyTKAdmin" element={<QuanLyTKAdmin />} />
-            <Route path="GiaBay" element={<QuanLyGiaBay />} />
-            <Route path="KhuyenMai" element={<QuanLyKhuyenMai />} />
-            <Route path="MayBay" element={<QuanLyMayBay />} />
-            <Route path="DonHang" element={<QuanLyDonHang />} />
-            <Route path="DatCho" element={<QuanLyDatCho />} />
-            <Route path="HoaDon" element={<QuanLyHoaDon />} />
-            <Route path="HoanTien" element={<QuanLyHoanTien />} />
-            <Route path="LichSuThaoTac" element={<QuanLyLichSuThaoTac />} />
-            <Route path="VaiTro" element={<QuanLyVaiTro />} />
-            <Route path="PhanQuyen" element={<QuanLyPhanQuyen />} />
-            <Route path="HangVe" element={<QuanLyHangVe />} />
           </Route>
         </Routes>
       </main>

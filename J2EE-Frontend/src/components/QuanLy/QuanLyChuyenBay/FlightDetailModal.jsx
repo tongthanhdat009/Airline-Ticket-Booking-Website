@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { FaPlane, FaTimes, FaCog, FaPlus, FaTrash, FaCalendarAlt, FaClock } from 'react-icons/fa';
 import { getDichVuByChuyenBay, addDichVuToChuyenBay, removeDichVuFromChuyenBay } from '../../../services/QLDichVuChuyenBayService';
 import { getAllServices, fetchImageByName } from '../../../services/QLDichVuService';
@@ -9,13 +9,28 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
     const [loading, setLoading] = useState(false);
     const [serviceImages, setServiceImages] = useState({});
 
-    useEffect(() => {
-        if (isOpen && flight) {
-            fetchAllData();
+    // Được khai báo trước vì fetchAllData phụ thuộc vào nó
+    const loadServiceImages = useCallback(async (servicesList) => {
+        if (!Array.isArray(servicesList) || servicesList.length === 0) {
+            return;
         }
-    }, [isOpen, flight, fetchAllData]);
 
-    const fetchAllData = async () => {
+        const images = {};
+        for (const service of servicesList) {
+            if (service.anh) {
+                try {
+                    const imageRes = await fetchImageByName(service.anh);
+                    const imageUrl = URL.createObjectURL(imageRes.data);
+                    images[service.maDichVu] = imageUrl;
+                } catch {
+                    // Silently handle image load errors
+                }
+            }
+        }
+        setServiceImages(images);
+    }, []);
+
+    const fetchAllData = useCallback(async () => {
         setLoading(true);
         try {
             // Lấy tất cả dịch vụ có sẵn
@@ -42,27 +57,13 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
         } finally {
             setLoading(false);
         }
-    };
+    }, [flight, showToast, loadServiceImages]);
 
-    const loadServiceImages = async (servicesList) => {
-        if (!Array.isArray(servicesList) || servicesList.length === 0) {
-            return;
+    useEffect(() => {
+        if (isOpen && flight) {
+            fetchAllData();
         }
-
-        const images = {};
-        for (const service of servicesList) {
-            if (service.anh) {
-                try {
-                    const imageRes = await fetchImageByName(service.anh);
-                    const imageUrl = URL.createObjectURL(imageRes.data);
-                    images[service.maDichVu] = imageUrl;
-                } catch {
-                    // Silently handle image load errors
-                }
-            }
-        }
-        setServiceImages(images);
-    };
+    }, [isOpen, flight, fetchAllData]);
 
     const handleAddService = async (maDichVu) => {
         try {

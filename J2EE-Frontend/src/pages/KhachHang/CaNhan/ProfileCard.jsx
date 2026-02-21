@@ -1,4 +1,4 @@
-import { FaUser, FaEnvelope, FaIdCard, FaPlane, FaReceipt, FaHome, FaGoogle } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaIdCard, FaPlane, FaReceipt, FaHome, FaGoogle, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 
 function ProfileCard({ accountInfo, onNavigate, activePage = 'profile' }) {
   return (
@@ -40,7 +40,7 @@ function ProfileCard({ accountInfo, onNavigate, activePage = 'profile' }) {
                 <FaEnvelope className="w-4 h-4" />
                 {accountInfo?.email || 'N/A'}
               </p>
-              <p className="mt-3">
+              <p className="mt-3 flex items-center justify-center gap-2 flex-wrap">
                 {accountInfo?.oauth2Provider ? (
                   <span className="inline-flex items-center gap-1.5 bg-red-50 text-red-700 px-4 py-1.5 rounded-full text-sm font-medium">
                     <FaGoogle className="w-4 h-4" />
@@ -50,6 +50,26 @@ function ProfileCard({ accountInfo, onNavigate, activePage = 'profile' }) {
                   <span className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full text-sm font-medium">
                     <FaIdCard className="w-4 h-4" />
                     Hành khách thông thường
+                  </span>
+                )}
+                {/* Email Verification Status */}
+                {accountInfo?.emailVerified !== undefined && (
+                  <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium ${
+                    accountInfo.emailVerified
+                      ? 'bg-green-50 text-green-700'
+                      : 'bg-amber-50 text-amber-700'
+                  }`}>
+                    {accountInfo.emailVerified ? (
+                      <>
+                        <FaCheckCircle className="w-4 h-4" />
+                        Đã xác thực
+                      </>
+                    ) : (
+                      <>
+                        <FaExclamationCircle className="w-4 h-4" />
+                        Chưa xác thực
+                      </>
+                    )}
                   </span>
                 )}
               </p>

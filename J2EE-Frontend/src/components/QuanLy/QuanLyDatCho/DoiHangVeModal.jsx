@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FaTicketAlt, FaSpinner, FaExchangeAlt, FaArrowUp, FaArrowDown, FaMoneyBillWave } from 'react-icons/fa';
 import QLDatChoService from '../../../services/QLDatChoService';
 
@@ -15,17 +15,8 @@ const DoiHangVeModal = ({
   const [loadingPhi, setLoadingPhi] = useState(false);
   const [loadingHangVe, setLoadingHangVe] = useState(false);
 
-  // Reset state khi mở modal
-  useEffect(() => {
-    if (isOpen && datCho) {
-      setSelectedHangVe(null);
-      setPhiDoiInfo(null);
-      loadHangVeList();
-    }
-  }, [isOpen, datCho, loadHangVeList]);
-
   // Load danh sách hạng vé
-  const loadHangVeList = async () => {
+  const loadHangVeList = useCallback(async () => {
     setLoadingHangVe(true);
     try {
       // Lấy danh sách hạng vé từ API
@@ -40,7 +31,16 @@ const DoiHangVeModal = ({
     } finally {
       setLoadingHangVe(false);
     }
-  };
+  }, [datCho?.tenHangVe]);
+
+  // Reset state khi mở modal
+  useEffect(() => {
+    if (isOpen && datCho) {
+      setSelectedHangVe(null);
+      setPhiDoiInfo(null);
+      loadHangVeList();
+    }
+  }, [isOpen, datCho, loadHangVeList]);
 
   // Tính phí khi chọn hạng vé
   const handleSelectHangVe = async (hangVe) => {

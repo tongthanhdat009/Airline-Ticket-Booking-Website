@@ -741,7 +741,7 @@ const QuanLyChuyenBay = () => {
                             data={flight}
                             getRouteInfo={getRouteInfo}
                             onView={handleOpenDetailModal}
-                            onEdit={(flight) => navigate(`/admin/dashboard/ChuyenBay/${flight.maChuyenBay}/sua`)}
+                            onEdit={(flight) => navigate(`/admin/ChuyenBay/${flight.maChuyenBay}/sua`)}
                         />
                     )}
                     emptyMessage={showDeleted ? 'Không tìm thấy chuyến bay đã xóa nào.' : 'Không tìm thấy chuyến bay nào.'}
@@ -917,7 +917,7 @@ const QuanLyChuyenBay = () => {
                                                                 <FaEye size={16} />
                                                             </button>
                                                             <button
-                                                                onClick={() => navigate(`/admin/dashboard/ChuyenBay/${flight.maChuyenBay}/sua`)}
+                                                                onClick={() => navigate(`/admin/ChuyenBay/${flight.maChuyenBay}/sua`)}
                                                                 disabled={['Đã hủy', 'Đã bay', 'Đang bay'].includes(flight.trangThai)}
                                                                 className={`p-2 rounded-lg transition-colors ${['Đã hủy', 'Đã bay', 'Đang bay'].includes(flight.trangThai) ? 'text-gray-400 cursor-not-allowed' : 'text-orange-600 hover:bg-orange-100'}`}
                                                                 title={['Đang bay'].includes(flight.trangThai) ? 'Không thể sửa khi đang bay' : 'Chỉnh sửa'}

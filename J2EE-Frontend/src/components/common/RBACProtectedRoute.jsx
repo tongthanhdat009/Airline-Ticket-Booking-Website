@@ -8,7 +8,7 @@ import { usePermission } from '../../hooks/usePermission';
  * @param {string} props.feature - Feature code (ví dụ: "FLIGHT", "BOOKING")
  * @param {string} props.action - Action code (ví dụ: "VIEW", "CREATE")
  * @param {React.ReactNode} props.children - Child component
- * @param {string} props.redirectTo - Path to redirect if no permission (default: /admin/dashboard)
+ * @param {string} props.redirectTo - Path to redirect if no permission (default: /admin)
  */
 export const PermissionProtectedRoute = ({
   feature,
@@ -31,7 +31,7 @@ export const PermissionProtectedRoute = ({
  * @param {string|string[]} props.roles - Role hoặc mảng roles yêu cầu
  * @param {boolean} props.requireAll - Yêu cầu tất cả roles (default: false)
  * @param {React.ReactNode} props.children - Child component
- * @param {string} props.redirectTo - Path to redirect if no permission (default: /admin/dashboard)
+ * @param {string} props.redirectTo - Path to redirect if no permission (default: /admin)
  */
 export const RoleProtectedRoute = ({
   roles,
