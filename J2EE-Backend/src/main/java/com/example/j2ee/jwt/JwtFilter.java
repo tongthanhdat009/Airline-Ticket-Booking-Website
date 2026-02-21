@@ -117,7 +117,10 @@ public class JwtFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
 
         } catch (ExpiredJwtException ex) {
-            unauthorized(response, "Access token expired"); // 401
+            // Token hết hạn: không set authentication và tiếp tục chain.
+            // - Endpoint permitAll() vẫn hoạt động bình thường cho khách vãng lai.
+            // - Endpoint authenticated() sẽ bị Spring Security chặn và trả 401 qua entrypoint.
+            chain.doFilter(request, response);
         } catch (JwtException ex) {
             unauthorized(response, "Invalid access token"); // 401
         }

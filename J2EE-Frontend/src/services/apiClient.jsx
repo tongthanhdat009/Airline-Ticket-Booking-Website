@@ -231,8 +231,13 @@ apiClient.interceptors.response.use(
       const accessToken = getAccessTokenByType(userType);
       const refreshToken = getRefreshTokenByType(userType);
 
+      if (!accessToken && !refreshToken) {
+        // Khách vãng lai: không có token nào cả -> chỉ reject, KHÔNG redirect về login
+        return Promise.reject(error);
+      }
+
       if (!accessToken || !refreshToken) {
-        // Không có access token hoặc refresh token => redirect về login
+        // Đã từng đăng nhập nhưng token bị mất/hết hạn -> xóa và redirect về login
         clearTokensByType(userType);
 
         // Nếu originalRequest.skipRedirect được đặt thì không redirect
