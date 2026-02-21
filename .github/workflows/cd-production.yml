@@ -121,29 +121,25 @@ jobs:
 
       # ===== 3. UPLOAD BACKEND JAR =====
       - name: Upload Backend JAR
-        uses: appleboy/scp-action@v0.1.7
+        uses: burnett01/rsync-deployments@5.2.3
         with:
-          host: ${{ secrets.PRODUCTION_HOST }}
-          username: ${{ secrets.PRODUCTION_USER }}
-          key: ${{ secrets.PRODUCTION_SSH_KEY }}
-          source: "J2EE-Backend/target/*.jar"
-          target: "/opt/airline-prod/backend/"
-          strip_components: 2
-          overwrite: true
+          switches: -avzr --delete
+          path: J2EE-Backend/target/
+          remote_path: /opt/airline-prod/backend/
+          remote_host: ${{ secrets.PRODUCTION_HOST }}
+          remote_user: ${{ secrets.PRODUCTION_USER }}
+          remote_key: ${{ secrets.PRODUCTION_SSH_KEY }}
 
       # ===== 4. PACKAGE & UPLOAD FRONTEND =====
-      - name: Package Frontend
-        run: tar -czf frontend-dist.tar.gz -C J2EE-Frontend/dist .
-
       - name: Upload Frontend Dist
-        uses: appleboy/scp-action@v0.1.7
+        uses: burnett01/rsync-deployments@5.2.3
         with:
-          host: ${{ secrets.PRODUCTION_HOST }}
-          username: ${{ secrets.PRODUCTION_USER }}
-          key: ${{ secrets.PRODUCTION_SSH_KEY }}
-          source: "frontend-dist.tar.gz"
-          target: "/opt/airline-deploy/"
-          overwrite: true
+          switches: -avzr --delete
+          path: J2EE-Frontend/dist/
+          remote_path: /opt/airline-prod/frontend/dist/
+          remote_host: ${{ secrets.PRODUCTION_HOST }}
+          remote_user: ${{ secrets.PRODUCTION_USER }}
+          remote_key: ${{ secrets.PRODUCTION_SSH_KEY }}
 
       # ===== FINALIZE DEPLOY =====
       - name: Finalize Deployment
