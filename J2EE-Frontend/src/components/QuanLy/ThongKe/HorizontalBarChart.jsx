@@ -6,7 +6,7 @@ import CustomTooltip from './CustomTooltip';
  * Horizontal Bar Chart Component
  * Dùng cho hiển thị Top chặng bay phổ biến nhất
  */
-const HorizontalBarChart = ({ data, dataKey = "soVeBan", nameKey = "changBay", color = "#3B82F6", formatValue }) => {
+const HorizontalBarChart = ({ data, dataKey = "soVeBan", nameKey = "changBay", formatValue }) => {
     if (!data || data.length === 0) {
         return (
             <div className="flex flex-col justify-center items-center h-64 text-gray-400">
