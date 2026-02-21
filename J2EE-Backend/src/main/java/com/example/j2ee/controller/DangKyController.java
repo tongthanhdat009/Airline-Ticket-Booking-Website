@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -32,6 +33,39 @@ public class DangKyController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
         }
+    }
 
+    /**
+     * Kiểm tra email đã tồn tại chưa
+     */
+    @PostMapping("/check-email")
+    public ResponseEntity<?> checkEmail(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+
+        if (email == null || email.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Email không được để trống"));
+        }
+
+        boolean exists = dangKyService.checkEmailExists(email);
+        Map<String, Object> response = new HashMap<>();
+        response.put("exists", exists);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Kiểm tra số điện thoại đã tồn tại chưa
+     */
+    @PostMapping("/check-phone")
+    public ResponseEntity<?> checkPhone(@RequestBody Map<String, String> payload) {
+        String soDienThoai = payload.get("soDienThoai");
+
+        if (soDienThoai == null || soDienThoai.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Số điện thoại không được để trống"));
+        }
+
+        boolean exists = dangKyService.checkPhoneExists(soDienThoai);
+        Map<String, Object> response = new HashMap<>();
+        response.put("exists", exists);
+        return ResponseEntity.ok(response);
     }
 }

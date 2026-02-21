@@ -23,6 +23,9 @@ public interface HanhKhachRepository extends JpaRepository<HanhKhach, Integer> {
     Optional<HanhKhach> findBySoDienThoai(String soDienThoai);
     Optional<HanhKhach> findByMaDinhDanh(String maDinhDanh);
 
+    // Kiểm tra tồn tại
+    boolean existsBySoDienThoai(String soDienThoai);
+
     // ==================== SOFT DELETE METHODS ====================
     /**
      * Tìm tất cả hành khách bao gồm cả đã xóa mềm

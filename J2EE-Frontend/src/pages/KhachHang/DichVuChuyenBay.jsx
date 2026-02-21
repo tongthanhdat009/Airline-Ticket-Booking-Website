@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'framer-motion';
 
 import ClientDichVuService from "../../services/ClientDichVuService";
 import { getAssetUrl } from "../../config/api.config";
