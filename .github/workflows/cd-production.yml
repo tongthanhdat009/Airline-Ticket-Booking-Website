@@ -166,6 +166,12 @@ jobs:
             sudo chown -R www-data:www-data /opt/airline-prod/frontend
             sudo chmod -R 755 /opt/airline-prod/frontend
 
-            # Make deploy script executable and run it
-            chmod +x /opt/airline-prod/deploy-production.sh
-            sudo bash /opt/airline-prod/deploy-production.sh
+            # Restart backend service
+            echo "Restarting airline service..."
+            sudo systemctl restart airline
+
+            # Check service status
+            sudo systemctl status airline --no-pager
+
+            # Reload nginx (optional)
+            sudo systemctl reload nginx
