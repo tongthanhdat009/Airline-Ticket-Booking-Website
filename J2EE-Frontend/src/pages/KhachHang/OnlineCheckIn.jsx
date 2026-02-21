@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import CheckInService from '../../services/CheckInService';
 import useTitle from '../../hooks/useTitle';

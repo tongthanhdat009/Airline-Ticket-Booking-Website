@@ -31,10 +31,7 @@ const itemVariants = {
 const AuthLayout = ({
   children,
   bannerContent,
-  className = "",
-  showProgress = false,
-  currentStep = 1,
-  steps = []
+  className = ""
 }) => {
   return (
     <div className="min-h-screen bg-slate-50 pt-20 pb-12 px-4 relative overflow-hidden">

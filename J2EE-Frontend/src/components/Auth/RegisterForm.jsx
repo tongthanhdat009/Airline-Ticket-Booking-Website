@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { validatePassword, validateBirthDate, calculateAge } from '../../services/validationService';
 import apiClient from '../../services/apiClient';
