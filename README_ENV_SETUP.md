@@ -100,7 +100,7 @@ This guide explains how to configure environment variables for the Airline Ticke
 
 **Setup Steps:**
 1. Register at [VNPay Sandbox](https://sandbox.vnpayment.vn/)
-2. Get your TMN Code and Secret Key from the merchant portal
+2. Get your TMN Code and Secret Key from the merchant portal.
 3. Configure the return URLs in your VNPay dashboard
 
 ---
