@@ -1,8 +1,6 @@
 package com.example.j2ee.jwt;
 
 import com.example.j2ee.security.AdminUserDetails;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +18,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * JWT Authentication Filter.
+ *
+ * <p>Nguyên tắc thiết kế:</p>
+ * <ul>
+ *   <li>Filter này CHỈ có nhiệm vụ set Authentication vào SecurityContext nếu có token hợp lệ.</li>
+ *   <li>KHÔNG BAO GIỜ block request hoặc trả lỗi 401 trực tiếp — việc đó do Spring Security xử lý.</li>
+ *   <li>Mọi exception đều được catch → request tiếp tục như anonymous user.</li>
+ *   <li>KHÔNG cần danh sách SKIP_PREFIXES riêng — SecurityConfig.permitAll() đã xử lý authorization.</li>
+ * </ul>
+ */
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -37,27 +46,16 @@ public class JwtFilter extends OncePerRequestFilter {
         this.adminService = adminService;
     }
 
-    // Skip filter cho public endpoints - KHÔNG cần /api prefix vì đã có context-path=/api
-    // request.getRequestURI() sẽ trả về full path bao gồm /api
-    private static final List<String> SKIP_PREFIXES = List.of(
-            "/api/dangnhap", "/api/dangky", "/api/dangxuat", "/api/current-user",
-            "/api/admin/dangnhap", "/api/admin/current-user", "/api/admin/dangxuat",
-            "/api/auth/", "/api/forgot-password/",
-            "/api/oauth2/", "/api/login/oauth2/",
-            "/api/vnpay/", "/api/checkin/", "/api/client/datcho/",
-            "/api/ai/", "/api/static/", "/api/sanbay/",
-            "/api/admin/dashboard/dichvu/anh/", "/api/admin/dashboard/dichvu/luachon/anh/",
-            "/api/admin/dashboard/chuyenbay/", "/api/countries/",
-            "/ws/"
-    );
-
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
+        // Chỉ skip filter cho những request chắc chắn không cần JWT
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) return true;
+
         String path = request.getRequestURI();
-        for (String prefix : SKIP_PREFIXES) {
-            if (path.startsWith(prefix)) return true;
-        }
+        // WebSocket không dùng JWT filter (dùng handshake riêng)
+        if (path.startsWith("/ws/")) return true;
+
+        // Static resources
         String lower = path.toLowerCase();
         return lower.endsWith(".svg") || lower.endsWith(".png") || lower.endsWith(".jpg")
                 || lower.endsWith(".jpeg") || lower.endsWith(".gif") || lower.endsWith(".webp");
@@ -67,71 +65,58 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws java.io.IOException, jakarta.servlet.ServletException {
 
-        String token = resolveToken(request); // đọc từ cookie accessToken hoặc header
-
+        // Bước 1: Thử set authentication từ token (nếu có)
+        // Mọi lỗi đều được catch — request luôn tiếp tục như anonymous nếu token không hợp lệ.
         try {
-            // Không có token -> cho qua; endpoint yêu cầu auth sẽ bị EntryPoint trả 401
-            if (token != null) {
+            String token = resolveToken(request);
+
+            if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                // Bỏ qua refresh token
                 Object typObj = jwtUtil.getClaim(token, "typ");
-                if ("refresh".equals(typObj)) {
-                    // Refresh token: skip, không set authentication, để chain đi qua
-                    // Endpoint cần auth sẽ bị SecurityConfig chặn
-                    chain.doFilter(request, response);
-                    return;
-                }
-
-                String username = jwtUtil.getSubject(token);
-                if (username != null
-                        && SecurityContextHolder.getContext().getAuthentication() == null
-                        && jwtUtil.validate(token)) {
-
-                    // Lấy roles từ token để xác định user type
-                    List<String> roles = jwtUtil.getRoles(token);
-                    // Dùng permissions claim để xác định admin token
-                    // Chỉ admin token mới có permissions claim
-                    List<String> permissions = jwtUtil.getPermissions(token);
-                    boolean isAdmin = !permissions.isEmpty();
-
-                    if (isAdmin) {
-                        // === ADMIN USER: Tạo AdminUserDetails từ TOKEN (không load database) ===
-                        // Sử dụng permissions và roles từ token thay vì database
-                        Set<String> roleSet = new HashSet<>(roles);
-                        Set<String> permissionSet = new HashSet<>(permissions);
-
-                        // Tạo AdminUserDetails từ token data
-                        AdminUserDetails adminUserDetails = AdminUserDetails.fromToken(
-                            username,
-                            roleSet,
-                            permissionSet
-                        );
-
-                        UsernamePasswordAuthenticationToken auth =
-                                new UsernamePasswordAuthenticationToken(
-                                        adminUserDetails, null, adminUserDetails.getAuthorities());
-                        SecurityContextHolder.getContext().setAuthentication(auth);
-                    } else {
-                        // === REGULAR USER: Load từ database như trước ===
-                        UserDetails userDetails = userService.loadUserByUsername(username);
-                        UsernamePasswordAuthenticationToken auth =
-                                new UsernamePasswordAuthenticationToken(
-                                        userDetails, null, userDetails.getAuthorities());
-                        SecurityContextHolder.getContext().setAuthentication(auth);
+                if (!"refresh".equals(typObj) && jwtUtil.validate(token)) {
+                    String username = jwtUtil.getSubject(token);
+                    if (username != null) {
+                        setAuthentication(token, username);
                     }
                 }
             }
-
-            chain.doFilter(request, response);
-
-        } catch (ExpiredJwtException ex) {
-            // Token hết hạn: không set authentication và tiếp tục chain.
-            // - Endpoint permitAll() vẫn hoạt động bình thường cho khách vãng lai.
-            // - Endpoint authenticated() sẽ bị Spring Security chặn và trả 401 qua entrypoint.
-            chain.doFilter(request, response);
-        } catch (JwtException ex) {
-            // Token invalid (định dạng sai, signature sai, etc.): bỏ qua và tiếp tục chain
-            // Endpoint permitAll() vẫn work, endpoint cần auth sẽ bị SecurityConfig chặn
-            chain.doFilter(request, response);
+        } catch (Exception ex) {
+            // Token hết hạn, sai chữ ký, user không tồn tại, v.v.
+            // → Xóa SecurityContext và tiếp tục như anonymous user.
+            // → Endpoint permitAll() vẫn hoạt động bình thường.
+            // → Endpoint cần auth sẽ bị Spring Security chặn → 401 qua AuthenticationEntryPoint.
+            SecurityContextHolder.clearContext();
+            logger.debug("JWT authentication failed, continuing as anonymous: " + ex.getMessage());
         }
+
+        // Bước 2: LUÔN tiếp tục filter chain — không bao giờ block tại đây
+        chain.doFilter(request, response);
+    }
+
+    /**
+     * Set authentication vào SecurityContext dựa trên token claims.
+     * Admin token có permissions claim, regular user thì load từ database.
+     */
+    private void setAuthentication(String token, String username) {
+        List<String> roles = jwtUtil.getRoles(token);
+        List<String> permissions = jwtUtil.getPermissions(token);
+        boolean isAdmin = !permissions.isEmpty();
+
+        UserDetails userDetails;
+        if (isAdmin) {
+            // ADMIN: Tạo từ token data (không query database)
+            Set<String> roleSet = new HashSet<>(roles);
+            Set<String> permissionSet = new HashSet<>(permissions);
+            userDetails = AdminUserDetails.fromToken(username, roleSet, permissionSet);
+        } else {
+            // REGULAR USER: Load từ database
+            userDetails = userService.loadUserByUsername(username);
+        }
+
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
     /** Lấy token: ưu tiên Authorization header, fallback cookie */
@@ -150,11 +135,5 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         }
         return null;
-    }
-
-    private void unauthorized(HttpServletResponse response, String message) throws java.io.IOException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
-        response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write("{\"message\":\"" + message + "\"}");
     }
 }

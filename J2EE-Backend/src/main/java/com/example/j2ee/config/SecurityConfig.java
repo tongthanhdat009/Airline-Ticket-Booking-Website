@@ -144,7 +144,8 @@ public class SecurityConfig {
         return (request, response, ex) -> {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"message\":\"Unauthorized\"}");
+            response.getWriter().write(
+                    "{\"success\":false,\"message\":\"Phiên đăng nhập hết hạn hoặc chưa đăng nhập\",\"data\":null}");
         };
     }
 
@@ -153,7 +154,8 @@ public class SecurityConfig {
         return (request, response, ex) -> {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"message\":\"Forbidden\"}");
+            response.getWriter().write(
+                    "{\"success\":false,\"message\":\"Bạn không có quyền truy cập tài nguyên này\",\"data\":null}");
         };
     }
 
