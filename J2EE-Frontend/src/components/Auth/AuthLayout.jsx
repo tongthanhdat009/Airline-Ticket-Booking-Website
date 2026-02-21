@@ -1,4 +1,5 @@
 import React from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 
 const containerVariants = {
@@ -24,9 +25,6 @@ const itemVariants = {
  * @param {React.ReactNode} props.children - Nội dung chính (form)
  * @param {React.ReactNode} props.bannerContent - Nội dung banner bên trái
  * @param {string} props.className - Class thêm vào cho container
- * @param {boolean}.props.showProgress - Có hiển thị progress step không (đăng ký)
- * @param {number} props.currentStep - Bước hiện tại (1-3)
- * @param {Array} props.steps - Danh sách các bước đăng ký
  */
 const AuthLayout = ({
   children,
