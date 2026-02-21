@@ -22,7 +22,12 @@ import {
   FaKey,
   FaTicketAlt,
   FaCalendarCheck,
-  FaShoppingCart
+  FaShoppingCart,
+  FaFileExport,
+  FaBalanceScale,
+  FaImage,
+  FaServer,
+  FaHeadset
 } from 'react-icons/fa';
 import { MdLocalAirport } from 'react-icons/md';
 import MenuService from '../services/MenuService';
@@ -48,6 +53,11 @@ const iconMap = {
   FaTicketAlt,
   FaCalendarCheck,
   FaShoppingCart,
+  FaFileExport,
+  FaBalanceScale,
+  FaImage,
+  FaServer,
+  FaHeadset,
   MdLocalAirport
 };
 
@@ -220,6 +230,61 @@ export const adminMenuItems = [
     description: 'Quản lý chương trình khuyến mãi'
   },
   {
+    path: '/admin/dashboard/XuatBaoCao',
+    text: 'Xuất báo cáo',
+    icon: FaFileExport,
+    permissionKey: 'EXPORT_REPORT_VIEW',
+    featureCode: 'EXPORT_REPORT',
+    featureName: 'Xuất báo cáo',
+    group: 'Báo cáo',
+    color: 'from-emerald-500 to-teal-500',
+    description: 'Xuất báo cáo doanh thu, danh sách hành khách dạng Excel/PDF'
+  },
+  {
+    path: '/admin/dashboard/DoiSoatGiaoDich',
+    text: 'Đối soát giao dịch',
+    icon: FaBalanceScale,
+    permissionKey: 'RECONCILIATION_VIEW',
+    featureCode: 'RECONCILIATION',
+    featureName: 'Đối soát giao dịch',
+    group: 'Tài chính',
+    color: 'from-amber-500 to-yellow-500',
+    description: 'Đối soát giao dịch với cổng thanh toán VNPay'
+  },
+  {
+    path: '/admin/dashboard/BannerTinTuc',
+    text: 'Banner & Tin tức',
+    icon: FaImage,
+    permissionKey: 'BANNER_NEWS_VIEW',
+    featureCode: 'BANNER_NEWS',
+    featureName: 'Quản lý Banner & Tin tức',
+    group: 'Marketing',
+    color: 'from-fuchsia-500 to-pink-500',
+    description: 'Quản lý banner quảng cáo và tin tức trang chủ'
+  },
+  {
+    path: '/admin/dashboard/LichSuGiaoDichVNPay',
+    text: 'Log giao dịch VNPay',
+    icon: FaServer,
+    permissionKey: 'TRANSACTION_LOG_VIEW',
+    featureCode: 'TRANSACTION_LOG',
+    featureName: 'Lịch sử giao dịch VNPay',
+    group: 'Tài chính',
+    color: 'from-slate-500 to-gray-600',
+    description: 'Xem raw data IPN từ VNPay để debug và xử lý khiếu nại'
+  },
+  {
+    path: '/admin/dashboard/HoTroLienHe',
+    text: 'Hỗ trợ / Liên hệ',
+    icon: FaHeadset,
+    permissionKey: 'SUPPORT_VIEW',
+    featureCode: 'SUPPORT',
+    featureName: 'Hỗ trợ / Liên hệ',
+    group: 'Dịch vụ',
+    color: 'from-sky-500 to-cyan-500',
+    description: 'Tiếp nhận và xử lý yêu cầu hỗ trợ từ khách hàng'
+  },
+  {
     path: '/admin/dashboard/LichSuThaoTac',
     text: 'Lịch sử thao tác',
     icon: FaHistory,
@@ -288,6 +353,11 @@ export const permissionMapping = {
   VAITRO: 'Quản lý Vai trò',
   PHANQUYEN: 'Phân quyền',
   AUDITLOG: 'Lịch sử thao tác',
+  EXPORT_REPORT: 'Xuất báo cáo',
+  RECONCILIATION: 'Đối soát giao dịch',
+  BANNER_NEWS: 'Banner & Tin tức',
+  TRANSACTION_LOG: 'Log giao dịch VNPay',
+  SUPPORT: 'Hỗ trợ / Liên hệ',
 
   // Mapping cũ để tương thích (nếu cần)
   REPORT: 'Thống kê & Báo cáo',
@@ -451,7 +521,12 @@ const checkPermissionMatch = (menuItem, feature, action) => {
     'USER': '/admin/dashboard/QuanLyTKAdmin',
     'ROLE': '/admin/dashboard/VaiTro',
     'PERMISSION': '/admin/dashboard/PhanQuyen',
-    'AUDITLOG': '/admin/dashboard/LichSuThaoTac'
+    'AUDITLOG': '/admin/dashboard/LichSuThaoTac',
+    'EXPORT_REPORT': '/admin/dashboard/XuatBaoCao',
+    'RECONCILIATION': '/admin/dashboard/DoiSoatGiaoDich',
+    'BANNER_NEWS': '/admin/dashboard/BannerTinTuc',
+    'TRANSACTION_LOG': '/admin/dashboard/LichSuGiaoDichVNPay',
+    'SUPPORT': '/admin/dashboard/HoTroLienHe'
   };
 
   // Special cases
@@ -526,7 +601,12 @@ export const rolePermissions = {
     'USER_MANAGE',
     'ROLE_MANAGE',
     'PERMISSION_MANAGE',
-    'AUDITLOG_MANAGE'
+    'AUDITLOG_MANAGE',
+    'EXPORT_REPORT_MANAGE',
+    'RECONCILIATION_MANAGE',
+    'BANNER_NEWS_MANAGE',
+    'TRANSACTION_LOG_MANAGE',
+    'SUPPORT_MANAGE'
   ],
 
   // QUAN_LY - Quản lý chính
@@ -537,7 +617,11 @@ export const rolePermissions = {
     'ORDER_VIEW', 'ORDER_UPDATE',
     'CUSTOMER_VIEW', 'CUSTOMER_CREATE', 'CUSTOMER_UPDATE',
     'PAYMENT_VIEW', 'PAYMENT_APPROVE',
-    'REPORT_VIEW', 'REPORT_EXPORT'
+    'REPORT_VIEW', 'REPORT_EXPORT',
+    'EXPORT_REPORT_VIEW', 'EXPORT_REPORT_EXPORT',
+    'RECONCILIATION_VIEW',
+    'BANNER_NEWS_VIEW', 'BANNER_NEWS_CREATE', 'BANNER_NEWS_UPDATE', 'BANNER_NEWS_DELETE',
+    'SUPPORT_VIEW', 'SUPPORT_UPDATE'
   ],
 
   // NHAN_VIEN_VE - Nhân viên bán vé
@@ -546,7 +630,8 @@ export const rolePermissions = {
     'ORDER_VIEW', 'ORDER_CREATE', 'ORDER_UPDATE',
     'CUSTOMER_VIEW', 'CUSTOMER_CREATE', 'CUSTOMER_UPDATE',
     'FLIGHT_VIEW',
-    'SERVICE_VIEW'
+    'SERVICE_VIEW',
+    'SUPPORT_VIEW', 'SUPPORT_UPDATE'
   ],
 
   // KE_TOAN - Kế toán
@@ -555,7 +640,10 @@ export const rolePermissions = {
     'REFUND_VIEW', 'REFUND_UPDATE', 'REFUND_APPROVE',
     'PRICE_VIEW', 'PRICE_UPDATE',
     'REPORT_VIEW', 'REPORT_EXPORT',
-    'ORDER_VIEW'
+    'ORDER_VIEW',
+    'EXPORT_REPORT_VIEW', 'EXPORT_REPORT_EXPORT',
+    'RECONCILIATION_VIEW', 'RECONCILIATION_UPDATE',
+    'TRANSACTION_LOG_VIEW'
   ],
 
   // VAN_HANH - Vận hành
@@ -564,7 +652,8 @@ export const rolePermissions = {
     'ROUTE_VIEW', 'ROUTE_CREATE', 'ROUTE_UPDATE',
     'AIRPORT_VIEW',
     'AIRCRAFT_VIEW', 'AIRCRAFT_UPDATE',
-    'BOOKING_VIEW'
+    'BOOKING_VIEW',
+    'TRANSACTION_LOG_VIEW'
   ]
 };
 

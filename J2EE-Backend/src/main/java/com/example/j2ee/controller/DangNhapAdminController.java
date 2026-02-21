@@ -1,15 +1,13 @@
 package com.example.j2ee.controller;
 
+import com.example.j2ee.dto.auth.RefreshTokenRequest;
 import com.example.j2ee.service.DangNhapAdminService;
 import com.example.j2ee.service.PermissionService;
 import com.example.j2ee.service.RefreshTokenService;
 import com.example.j2ee.jwt.JwtUtil;
 import com.example.j2ee.security.AdminUserDetails;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
-
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/admin")
@@ -28,10 +27,6 @@ public class DangNhapAdminController {
     private final PermissionService permissionService;
     private final UserDetailsService adminDetailsService;
     private final Environment environment;
-
-    // Cookie settings cho httpOnly refresh token
-    private static final String REFRESH_COOKIE_NAME = "admin_refresh_token";
-    private static final int REFRESH_COOKIE_MAX_AGE = 30 * 24 * 60 * 60; // 30 ngày (giây)
 
     public DangNhapAdminController(
             DangNhapAdminService dangNhapAdminService,
@@ -49,27 +44,9 @@ public class DangNhapAdminController {
         this.environment = environment;
     }
 
-    /**
-     * Lấy cookie attributes dựa trên environment
-     * Production: SameSite=None; Secure
-     * Development: SameSite=Strict
-     */
-    private String getCookieAttributes() {
-        String profile = environment.getProperty("spring.profiles.active", "dev");
-        boolean isProduction = "production".equalsIgnoreCase(profile) ||
-                              "prod".equalsIgnoreCase(profile);
-
-        if (isProduction) {
-            return "Path=/; Max-Age=%d; HttpOnly; SameSite=None; Secure";
-        } else {
-            return "Path=/; Max-Age=%d; HttpOnly; SameSite=Strict";
-        }
-    }
-
     @PostMapping("/dangnhap")
     public ResponseEntity<?> dangNhap(
-            @RequestBody Map<String, String> payload,
-            HttpServletResponse response
+            @RequestBody Map<String, String> payload
     ) {
         try {
             // Lấy username và password từ request
@@ -90,25 +67,16 @@ public class DangNhapAdminController {
             // Access token: typ=access, TTL ngắn, chứa cả roles và permissions
             String accessToken = jwtUtil.generateAccessToken(tenDangNhap, roles, permissions);
 
-            // Refresh token: typ=refresh, TTL dài và lưu vào database ONLY
+            // Refresh token: typ=refresh, TTL dài và lưu vào database
             var refreshTokenEntity = refreshTokenService.createRefreshTokenForAdmin(tenDangNhap);
             String refreshToken = refreshTokenEntity.getToken();
 
-            // === SECURITY: Lưu refresh token vào httpOnly cookie ===
-            // Sử dụng Set-Cookie header để có SameSite attribute
-            // Production: SameSite=None; Secure, Development: SameSite=Strict
-            String cookieAttributes = String.format(getCookieAttributes(), REFRESH_COOKIE_MAX_AGE);
-            String setCookieHeader = String.format(
-                "%s=%s; %s",
-                REFRESH_COOKIE_NAME, refreshToken, cookieAttributes
-            );
-            response.addHeader("Set-Cookie", setCookieHeader);
-
-            // Trả về body: KHÔNG bao gồm refreshToken (chỉ accessToken + roles + permissions)
+            // === Trả về response body bao gồm cả accessToken và refreshToken ===
+            // Refresh token được lưu ở frontend (localStorage/sessionStorage) và gửi lại khi refresh
             Map<String, Object> responseBody = new HashMap<>();
             responseBody.put("message", "Đăng nhập thành công");
             responseBody.put("accessToken", accessToken);
-            // refreshToken KHÔNG được trả trong body - chỉ ở httpOnly cookie
+            responseBody.put("refreshToken", refreshToken);
             responseBody.put("roles", roles);
             responseBody.put("permissions", permissions);
             responseBody.put("username", tenDangNhap);
@@ -126,12 +94,14 @@ public class DangNhapAdminController {
         }
     }
 
-    // Endpoint refresh token - Đọc refresh token từ httpOnly cookie
-    // Gọi: POST /admin/dangnhap/refresh (không cần body)
+    // Endpoint refresh token - Đọc refresh token từ request body
+    // Gọi: POST /admin/dangnhap/refresh với body { "refreshToken": "..." }
     @PostMapping("/dangnhap/refresh")
     public ResponseEntity<?> refreshAdmin(
-            @CookieValue(value = REFRESH_COOKIE_NAME, required = false) String refreshToken
+            @Valid @RequestBody RefreshTokenRequest request
     ) {
+        String refreshToken = request.getRefreshToken();
+
         if (refreshToken == null || refreshToken.isEmpty() || !jwtUtil.isRefreshToken(refreshToken)) {
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("message", "Thiếu hoặc sai refresh token");
@@ -208,25 +178,19 @@ public class DangNhapAdminController {
         }
     }
 
-    // Endpoint logout - Thu hồi refresh token từ cookie và xóa cookie
+    // Endpoint logout - Thu hồi refresh token từ request body
+    // Gọi: POST /admin/dangxuat với body { "refreshToken": "..." }
     @PostMapping("/dangxuat")
     public ResponseEntity<?> logout(
-            @CookieValue(value = REFRESH_COOKIE_NAME, required = false) String refreshToken,
-            HttpServletResponse response
+            @RequestBody(required = false) Map<String, String> payload
     ) {
         try {
-            // Thu hồi refresh token từ cookie
+            String refreshToken = payload != null ? payload.get("refreshToken") : null;
+
+            // Thu hồi refresh token nếu có
             if (refreshToken != null && !refreshToken.isEmpty()) {
                 refreshTokenService.revokeRefreshToken(refreshToken);
             }
-
-            // Xóa cookie bằng Set-Cookie header với Max-Age=0
-            String cookieAttributes = getCookieAttributes().replace("Max-Age=%d", "Max-Age=0");
-            String deleteCookieHeader = String.format(
-                "%s=; %s",
-                REFRESH_COOKIE_NAME, cookieAttributes
-            );
-            response.addHeader("Set-Cookie", deleteCookieHeader);
 
             Map<String, String> responseBody = new HashMap<>();
             responseBody.put("message", "Đăng xuất thành công");

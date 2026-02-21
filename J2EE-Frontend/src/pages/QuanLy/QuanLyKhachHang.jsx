@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { FaSearch, FaUserPlus, FaFileExport, FaEdit, FaTrash, FaBan, FaEye } from 'react-icons/fa';
-import * as XLSX from 'xlsx';
+import { FaSearch, FaUserPlus, FaEdit, FaTrash, FaBan, FaEye } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
 import ViewToggleButton from '../../components/common/ViewToggleButton';
@@ -165,63 +164,6 @@ const QuanLyKhachHang = () => {
         }
     };
 
-    const handleExportExcel = () => {
-        if (currentItems.length === 0) {
-            showToast('Không có dữ liệu để xuất!', 'warning');
-            return;
-        }
-
-        try {
-            // Chuẩn bị dữ liệu để xuất
-            const exportData = currentItems.map((customer, index) => ({
-                'STT': indexOfFirstItem + index + 1,
-                'Mã KH': customer.maHanhKhach,
-                'Họ và tên': customer.hoVaTen || '',
-                'Email': customer.email || '',
-                'Số điện thoại': customer.soDienThoai || '',
-                'Giới tính': customer.gioiTinh || '',
-                'Ngày sinh': customer.ngaySinh ? new Date(customer.ngaySinh).toLocaleDateString('vi-VN') : '',
-                'Quốc gia': customer.quocGia || '',
-                'Mã định danh': customer.maDinhDanh || '',
-                'Địa chỉ': customer.diaChi || ''
-            }));
-
-            // Tạo worksheet
-            const ws = XLSX.utils.json_to_sheet(exportData);
-
-            // Tự động điều chỉnh độ rộng cột
-            const colWidths = [
-                { wch: 5 },  // STT
-                { wch: 10 }, // Mã KH
-                { wch: 25 }, // Họ và tên
-                { wch: 30 }, // Email
-                { wch: 15 }, // Số điện thoại
-                { wch: 10 }, // Giới tính
-                { wch: 12 }, // Ngày sinh
-                { wch: 15 }, // Quốc gia
-                { wch: 15 }, // Mã định danh
-                { wch: 30 }  // Địa chỉ
-            ];
-            ws['!cols'] = colWidths;
-
-            // Tạo workbook
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Danh sách khách hàng');
-
-            // Tạo tên file với timestamp
-            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-            const fileName = `DanhSachKhachHang_${timestamp}.xlsx`;
-
-            // Xuất file
-            XLSX.writeFile(wb, fileName);
-
-            showToast(`Đã xuất thành công ${currentItems.length} khách hàng ra file Excel!`, 'success');
-        } catch (error) {
-            console.error('Error exporting to Excel:', error);
-            showToast('Có lỗi xảy ra khi xuất file Excel!', 'error');
-        }
-    };
-
     const handleViewCustomer = (customer, mode = 'view') => {
         setViewCustomer(customer);
         setViewModalMode(mode);
@@ -267,13 +209,6 @@ const QuanLyKhachHang = () => {
                     className="shrink-0"
                 />
                 <div className="flex gap-2">
-                    <button
-                        onClick={handleExportExcel}
-                        className="flex items-center gap-2 bg-green-600 text-white px-5 py-3 rounded-lg hover:bg-green-700 transition-all shadow-lg hover:shadow-xl"
-                    >
-                        <FaFileExport />
-                        <span className="font-semibold">Xuất Excel</span>
-                    </button>
                     <button
                         onClick={() => handleOpenModal()}
                         className="flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl"

@@ -1,11 +1,6 @@
 package com.example.j2ee.service;
 
-import com.example.j2ee.dto.ThongKeDichVuDTO;
-import com.example.j2ee.dto.ThongKeDoanhThuNgayDTO;
-import com.example.j2ee.dto.ThongKeHangVeDTO;
-import com.example.j2ee.dto.ThongKeNgayDTO;
-import com.example.j2ee.dto.ThongKeSoSanhDTO;
-import com.example.j2ee.dto.ThongKeTongQuanDTO;
+import com.example.j2ee.dto.*;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -14,6 +9,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -393,5 +389,316 @@ public class ThongKeService {
         return current.subtract(previous)
                 .multiply(BigDecimal.valueOf(100))
                 .divide(previous, 2, RoundingMode.HALF_UP);
+    }
+
+    // ========================================
+    // CAC THONG KE MOI - BO SUNG
+    // ========================================
+
+    /**
+     * Top 10 chặng bay phổ biến nhất
+     * Dùng cho Horizontal Bar Chart
+     */
+    @Cacheable(value = "topChangBay", key = "#startDate.toString() + '-' + #endDate.toString()")
+    public List<ThongKeChangBayDTO> getTopChangBay(LocalDate startDate, LocalDate endDate, int limit) {
+        String sql = """
+            SELECT
+                sbdi.tensanbay AS SanBayDi,
+                sbden.tensanbay AS SanBayDen,
+                CONCAT(sbdi.tensanbay, ' - ', sbden.tensanbay) AS ChangBay,
+                COUNT(dc.madatcho) AS SoVeBan,
+                SUM(dc.giave) AS DoanhThu
+            FROM
+                datcho dc
+            JOIN
+                chitietchuyenbay ctb ON dc.machuyenbay = ctb.machuyenbay
+            JOIN
+                tuyenbay tb ON ctb.matuyenbay = tb.matuyenbay
+            JOIN
+                sanbay sbdi ON tb.masanbaydi = sbdi.masanbay
+            JOIN
+                sanbay sbden ON tb.masanbayden = sbden.masanbay
+            JOIN
+                donhang dh ON dc.madonhang = dh.madonhang
+            JOIN
+                trangthaithanhtoan ttt ON dh.madonhang = ttt.madonhang
+            WHERE
+                ttt.dathanhtoan = 1
+                AND DATE(dc.ngaydatcho) BETWEEN ? AND ?
+                AND dc.da_xoa = 0
+            GROUP BY
+                sbdi.tensanbay, sbden.tensanbay
+            ORDER BY
+                SoVeBan DESC
+            LIMIT ?
+            """;
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            String sanBayDi = rs.getString("SanBayDi");
+            String sanBayDen = rs.getString("SanBayDen");
+            String changBay = rs.getString("ChangBay");
+            Long soVeBan = rs.getLong("SoVeBan");
+            BigDecimal doanhThu = rs.getBigDecimal("DoanhThu");
+            return new ThongKeChangBayDTO(sanBayDi, sanBayDen, changBay, soVeBan, doanhThu);
+        }, startDate, endDate, limit);
+    }
+
+    /**
+     * Thống kê tỷ lệ trạng thái đơn hàng
+     * Dùng cho Pie Chart
+     */
+    @Cacheable(value = "thongKeTrangThaiDonHang", key = "#startDate.toString() + '-' + #endDate.toString()")
+    public List<ThongKeTrangThaiDonHangDTO> getThongKeTrangThaiDonHang(LocalDate startDate, LocalDate endDate) {
+        String sql = """
+            SELECT
+                trangthai AS TrangThai,
+                COUNT(*) AS SoDonHang
+            FROM
+                donhang
+            WHERE
+                DATE(ngaydat) BETWEEN ? AND ?
+                AND da_xoa = 0
+            GROUP BY
+                trangthai
+            """;
+
+        List<ThongKeTrangThaiDonHangDTO> results = jdbcTemplate.query(sql, (rs, rowNum) -> {
+            String trangThai = rs.getString("TrangThai");
+            Long soDonHang = rs.getLong("SoDonHang");
+            String moTa = getMoTaTrangThai(trangThai);
+            return new ThongKeTrangThaiDonHangDTO(trangThai, soDonHang, BigDecimal.ZERO, moTa);
+        }, startDate, endDate);
+
+        // Tính tổng đơn hàng để tính tỷ lệ
+        long totalDonHang = results.stream().mapToLong(ThongKeTrangThaiDonHangDTO::getSoDonHang).sum();
+
+        // Cập nhật tỷ lệ
+        for (ThongKeTrangThaiDonHangDTO dto : results) {
+            if (totalDonHang > 0) {
+                BigDecimal tyLe = BigDecimal.valueOf(dto.getSoDonHang())
+                        .multiply(BigDecimal.valueOf(100))
+                        .divide(BigDecimal.valueOf(totalDonHang), 2, RoundingMode.HALF_UP);
+                dto.setTyLe(tyLe);
+            }
+        }
+
+        return results;
+    }
+
+    /**
+     * Thống kê khung giờ đặt vé cao điểm
+     * Dùng cho Heatmap Chart
+     */
+    @Cacheable(value = "thongKeKhungGio", key = "#startDate.toString() + '-' + #endDate.toString()")
+    public List<ThongKeKhungGioDTO> getThongKeKhungGio(LocalDate startDate, LocalDate endDate) {
+        String sql = """
+            SELECT
+                DAYOFWEEK(ngaydatcho) AS Thu,
+                HOUR(ngaydatcho) AS Gio,
+                COUNT(*) AS SoLuong
+            FROM
+                datcho
+            WHERE
+                DATE(ngaydatcho) BETWEEN ? AND ?
+                AND da_xoa = 0
+            GROUP BY
+                DAYOFWEEK(ngaydatcho), HOUR(ngaydatcho)
+            ORDER BY
+                Thu, Gio
+            """;
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            Integer thu = rs.getInt("Thu");
+            String tenThu = getTenThu(thu);
+            Integer gio = rs.getInt("Gio");
+            Long soLuong = rs.getLong("SoLuong");
+            return new ThongKeKhungGioDTO(thu, tenThu, gio, soLuong);
+        }, startDate, endDate);
+    }
+
+    /**
+     * Thống kê tỷ lệ chuyển đổi đặt vé (Funnel Chart)
+     * Các bước: Truy cập -> Tìm kiếm -> Điền thông tin -> Thanh toán thành công
+     * Lưu ý: Do hạn chế về tracking, ta sử dụng các metric có thể đo lường được
+     */
+    @Cacheable(value = "thongKeTyLeChuyenDoi", key = "#startDate.toString() + '-' + #endDate.toString()")
+    public List<ThongKeTyLeChuyenDoiDTO> getThongKeTyLeChuyenDoi(LocalDate startDate, LocalDate endDate) {
+        List<ThongKeTyLeChuyenDoiDTO> results = new ArrayList<>();
+
+        // Bước 1: Số lượt truy cập/tìm kiếm (số đơn hàng đã tạo = số người đi đến bước tìm kiếm và chọn)
+        String sqlBuoc1 = """
+            SELECT COUNT(*)
+            FROM donhang
+            WHERE DATE(ngaydat) BETWEEN ? AND ?
+            AND da_xoa = 0
+            """;
+        Long buoc1 = jdbcTemplate.queryForObject(sqlBuoc1, Long.class, startDate, endDate);
+        if (buoc1 == null) buoc1 = 0L;
+
+        // Bước 2: Số đơn hàng đã có đặt chỗ (đã điền thông tin)
+        String sqlBuoc2 = """
+            SELECT COUNT(DISTINCT dh.madonhang)
+            FROM donhang dh
+            JOIN datcho dc ON dh.madonhang = dc.madonhang
+            WHERE DATE(dh.ngaydat) BETWEEN ? AND ?
+            AND dh.da_xoa = 0
+            """;
+        Long buoc2 = jdbcTemplate.queryForObject(sqlBuoc2, Long.class, startDate, endDate);
+        if (buoc2 == null) buoc2 = 0L;
+
+        // Bước 3: Số đơn hàng thanh toán thành công
+        String sqlBuoc3 = """
+            SELECT COUNT(*)
+            FROM donhang dh
+            JOIN trangthaithanhtoan ttt ON dh.madonhang = ttt.madonhang
+            WHERE DATE(dh.ngaydat) BETWEEN ? AND ?
+            AND ttt.dathanhtoan = 1
+            AND dh.da_xoa = 0
+            """;
+        Long buoc3 = jdbcTemplate.queryForObject(sqlBuoc3, Long.class, startDate, endDate);
+        if (buoc3 == null) buoc3 = 0L;
+
+        // Bước 4: Số hóa đơn phát hành (hoàn tất quy trình)
+        String sqlBuoc4 = """
+            SELECT COUNT(*)
+            FROM hoadon
+            WHERE DATE(ngaylap) BETWEEN ? AND ?
+            AND trangthai = 'DA_PHAT_HANH'
+            AND da_xoa = 0
+            """;
+        Long buoc4 = jdbcTemplate.queryForObject(sqlBuoc4, Long.class, startDate, endDate);
+        if (buoc4 == null) buoc4 = 0L;
+
+        // Tính tỷ lệ chuyển đổi
+        BigDecimal base = BigDecimal.valueOf(buoc1 > 0 ? buoc1 : 1);
+
+        results.add(new ThongKeTyLeChuyenDoiDTO("Tìm kiếm chuyến bay", buoc1,
+                BigDecimal.valueOf(100).setScale(2, RoundingMode.HALF_UP), 1));
+
+        results.add(new ThongKeTyLeChuyenDoiDTO("Điền thông tin hành khách", buoc2,
+                BigDecimal.valueOf(buoc2 * 100.0 / buoc1).setScale(2, RoundingMode.HALF_UP), 2));
+
+        results.add(new ThongKeTyLeChuyenDoiDTO("Thanh toán thành công", buoc3,
+                BigDecimal.valueOf(buoc3 * 100.0 / buoc1).setScale(2, RoundingMode.HALF_UP), 3));
+
+        results.add(new ThongKeTyLeChuyenDoiDTO("Xuất vé thành công", buoc4,
+                BigDecimal.valueOf(buoc4 * 100.0 / buoc1).setScale(2, RoundingMode.HALF_UP), 4));
+
+        return results;
+    }
+
+    /**
+     * So sánh cùng kỳ (Grouped Bar Chart)
+     * So sánh kỳ hiện tại với kỳ trước
+     */
+    public List<ThongKeSoSanhCungKyDTO> getSoSanhCungKy(LocalDate startDate, LocalDate endDate, String loaiKy) {
+        List<ThongKeSoSanhCungKyDTO> results = new ArrayList<>();
+
+        // Tính kỳ hiện tại
+        LocalDate currentStart = startDate;
+        LocalDate currentEnd = endDate;
+
+        // Tính kỳ trước
+        LocalDate prevStart;
+        LocalDate prevEnd;
+
+        String tenKyHienTai;
+        String tenKyTruoc;
+
+        switch (loaiKy.toUpperCase()) {
+            case "MONTH":
+                tenKyHienTai = "Tháng này";
+                tenKyTruoc = "Tháng trước";
+                prevStart = currentStart.minusMonths(1);
+                prevEnd = currentEnd.minusMonths(1);
+                break;
+            case "YEAR":
+                tenKyHienTai = "Năm nay";
+                tenKyTruoc = "Năm trước";
+                prevStart = currentStart.minusYears(1);
+                prevEnd = currentEnd.minusYears(1);
+                break;
+            default:
+                tenKyHienTai = "Kỳ này";
+                tenKyTruoc = "Kỳ trước";
+                prevStart = currentStart.minusWeeks(1);
+                prevEnd = currentEnd.minusWeeks(1);
+        }
+
+        // Query cho kỳ hiện tại
+        String sqlDoanhThu = """
+            SELECT COALESCE(SUM(hd.tongthanhtoan), 0)
+            FROM hoadon hd
+            WHERE hd.trangthai = 'DA_PHAT_HANH'
+            AND hd.da_xoa = 0
+            AND DATE(hd.ngaylap) BETWEEN ? AND ?
+            """;
+
+        String sqlSoVe = """
+            SELECT COUNT(*)
+            FROM datcho dc
+            JOIN donhang dh ON dc.madonhang = dh.madonhang
+            JOIN trangthaithanhtoan ttt ON dh.madonhang = ttt.madonhang
+            WHERE ttt.dathanhtoan = 1
+            AND DATE(dc.ngaydatcho) BETWEEN ? AND ?
+            """;
+
+        String sqlSoDonHang = """
+            SELECT COUNT(*)
+            FROM donhang
+            WHERE DATE(ngaydat) BETWEEN ? AND ?
+            AND da_xoa = 0
+            """;
+
+        // Dữ liệu kỳ hiện tại
+        BigDecimal doanhThuHienTai = jdbcTemplate.queryForObject(sqlDoanhThu, BigDecimal.class, currentStart, currentEnd);
+        if (doanhThuHienTai == null) doanhThuHienTai = BigDecimal.ZERO;
+
+        Long soVeHienTai = jdbcTemplate.queryForObject(sqlSoVe, Long.class, currentStart, currentEnd);
+        if (soVeHienTai == null) soVeHienTai = 0L;
+
+        Long soDonHangHienTai = jdbcTemplate.queryForObject(sqlSoDonHang, Long.class, currentStart, currentEnd);
+        if (soDonHangHienTai == null) soDonHangHienTai = 0L;
+
+        // Dữ liệu kỳ trước
+        BigDecimal doanhThuTruoc = jdbcTemplate.queryForObject(sqlDoanhThu, BigDecimal.class, prevStart, prevEnd);
+        if (doanhThuTruoc == null) doanhThuTruoc = BigDecimal.ZERO;
+
+        Long soVeTruoc = jdbcTemplate.queryForObject(sqlSoVe, Long.class, prevStart, prevEnd);
+        if (soVeTruoc == null) soVeTruoc = 0L;
+
+        Long soDonHangTruoc = jdbcTemplate.queryForObject(sqlSoDonHang, Long.class, prevStart, prevEnd);
+        if (soDonHangTruoc == null) soDonHangTruoc = 0L;
+
+        results.add(new ThongKeSoSanhCungKyDTO(tenKyHienTai, doanhThuHienTai, soVeHienTai, soDonHangHienTai));
+        results.add(new ThongKeSoSanhCungKyDTO(tenKyTruoc, doanhThuTruoc, soVeTruoc, soDonHangTruoc));
+
+        return results;
+    }
+
+    // ========================================
+    // HELPER METHODS
+    // ========================================
+
+    private String getMoTaTrangThai(String trangThai) {
+        return switch (trangThai) {
+            case "CHỜ THANH TOÁN" -> "Đang giữ chỗ";
+            case "ĐÃ THANH TOÁN" -> "Xuất vé thành công";
+            case "ĐÃ HỦY" -> "Đã hủy";
+            default -> trangThai;
+        };
+    }
+
+    private String getTenThu(int thu) {
+        return switch (thu) {
+            case 1 -> "Chủ Nhật";
+            case 2 -> "Thứ 2";
+            case 3 -> "Thứ 3";
+            case 4 -> "Thứ 4";
+            case 5 -> "Thứ 5";
+            case 6 -> "Thứ 6";
+            case 7 -> "Thứ 7";
+            default -> "";
+        };
     }
 }

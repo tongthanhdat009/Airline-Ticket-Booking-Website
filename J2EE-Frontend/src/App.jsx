@@ -26,6 +26,11 @@ import QuanLyVaiTro from "./pages/QuanLy/QuanLyVaiTro"
 import QuanLyPhanQuyen from "./pages/QuanLy/QuanLyPhanQuyen"
 import QuanLyHangVe from "./pages/QuanLy/QuanLyHangVe"
 import ChinhSuaSoDoGhe from "./pages/QuanLy/ChinhSuaSoDoGhe"
+import XuatBaoCao from "./pages/QuanLy/XuatBaoCao"
+import DoiSoatGiaoDich from "./pages/QuanLy/DoiSoatGiaoDich"
+import QuanLyBannerTinTuc from "./pages/QuanLy/QuanLyBannerTinTuc"
+import LichSuGiaoDichVNPay from "./pages/QuanLy/LichSuGiaoDichVNPay"
+import HoTroLienHe from "./pages/QuanLy/HoTroLienHe"
 import DichVuChuyenBay from "./pages/KhachHang/DichVuChuyenBay"
 import DichVuKhac from "./pages/KhachHang/DichVuKhac"
 import TraCuuChuyenBay from "./pages/KhachHang/TraCuuChuyenBay"
@@ -141,6 +146,11 @@ function AppContent() {
             <Route path="PhanQuyen" element={<QuanLyPhanQuyen />} />
             <Route path="HangVe" element={<QuanLyHangVe />} />
             <Route path="MayBay/:maMayBay/ghe" element={<ChinhSuaSoDoGhe />} />
+            <Route path="XuatBaoCao" element={<XuatBaoCao />} />
+            <Route path="DoiSoatGiaoDich" element={<DoiSoatGiaoDich />} />
+            <Route path="BannerTinTuc" element={<QuanLyBannerTinTuc />} />
+            <Route path="LichSuGiaoDichVNPay" element={<LichSuGiaoDichVNPay />} />
+            <Route path="HoTroLienHe" element={<HoTroLienHe />} />
           </Route>
         </Routes>
       </main>

@@ -1,4 +1,4 @@
-import apiClient, { loginAndSetTokens } from './apiClient';
+import apiClient, { loginAndSetTokens, getRefreshToken } from './apiClient';
 import { setAdminUserInfo, clearAdminAuthCookies } from '../utils/cookieUtils';
 
 const AUTH_API_URL = '/admin/dangnhap';
@@ -6,8 +6,8 @@ const AUTH_API_URL = '/admin/dangnhap';
 /**
  * Đăng nhập admin với multi-role và permissions
  * @param {Object} credentials - { username, password }
- * @returns {Object} - { accessToken, roles, permissions, username }
- * NOTE: refreshToken KHÔNG được trả về nữa, nó được backend set vào httpOnly cookie
+ * @returns {Object} - { accessToken, refreshToken, roles, permissions, username }
+ * NOTE: refreshToken giờ được trả về trong response và lưu vào localStorage
  */
 export const loginAdmin = async (credentials) => {
     try {
@@ -16,9 +16,9 @@ export const loginAdmin = async (credentials) => {
             matKhau: credentials.password
         });
 
-        // Lưu access token - refresh token đã được backend set vào httpOnly cookie
+        // Lưu cả access token và refresh token
         if (response.data.accessToken) {
-            loginAndSetTokens('admin', response.data.accessToken);
+            loginAndSetTokens('admin', response.data.accessToken, response.data.refreshToken);
 
             // Lưu thông tin user với roles và permissions
             const userInfo = {
@@ -39,15 +39,20 @@ export const loginAdmin = async (credentials) => {
 // Đăng xuất
 export const logout = async () => {
     try {
-        // SECURITY: Refresh token giờ ở httpOnly cookie, frontend không thể truy cập
-        // Backend sẽ tự động đọc refreshToken từ cookie và revoke nó
-        // Gọi logout API để backend revoke refresh token và xóa cookie
-        await apiClient.post('/admin/dangxuat');
+        // Gửi refreshToken trong body để backend revoke nó
+        const refreshToken = getRefreshToken('admin');
+        await apiClient.post('/admin/dangxuat', { refreshToken });
     } catch (error) {
         console.error("Error calling logout API:", error);
     } finally {
-        // Luôn xóa local cookies ngay cả khi API fail
+        // Luôn xóa local tokens ngay cả khi API fail
         clearAdminAuthCookies();
+        // Xóa refreshToken từ localStorage
+        try {
+            localStorage.removeItem('admin_refresh_token');
+        } catch (e) {
+            console.error("Error removing refresh token:", e);
+        }
     }
 };
 
@@ -73,7 +78,12 @@ export const logoutAllDevices = async () => {
         console.error("Error logging out all devices:", error);
         throw error;
     } finally {
-        // Xóa local cookies
+        // Xóa local cookies và refreshToken
         clearAdminAuthCookies();
+        try {
+            localStorage.removeItem('admin_refresh_token');
+        } catch (e) {
+            console.error("Error removing refresh token:", e);
+        }
     }
 };

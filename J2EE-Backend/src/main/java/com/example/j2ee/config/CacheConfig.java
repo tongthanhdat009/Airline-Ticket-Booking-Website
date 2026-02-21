@@ -22,7 +22,12 @@ public class CacheConfig {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager(
                 "thongKeTongQuan",
                 "doanhThuTheoNgay",
-                "thongKeNgay");
+                "thongKeNgay",
+                "topChangBay",
+                "thongKeTrangThaiDonHang",
+                "thongKeKhungGio",
+                "thongKeTyLeChuyenDoi",
+                "soSanhCungKy");
 
         cacheManager.setCaffeine(Caffeine.newBuilder()
                 .expireAfterWrite(5, TimeUnit.MINUTES) // TTL 5 phút

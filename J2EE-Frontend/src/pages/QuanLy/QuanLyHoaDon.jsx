@@ -3,7 +3,6 @@ import {
   FaSearch,
   FaEye,
   FaFilePdf,
-  FaFileExcel,
   FaCalendar,
   FaTimes,
   FaPrint
@@ -180,33 +179,6 @@ const QuanLyHoaDon = () => {
     }
   };
 
-  // Export Excel
-  const handleExportExcel = async () => {
-    try {
-      setExportLoading(true);
-      const excelBlob = await hoaDonApi.exportHoaDonExcel(filters);
-      
-      // Create download link
-      const url = window.URL.createObjectURL(new Blob([excelBlob], { 
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
-      }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `danh_sach_hoa_don_${new Date().toISOString().split('T')[0]}.xlsx`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-      
-      showToast('Xuất Excel thành công!', 'success');
-    } catch (err) {
-      console.error('Error exporting Excel:', err);
-      showToast('Lỗi khi xuất Excel', 'error');
-    } finally {
-      setExportLoading(false);
-    }
-  };
-
   // View detail - gọi API để lấy chi tiết đầy đủ
   const handleViewDetail = async (hoaDon) => {
     try {
@@ -352,15 +324,6 @@ const QuanLyHoaDon = () => {
             <option value="DA_HUY">Đã hủy</option>
             <option value="DIEU_CHINH">Điều chỉnh</option>
           </select>
-
-          <button
-            onClick={handleExportExcel}
-            disabled={exportLoading || hoaDonList.length === 0}
-            className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-5 py-3 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <FaFileExcel />
-            <span className="hidden sm:inline">Xuất Excel</span>
-          </button>
 
           <button
             onClick={() => loadData()}

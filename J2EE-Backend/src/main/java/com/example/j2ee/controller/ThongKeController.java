@@ -7,6 +7,11 @@ import com.example.j2ee.dto.ThongKeHangVeDTO;
 import com.example.j2ee.dto.ThongKeNgayDTO;
 import com.example.j2ee.dto.ThongKeSoSanhDTO;
 import com.example.j2ee.dto.ThongKeTongQuanDTO;
+import com.example.j2ee.dto.ThongKeChangBayDTO;
+import com.example.j2ee.dto.ThongKeTrangThaiDonHangDTO;
+import com.example.j2ee.dto.ThongKeKhungGioDTO;
+import com.example.j2ee.dto.ThongKeTyLeChuyenDoiDTO;
+import com.example.j2ee.dto.ThongKeSoSanhCungKyDTO;
 import com.example.j2ee.annotation.RequirePermission;
 import com.example.j2ee.service.JasperRevenueReportService;
 import com.example.j2ee.service.ThongKeService;
@@ -42,9 +47,6 @@ public class ThongKeController {
     /**
      * GET: /admin/dashboard/thongke/tongquan
      * Lấy thống kê tổng quan (KPI cards)
-     * 
-     * @param startDate Ngày bắt đầu (optional, mặc định 7 ngày trước)
-     * @param endDate   Ngày kết thúc (optional, mặc định hôm nay)
      */
     @GetMapping("/tongquan")
     @RequirePermission(feature = "REPORT", action = "VIEW")
@@ -52,7 +54,6 @@ public class ThongKeController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         try {
-            // Nếu không có tham số, mặc định lấy 7 ngày qua
             if (startDate == null) {
                 startDate = LocalDate.now().minusDays(6);
             }
@@ -71,9 +72,6 @@ public class ThongKeController {
     /**
      * GET: /admin/dashboard/thongke/doanhthu-ngay
      * Lấy xu hướng doanh thu theo ngày (Line chart)
-     * 
-     * @param startDate Ngày bắt đầu (optional, mặc định 7 ngày trước)
-     * @param endDate   Ngày kết thúc (optional, mặc định hôm nay)
      */
     @GetMapping("/doanhthu-ngay")
     @RequirePermission(feature = "REPORT", action = "VIEW")
@@ -81,7 +79,6 @@ public class ThongKeController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         try {
-            // Nếu không có tham số, mặc định lấy 7 ngày qua
             if (startDate == null) {
                 startDate = LocalDate.now().minusDays(6);
             }
@@ -100,9 +97,6 @@ public class ThongKeController {
     /**
      * GET: /admin/dashboard/thongke/doanhthu-dichvu
      * Lấy cơ cấu doanh thu dịch vụ (Bar chart)
-     * 
-     * @param startDate Ngày bắt đầu (optional, mặc định 7 ngày trước)
-     * @param endDate   Ngày kết thúc (optional, mặc định hôm nay)
      */
     @GetMapping("/doanhthu-dichvu")
     @RequirePermission(feature = "REPORT", action = "VIEW")
@@ -110,7 +104,6 @@ public class ThongKeController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         try {
-            // Nếu không có tham số, mặc định lấy 7 ngày qua
             if (startDate == null) {
                 startDate = LocalDate.now().minusDays(6);
             }
@@ -129,9 +122,6 @@ public class ThongKeController {
     /**
      * GET: /admin/dashboard/thongke/doanhthu-hangve
      * Lấy cơ cấu doanh thu theo hạng vé (Pie chart)
-     * 
-     * @param startDate Ngày bắt đầu (optional, mặc định 7 ngày trước)
-     * @param endDate   Ngày kết thúc (optional, mặc định hôm nay)
      */
     @GetMapping("/doanhthu-hangve")
     @RequirePermission(feature = "REPORT", action = "VIEW")
@@ -139,7 +129,6 @@ public class ThongKeController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         try {
-            // Nếu không có tham số, mặc định lấy 7 ngày qua
             if (startDate == null) {
                 startDate = LocalDate.now().minusDays(6);
             }
@@ -174,10 +163,6 @@ public class ThongKeController {
     /**
      * GET: /admin/dashboard/thongke/so-sanh
      * Lấy thống kê so sánh giữa các kỳ
-     * 
-     * @param tuNgay  Ngày bắt đầu (required)
-     * @param denNgay Ngày kết thúc (required)
-     * @param kyTruoc Kỳ so sánh: WEEK, MONTH, YEAR (mặc định WEEK)
      */
     @GetMapping("/so-sanh")
     @RequirePermission(feature = "REPORT", action = "VIEW")
@@ -196,10 +181,7 @@ public class ThongKeController {
 
     /**
      * GET: /admin/dashboard/thongke/export-pdf
-     * Xuất báo cáo thống kê doanh thu ra file PDF sử dụng JasperReports
-     * 
-     * @param startDate Ngày bắt đầu (optional)
-     * @param endDate   Ngày kết thúc (optional)
+     * Xuất báo cáo thống kê doanh thu ra file PDF
      */
     @GetMapping("/export-pdf")
     @RequirePermission(feature = "REPORT", action = "VIEW")
@@ -207,14 +189,9 @@ public class ThongKeController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         try {
-            // Tạo tên file với ngày tháng
-            String fileName = "bao-cao-thong-ke-" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                    + ".pdf";
-
-            // Generate PDF sử dụng JasperReports
+            String fileName = "bao-cao-thong-ke-" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + ".pdf";
             byte[] pdfBytes = jasperRevenueReportService.generateRevenueReport(startDate, endDate);
 
-            // Set headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDispositionFormData("attachment", fileName);
@@ -223,6 +200,137 @@ public class ThongKeController {
             return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
         } catch (Exception ex) {
             return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    // ========================================
+    // CAC API MOI - BO SUNG
+    // ========================================
+
+    /**
+     * GET: /admin/dashboard/thongke/top-chang-bay
+     * Top chặng bay phổ biến nhất (Horizontal Bar Chart)
+     */
+    @GetMapping("/top-chang-bay")
+    @RequirePermission(feature = "REPORT", action = "VIEW")
+    public ResponseEntity<ApiResponse<List<ThongKeChangBayDTO>>> getTopChangBay(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false, defaultValue = "10") int limit) {
+        try {
+            if (startDate == null) {
+                startDate = LocalDate.now().minusDays(29);
+            }
+            if (endDate == null) {
+                endDate = LocalDate.now();
+            }
+
+            List<ThongKeChangBayDTO> data = thongKeService.getTopChangBay(startDate, endDate, limit);
+            return ResponseEntity.ok(ApiResponse.success("Lấy top chặng bay thành công", data));
+        } catch (Exception ex) {
+            return ResponseEntity.status(500)
+                    .body(ApiResponse.error("Lỗi khi lấy top chặng bay: " + ex.getMessage()));
+        }
+    }
+
+    /**
+     * GET: /admin/dashboard/thongke/trang-thai-don-hang
+     * Thống kê tỷ lệ trạng thái đơn hàng (Pie Chart)
+     */
+    @GetMapping("/trang-thai-don-hang")
+    @RequirePermission(feature = "REPORT", action = "VIEW")
+    public ResponseEntity<ApiResponse<List<ThongKeTrangThaiDonHangDTO>>> getThongKeTrangThaiDonHang(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        try {
+            if (startDate == null) {
+                startDate = LocalDate.now().minusDays(29);
+            }
+            if (endDate == null) {
+                endDate = LocalDate.now();
+            }
+
+            List<ThongKeTrangThaiDonHangDTO> data = thongKeService.getThongKeTrangThaiDonHang(startDate, endDate);
+            return ResponseEntity.ok(ApiResponse.success("Lấy thống kê trạng thái đơn hàng thành công", data));
+        } catch (Exception ex) {
+            return ResponseEntity.status(500)
+                    .body(ApiResponse.error("Lỗi khi lấy thống kê trạng thái đơn hàng: " + ex.getMessage()));
+        }
+    }
+
+    /**
+     * GET: /admin/dashboard/thongke/khung-gio
+     * Thống kê khung giờ đặt vé cao điểm (Heatmap)
+     */
+    @GetMapping("/khung-gio")
+    @RequirePermission(feature = "REPORT", action = "VIEW")
+    public ResponseEntity<ApiResponse<List<ThongKeKhungGioDTO>>> getThongKeKhungGio(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        try {
+            if (startDate == null) {
+                startDate = LocalDate.now().minusDays(29);
+            }
+            if (endDate == null) {
+                endDate = LocalDate.now();
+            }
+
+            List<ThongKeKhungGioDTO> data = thongKeService.getThongKeKhungGio(startDate, endDate);
+            return ResponseEntity.ok(ApiResponse.success("Lấy thống kê khung giờ thành công", data));
+        } catch (Exception ex) {
+            return ResponseEntity.status(500)
+                    .body(ApiResponse.error("Lỗi khi lấy thống kê khung giờ: " + ex.getMessage()));
+        }
+    }
+
+    /**
+     * GET: /admin/dashboard/thongke/ty-le-chuyen-doi
+     * Thống kê tỷ lệ chuyển đổi đặt vé (Funnel Chart)
+     */
+    @GetMapping("/ty-le-chuyen-doi")
+    @RequirePermission(feature = "REPORT", action = "VIEW")
+    public ResponseEntity<ApiResponse<List<ThongKeTyLeChuyenDoiDTO>>> getThongKeTyLeChuyenDoi(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        try {
+            if (startDate == null) {
+                startDate = LocalDate.now().minusDays(29);
+            }
+            if (endDate == null) {
+                endDate = LocalDate.now();
+            }
+
+            List<ThongKeTyLeChuyenDoiDTO> data = thongKeService.getThongKeTyLeChuyenDoi(startDate, endDate);
+            return ResponseEntity.ok(ApiResponse.success("Lấy thống kê tỷ lệ chuyển đổi thành công", data));
+        } catch (Exception ex) {
+            return ResponseEntity.status(500)
+                    .body(ApiResponse.error("Lỗi khi lấy thống kê tỷ lệ chuyển đổi: " + ex.getMessage()));
+        }
+    }
+
+    /**
+     * GET: /admin/dashboard/thongke/so-sanh-cung-ky
+     * So sánh cùng kỳ (Grouped Bar Chart)
+     */
+    @GetMapping("/so-sanh-cung-ky")
+    @RequirePermission(feature = "REPORT", action = "VIEW")
+    public ResponseEntity<ApiResponse<List<ThongKeSoSanhCungKyDTO>>> getSoSanhCungKy(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false, defaultValue = "MONTH") String loaiKy) {
+        try {
+            if (startDate == null) {
+                startDate = LocalDate.now().minusDays(29);
+            }
+            if (endDate == null) {
+                endDate = LocalDate.now();
+            }
+
+            List<ThongKeSoSanhCungKyDTO> data = thongKeService.getSoSanhCungKy(startDate, endDate, loaiKy);
+            return ResponseEntity.ok(ApiResponse.success("Lấy thống kê so sánh cùng kỳ thành công", data));
+        } catch (Exception ex) {
+            return ResponseEntity.status(500)
+                    .body(ApiResponse.error("Lỗi khi lấy thống kê so sánh cùng kỳ: " + ex.getMessage()));
         }
     }
 }
