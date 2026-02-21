@@ -37,13 +37,18 @@ public class JwtFilter extends OncePerRequestFilter {
         this.adminService = adminService;
     }
 
-    // Skip filter cho public endpoints và static resources
+    // Skip filter cho public endpoints - KHÔNG cần /api prefix vì đã có context-path=/api
+    // request.getRequestURI() sẽ trả về full path bao gồm /api
     private static final List<String> SKIP_PREFIXES = List.of(
-            "/dangnhap", "/dangky", "/admin/dangnhap",
-            "/ai/", "/AnhDichVuCungCap/", "/static/",
-            "/admin/dashboard/dichvu/anh/", "/admin/dashboard/dichvu/luachon/anh/",
-            "/api/dangnhap", "/api/dangky", "/api/admin/dangnhap", "/api/admin/current-user",
-            "/api/ai/", "/api/AnhDichVuCungCap/", "/api/static/"
+            "/api/dangnhap", "/api/dangky", "/api/dangxuat", "/api/current-user",
+            "/api/admin/dangnhap", "/api/admin/current-user", "/api/admin/dangxuat",
+            "/api/auth/", "/api/forgot-password/",
+            "/api/oauth2/", "/api/login/oauth2/",
+            "/api/vnpay/", "/api/checkin/", "/api/client/datcho/",
+            "/api/ai/", "/api/static/", "/api/sanbay/",
+            "/api/admin/dashboard/dichvu/anh/", "/api/admin/dashboard/dichvu/luachon/anh/",
+            "/api/admin/dashboard/chuyenbay/", "/api/countries/",
+            "/ws/"
     );
 
     @Override
@@ -51,11 +56,11 @@ public class JwtFilter extends OncePerRequestFilter {
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) return true;
         String path = request.getRequestURI();
         for (String prefix : SKIP_PREFIXES) {
-            if (path.equals(prefix) || path.startsWith(prefix)) return true;
+            if (path.startsWith(prefix)) return true;
         }
         String lower = path.toLowerCase();
         return lower.endsWith(".svg") || lower.endsWith(".png") || lower.endsWith(".jpg")
-                || lower.endsWith(".jpeg") || lower.endsWith(".gif");
+                || lower.endsWith(".jpeg") || lower.endsWith(".gif") || lower.endsWith(".webp");
     }
 
     @Override
@@ -69,8 +74,9 @@ public class JwtFilter extends OncePerRequestFilter {
             if (token != null) {
                 Object typObj = jwtUtil.getClaim(token, "typ");
                 if ("refresh".equals(typObj)) {
-                    // Cố dùng refresh token gọi API -> trả 401
-                    unauthorized(response, "Refresh token is not allowed for this endpoint");
+                    // Refresh token: skip, không set authentication, để chain đi qua
+                    // Endpoint cần auth sẽ bị SecurityConfig chặn
+                    chain.doFilter(request, response);
                     return;
                 }
 
@@ -122,7 +128,9 @@ public class JwtFilter extends OncePerRequestFilter {
             // - Endpoint authenticated() sẽ bị Spring Security chặn và trả 401 qua entrypoint.
             chain.doFilter(request, response);
         } catch (JwtException ex) {
-            unauthorized(response, "Invalid access token"); // 401
+            // Token invalid (định dạng sai, signature sai, etc.): bỏ qua và tiếp tục chain
+            // Endpoint permitAll() vẫn work, endpoint cần auth sẽ bị SecurityConfig chặn
+            chain.doFilter(request, response);
         }
     }
 
