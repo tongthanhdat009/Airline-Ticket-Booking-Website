@@ -146,7 +146,7 @@ jobs:
           overwrite: true
 
       # ===== FINALIZE DEPLOY =====
-        - name: Finalize Deployment
+      - name: Finalize Deployment
           uses: appleboy/ssh-action@v1.0.3
           with:
             host: ${{ secrets.PRODUCTION_HOST }}
