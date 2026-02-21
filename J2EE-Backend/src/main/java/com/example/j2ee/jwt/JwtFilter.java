@@ -77,6 +77,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     String username = jwtUtil.getSubject(token);
                     if (username != null) {
                         setAuthentication(token, username);
+                        logger.debug("Authenticated user: " + username + " for " + request.getRequestURI());
                     }
                 }
             }
@@ -86,7 +87,9 @@ public class JwtFilter extends OncePerRequestFilter {
             // → Endpoint permitAll() vẫn hoạt động bình thường.
             // → Endpoint cần auth sẽ bị Spring Security chặn → 401 qua AuthenticationEntryPoint.
             SecurityContextHolder.clearContext();
-            logger.debug("JWT authentication failed, continuing as anonymous: " + ex.getMessage());
+            logger.warn("JWT auth failed for " + request.getRequestURI()
+                    + " (" + ex.getClass().getSimpleName() + ": " + ex.getMessage()
+                    + "). Continuing as anonymous.");
         }
 
         // Bước 2: LUÔN tiếp tục filter chain — không bao giờ block tại đây
