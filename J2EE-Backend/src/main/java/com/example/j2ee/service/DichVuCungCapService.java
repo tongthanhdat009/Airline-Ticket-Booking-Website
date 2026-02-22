@@ -51,17 +51,36 @@ public class DichVuCungCapService {
     @PostConstruct
     public void init() {
         try {
-            // Tạo đường dẫn: project-root/uploads/AnhDichVuCungCap và project-root/uploads/AnhLuaChonDichVu
-            Path baseUploadPath = Paths.get(System.getProperty("user.dir")).resolve(uploadDir);
+            // Xác định đường dẫn base upload
+            // Nếu uploadDir là đường dẫn tuyệt đối (vd: /var/www/uploads) -> dùng trực tiếp
+            // Nếu uploadDir là đường dẫn tương đối (vd: uploads) -> resolve từ project root
+            Path uploadPath = Paths.get(uploadDir);
+            Path baseUploadPath;
+            if (uploadPath.isAbsolute()) {
+                baseUploadPath = uploadPath;
+            } else {
+                baseUploadPath = Paths.get(System.getProperty("user.dir")).resolve(uploadDir);
+            }
+
             this.storageDir = baseUploadPath.resolve("AnhDichVuCungCap");
             this.storageDirLuaChon = baseUploadPath.resolve("AnhLuaChonDichVu");
 
             // Tạo thư mục nếu chưa có
             Files.createDirectories(storageDir);
             Files.createDirectories(storageDirLuaChon);
-            log.info("Upload directory: {}", baseUploadPath.toAbsolutePath());
+
+            // Log chi tiết để debug trên VPS
+            log.info("===========================================");
+            log.info("FILE UPLOAD CONFIGURATION:");
+            log.info("Upload dir config value: {}", uploadDir);
+            log.info("Base upload path: {}", baseUploadPath.toAbsolutePath());
+            log.info("Storage dir (DichVu): {}", storageDir.toAbsolutePath());
+            log.info("Storage dir (LuaChon): {}", storageDirLuaChon.toAbsolutePath());
+            log.info("Directory exists (DichVu): {}", Files.exists(storageDir));
+            log.info("Directory exists (LuaChon): {}", Files.exists(storageDirLuaChon));
+            log.info("===========================================");
         } catch (IOException e) {
-            log.error("Không thể tạo thư mục upload: {}", e.getMessage());
+            log.error("Không thể tạo thư mục upload: {}", e.getMessage(), e);
             // Fallback: dùng thư mục uploads tại project root
             Path fallback = Paths.get(System.getProperty("user.dir"), "uploads");
             this.storageDir = fallback.resolve("AnhDichVuCungCap");
@@ -69,8 +88,9 @@ public class DichVuCungCapService {
             try {
                 Files.createDirectories(storageDir);
                 Files.createDirectories(storageDirLuaChon);
+                log.warn("Using fallback directory: {}", fallback.toAbsolutePath());
             } catch (IOException ex) {
-                log.error("Không thể tạo thư mục upload fallback: {}", ex.getMessage());
+                log.error("Không thể tạo thư mục upload fallback: {}", ex.getMessage(), ex);
             }
         }
     }
