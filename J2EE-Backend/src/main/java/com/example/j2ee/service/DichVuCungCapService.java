@@ -6,10 +6,6 @@ import com.example.j2ee.repository.DichVuChuyenBayRepository;
 import com.example.j2ee.repository.DichVuCungCapRepository;
 import com.example.j2ee.repository.LuaChonDichVuRepository;
 import com.example.j2ee.repository.DatChoDichVuRepository;
-import jakarta.annotation.PostConstruct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,18 +21,13 @@ import java.util.UUID;
 
 @Service
 public class DichVuCungCapService {
-    private static final Logger log = LoggerFactory.getLogger(DichVuCungCapService.class);
-
     private final DichVuCungCapRepository dichVuCungCapRepository;
     private final LuaChonDichVuRepository luaChonDichVuRepository;
     private final DichVuChuyenBayRepository dichVuChuyenBayRepository;
     private final DatChoDichVuRepository datChoDichVuRepository;
 
-    @Value("${file.upload-dir:uploads}")
-    private String uploadDir;
-
-    private Path storageDir;
-    private Path storageDirLuaChon;
+    private static final Path STORAGE_DIR = Paths.get("target", "classes", "static", "AnhDichVuCungCap");
+    private static final Path STORAGE_DIR_LUACHON = Paths.get("target", "classes", "static", "AnhLuaChonDichVu");
 
     public DichVuCungCapService(DichVuCungCapRepository dichVuCungCapRepository,
                                 LuaChonDichVuRepository luaChonDichVuRepository,
@@ -46,61 +37,6 @@ public class DichVuCungCapService {
         this.luaChonDichVuRepository = luaChonDichVuRepository;
         this.dichVuChuyenBayRepository = dichVuChuyenBayRepository;
         this.datChoDichVuRepository = datChoDichVuRepository;
-    }
-
-    @PostConstruct
-    public void init() {
-        try {
-            // Xác định đường dẫn base upload
-            // Nếu uploadDir là đường dẫn tuyệt đối (vd: /var/www/uploads) -> dùng trực tiếp
-            // Nếu uploadDir là đường dẫn tương đối (vd: uploads) -> resolve từ project root
-            Path uploadPath = Paths.get(uploadDir);
-            Path baseUploadPath;
-            if (uploadPath.isAbsolute()) {
-                baseUploadPath = uploadPath;
-            } else {
-                baseUploadPath = Paths.get(System.getProperty("user.dir")).resolve(uploadDir);
-            }
-
-            this.storageDir = baseUploadPath.resolve("AnhDichVuCungCap");
-            this.storageDirLuaChon = baseUploadPath.resolve("AnhLuaChonDichVu");
-
-            // Tạo thư mục nếu chưa có
-            Files.createDirectories(storageDir);
-            Files.createDirectories(storageDirLuaChon);
-
-            // Log chi tiết để debug trên VPS
-            log.info("===========================================");
-            log.info("FILE UPLOAD CONFIGURATION:");
-            log.info("Upload dir config value: {}", uploadDir);
-            log.info("Base upload path: {}", baseUploadPath.toAbsolutePath());
-            log.info("Storage dir (DichVu): {}", storageDir.toAbsolutePath());
-            log.info("Storage dir (LuaChon): {}", storageDirLuaChon.toAbsolutePath());
-            log.info("Directory exists (DichVu): {}", Files.exists(storageDir));
-            log.info("Directory exists (LuaChon): {}", Files.exists(storageDirLuaChon));
-            log.info("===========================================");
-        } catch (IOException e) {
-            log.error("Không thể tạo thư mục upload: {}", e.getMessage(), e);
-            // Fallback: dùng thư mục uploads tại project root
-            Path fallback = Paths.get(System.getProperty("user.dir"), "uploads");
-            this.storageDir = fallback.resolve("AnhDichVuCungCap");
-            this.storageDirLuaChon = fallback.resolve("AnhLuaChonDichVu");
-            try {
-                Files.createDirectories(storageDir);
-                Files.createDirectories(storageDirLuaChon);
-                log.warn("Using fallback directory: {}", fallback.toAbsolutePath());
-            } catch (IOException ex) {
-                log.error("Không thể tạo thư mục upload fallback: {}", ex.getMessage(), ex);
-            }
-        }
-    }
-
-    public Path getStorageDir() {
-        return storageDir;
-    }
-
-    public Path getStorageDirLuaChon() {
-        return storageDirLuaChon;
     }
 
     public List<DichVuCungCap> getAllDichVuCungCap(){
@@ -225,14 +161,14 @@ public class DichVuCungCapService {
         }
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
         String safeName = (timestamp + "_" + UUID.randomUUID() + (ext.isEmpty() ? "" : "." + ext)).replaceAll("[^a-zA-Z0-9._-]", "");
-        Path target = storageDir.resolve(safeName);
+        Path target = STORAGE_DIR.resolve(safeName);
         Files.copy(file.getInputStream(), target);
         return safeName;
     }
 
     private void ensureStorageDir() throws IOException {
-        if (!Files.exists(storageDir)) {
-            Files.createDirectories(storageDir);
+        if (!Files.exists(STORAGE_DIR)) {
+            Files.createDirectories(STORAGE_DIR);
         }
     }
 
@@ -253,7 +189,7 @@ public class DichVuCungCapService {
     private void deleteOldImageIfExists(String relativePath) {
         try {
             if (relativePath == null || relativePath.trim().isEmpty()) return;
-            Path p = storageDir.resolve(relativePath);
+            Path p = STORAGE_DIR.resolve(relativePath);
             if (Files.exists(p)) Files.delete(p);
         } catch (Exception ignored) {}
     }
@@ -261,14 +197,14 @@ public class DichVuCungCapService {
     private void deleteOldImageLuaChonIfExists(String relativePath) {
         try {
             if (relativePath == null || relativePath.trim().isEmpty()) return;
-            Path p = storageDirLuaChon.resolve(relativePath);
+            Path p = STORAGE_DIR_LUACHON.resolve(relativePath);
             if (Files.exists(p)) Files.delete(p);
         } catch (Exception ignored) {}
     }
 
     private void ensureStorageDirLuaChon() throws IOException {
-        if (!Files.exists(storageDirLuaChon)) {
-            Files.createDirectories(storageDirLuaChon);
+        if (!Files.exists(STORAGE_DIR_LUACHON)) {
+            Files.createDirectories(STORAGE_DIR_LUACHON);
         }
     }
 
@@ -282,7 +218,7 @@ public class DichVuCungCapService {
         }
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
         String safeName = (timestamp + "_" + UUID.randomUUID() + (ext.isEmpty() ? "" : "." + ext)).replaceAll("[^a-zA-Z0-9._-]", "");
-        Path target = storageDirLuaChon.resolve(safeName);
+        Path target = STORAGE_DIR_LUACHON.resolve(safeName);
         Files.copy(file.getInputStream(), target);
         return safeName;
     }

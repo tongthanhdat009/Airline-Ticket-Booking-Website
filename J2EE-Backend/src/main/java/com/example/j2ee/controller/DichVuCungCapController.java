@@ -5,11 +5,8 @@ import com.example.j2ee.dto.ApiResponse;
 import com.example.j2ee.model.DichVuCungCap;
 import com.example.j2ee.model.LuaChonDichVu;
 import com.example.j2ee.service.DichVuCungCapService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URLConnection;
-import java.nio.file.Path;
 import java.util.List;
 
 @RestController
@@ -174,19 +169,7 @@ public class DichVuCungCapController {
     @GetMapping("/anh/{filename:.+}")
     public ResponseEntity<Resource> getAnh(@PathVariable String filename) {
         try {
-            Path storageDir = dichVuCungCapService.getStorageDir();
-            Path filePath = storageDir.resolve(filename).normalize();
-
-            log.debug("===========================================");
-            log.debug("GET ANH REQUEST:");
-            log.debug("Filename: {}", filename);
-            log.debug("Storage dir: {}", storageDir.toAbsolutePath());
-            log.debug("Full file path: {}", filePath.toAbsolutePath());
-            log.debug("File exists: {}", java.nio.file.Files.exists(filePath));
-            log.debug("File readable: {}", java.nio.file.Files.isReadable(filePath));
-            log.debug("===========================================");
-
-            Resource resource = new UrlResource(filePath.toUri());
+            Resource resource = new ClassPathResource("static/AnhDichVuCungCap/" + filename);
             if (resource.exists() && resource.isReadable()) {
                 String contentType = URLConnection.guessContentTypeFromName(filename);
                 if (contentType == null) {
@@ -200,30 +183,6 @@ public class DichVuCungCapController {
                         .contentType(MediaType.parseMediaType(contentType))
                         .body(resource);
             }
-
-            // Fallback: thử tìm trong classpath resources
-            log.debug("File not found in uploads, trying classpath resources");
-            Resource classpathResource = new ClassPathResource("static/images/dichvu/" + filename);
-            if (classpathResource.exists() && classpathResource.isReadable()) {
-                log.debug("Found in classpath: {}", classpathResource.getURL());
-                String contentType = URLConnection.guessContentTypeFromName(filename);
-                if (contentType == null) {
-                    if (filename.toLowerCase().endsWith(".svg")) {
-                        contentType = "image/svg+xml";
-                    } else {
-                        contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
-                    }
-                }
-                return ResponseEntity.ok()
-                        .contentType(MediaType.parseMediaType(contentType))
-                        .body(classpathResource);
-            }
-
-            log.warn("Image not found in uploads or classpath: {}", filename);
-            return ResponseEntity.notFound().build();
-        } catch (MalformedURLException e) {
-            log.error("MalformedURLException when serving image: {}", e.getMessage(), e);
-            return ResponseEntity.status(500).build();
         } catch (Exception e) {
             log.error("Exception when serving image: {}", e.getMessage(), e);
             return ResponseEntity.status(500).build();
@@ -253,19 +212,7 @@ public class DichVuCungCapController {
     @GetMapping("/luachon/anh/{filename:.+}")
     public ResponseEntity<Resource> getAnhLuaChon(@PathVariable String filename) {
         try {
-            Path storageDirLuaChon = dichVuCungCapService.getStorageDirLuaChon();
-            Path filePath = storageDirLuaChon.resolve(filename).normalize();
-
-            log.debug("===========================================");
-            log.debug("GET ANH LUA CHON REQUEST:");
-            log.debug("Filename: {}", filename);
-            log.debug("Storage dir (LuaChon): {}", storageDirLuaChon.toAbsolutePath());
-            log.debug("Full file path: {}", filePath.toAbsolutePath());
-            log.debug("File exists: {}", java.nio.file.Files.exists(filePath));
-            log.debug("File readable: {}", java.nio.file.Files.isReadable(filePath));
-            log.debug("===========================================");
-
-            Resource resource = new UrlResource(filePath.toUri());
+            Resource resource = new ClassPathResource("static/AnhLuaChonDichVu/" + filename);
             if (resource.exists() && resource.isReadable()) {
                 String contentType = URLConnection.guessContentTypeFromName(filename);
                 if (contentType == null) {
@@ -283,34 +230,6 @@ public class DichVuCungCapController {
                         .contentType(MediaType.parseMediaType(contentType))
                         .body(resource);
             }
-
-            // Fallback: thử tìm trong classpath resources
-            log.debug("Lua chon image not found in uploads, trying classpath resources");
-            Resource classpathResource = new ClassPathResource("static/images/luachon/" + filename);
-            if (classpathResource.exists() && classpathResource.isReadable()) {
-                log.debug("Found in classpath: {}", classpathResource.getURL());
-                String contentType = URLConnection.guessContentTypeFromName(filename);
-                if (contentType == null) {
-                    if (filename.toLowerCase().endsWith(".svg")) {
-                        contentType = "image/svg+xml";
-                    } else if (filename.toLowerCase().endsWith(".png")) {
-                        contentType = "image/png";
-                    } else if (filename.toLowerCase().endsWith(".jpg") || filename.toLowerCase().endsWith(".jpeg")) {
-                        contentType = "image/jpeg";
-                    } else {
-                        contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
-                    }
-                }
-                return ResponseEntity.ok()
-                        .contentType(MediaType.parseMediaType(contentType))
-                        .body(classpathResource);
-            }
-
-            log.warn("Lua chon image not found in uploads or classpath: {}", filename);
-            return ResponseEntity.notFound().build();
-        } catch (MalformedURLException e) {
-            log.error("MalformedURLException when serving lua chon image: {}", e.getMessage(), e);
-            return ResponseEntity.status(500).build();
         } catch (Exception e) {
             log.error("Exception when serving lua chon image: {}", e.getMessage(), e);
             return ResponseEntity.status(500).build();
