@@ -119,6 +119,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/audit-logs/**", "/admin/dangxuat/all").access(dynamicAdminAuthManager)
                         // Public API endpoints (dropdown data, no auth required)
                         .requestMatchers("/sanbay/**").permitAll()
+                        .requestMatchers("/hangve/**").permitAll()
                         .anyRequest().authenticated()
                 )
 
