@@ -58,10 +58,11 @@ public class VNPayController {
     @GetMapping("/payment-callback")
     public void paymentCallback(
             @RequestParam Map<String, String> params,
+            HttpServletRequest request,
             HttpServletResponse response) throws IOException {
-        
+
         try {
-            Map<String, Object> result = vnPayService.handlePaymentReturn(params);
+            Map<String, Object> result = vnPayService.handlePaymentReturn(params, request);
             
             // Lấy frontend URL từ config
             String frontendUrl = vnPayService.getFrontendUrl();
@@ -108,8 +109,10 @@ public class VNPayController {
      * Endpoint này được gọi từ frontend sau khi VNPay redirect về
      */
     @GetMapping("/payment-result")
-    public ResponseEntity<Map<String, Object>> getPaymentResult(@RequestParam Map<String, String> params) {
-        Map<String, Object> result = vnPayService.handlePaymentReturn(params);
+    public ResponseEntity<Map<String, Object>> getPaymentResult(
+            @RequestParam Map<String, String> params,
+            HttpServletRequest request) {
+        Map<String, Object> result = vnPayService.handlePaymentReturn(params, request);
         
         if ((boolean) result.get("success")) {
             return ResponseEntity.ok(result);
