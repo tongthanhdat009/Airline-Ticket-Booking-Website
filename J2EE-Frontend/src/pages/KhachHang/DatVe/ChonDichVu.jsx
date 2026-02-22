@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 
 import { formatCurrencyWithCommas } from "../../../services/utils";
-import { getAssetUrl } from "../../../config/api.config";
+import { getServiceImageUrl } from "../../../config/api.config";
 
 import { getAllDichVuCungCapByChuyenBay } from "../../../services/datVeServices";
 import ChoNgoiPanel from "../../../components/KhachHang/SlidePanel";
@@ -184,7 +184,7 @@ function ChonDichVu() {
                                 onClick={() => handleOpenPanel(dichVu)}
                             >
                                 <img
-                                    src={getAssetUrl(`/admin/dashboard/dichvu/anh/${dichVu.anh}`)}
+                                    src={getServiceImageUrl(dichVu.anh)}
                                     alt={dichVu.tenDichVu}
                                     className="w-20 h-20 rounded-xl mr-6"
                                 />

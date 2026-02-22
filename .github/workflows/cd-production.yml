@@ -175,7 +175,7 @@ jobs:
               chmod -R 755 /opt/airline-prod/frontend
 
               # ===== RESTART =====
-              echo "🔄 Restarting airline service..."
+              echo "🔄 Restarting airline-backend service..."
               sudo systemctl restart airline
               sleep 5
 
@@ -186,6 +186,10 @@ jobs:
                 sudo systemctl status airline --no-pager
                 exit 1
               fi
+
+              # Show recent logs for verification
+              echo "📋 Recent logs:"
+              sudo journalctl -u airline --since "30 seconds ago" --no-pager | tail -20
 
               sudo systemctl reload nginx
               echo "✅ Deploy completed!"

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import ClientDichVuService from "../../services/ClientDichVuService";
-import { getAssetUrl } from "../../config/api.config";
+import { getAssetUrl, getServiceImageUrl, getServiceOptionImageUrl } from "../../config/api.config";
 import useTitle from '../../hooks/useTitle';
 
 function DichVuChuyenBay() {
@@ -287,8 +287,8 @@ function DichVuChuyenBay() {
                     <div className="p-6 md:p-8 border-b border-slate-100 bg-slate-50/50 flex items-start gap-6">
                       {service.anh ? (
                         <div className="w-20 h-20 rounded-2xl bg-white shadow-sm border border-slate-100 p-2 flex-shrink-0">
-                          <img 
-                            src={getAssetUrl(`/admin/dashboard/dichvu/anh/${service.anh}`)}
+                          <img
+                            src={getServiceImageUrl(service.anh)}
                             alt={service.tenDichVu}
                             className="w-full h-full object-contain"
                           />
@@ -327,8 +327,8 @@ function DichVuChuyenBay() {
                             
                             {option.anh && (
                               <div className="aspect-video rounded-xl overflow-hidden mb-4 bg-slate-50">
-                                <img 
-                                  src={getAssetUrl(`/admin/dashboard/dichvu/luachon/anh/${option.anh}`)}
+                                <img
+                                  src={getServiceOptionImageUrl(option.anh)}
                                   alt={option.tenLuaChon}
                                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                 />

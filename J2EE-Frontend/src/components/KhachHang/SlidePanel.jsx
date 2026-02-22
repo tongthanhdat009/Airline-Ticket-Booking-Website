@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { getSoDoGheByChuyenBay, getLuaChonByDichVuId } from "../../services/datVeServices";
-import { getAssetUrl } from "../../config/api.config";
+import { getServiceOptionImageUrl } from "../../config/api.config";
 
 function ChoNgoiPanel({
   isOpen,
@@ -482,7 +482,7 @@ function ChoNgoiPanel({
                 >
                   {item.anh && (
                     <img
-                      src={getAssetUrl(`/admin/dashboard/dichvu/luachon/anh/${item.anh}`)}
+                      src={getServiceOptionImageUrl(item.anh)}
                       alt={item.tenLuaChon}
                       className="w-20 h-20 rounded-lg mr-4 object-cover"
                     />
