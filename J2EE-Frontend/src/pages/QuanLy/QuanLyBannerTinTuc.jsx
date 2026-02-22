@@ -49,6 +49,18 @@ const QuanLyBannerTinTuc = () => {
     trangThai: true
   });
 
+  // Form state cho Tin Tuc
+  const [tinTucForm, setTinTucForm] = useState({
+    tieuDe: '',
+    tomTat: '',
+    noiDung: '',
+    hinhAnh: '',
+    danhMuc: 'Tin tức',
+    trangThai: 'ban_nhap',
+    ngayDang: '',
+    tacGia: 'Admin'
+  });
+
   // Toast & Confirm
   const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
   const [confirmDialog, setConfirmDialog] = useState({
@@ -136,6 +148,36 @@ const QuanLyBannerTinTuc = () => {
     setIsFormOpen(true);
   };
 
+  // Mở form tạo/sửa tin tức
+  const openTinTucForm = (tinTucItem = null) => {
+    if (tinTucItem) {
+      setEditingItem(tinTucItem);
+      setTinTucForm({
+        tieuDe: tinTucItem.tieuDe,
+        tomTat: tinTucItem.tomTat,
+        noiDung: tinTucItem.noiDung || '',
+        hinhAnh: tinTucItem.hinhAnh,
+        danhMuc: tinTucItem.danhMuc,
+        trangThai: tinTucItem.trangThai,
+        ngayDang: tinTucItem.ngayDang || '',
+        tacGia: tinTucItem.tacGia || 'Admin'
+      });
+    } else {
+      setEditingItem(null);
+      setTinTucForm({
+        tieuDe: '',
+        tomTat: '',
+        noiDung: '',
+        hinhAnh: '',
+        danhMuc: 'Tin tức',
+        trangThai: 'ban_nhap',
+        ngayDang: new Date().toISOString().split('T')[0],
+        tacGia: 'Admin'
+      });
+    }
+    setIsFormOpen(true);
+  };
+
   // Lưu banner
   const handleSaveBanner = async () => {
     if (!bannerForm.tieuDe.trim()) {
@@ -155,6 +197,32 @@ const QuanLyBannerTinTuc = () => {
     } catch (error) {
       console.error('Lỗi khi lưu banner:', error);
       showToast(error.response?.data?.message || 'Không thể lưu banner', 'error');
+    }
+  };
+
+  // Lưu tin tức
+  const handleSaveTinTuc = async () => {
+    if (!tinTucForm.tieuDe.trim()) {
+      showToast('Vui lòng nhập tiêu đề tin tức', 'error');
+      return;
+    }
+    if (!tinTucForm.tomTat.trim()) {
+      showToast('Vui lòng nhập tóm tắt', 'error');
+      return;
+    }
+    try {
+      if (editingItem) {
+        await TinTucService.update(editingItem.id, tinTucForm);
+        showToast('Cập nhật tin tức thành công!');
+      } else {
+        await TinTucService.create(tinTucForm);
+        showToast('Thêm tin tức mới thành công!');
+      }
+      setIsFormOpen(false);
+      loadTinTuc();
+    } catch (error) {
+      console.error('Lỗi khi lưu tin tức:', error);
+      showToast(error.response?.data?.message || 'Không thể lưu tin tức', 'error');
     }
   };
 
@@ -186,6 +254,40 @@ const QuanLyBannerTinTuc = () => {
         } catch (error) {
           console.error('Lỗi khi xóa banner:', error);
           showToast(error.response?.data?.message || 'Không thể xóa banner', 'error');
+        }
+        setConfirmDialog(prev => ({ ...prev, isVisible: false }));
+      }
+    });
+  };
+
+  // Toggle publish tin tức
+  const toggleTinTucPublish = async (id) => {
+    try {
+      await TinTucService.togglePublish(id);
+      showToast('Đã cập nhật trạng thái xuất bản');
+      loadTinTuc();
+    } catch (error) {
+      console.error('Lỗi khi cập nhật trạng thái tin tức:', error);
+      showToast(error.response?.data?.message || 'Không thể cập nhật trạng thái tin tức', 'error');
+    }
+  };
+
+  // Xóa tin tức
+  const handleDeleteTinTuc = (id) => {
+    setConfirmDialog({
+      isVisible: true,
+      title: 'Xóa tin tức',
+      message: 'Bạn có chắc chắn muốn xóa tin tức này?',
+      type: 'danger',
+      confirmText: 'Xóa',
+      onConfirm: async () => {
+        try {
+          await TinTucService.delete(id);
+          showToast('Đã xóa tin tức thành công');
+          loadTinTuc();
+        } catch (error) {
+          console.error('Lỗi khi xóa tin tức:', error);
+          showToast(error.response?.data?.message || 'Không thể xóa tin tức', 'error');
         }
         setConfirmDialog(prev => ({ ...prev, isVisible: false }));
       }
@@ -256,7 +358,7 @@ const QuanLyBannerTinTuc = () => {
         </div>
         <ViewToggleButton currentView={viewMode} onViewChange={handleViewChange} />
         <button
-          onClick={() => activeTab === 'banner' ? openBannerForm() : showToast('Chức năng thêm tin tức đang phát triển', 'info')}
+          onClick={() => activeTab === 'banner' ? openBannerForm() : openTinTucForm()}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
         >
           <FaPlus />
@@ -465,9 +567,11 @@ const QuanLyBannerTinTuc = () => {
                         <span className="flex items-center gap-1"><FaEye className="text-gray-400" /> {item.luotXem.toLocaleString()}</span>
                       </div>
                       <div className="flex items-center justify-end gap-1 mt-3 pt-3 border-t">
-                        <button className="p-1.5 text-blue-600 hover:bg-blue-100 rounded-lg" title="Xem"><FaEye /></button>
-                        <button className="p-1.5 text-yellow-600 hover:bg-yellow-100 rounded-lg" title="Sửa"><FaEdit /></button>
-                        <button className="p-1.5 text-red-600 hover:bg-red-100 rounded-lg" title="Xóa"><FaTrash /></button>
+                        <button onClick={() => toggleTinTucPublish(item.id)} className="p-1.5 text-green-600 hover:bg-green-100 rounded-lg" title={item.trangThai === 'da_xuat_ban' ? 'Bản nháp' : 'Xuất bản'}>
+                          {item.trangThai === 'da_xuat_ban' ? <FaEyeSlash /> : <FaEye />}
+                        </button>
+                        <button onClick={() => openTinTucForm(item)} className="p-1.5 text-yellow-600 hover:bg-yellow-100 rounded-lg" title="Sửa"><FaEdit /></button>
+                        <button onClick={() => handleDeleteTinTuc(item.id)} className="p-1.5 text-red-600 hover:bg-red-100 rounded-lg" title="Xóa"><FaTrash /></button>
                       </div>
                     </div>
                   </div>
@@ -521,13 +625,13 @@ const QuanLyBannerTinTuc = () => {
                       <td className="px-4 py-3 text-sm text-gray-600">{item.tacGia}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-center gap-1">
-                          <button className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg" title="Xem">
-                            <FaEye />
+                          <button onClick={() => toggleTinTucPublish(item.id)} className="p-2 text-green-600 hover:bg-green-100 rounded-lg" title={item.trangThai === 'da_xuat_ban' ? 'Bản nháp' : 'Xuất bản'}>
+                            {item.trangThai === 'da_xuat_ban' ? <FaEyeSlash /> : <FaEye />}
                           </button>
-                          <button className="p-2 text-yellow-600 hover:bg-yellow-100 rounded-lg" title="Sửa">
+                          <button onClick={() => openTinTucForm(item)} className="p-2 text-yellow-600 hover:bg-yellow-100 rounded-lg" title="Sửa">
                             <FaEdit />
                           </button>
-                          <button className="p-2 text-red-600 hover:bg-red-100 rounded-lg" title="Xóa">
+                          <button onClick={() => handleDeleteTinTuc(item.id)} className="p-2 text-red-600 hover:bg-red-100 rounded-lg" title="Xóa">
                             <FaTrash />
                           </button>
                         </div>
@@ -558,7 +662,7 @@ const QuanLyBannerTinTuc = () => {
       })()}
 
       {/* Modal form Banner */}
-      {isFormOpen && (
+      {isFormOpen && activeTab === 'banner' && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setIsFormOpen(false)}>
           <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center p-6 border-b">
@@ -672,6 +776,133 @@ const QuanLyBannerTinTuc = () => {
               </button>
               <button
                 onClick={handleSaveBanner}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+              >
+                <FaSave />
+                {editingItem ? 'Cập nhật' : 'Thêm mới'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal form Tin tức */}
+      {isFormOpen && activeTab === 'tin_tuc' && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setIsFormOpen(false)}>
+          <div className="bg-white rounded-2xl shadow-xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center p-6 border-b">
+              <h3 className="text-lg font-bold text-gray-800">
+                {editingItem ? 'Chỉnh sửa Tin tức' : 'Thêm Tin tức mới'}
+              </h3>
+              <button onClick={() => setIsFormOpen(false)} className="text-gray-400 hover:text-gray-600">
+                <FaTimes />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tiêu đề *</label>
+                <input
+                  type="text"
+                  value={tinTucForm.tieuDe}
+                  onChange={(e) => setTinTucForm(prev => ({ ...prev, tieuDe: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                  placeholder="VD: Thông báo chuyến bay mới..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tóm tắt *</label>
+                <textarea
+                  value={tinTucForm.tomTat}
+                  onChange={(e) => setTinTucForm(prev => ({ ...prev, tomTat: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                  rows={2}
+                  placeholder="Tóm tắt ngắn cho tin tức..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nội dung chi tiết</label>
+                <textarea
+                  value={tinTucForm.noiDung}
+                  onChange={(e) => setTinTucForm(prev => ({ ...prev, noiDung: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                  rows={8}
+                  placeholder="Nội dung chi tiết của tin tức..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">URL hình ảnh</label>
+                <input
+                  type="url"
+                  value={tinTucForm.hinhAnh}
+                  onChange={(e) => setTinTucForm(prev => ({ ...prev, hinhAnh: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                  placeholder="https://example.com/image.jpg"
+                />
+                {tinTucForm.hinhAnh && (
+                  <img
+                    src={tinTucForm.hinhAnh}
+                    alt="Preview"
+                    className="mt-2 w-full h-40 object-cover rounded-lg border"
+                    onError={(e) => { e.target.style.display = 'none'; }}
+                  />
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Danh mục</label>
+                  <select
+                    value={tinTucForm.danhMuc}
+                    onChange={(e) => setTinTucForm(prev => ({ ...prev, danhMuc: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="Tin tức">Tin tức</option>
+                    <option value="Thông báo">Thông báo</option>
+                    <option value="Khuyến mãi">Khuyến mãi</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
+                  <select
+                    value={tinTucForm.trangThai}
+                    onChange={(e) => setTinTucForm(prev => ({ ...prev, trangThai: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="ban_nhap">Bản nháp</option>
+                    <option value="da_xuat_ban">Đã xuất bản</option>
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ngày đăng</label>
+                  <input
+                    type="date"
+                    value={tinTucForm.ngayDang}
+                    onChange={(e) => setTinTucForm(prev => ({ ...prev, ngayDang: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tác giả</label>
+                  <input
+                    type="text"
+                    value={tinTucForm.tacGia}
+                    onChange={(e) => setTinTucForm(prev => ({ ...prev, tacGia: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                    placeholder="Admin"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 p-6 border-t">
+              <button
+                onClick={() => setIsFormOpen(false)}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm font-medium"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleSaveTinTuc}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
               >
                 <FaSave />
