@@ -32,7 +32,6 @@ const QuanLyBannerTinTuc = () => {
   const [search, setSearch] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
-  const [loading, setLoading] = useState(true);
   const { viewMode, setViewMode: handleViewChange } = useViewToggle('banner-tin-tuc-view', 'grid');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -79,28 +78,22 @@ const QuanLyBannerTinTuc = () => {
   // Load banners from API
   const loadBanners = async () => {
     try {
-      setLoading(true);
       const data = await BannerService.getAll();
       setBanners(data);
     } catch (error) {
       console.error('Lỗi khi tải danh sách banner:', error);
       showToast('Không thể tải danh sách banner', 'error');
-    } finally {
-      setLoading(false);
     }
   };
 
   // Load tin tuc from API
   const loadTinTuc = async () => {
     try {
-      setLoading(true);
       const data = await TinTucService.getAll();
       setTinTuc(data);
     } catch (error) {
       console.error('Lỗi khi tải danh sách tin tức:', error);
       showToast('Không thể tải danh sách tin tức', 'error');
-    } finally {
-      setLoading(false);
     }
   };
 
