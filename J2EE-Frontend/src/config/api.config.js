@@ -24,7 +24,7 @@ export const getApiUrl = (path) => {
 };
 
 // Helper function để build URL cho static assets (images, etc.)
-export const getAssetUrl = (path, assetType = 'default') => {
+export const getAssetUrl = (path) => {
   if (!path) return '';
   // Nếu path đã là đầy đủ URL hoặc blob URL
   if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:') || path.startsWith('data:')) {

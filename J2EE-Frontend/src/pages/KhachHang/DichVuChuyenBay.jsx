@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import ClientDichVuService from "../../services/ClientDichVuService";
-import { getAssetUrl, getServiceImageUrl, getServiceOptionImageUrl } from "../../config/api.config";
+import { getServiceImageUrl, getServiceOptionImageUrl } from "../../config/api.config";
 import useTitle from '../../hooks/useTitle';
 
 function DichVuChuyenBay() {
