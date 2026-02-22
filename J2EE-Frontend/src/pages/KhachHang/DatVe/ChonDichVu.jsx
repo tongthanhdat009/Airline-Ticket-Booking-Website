@@ -47,7 +47,7 @@ function ChonDichVu() {
         maDichVu: 99,
         tenDichVu: t('booking.services.seat_selection'),
         moTa: t('booking.services.select_seat_desc'),
-        anh: "public/service/select-service_favorite-seat.cc6498ae.svg",
+        anh: "/service/select-service_favorite-seat.cc6498ae.svg",
     };
 
     const tiepTucOnClick = () => {
