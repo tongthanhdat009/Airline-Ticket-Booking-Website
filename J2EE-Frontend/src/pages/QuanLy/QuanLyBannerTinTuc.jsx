@@ -161,9 +161,7 @@ const QuanLyBannerTinTuc = () => {
   // Toggle trạng thái banner
   const toggleBannerStatus = async (id) => {
     try {
-      const banner = banners.find(b => b.id === id);
-      const newStatus = !banner.trangThai;
-      await BannerService.updateStatus(id, newStatus);
+      await BannerService.updateStatus(id);
       showToast('Đã cập nhật trạng thái banner');
       loadBanners();
     } catch (error) {

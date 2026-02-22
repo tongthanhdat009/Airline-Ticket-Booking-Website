@@ -85,10 +85,9 @@ const BannerService = {
   /**
    * Cập nhật trạng thái banner (toggle)
    * @param {number} id - ID của banner
-   * @param {boolean} trangThai - Trạng thái mới (true/false)
    * @returns {Promise<Object>} Banner đã cập nhật
    */
-  updateStatus: async (id, trangThai) => {
+  updateStatus: async (id) => {
     try {
       const response = await apiClient.patch(`${BASE_URL}/${id}/toggle-status`);
       return response.data.data;
