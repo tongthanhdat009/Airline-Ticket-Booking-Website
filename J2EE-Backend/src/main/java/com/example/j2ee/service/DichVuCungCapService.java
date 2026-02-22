@@ -49,22 +49,30 @@ public class DichVuCungCapService {
     }
 
     @PostConstruct
-    public void init() throws IOException {
-        // Tạo đường dẫn: project-root/uploads/AnhDichVuCungCap và project-root/uploads/AnhLuaChonDichVu
-        Path baseUploadPath = Paths.get(System.getProperty("user.dir")).resolve(uploadDir);
-        this.storageDir = baseUploadPath.resolve("AnhDichVuCungCap");
-        this.storageDirLuaChon = baseUploadPath.resolve("AnhLuaChonDichVu");
+    public void init() {
+        try {
+            // Tạo đường dẫn: project-root/uploads/AnhDichVuCungCap và project-root/uploads/AnhLuaChonDichVu
+            Path baseUploadPath = Paths.get(System.getProperty("user.dir")).resolve(uploadDir);
+            this.storageDir = baseUploadPath.resolve("AnhDichVuCungCap");
+            this.storageDirLuaChon = baseUploadPath.resolve("AnhLuaChonDichVu");
 
-        // Tạo thư mục nếu chưa có
-        if (!Files.exists(storageDir)) {
+            // Tạo thư mục nếu chưa có
             Files.createDirectories(storageDir);
-            log.info("Đã tạo thư mục lưu ảnh dịch vụ: {}", storageDir.toAbsolutePath());
-        }
-        if (!Files.exists(storageDirLuaChon)) {
             Files.createDirectories(storageDirLuaChon);
-            log.info("Đã tạo thư mục lưu ảnh lựa chọn dịch vụ: {}", storageDirLuaChon.toAbsolutePath());
+            log.info("Upload directory: {}", baseUploadPath.toAbsolutePath());
+        } catch (IOException e) {
+            log.error("Không thể tạo thư mục upload: {}", e.getMessage());
+            // Fallback: dùng thư mục uploads tại project root
+            Path fallback = Paths.get(System.getProperty("user.dir"), "uploads");
+            this.storageDir = fallback.resolve("AnhDichVuCungCap");
+            this.storageDirLuaChon = fallback.resolve("AnhLuaChonDichVu");
+            try {
+                Files.createDirectories(storageDir);
+                Files.createDirectories(storageDirLuaChon);
+            } catch (IOException ex) {
+                log.error("Không thể tạo thư mục upload fallback: {}", ex.getMessage());
+            }
         }
-        log.info("Upload directory: {}", baseUploadPath.toAbsolutePath());
     }
 
     public Path getStorageDir() {
