@@ -1,6 +1,7 @@
 package com.example.j2ee.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,6 +27,7 @@ public class Banner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "mabanner")
+    @JsonProperty("id")
     private int maBanner;
 
     @Column(name = "tieu_de", nullable = false, length = 255)
