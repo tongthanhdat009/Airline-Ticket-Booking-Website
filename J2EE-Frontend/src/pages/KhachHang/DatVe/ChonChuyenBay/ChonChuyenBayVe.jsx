@@ -25,8 +25,6 @@ function ChonChuyenBayVe() {
     const [selectedTuyenBayVe, setSelectedTuyenBayVe] = useState(null);
     const [soGheCon, setSoGheCon] = useState({});
     const [hangVeList, setHangVeList] = useState([]);
-    // Lấy hạng vé đã chọn ở chuyến bay đi
-    const maHangVeDi = formData.selectedTuyenBayDi?.hangVe?.maHangVe;
 
     const tiepTucOnClick = () => {
         if (!selectedTuyenBayVe) {
@@ -201,7 +199,6 @@ function ChonChuyenBayVe() {
                                         setSelectedTuyenBayVe({ ...chuyenBay, hangVe: { ...hangVe, ...giaVeData } });
                                     }}
                                     selectedTuyenBay={selectedTuyenBayVe}
-                                    lockedHangVe={maHangVeDi}
                                 />
                             </div>
                             )

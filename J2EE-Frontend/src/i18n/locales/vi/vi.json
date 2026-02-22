@@ -427,7 +427,8 @@
       "insurance": "Bảo hiểm du lịch",
       "added": "Đã thêm",
       "error_select_seats_round": "Vui lòng chọn đủ {{count}} ghế cho cả chuyến đi và chuyến về.",
-      "error_select_seats_oneway": "Vui lòng chọn đủ {{count}} ghế cho chuyến đi."
+      "error_select_seats_oneway": "Vui lòng chọn đủ {{count}} ghế cho chuyến đi.",
+      "error_select_seats_return": "Vui lòng chọn đủ {{count}} ghế cho chuyến về."
     },
     "payment": {
       "title": "Thanh toán",

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { getChiTietGheByGheId, getLuaChonByDichVuId } from "../../services/datVeServices";
+import { getSoDoGheByChuyenBay, getLuaChonByDichVuId } from "../../services/datVeServices";
 import { getAssetUrl } from "../../config/api.config";
 
 function ChoNgoiPanel({
@@ -30,7 +30,8 @@ function ChoNgoiPanel({
         if (numericId === 99 && data.selectedSeats?.length > 0) {
           tabResult.selectedSeats = data.selectedSeats.map(s => ({
             id: s.id,
-            hangVe: s.hangVe
+            soGhe: s.soGhe,
+            hangVe: s.hangVe?.tenHangVe || s.hangVe
           }));
         }
 
@@ -114,49 +115,43 @@ function ChoNgoiPanel({
             : formData?.selectedTuyenBayVe?.maChuyenBay;
 
         if (!maChuyenBay) {
-          setSeatRows((prev) => ({ ...prev, [tab]: [] }));
+          setSeatRows((prev) => ({ ...prev, [tab]: { rows: [], columns: [] } }));
           return;
         }
 
-        const res = await getChiTietGheByGheId(maChuyenBay);
+        const res = await getSoDoGheByChuyenBay(maChuyenBay);
         const gheList = res?.data || res || [];
 
-        const hangVePriority = {
-          "first class": 3,
-          business: 2,
-          deluxe: 1,
-          economy: 0,
-        };
+        // Map ghế với đầy đủ thông tin hang/cot và trạng thái daDat
+        const seatsMapped = (gheList || []).map((item) => ({
+          maGhe: item?.maGhe,
+          soGhe: item?.soGhe,
+          hang: item?.hang,
+          cot: item?.cot,
+          hangVe: item?.hangVe,
+          viTriGhe: item?.viTriGhe,
+          daDat: item?.daDat === true,
+          id: String(item?.maGhe ?? ''),
+        }));
 
-        const userHangVe =
-          tab === "di"
-            ? formData?.selectedTuyenBayDi?.hangVe?.hangVe?.tenHangVe?.toLowerCase()
-            : formData?.selectedTuyenBayVe?.hangVe?.hangVe?.tenHangVe?.toLowerCase();
-
-        const userPriority = hangVePriority[userHangVe] ?? 0;
-
-        const seatsMapped = (gheList || []).map((item) => {
-          const seatType = item?.hangVe?.tenHangVe?.toLowerCase?.() || "economy";
-          const seatPriority = hangVePriority[seatType] ?? 0;
-
-          return {
-            id: `${item?.maGhe ?? item?.soGhe ?? ""}`,
-            type: seatType,
-            hangVe: item?.hangVe?.tenHangVe || "",
-            booked: seatPriority > userPriority,
-          };
+        // Nhóm theo hàng thực tế (hang/cot)
+        const rowMap = {};
+        const columnSet = new Set();
+        seatsMapped.forEach(seat => {
+          if (seat.hang != null) {
+            if (!rowMap[seat.hang]) rowMap[seat.hang] = {};
+            rowMap[seat.hang][seat.cot] = seat;
+            if (seat.cot) columnSet.add(seat.cot);
+          }
         });
 
-        // chia thành hàng (6 ghế/một hàng)
-        const rows = [];
-        for (let i = 0; i < seatsMapped.length; i += 6) {
-          rows.push({
-            row: Math.floor(i / 6) + 1,
-            seats: seatsMapped.slice(i, i + 6),
-          });
-        }
+        const allColumns = Array.from(columnSet).sort();
+        const sortedRows = Object.keys(rowMap)
+          .map(r => parseInt(r))
+          .sort((a, b) => a - b)
+          .map(row => ({ row, seatsByCol: rowMap[row] }));
 
-        setSeatRows((prev) => ({ ...prev, [tab]: rows }));
+        setSeatRows((prev) => ({ ...prev, [tab]: { rows: sortedRows, columns: allColumns } }));
         return;
       }
 
@@ -183,8 +178,18 @@ function ChoNgoiPanel({
   // ============================ GHẾ ============================
   const selectedSeats = currentService.selectedSeats || [];
 
+  // Hạng vé hiện tại của hành khách (maHangVe từ chuyến bay đã chọn)
+  const userMaHangVe =
+    tab === "di"
+      ? formData?.selectedTuyenBayDi?.hangVe?.maHangVe
+      : (formData?.selectedTuyenBayVe?.hangVe?.maHangVe ?? formData?.selectedTuyenBayDi?.hangVe?.maHangVe);
+
   const handleSelect = (seat) => {
-    if (!seat || seat.booked) return;
+    if (!seat) return;
+    // Không cho chọn ghế đã đặt
+    if (seat.daDat) return;
+    // Chỉ cho chọn ghế cùng hạng vé với vé đã mua
+    if (userMaHangVe && seat.hangVe?.maHangVe !== userMaHangVe) return;
 
     const isSelected = selectedSeats.some((s) => s.id === seat.id);
     let updated;
@@ -192,7 +197,7 @@ function ChoNgoiPanel({
     if (isSelected) {
       updated = selectedSeats.filter((s) => s.id !== seat.id);
     } else {
-      const maxPassengers = formData?.passengers ?? formData?.passengerInfo?.length ?? 1;
+      const maxPassengers = Number(formData?.passengers ?? formData?.passengerInfo?.length ?? 1);
       if (selectedSeats.length >= maxPassengers) return;
       updated = [...selectedSeats, seat];
     }
@@ -201,20 +206,29 @@ function ChoNgoiPanel({
   };
 
   const getSeatColor = (seat) => {
-    if (!seat) return "bg-white";
-    if (seat.booked) return "bg-gray-400 cursor-not-allowed text-white";
-    if (selectedSeats.some((s) => s.id === seat.id)) return "bg-blue-500 text-white";
+    if (!seat) return "bg-white border-gray-200 text-gray-400";
+    // Ghế đã được đặt bởi người khác
+    if (seat.daDat) return "bg-gray-300 border-gray-300 text-gray-400 cursor-not-allowed opacity-60";
+    // Ghế đã được chọn bởi người dùng hiện tại
+    if (selectedSeats.some((s) => s.id === seat.id))
+      return "bg-sky-500 border-sky-600 text-white cursor-pointer";
+    const maHangVe = seat.hangVe?.maHangVe || 1;
+    const isUserClass = !userMaHangVe || maHangVe === userMaHangVe;
+    const notAllowed = !isUserClass ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:scale-105";
+    if (maHangVe === 5) return `bg-amber-50 border-amber-400 text-amber-700 ${notAllowed}`;
+    if (maHangVe === 4) return `bg-slate-700 border-slate-800 text-white ${notAllowed}`;
+    if (maHangVe === 3) return `bg-emerald-50 border-emerald-400 text-emerald-700 ${notAllowed}`;
+    if (maHangVe === 2) return `bg-sky-50 border-sky-300 text-sky-700 ${notAllowed}`;
+    return `bg-gray-50 border-gray-200 text-gray-600 ${notAllowed}`;
+  };
 
-    switch ((seat.type || "").toLowerCase()) {
-      case "first class":
-        return "bg-yellow-300 hover:bg-yellow-400";
-      case "business":
-        return "bg-orange-300 hover:bg-orange-400";
-      case "deluxe":
-        return "bg-green-300 hover:bg-green-400";
-      default:
-        return "bg-white hover:bg-blue-100";
-    }
+  // Xác định vị trí lối đi
+  const shouldInsertAisle = (colIdx, totalCols) => {
+    if (totalCols === 4) return colIdx === 1;
+    if (totalCols === 6) return colIdx === 2;
+    if (totalCols === 9) return colIdx === 2 || colIdx === 5;
+    if (totalCols === 10) return colIdx === 2 || colIdx === 6;
+    return false;
   };
 
   // ============================ DỊCH VỤ SỐ LƯỢNG ============================
@@ -299,14 +313,23 @@ function ChoNgoiPanel({
   };
 
 
-  const rowsToRender = seatRows[tab] || [];
+  const rowsToRender = seatRows[tab] || { rows: [], columns: [] };
+
+  // Lưu state hiện tại vào parent và đóng panel
+  const handleSaveAndClose = () => {
+    if (onSave) {
+      const allServices = extractAllServiceData(serviceState);
+      onSave(allServices);
+    }
+    onClose();
+  };
 
   return (
     <>
-      {isOpen && <div onClick={onClose} className="fixed inset-0 bg-black/50 z-40" />}
+      {isOpen && <div onClick={handleSaveAndClose} className="fixed inset-0 bg-black/50 z-60" />}
 
       <div
-        className="fixed top-0 right-0 h-full bg-white shadow-2xl z-50 transform transition-transform duration-300"
+        className="fixed top-0 right-0 h-full bg-white shadow-2xl z-70 transform transition-transform duration-300"
         style={{
           width,
           transform: isOpen ? "translateX(0)" : "translateX(100%)",
@@ -316,7 +339,7 @@ function ChoNgoiPanel({
           {/* Header */}
           <div className="flex bg-linear-to-b from-[#1E88E5] to-[#1565C0] items-center px-4 py-3 ">
             <h2 className="text-xl text-white font-bold">Chọn dịch vụ</h2>
-            <button onClick={onClose} className="text-white text-2xl ml-auto">
+            <button onClick={handleSaveAndClose} className="text-white text-2xl ml-auto">
               ×
             </button>
           </div>
@@ -351,7 +374,7 @@ function ChoNgoiPanel({
                 <div className="flex">
                   {(formData?.passengerInfo || []).map((p, i) => (
                     <span key={i} className="pl-2 font-bold text-md">
-                      {p.firstName} {p.lastName}
+                      {p.fullName}
                     </span>
                   ))}
                 </div>
@@ -366,7 +389,7 @@ function ChoNgoiPanel({
 
                 {dichVu?.maDichVu === 99 && (
                   <span className="font-bold min-h-[30px] block">
-                    {selectedSeats.map((s) => `${s.id}-${s.hangVe}`).join(", ")}
+                    {selectedSeats.map((s) => s.soGhe || s.id).join(", ")}
                   </span>
                 )}
               </div>
@@ -377,69 +400,79 @@ function ChoNgoiPanel({
           <div className="flex-1 overflow-y-auto p-6 bg-white">
             {dichVu?.maDichVu === 99 ? (
               <>
-                <div className="text-lg font-semibold mb-4 flex justify-center">Sơ đồ chỗ ngồi</div>
-                <div className="grid grid-cols-8 gap-1 justify-items-center">
-                  <div></div>
-                  <div>A</div>
-                  <div>B</div>
-                  <div>C</div>
-                  <div></div>
-                  <div>D</div>
-                  <div>E</div>
-                  <div>F</div>
+                <div className="text-lg font-semibold mb-3 flex justify-center">Sơ đồ chỗ ngồi</div>
+
+                {/* Legend */}
+                <div className="flex flex-wrap justify-center gap-2 mb-4 text-xs">
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded border bg-gray-50 border-gray-200"></div><span>Economy</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded border bg-sky-50 border-sky-300"></div><span>Economy Saver</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded border bg-emerald-50 border-emerald-400"></div><span>Deluxe</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded border bg-slate-700 border-slate-800"></div><span>Business</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded border bg-amber-50 border-amber-400"></div><span>First Class</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-sky-500"></div><span>Đã chọn</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-gray-300 opacity-60"></div><span>Đã đặt</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded border border-gray-200 opacity-50"></div><span>Khác hạng</span></div>
                 </div>
 
-                {rowsToRender?.map((row) => (
-                  <div key={row.row} className="grid grid-cols-8 gap-1 items-center my-1">
-                    <div className="font-bold">{row.row}</div>
-                    {row.seats.slice(0, 3).map((seat) => (
-                      <div
-                        key={seat.id}
-                        onClick={() => handleSelect(seat)}
-                        className={`w-10 h-10 flex items-center justify-center rounded-md border border-gray-300 ${getSeatColor(
-                          seat
-                        )}`}
-                      >
-                        {seat.id}
-                      </div>
-                    ))}
-                    <div></div>
-                    {row.seats.slice(3).map((seat) => (
-                      <div
-                        key={seat.id}
-                        onClick={() => handleSelect(seat)}
-                        className={`w-10 h-10 flex items-center justify-center rounded-md border border-gray-300 ${getSeatColor(
-                          seat
-                        )}`}
-                      >
-                        {seat.id}
-                      </div>
-                    ))}
+                {rowsToRender.rows?.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="border-collapse mx-auto text-xs">
+                      <thead>
+                        <tr>
+                          <th className="px-1 py-1 w-8">
+                            <div className="w-8 h-8 flex items-center justify-center bg-slate-600 rounded text-[10px] font-semibold text-white">R</div>
+                          </th>
+                          {rowsToRender.columns?.map((col, idx) => (
+                            <React.Fragment key={col}>
+                              {shouldInsertAisle(idx, rowsToRender.columns.length) && (
+                                <th className="px-2"></th>
+                              )}
+                              <th className="px-0.5 py-1">
+                                <div className="w-10 h-7 flex items-center justify-center bg-slate-500 rounded text-xs font-semibold text-white">{col}</div>
+                              </th>
+                            </React.Fragment>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {rowsToRender.rows?.map(({ row, seatsByCol }) => (
+                          <tr key={row}>
+                            <td className="px-1 py-1 text-center">
+                              <div className="w-8 h-10 flex items-center justify-center bg-gray-200 rounded text-xs font-semibold text-gray-600">{row}</div>
+                            </td>
+                            {rowsToRender.columns?.map((col, idx) => {
+                              const seat = seatsByCol[col];
+                              return (
+                                <React.Fragment key={col}>
+                                  {shouldInsertAisle(idx, rowsToRender.columns.length) && (
+                                    <td className="px-2"></td>
+                                  )}
+                                  <td className="px-0.5 py-0.5">
+                                    {seat ? (
+                                      <div
+                                        onClick={() => handleSelect(seat)}
+                                        title={seat.daDat ? `${seat.soGhe} - Đã đặt` : seat.hangVe?.maHangVe !== userMaHangVe ? `${seat.soGhe} - Không đúng hạng vé` : `${seat.soGhe} - ${seat.hangVe?.tenHangVe || ''}`}
+                                        className={`w-10 h-10 flex flex-col items-center justify-center rounded-lg border transition-all duration-150 active:scale-95 ${getSeatColor(seat)}`}
+                                      >
+                                        <span className="text-[9px] font-semibold leading-none">{seat.soGhe}</span>
+                                      </div>
+                                    ) : (
+                                      <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-200 border border-gray-300 cursor-not-allowed">
+                                        <span className="text-gray-400 text-xs">✕</span>
+                                      </div>
+                                    )}
+                                  </td>
+                                </React.Fragment>
+                              );
+                            })}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
-                ))}
-                {/* Legend */}
-              <div className="flex flex-wrap justify-center gap-4 mb-4 text-sm pt-5">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-md border border-gray-300 bg-white"></div>
-                  <span>Economy</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-md border border-gray-300 bg-green-300"></div>
-                  <span>Deluxe</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-md border border-gray-300 bg-orange-300"></div>
-                  <span>Business</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-md border border-gray-300 bg-yellow-300"></div>
-                  <span>First Class</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-md border border-gray-300 bg-blue-500"></div>
-                  <span>Đã chọn</span>
-                </div>
-              </div>
+                ) : (
+                  <div className="text-center text-gray-400 py-8">Không có ghế khả dụng</div>
+                )}
               </>
             ) : (
               (currentService.options || []).map((item) => (
@@ -507,7 +540,7 @@ function ChoNgoiPanel({
                     <>
                       <span className="text-[#E3F2FD]">
                         {selectedSeats.length > 0
-                          ? selectedSeats.map((s) => `${s.id}-${s.hangVe}`).join(", ")
+                          ? selectedSeats.map((s) => s.soGhe || s.id).join(", ")
                           : "Chưa chọn"}
                       </span>
                       ({selectedSeats.length}/{formData?.passengers ?? formData?.passengerInfo?.length ?? 0})

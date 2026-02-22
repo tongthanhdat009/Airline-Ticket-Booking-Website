@@ -73,6 +73,16 @@ public class SanBayController {
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 
+    /**
+     * Lấy toàn bộ sơ đồ ghế của chuyến bay (cả ghế đã đặt và chưa đặt)
+     * Trả về danh sách SoDoGheDTO với field daDat
+     */
+    @GetMapping("/sodoghe/{maChuyenBay}")
+    public ResponseEntity<ApiResponse<?>> getSoDoGheByChuyenBay(@PathVariable int maChuyenBay) {
+        Object result = chiTietGheService.getSoDoGheForFlight(maChuyenBay);
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
     @GetMapping("/giave/{maChuyenBay}/{maHangVe}")
     public ResponseEntity<ApiResponse<?>> getGiaVeByChuyenBayAndHangVe(
             @PathVariable int maChuyenBay,

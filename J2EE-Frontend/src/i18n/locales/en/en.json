@@ -420,7 +420,8 @@
       "insurance": "Travel Insurance",
       "added": "Added",
       "error_select_seats_round": "Please select {{count}} seats for both outbound and return flights.",
-      "error_select_seats_oneway": "Please select {{count}} seats for the outbound flight."
+      "error_select_seats_oneway": "Please select {{count}} seats for the outbound flight.",
+      "error_select_seats_return": "Please select {{count}} seats for the return flight."
     },
     "payment": {
       "title": "Payment",

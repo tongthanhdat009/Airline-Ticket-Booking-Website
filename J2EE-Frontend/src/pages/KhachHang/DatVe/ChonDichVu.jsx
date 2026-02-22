@@ -5,9 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 
 import { formatCurrencyWithCommas } from "../../../services/utils";
+import { getAssetUrl } from "../../../config/api.config";
 
-import { getDichVuByChuyenBay } from "../../../services/QLDichVuChuyenBayService";
-import SlidePanel from "../../../components/KhachHang/SlidePanel";
+import { getAllDichVuCungCapByChuyenBay } from "../../../services/datVeServices";
+import ChoNgoiPanel from "../../../components/KhachHang/SlidePanel";
 import ThongTinThanhToan from "../../../components/KhachHang/ThongTinThanhToan";
 import HeaderTimKiemChuyen from "../../../components/KhachHang/HeaderTimKiemChuyen";
 import useTitle from '../../../hooks/useTitle';
@@ -55,8 +56,16 @@ function ChonDichVu() {
         const soHanhKhach = Number(formData?.passengers ?? formData?.passengerInfo?.length ?? 1);
 
         if (formData.flightType === "round") {
-            if (choNgoiDi !== soHanhKhach || choNgoiVe !== soHanhKhach) {
+            if (choNgoiDi !== soHanhKhach && choNgoiVe !== soHanhKhach) {
                 alert(t('booking.services.error_select_seats_round', { count: soHanhKhach }));
+                return;
+            }
+            if (choNgoiDi !== soHanhKhach) {
+                alert(t('booking.services.error_select_seats_oneway', { count: soHanhKhach }));
+                return;
+            }
+            if (choNgoiVe !== soHanhKhach) {
+                alert(t('booking.services.error_select_seats_return', { count: soHanhKhach }));
                 return;
             }
         } else {
@@ -72,7 +81,7 @@ function ChonDichVu() {
         const fetchDichVuCungCap = async () => {
             try {
                 // Lấy dịch vụ cho chuyến bay đi
-                const resDi = await getDichVuByChuyenBay(
+                const resDi = await getAllDichVuCungCapByChuyenBay(
                     formData.selectedTuyenBayDi.maChuyenBay
                 );
                 console.log("Dịch vụ chuyến bay đi:", resDi.data);
@@ -81,13 +90,13 @@ function ChonDichVu() {
 
                 // Nếu là chuyến bay khứ hồi, lấy thêm dịch vụ cho chuyến bay về
                 if (formData.flightType === 'round' && formData.selectedTuyenBayVe) {
-                    const resVe = await getDichVuByChuyenBay(
+                    const resVe = await getAllDichVuCungCapByChuyenBay(
                         formData.selectedTuyenBayVe.maChuyenBay
                     );
                     console.log("Dịch vụ chuyến bay về:", resVe.data);
-                    
+
                     const dichVuVe = resVe.data?.data || resVe.data || [];
-                    
+
                     // Gộp 2 danh sách và loại bỏ trùng lặp dựa trên maDichVu
                     const dichVuMap = new Map();
                     [...allDichVu, ...dichVuVe].forEach(dv => {
@@ -129,7 +138,7 @@ function ChonDichVu() {
             {/* Content wrapper */}
             <div className="relative z-10">
             {/* Panel */}
-            <SlidePanel
+            <ChoNgoiPanel
                 formData={formData}
                 isOpen={isPanelOpen}
                 onClose={handleClosePanel}
@@ -175,7 +184,7 @@ function ChonDichVu() {
                                 onClick={() => handleOpenPanel(dichVu)}
                             >
                                 <img
-                                    src={`http://localhost:8080/AnhDichVuCungCap/${dichVu.anh}`}
+                                    src={getAssetUrl(`/admin/dashboard/dichvu/anh/${dichVu.anh}`)}
                                     alt={dichVu.tenDichVu}
                                     className="w-20 h-20 rounded-xl mr-6"
                                 />
@@ -200,7 +209,7 @@ function ChonDichVu() {
                 </div>
             </div>
             {/* Footer */}
-            <div className="flex justify-between fixed bottom-0 left-0 w-full bg-white p-4 h-[80px] px-32 shadow-[0_-4px_20px_rgba(0,0,0,0.25)] items-center z-50">
+            <div className={`flex justify-between fixed bottom-0 left-0 w-full bg-white p-4 h-[80px] px-32 shadow-[0_-4px_20px_rgba(0,0,0,0.25)] items-center z-50 transition-opacity duration-300 ${isPanelOpen ? 'pointer-events-none opacity-50' : ''}`}>
                 <span 
                     className="bg-gray-200 rounded-xl flex items-center justify-center px-10 py-2 text-black cursor-pointer hover:bg-gray-300 transition mr-100"
                     onClick={() => navigate(-1)}

@@ -50,6 +50,20 @@ export const getChiTietGheByGheId = async (gheId) => {
     }
 };
 
+/**
+ * Lấy toàn bộ sơ đồ ghế của chuyến bay (cả ghế đã đặt và chưa đặt)
+ * Trả về danh sách SoDoGheDTO với field daDat
+ */
+export const getSoDoGheByChuyenBay = async (maChuyenBay) => {
+    try {
+        const response = await apiClient.get(`/sanbay/sodoghe/${maChuyenBay}`);
+        return response.data;
+    } catch (error) {
+        console.error("Lỗi khi lấy sơ đồ ghế", error);
+        throw error;
+    }
+};
+
 export const getAllDichVuCungCapByChuyenBay = async (maChuyenBay) => {
     try {
         const response = await apiClient.get(`/sanbay/dichvu/${maChuyenBay}`);

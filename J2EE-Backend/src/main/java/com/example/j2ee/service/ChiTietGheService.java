@@ -1,5 +1,6 @@
 package com.example.j2ee.service;
 
+import com.example.j2ee.dto.SoDoGheDTO;
 import com.example.j2ee.dto.maybay.SeatLayoutRequest;
 import com.example.j2ee.model.ChiTietGhe;
 import com.example.j2ee.model.GheDaDat;
@@ -15,6 +16,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -73,6 +75,39 @@ public class ChiTietGheService {
         // Trả về ghế chưa được đặt
         return allSeats.stream()
                 .filter(seat -> !bookedSeatIds.contains(seat.getMaGhe()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Lấy toàn bộ sơ đồ ghế của một chuyến bay bao gồm cả ghế đã đặt.
+     * Field daDat = true nếu ghế đó đã có người đặt cho chuyến bay này.
+     */
+    public List<SoDoGheDTO> getSoDoGheForFlight(int maChuyenBay) {
+        var chuyenBay = chiTietChuyenBayRepository.findById(maChuyenBay).orElse(null);
+        if (chuyenBay == null || chuyenBay.getMayBay() == null) {
+            return null;
+        }
+
+        int maMayBay = chuyenBay.getMayBay().getMaMayBay();
+        List<ChiTietGhe> allSeats = chiTietGheRepository.findByMayBay_MaMayBay(maMayBay);
+
+        // Lấy danh sách ID của ghế đã được đặt cho chuyến bay này
+        Set<Integer> bookedSeatIds = gheDaDatRepository
+                .findByChuyenBay_MaChuyenBay(maChuyenBay)
+                .stream()
+                .map(gdd -> gdd.getGhe().getMaGhe())
+                .collect(Collectors.toSet());
+
+        return allSeats.stream()
+                .map(seat -> new SoDoGheDTO(
+                        seat.getMaGhe(),
+                        seat.getSoGhe(),
+                        seat.getHang(),
+                        seat.getCot(),
+                        seat.getViTriGhe(),
+                        seat.getHangVe(),
+                        bookedSeatIds.contains(seat.getMaGhe())
+                ))
                 .collect(Collectors.toList());
     }
 

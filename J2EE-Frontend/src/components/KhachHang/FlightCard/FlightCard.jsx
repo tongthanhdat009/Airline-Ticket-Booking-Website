@@ -17,7 +17,7 @@ const FlightCard = ({
     hangVes, // Array of ticket classes with price and availability
     onHangVeClick,
     selectedTuyenBay, // Thay đổi từ selectedHangVe sang selectedTuyenBay
-    lockedHangVe = null // Hạng vé bị khóa (chỉ được chọn hạng vé này)
+    lockedHangVe = null // (deprecated - không còn dùng)
 }) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -26,11 +26,6 @@ const FlightCard = ({
     };
 
     const handleHangVeSelect = (hangVe) => {
-        // Nếu có hạng vé bị khóa và người dùng chọn hạng khác, hiển thị thông báo
-        if (lockedHangVe && hangVe.maHangVe !== lockedHangVe) {
-            alert(`Vui lòng chọn cùng hạng vé với chuyến bay đi (${hangVes.find(hv => hv.maHangVe === lockedHangVe)?.tenHangVe || 'Hạng vé đã chọn'})`);
-            return;
-        }
         onHangVeClick(chuyenBay, hangVe);
         // Không đóng collapse sau khi chọn - giữ mở để user thấy các lựa chọn khác
     };
@@ -133,9 +128,7 @@ const FlightCard = ({
                                     // Chỉ coi là selected khi khớp cả maChuyenBay VÀ maHangVe
                                     const isSelected = selectedMaChuyenBay === chuyenBay.maChuyenBay && selectedMaHangVe === hangVe.maHangVe;
                                     const isPremium = config.tier === 'premium';
-                                    // Kiểm tra hạng vé có bị khóa không (chỉ được chọn hạng vé lockedHangVe)
-                                    const isLocked = lockedHangVe && hangVe.maHangVe !== lockedHangVe;
-                                    const isRequired = lockedHangVe && hangVe.maHangVe === lockedHangVe;
+                                    const isLocked = false;
 
                                     return (
                                         <div
@@ -202,11 +195,6 @@ const FlightCard = ({
                                                     <div className="mt-1 inline-block text-xs font-semibold px-2 py-0.5 rounded-full"
                                                         style={{ backgroundColor: config.badgeBg, color: config.textColor }}>
                                                         Cao cấp
-                                                    </div>
-                                                )}
-                                                {isRequired && (
-                                                    <div className="mt-1 inline-block text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700">
-                                                        Cùng hạng vé đi
                                                     </div>
                                                 )}
                                             </div>

@@ -84,13 +84,12 @@ public class BookingService {
         HanhKhach hanhKhachNguoiDat = hanhKhachService.findOrCreateHanhKhach(nguoiDatInfo);
 
         // Bước 2: Insert hanhkhach (các hành khách bay)
-        // Loop qua tất cả passengerInfo và tạo HanhKhach (bao gồm cả người đặt nếu cũng là hành khách)
+        // Loop qua tất cả passengerInfo và tạo HanhKhach
+        // Giữ 1:1 mapping giữa passengerInfo và danhSachHanhKhach (cho phép trùng)
         List<HanhKhach> danhSachHanhKhach = new ArrayList<>();
         for (CreateBookingRequest.PassengerInfo passengerInfo : request.getPassengerInfo()) {
             HanhKhach hanhKhach = hanhKhachService.findOrCreateHanhKhach(passengerInfo);
-            if (!danhSachHanhKhach.contains(hanhKhach)) {
-                danhSachHanhKhach.add(hanhKhach);
-            }
+            danhSachHanhKhach.add(hanhKhach);
         }
 
         // Bước 3: Insert donhang
@@ -123,8 +122,8 @@ public class BookingService {
         }
 
         // Bước 6: Insert ghe_da_dat (tách riêng khỏi createDatCho)
-        // Tạo GheDaDat cho tất cả ghế (đi + về) sau khi tất cả DatCho đã insert
-        for (int i = 0; i < danhSachDatCho.size(); i++) {
+        // Tạo GheDaDat cho ghế chiều ĐI (chỉ dùng danhSachGhe.size(), không dùng danhSachDatCho.size())
+        for (int i = 0; i < danhSachGhe.size(); i++) {
             DatCho datCho = danhSachDatCho.get(i);
             ChiTietGhe ghe = danhSachGhe.get(i);
             createGheDaDat(chuyenBayDi, ghe, datCho);

@@ -82,7 +82,7 @@ function ThongTinThanhToan({ cb, onBackToChonChuyenDi = () => {}, onBackToChonCh
                 {expanded.thongTinKhachHang && 
                     cb.passengerInfo?.map((element, index) => (
                         <div key={index} className="flex justify-between bg-gray-100 px-4 py-2 rounded-b-md text-sm">
-                            <span>{element.firstName} {element.lastName}</span>
+                            <span>{element.fullName}</span>
                             <LuPencilLine className="mt-1 cursor-pointer text-[#1E88E5] text-xl" onClick={(e) => {
                                                                     e.stopPropagation();
                                                                     onBackToThongTinKhachHang?.();
