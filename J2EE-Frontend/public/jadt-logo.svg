@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" width="32" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 50 50">
+  <defs>
+    <linearGradient id="topWing" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+    
+    <linearGradient id="bottomWing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E40AF"/>
+      <stop offset="100%" stop-color="#172554"/>
+    </linearGradient>
+  </defs>
+
+  <g>
+    <path d="M 45 5 L 5 25 L 20 27 Z" fill="url(#topWing)"/>
+    <path d="M 45 5 L 20 27 L 25 45 Z" fill="url(#bottomWing)"/>
+  </g>
+</svg>

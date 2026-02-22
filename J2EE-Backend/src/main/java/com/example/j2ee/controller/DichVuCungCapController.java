@@ -5,8 +5,8 @@ import com.example.j2ee.dto.ApiResponse;
 import com.example.j2ee.model.DichVuCungCap;
 import com.example.j2ee.model.LuaChonDichVu;
 import com.example.j2ee.service.DichVuCungCapService;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URLConnection;
+import java.nio.file.Path;
 import java.util.List;
 
 @RestController
@@ -168,7 +170,8 @@ public class DichVuCungCapController {
     @GetMapping("/anh/{filename:.+}")
     public ResponseEntity<Resource> getAnh(@PathVariable String filename) {
         try {
-            Resource resource = new ClassPathResource("static/AnhDichVuCungCap/" + filename);
+            Path filePath = dichVuCungCapService.getStorageDir().resolve(filename).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
             if (resource.exists() && resource.isReadable()) {
                 String contentType = URLConnection.guessContentTypeFromName(filename);
                 if (contentType == null) {
@@ -184,6 +187,8 @@ public class DichVuCungCapController {
             } else {
                 return ResponseEntity.notFound().build();
             }
+        } catch (MalformedURLException e) {
+            return ResponseEntity.status(500).build();
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
         }
@@ -212,7 +217,8 @@ public class DichVuCungCapController {
     @GetMapping("/luachon/anh/{filename:.+}")
     public ResponseEntity<Resource> getAnhLuaChon(@PathVariable String filename) {
         try {
-            Resource resource = new ClassPathResource("static/AnhLuaChonDichVu/" + filename);
+            Path filePath = dichVuCungCapService.getStorageDirLuaChon().resolve(filename).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
             if (resource.exists() && resource.isReadable()) {
                 String contentType = URLConnection.guessContentTypeFromName(filename);
                 if (contentType == null) {
@@ -232,6 +238,8 @@ public class DichVuCungCapController {
             } else {
                 return ResponseEntity.notFound().build();
             }
+        } catch (MalformedURLException e) {
+            return ResponseEntity.status(500).build();
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
         }
