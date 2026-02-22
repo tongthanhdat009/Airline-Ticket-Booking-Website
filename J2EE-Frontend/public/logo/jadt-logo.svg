@@ -1,34 +1,47 @@
-<svg width="260" height="60" viewBox="0 0 260 60" xmlns="http://www.w3.org/2000/svg">
+<svg width="280" height="70" viewBox="0 0 280 70" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="jadtGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#1E40AF;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#3B82F6;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#1E40AF;stop-opacity:1" />
+    <linearGradient id="topWing" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+    
+    <linearGradient id="bottomWing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E40AF"/>
+      <stop offset="100%" stop-color="#172554"/>
     </linearGradient>
 
-    <linearGradient id="planeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#1E40AF;stop-opacity:1" />
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
     </linearGradient>
 
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#1E40AF" flood-opacity="0.15"/>
+    <linearGradient id="trailGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0"/>
+      <stop offset="60%" stop-color="#38BDF8" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#1D4ED8" stop-opacity="0"/>
+    </linearGradient>
+
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#1D4ED8" flood-opacity="0.25"/>
     </filter>
   </defs>
 
-  <g filter="url(#shadow)" transform="translate(4, 0)">
-    <path d="M 36 28 C 40 28, 42 29, 42 30 C 42 31, 40 32, 36 32 L 26 32 L 16 42 L 12 42 L 18 32 L 8 32 L 4 36 L 2 36 L 4 30 L 2 24 L 4 24 L 8 28 L 18 28 L 12 18 L 16 18 L 26 28 Z" fill="url(#planeGradient)"/>
-    <circle cx="0" cy="30" r="2.5" fill="#93C5FD" opacity="0.6" />
-    <circle cx="-6" cy="30" r="1.5" fill="#93C5FD" opacity="0.3" />
+  <path d="M 0 65 Q 120 70, 240 25" fill="none" stroke="url(#trailGrad)" stroke-width="4" stroke-dasharray="8 6" stroke-linecap="round"/>
+
+  <g transform="translate(10, 5)" filter="url(#glow)">
+    <path d="M 45 10 L 5 30 L 20 32 Z" fill="url(#topWing)"/>
+    <path d="M 45 10 L 20 32 L 25 50 Z" fill="url(#bottomWing)"/>
   </g>
 
-  <text x="56" y="41" font-family="'Be Vietnam Pro', system-ui, Arial, sans-serif" font-size="34" font-weight="800" fill="url(#jadtGradient)" filter="url(#shadow)" letter-spacing="1">
-    JadT
+  <text x="65" y="47" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="36" font-weight="900" font-style="italic" fill="url(#textGrad)" letter-spacing="1">
+    Jad<tspan fill="#0EA5E9">T</tspan>
   </text>
 
-  <line x1="146" y1="23" x2="146" y2="43" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" opacity="0.4" />
+  <path d="M 165 20 L 155 52" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
 
-  <text x="158" y="39" font-family="'Be Vietnam Pro', system-ui, Arial, sans-serif" font-size="14" font-weight="600" fill="#374151" letter-spacing="3">
+  <text x="175" y="40" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="800" font-style="italic" fill="#475569" letter-spacing="3">
     AIRLINE
   </text>
+  
+  <rect x="176" y="47" width="24" height="4" rx="2" fill="#0EA5E9" />
 </svg>

@@ -4,6 +4,7 @@ import Admin, { AdminSidebarProvider } from "./pages/QuanLy/TrangChuAdmin"
 import LoginAdmin from "./pages/QuanLy/DangNhap"
 import LoginClient from "./pages/KhachHang/DangNhap"
 import ProtectedRoute, { AdminProtectedRoute } from "./components/common/ProtectedRoute"
+import { LoginGuard, RegisterGuard, AdminLoginGuard } from "./components/common/AuthGuard"
 
 import ThongKeDoanhThu from './pages/QuanLy/ThongKeDoanhThu';
 import QuanLyKhachHang from './pages/QuanLy/QuanLyKhachHang';
@@ -66,10 +67,26 @@ function AppContent() {
           {/*public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
-          <Route path="/admin/login" element={<LoginAdmin/>}/>
-          <Route path="/dang-nhap-admin" element={<LoginAdmin/>}/>
-          <Route path="/dang-nhap-client" element={<LoginClient/>}/>
-          <Route path="/dang-ky-client" element={<SignupClient/>}/>
+          <Route path="/admin/login" element={
+            <AdminLoginGuard>
+              <LoginAdmin/>
+            </AdminLoginGuard>
+          }/>
+          <Route path="/dang-nhap-admin" element={
+            <AdminLoginGuard>
+              <LoginAdmin/>
+            </AdminLoginGuard>
+          }/>
+          <Route path="/dang-nhap-client" element={
+            <LoginGuard>
+              <LoginClient/>
+            </LoginGuard>
+          }/>
+          <Route path="/dang-ky-client" element={
+            <RegisterGuard>
+              <SignupClient/>
+            </RegisterGuard>
+          }/>
           <Route path="/quen-mat-khau" element={<QuenMatKhau/>}/>
           <Route path="/oauth2/callback" element={<OAuth2Callback/>}/>
           <Route path="/hoan-thien-thong-tin" element={<HoanThienThongTin/>}/>

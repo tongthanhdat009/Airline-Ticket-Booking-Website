@@ -1,26 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaLock, FaPlaneDeparture } from 'react-icons/fa';
 import { loginAdmin } from '../../services/AuthService';
-import { isAuthenticated } from '../../services/apiClient';
 import useTitle from '../../hooks/useTitle';
 
 function DangNhapAdmin() {
     const navigate = useNavigate();
-    useTitle('Đăng nhập quản trị - Airline Booking Admin');
+    useTitle('Đăng nhập quản trị - JadT Airline Admin');
     const [formData, setFormData] = useState({
         username: '',
         password: ''
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-
-    // Nếu đã đăng nhập, chuyển về trang thống kê
-    useEffect(() => {
-        if (isAuthenticated('admin')) {
-            navigate('/admin/dashboard/ThongKe');
-        }
-    }, [navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -53,11 +45,11 @@ function DangNhapAdmin() {
 
             // Đăng nhập thành công, chuyển về trang thống kê
             console.log('Đăng nhập thành công:', response);
-            navigate('/admin/dashboard/ThongKe');
-            
+            navigate('/admin/dashboard/ThongKe', { replace: true });
+
         } catch (err) {
             console.error('Lỗi đăng nhập:', err);
-            
+
             // Xử lý các loại lỗi khác nhau
             if (err.response) {
                 switch (err.response.status) {
@@ -95,12 +87,12 @@ function DangNhapAdmin() {
                 {/* Login Card */}
                 <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-sky-500 to-blue-600 p-8 text-center">
+                    <div className="bg-linear-to-r from-sky-500 to-blue-600 p-8 text-center">
                         <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full mb-4 shadow-lg">
                             <FaPlaneDeparture className="text-blue-600" size={40} />
                         </div>
                         <h1 className="text-3xl font-bold text-white mb-2">Admin Portal</h1>
-                        <p className="text-blue-100">Hệ thống quản lý chuyến bay</p>
+                        <p className="text-blue-100">Hệ thống quản lý JadT Airline</p>
                     </div>
 
                     {/* Form */}
@@ -173,7 +165,7 @@ function DangNhapAdmin() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                                className="w-full bg-linear-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                             >
                                 {loading ? (
                                     <span className="flex items-center justify-center">
@@ -193,7 +185,7 @@ function DangNhapAdmin() {
                     {/* Footer */}
                     <div className="bg-gray-50 px-8 py-4 border-t border-gray-100">
                         <p className="text-center text-sm text-gray-600">
-                            © 2025 Admin Portal. All rights reserved.
+                            © 2026 JadT Airline Admin. All rights reserved.
                         </p>
                     </div>
                 </div>
