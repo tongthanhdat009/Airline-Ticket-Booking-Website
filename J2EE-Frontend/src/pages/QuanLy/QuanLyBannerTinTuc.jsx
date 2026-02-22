@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   FaSearch,
   FaPlus,
@@ -14,117 +14,25 @@ import {
   FaArrowDown,
   FaLink,
   FaTimes,
-  FaSave
+  FaSave,
+  FaSpinner
 } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import ViewToggleButton from '../../components/common/ViewToggleButton';
 import { useViewToggle } from '../../hooks/useViewToggle';
-
-// Dữ liệu mẫu Banner
-const mockBanners = [
-  {
-    id: 1,
-    tieuDe: 'Khuyến mãi Tết 2026 - Giảm đến 30%',
-    moTa: 'Đặt vé sớm nhận ngay ưu đãi khủng cho Tết Nguyên Đán 2026',
-    hinhAnh: 'https://placehold.co/1200x400/2563eb/ffffff?text=Khuyen+Mai+Tet+2026',
-    linkUrl: '/khuyen-mai',
-    viTri: 'hero',
-    thuTu: 1,
-    trangThai: true,
-    ngayBatDau: '2026-01-15',
-    ngayKetThuc: '2026-02-28',
-    ngayTao: '2026-01-10 09:00:00'
-  },
-  {
-    id: 2,
-    tieuDe: 'Chính sách hành lý mới 2026',
-    moTa: 'Cập nhật quy định hành lý xách tay và ký gửi áp dụng từ 01/03/2026',
-    hinhAnh: 'https://placehold.co/1200x400/059669/ffffff?text=Chinh+Sach+Hanh+Ly+Moi',
-    linkUrl: '/ho-tro',
-    viTri: 'hero',
-    thuTu: 2,
-    trangThai: true,
-    ngayBatDau: '2026-02-01',
-    ngayKetThuc: '2026-04-30',
-    ngayTao: '2026-01-25 14:00:00'
-  },
-  {
-    id: 3,
-    tieuDe: 'Bay đến Đà Nẵng chỉ từ 990K',
-    moTa: 'Đặt vé ngay để khám phá thành phố đáng sống nhất Việt Nam',
-    hinhAnh: 'https://placehold.co/1200x400/d97706/ffffff?text=Da+Nang+990K',
-    linkUrl: '/chon-chuyen-bay',
-    viTri: 'hero',
-    thuTu: 3,
-    trangThai: false,
-    ngayBatDau: '2026-02-15',
-    ngayKetThuc: '2026-03-15',
-    ngayTao: '2026-02-10 10:00:00'
-  },
-  {
-    id: 4,
-    tieuDe: 'Online Check-in mở cửa 24h trước giờ bay',
-    moTa: 'Tiết kiệm thời gian với check-in trực tuyến tiện lợi',
-    hinhAnh: 'https://placehold.co/600x300/7c3aed/ffffff?text=Online+Check-in',
-    linkUrl: '/online-check-in',
-    viTri: 'sidebar',
-    thuTu: 1,
-    trangThai: true,
-    ngayBatDau: '2026-01-01',
-    ngayKetThuc: '2026-12-31',
-    ngayTao: '2026-01-01 08:00:00'
-  }
-];
-
-// Dữ liệu mẫu Tin tức
-const mockTinTuc = [
-  {
-    id: 1,
-    tieuDe: 'JadT Airlines khai trương đường bay mới Hà Nội - Phú Quốc',
-    tomTat: 'Từ ngày 15/03/2026, JadT Airlines chính thức khai thác đường bay thẳng Hà Nội - Phú Quốc với tần suất 2 chuyến/ngày.',
-    noiDung: 'Nội dung chi tiết bài viết...',
-    hinhAnh: 'https://placehold.co/800x400/0ea5e9/ffffff?text=Duong+Bay+Moi',
-    danhMuc: 'Tin tức',
-    trangThai: 'da_xuat_ban',
-    ngayDang: '2026-02-20 10:00:00',
-    luotXem: 1250,
-    tacGia: 'Admin'
-  },
-  {
-    id: 2,
-    tieuDe: 'Cập nhật quy định mang hành lý xách tay',
-    tomTat: 'Kể từ 01/03/2026, hành khách được mang theo 01 kiện hành lý xách tay tối đa 7kg và 01 túi cá nhân.',
-    noiDung: 'Nội dung chi tiết bài viết...',
-    hinhAnh: 'https://placehold.co/800x400/f59e0b/ffffff?text=Hanh+Ly',
-    danhMuc: 'Thông báo',
-    trangThai: 'da_xuat_ban',
-    ngayDang: '2026-02-18 14:30:00',
-    luotXem: 890,
-    tacGia: 'Marketing'
-  },
-  {
-    id: 3,
-    tieuDe: 'Chương trình thành viên JadT Rewards ra mắt',
-    tomTat: 'Tích điểm mỗi chuyến bay, đổi vé miễn phí và nhận nhiều ưu đãi hấp dẫn.',
-    noiDung: 'Nội dung chi tiết bài viết...',
-    hinhAnh: 'https://placehold.co/800x400/8b5cf6/ffffff?text=JadT+Rewards',
-    danhMuc: 'Khuyến mãi',
-    trangThai: 'ban_nhap',
-    ngayDang: null,
-    luotXem: 0,
-    tacGia: 'Marketing'
-  }
-];
+import BannerService from '../../services/BannerService';
+import TinTucService from '../../services/TinTucService';
 
 const QuanLyBannerTinTuc = () => {
   const [activeTab, setActiveTab] = useState('banner');
-  const [banners, setBanners] = useState(mockBanners);
-  const [tinTuc] = useState(mockTinTuc);
+  const [banners, setBanners] = useState([]);
+  const [tinTuc, setTinTuc] = useState([]);
   const [search, setSearch] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [loading, setLoading] = useState(true);
   const { viewMode, setViewMode: handleViewChange } = useViewToggle('banner-tin-tuc-view', 'grid');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -155,6 +63,40 @@ const QuanLyBannerTinTuc = () => {
   const showToast = (message, type = 'success') => {
     setToast({ isVisible: true, message, type });
   };
+
+  // Load banners from API
+  const loadBanners = async () => {
+    try {
+      setLoading(true);
+      const data = await BannerService.getAll();
+      setBanners(data);
+    } catch (error) {
+      console.error('Lỗi khi tải danh sách banner:', error);
+      showToast('Không thể tải danh sách banner', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load tin tuc from API
+  const loadTinTuc = async () => {
+    try {
+      setLoading(true);
+      const data = await TinTucService.getAll();
+      setTinTuc(data);
+    } catch (error) {
+      console.error('Lỗi khi tải danh sách tin tức:', error);
+      showToast('Không thể tải danh sách tin tức', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load banners and tin tuc on component mount
+  useEffect(() => {
+    loadBanners();
+    loadTinTuc();
+  }, []);
 
   // Lọc dữ liệu
   const filteredBanners = banners.filter(b =>
@@ -195,35 +137,39 @@ const QuanLyBannerTinTuc = () => {
   };
 
   // Lưu banner
-  const handleSaveBanner = () => {
+  const handleSaveBanner = async () => {
     if (!bannerForm.tieuDe.trim()) {
       showToast('Vui lòng nhập tiêu đề banner', 'error');
       return;
     }
-    if (editingItem) {
-      setBanners(prev => prev.map(b =>
-        b.id === editingItem.id ? { ...b, ...bannerForm } : b
-      ));
-      showToast('Cập nhật banner thành công!');
-    } else {
-      const newBanner = {
-        ...bannerForm,
-        id: Date.now(),
-        thuTu: banners.length + 1,
-        ngayTao: new Date().toISOString()
-      };
-      setBanners(prev => [...prev, newBanner]);
-      showToast('Thêm banner mới thành công!');
+    try {
+      if (editingItem) {
+        await BannerService.update(editingItem.id, bannerForm);
+        showToast('Cập nhật banner thành công!');
+      } else {
+        await BannerService.create(bannerForm);
+        showToast('Thêm banner mới thành công!');
+      }
+      setIsFormOpen(false);
+      loadBanners();
+    } catch (error) {
+      console.error('Lỗi khi lưu banner:', error);
+      showToast(error.response?.data?.message || 'Không thể lưu banner', 'error');
     }
-    setIsFormOpen(false);
   };
 
   // Toggle trạng thái banner
-  const toggleBannerStatus = (id) => {
-    setBanners(prev => prev.map(b =>
-      b.id === id ? { ...b, trangThai: !b.trangThai } : b
-    ));
-    showToast('Đã cập nhật trạng thái banner');
+  const toggleBannerStatus = async (id) => {
+    try {
+      const banner = banners.find(b => b.id === id);
+      const newStatus = !banner.trangThai;
+      await BannerService.updateStatus(id, newStatus);
+      showToast('Đã cập nhật trạng thái banner');
+      loadBanners();
+    } catch (error) {
+      console.error('Lỗi khi cập nhật trạng thái banner:', error);
+      showToast(error.response?.data?.message || 'Không thể cập nhật trạng thái banner', 'error');
+    }
   };
 
   // Xóa banner
@@ -234,9 +180,15 @@ const QuanLyBannerTinTuc = () => {
       message: 'Bạn có chắc chắn muốn xóa banner này?',
       type: 'danger',
       confirmText: 'Xóa',
-      onConfirm: () => {
-        setBanners(prev => prev.filter(b => b.id !== id));
-        showToast('Đã xóa banner thành công');
+      onConfirm: async () => {
+        try {
+          await BannerService.delete(id);
+          showToast('Đã xóa banner thành công');
+          loadBanners();
+        } catch (error) {
+          console.error('Lỗi khi xóa banner:', error);
+          showToast(error.response?.data?.message || 'Không thể xóa banner', 'error');
+        }
         setConfirmDialog(prev => ({ ...prev, isVisible: false }));
       }
     });
