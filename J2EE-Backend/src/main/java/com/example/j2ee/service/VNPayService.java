@@ -36,6 +36,7 @@ public class VNPayService {
     private final EmailService emailService;
     private final DonHangService donHangService;
     private final DonHangRepository donHangRepository;
+    private final VnPayTransactionLogService vnPayTransactionLogService;
 
     /**
      * Lấy frontend URL
