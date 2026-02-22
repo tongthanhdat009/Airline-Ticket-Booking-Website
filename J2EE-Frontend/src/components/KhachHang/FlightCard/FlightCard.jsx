@@ -17,7 +17,6 @@ const FlightCard = ({
     hangVes, // Array of ticket classes with price and availability
     onHangVeClick,
     selectedTuyenBay, // Thay đổi từ selectedHangVe sang selectedTuyenBay
-    lockedHangVe = null // (deprecated - không còn dùng)
 }) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
