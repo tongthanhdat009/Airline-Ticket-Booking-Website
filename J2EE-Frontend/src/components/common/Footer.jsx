@@ -205,21 +205,6 @@ function Footer() {
                 </a>
               </div>
             </div>
-            
-            <div className="text-center md:text-right">
-              <p className="text-sm text-slate-300 mb-2">
-                <strong>CÔNG TY CỔ PHẦN HÀNG KHÔNG JADT AIRLINE</strong>
-              </p>
-              <p className="text-xs text-slate-500 mb-1">
-                302/3 Phố Kim Mã, Phường Ngọc Hà, TP. Hà Nội, Việt Nam.
-              </p>
-              <p className="text-xs text-slate-500">
-                Chịu trách nhiệm nội dung: <strong className="text-slate-400">Ông Nguyễn Thanh Sơn</strong>
-              </p>
-              <div className="mt-4 flex justify-center md:justify-end">
-                <img src="http://online.gov.vn/Content/EndUser/LogoCCDVSaleNoti/logoSaleNoti.png" alt="Đã thông báo Bộ Công Thương" className="h-10 opacity-80 hover:opacity-100 transition-opacity" />
-              </div>
-            </div>
           </div>
         </div>
 
