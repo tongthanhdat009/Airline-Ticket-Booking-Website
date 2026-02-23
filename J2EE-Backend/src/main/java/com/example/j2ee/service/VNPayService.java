@@ -110,10 +110,10 @@ public class VNPayService {
                 hashData.append('=');
                 hashData.append(fieldValue); // Raw value, không encode
                 
-                // Build query: CÓ encode
-                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
+                // Build query: CÓ encode (dùng UTF-8 thay vì US_ASCII)
+                query.append(URLEncoder.encode(fieldName, StandardCharsets.UTF_8.toString()));
                 query.append('=');
-                query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                query.append(URLEncoder.encode(fieldValue, StandardCharsets.UTF_8.toString()));
                 
                 if (itr.hasNext()) {
                     query.append('&');
@@ -124,6 +124,14 @@ public class VNPayService {
 
         String queryUrl = query.toString();
         String vnpSecureHash = VNPayUtil.hmacSHA512(vnPayConfig.getSecretKey(), hashData.toString());
+        
+        // DEBUG LOG
+        System.out.println("=== VNPAY DEBUG ===");
+        System.out.println("hashData: " + hashData.toString());
+        System.out.println("secretKeyLength: " + vnPayConfig.getSecretKey().length());
+        System.out.println("vnpSecureHash: " + vnpSecureHash);
+        System.out.println("===================");
+        
         queryUrl += "&vnp_SecureHash=" + vnpSecureHash;
 
         return vnPayConfig.getPayUrl() + "?" + queryUrl;
