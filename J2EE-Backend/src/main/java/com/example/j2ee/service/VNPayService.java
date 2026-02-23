@@ -84,8 +84,9 @@ public class VNPayService {
         vnpParams.put("vnp_ReturnUrl", vnPayConfig.getReturnUrl());
         vnpParams.put("vnp_IpAddr", VNPayUtil.getIpAddress(request));
 
-        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        formatter.setTimeZone(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
         String vnpCreateDate = formatter.format(cld.getTime());
         vnpParams.put("vnp_CreateDate", vnpCreateDate);
 
@@ -100,35 +101,37 @@ public class VNPayService {
         StringBuilder hashData = new StringBuilder();
         StringBuilder query = new StringBuilder();
 
-        Iterator<String> itr = fieldNames.iterator();
-        while (itr.hasNext()) {
-            String fieldName = itr.next();
+        boolean first = true;
+        for (String fieldName : fieldNames) {
             String fieldValue = vnpParams.get(fieldName);
             if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                // Build hash data: KHÔNG encode value (dùng raw value)
-                hashData.append(fieldName);
-                hashData.append('=');
-                hashData.append(fieldValue); // Raw value, không encode
-                
-                // Build query: CÓ encode (dùng UTF-8 thay vì US_ASCII)
-                query.append(URLEncoder.encode(fieldName, StandardCharsets.UTF_8.toString()));
-                query.append('=');
-                query.append(URLEncoder.encode(fieldValue, StandardCharsets.UTF_8.toString()));
-                
-                if (itr.hasNext()) {
-                    query.append('&');
+                if (!first) {
                     hashData.append('&');
+                    query.append('&');
                 }
+                // Build hash data: URL-encode (US-ASCII) - matching VNPay's Java demo
+                hashData.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
+                hashData.append('=');
+                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                
+                // Build query: URL-encode (US-ASCII)
+                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
+                query.append('=');
+                query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                
+                first = false;
             }
         }
 
         String queryUrl = query.toString();
-        String vnpSecureHash = VNPayUtil.hmacSHA512(vnPayConfig.getSecretKey(), hashData.toString());
+        String secretKey = vnPayConfig.getSecretKey().trim();
+        String vnpSecureHash = VNPayUtil.hmacSHA512(secretKey, hashData.toString());
         
         // DEBUG LOG
         System.out.println("=== VNPAY DEBUG ===");
         System.out.println("hashData: " + hashData.toString());
-        System.out.println("secretKeyLength: " + vnPayConfig.getSecretKey().length());
+        System.out.println("secretKeyLength: " + secretKey.length());
+        System.out.println("secretKeyFirst4: " + (secretKey.length() >= 4 ? secretKey.substring(0, 4) + "..." : "TOO SHORT"));
         System.out.println("vnpSecureHash: " + vnpSecureHash);
         System.out.println("===================");
         

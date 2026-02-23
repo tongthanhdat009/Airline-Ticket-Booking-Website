@@ -2,6 +2,7 @@ package com.example.j2ee.util;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -13,7 +14,7 @@ public class VNPayUtil {
                 throw new NullPointerException();
             }
             final Mac hmac512 = Mac.getInstance("HmacSHA512");
-            byte[] hmacKeyBytes = key.getBytes();
+            byte[] hmacKeyBytes = key.getBytes(StandardCharsets.UTF_8);
             final SecretKeySpec secretKey = new SecretKeySpec(hmacKeyBytes, "HmacSHA512");
             hmac512.init(secretKey);
             byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
@@ -32,20 +33,21 @@ public class VNPayUtil {
         List<String> fieldNames = new ArrayList<>(fields.keySet());
         Collections.sort(fieldNames);
         StringBuilder sb = new StringBuilder();
-        Iterator<String> itr = fieldNames.iterator();
-        while (itr.hasNext()) {
-            String fieldName = itr.next();
+        boolean first = true;
+        for (String fieldName : fieldNames) {
             String fieldValue = fields.get(fieldName);
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                sb.append(fieldName);
-                sb.append("=");
-                sb.append(fieldValue);
-            }
-            if (itr.hasNext()) {
-                sb.append("&");
+            if (fieldValue != null && !fieldValue.isEmpty()) {
+                if (!first) {
+                    sb.append('&');
+                }
+                // URL-encode field name và value (US-ASCII) - theo đúng VNPay Java demo
+                sb.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII));
+                sb.append('=');
+                sb.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
+                first = false;
             }
         }
-        return hmacSHA512(secretKey, sb.toString());
+        return hmacSHA512(secretKey.trim(), sb.toString());
     }
 
     public static String getIpAddress(jakarta.servlet.http.HttpServletRequest request) {
