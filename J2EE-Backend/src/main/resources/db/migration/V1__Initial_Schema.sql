@@ -324,7 +324,7 @@ CREATE TABLE `hoadon` (
   `created_at` DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `da_xoa` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0 = active, 1 = deleted',
-  `deleted_at` datetime DEFAULT null COMMENT 'Thờ gian xóa mềm'
+  `deleted_at` datetime DEFAULT null COMMENT 'Thời gian xóa mềm'
 );
 
 -- Bảng khuyến mãi đặt chỗ
