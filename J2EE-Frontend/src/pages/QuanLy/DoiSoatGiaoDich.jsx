@@ -95,7 +95,6 @@ const DoiSoatGiaoDich = () => {
     tongTienVNPAY: 0,
     chenhLech: 0
   });
-  const [statsLoading, setStatsLoading] = useState(false);
 
   // Toast state
   const [toast, setToast] = useState({
@@ -110,7 +109,6 @@ const DoiSoatGiaoDich = () => {
 
   // Load thống kê từ API
   const loadThongKe = async () => {
-    setStatsLoading(true);
     try {
       const response = await doiSoatGiaoDichApi.getThongKeDoiSoat();
       if (response.success && response.data) {
@@ -125,8 +123,6 @@ const DoiSoatGiaoDich = () => {
       }
     } catch (err) {
       console.error('Lỗi khi tải thống kê:', err);
-    } finally {
-      setStatsLoading(false);
     }
   };
 
@@ -177,11 +173,8 @@ const DoiSoatGiaoDich = () => {
   }, []);
 
   // Lọc dữ liệu (client-side filter cho search text)
-  const filteredData = data.filter(item => {
-    // Server-side filter already applied for search, trangThai, tuNgay, denNgay
-    // But we keep client-side filter for search text to support immediate feedback
-    return true;
-  });
+  // Server-side filter already applied for search, trangThai, tuNgay, denNgay
+  const filteredData = data;
 
   // Chạy đối soát - gọi API thực sự
   const handleReconcile = async () => {
@@ -208,23 +201,6 @@ const DoiSoatGiaoDich = () => {
       showToast(errorMsg, 'error');
     } finally {
       setIsReconciling(false);
-    }
-  };
-
-  // Cập nhật ghi chú xử lý
-  const handleUpdateNote = async (id, ghiChu, nguoiXuLy) => {
-    try {
-      await doiSoatGiaoDichApi.updateReconciliationNote(id, {
-        ghiChu,
-        nguoiXuLy,
-        trangThai: 'RESOLVED'
-      });
-      showToast('Đã cập nhật ghi chú xử lý', 'success');
-      await loadData();
-      await loadThongKe();
-    } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Lỗi khi cập nhật ghi chú';
-      showToast(errorMsg, 'error');
     }
   };
 

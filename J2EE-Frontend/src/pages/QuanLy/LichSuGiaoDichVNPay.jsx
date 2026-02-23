@@ -58,24 +58,6 @@ const formatVnpDate = (vnpDate) => {
   return `${vnpDate.slice(0, 4)}-${vnpDate.slice(4, 6)}-${vnpDate.slice(6, 8)} ${vnpDate.slice(8, 10)}:${vnpDate.slice(10, 12)}:${vnpDate.slice(12, 14)}`;
 };
 
-// Format ISO date time to display format
-const formatDateTime = (isoDateTime) => {
-  if (!isoDateTime) return '-';
-  try {
-    const date = new Date(isoDateTime);
-    return date.toLocaleString('vi-VN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    });
-  } catch (e) {
-    return isoDateTime;
-  }
-};
 
 const LichSuGiaoDichVNPay = () => {
   const [search, setSearch] = useState('');

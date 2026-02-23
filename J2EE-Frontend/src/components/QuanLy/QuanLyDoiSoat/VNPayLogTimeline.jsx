@@ -134,7 +134,7 @@ const VNPayLogTimeline = ({ txnRef }) => {
         <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
         
         <div className="space-y-3">
-          {logs.map((log, index) => (
+          {logs.map((log) => (
             <div 
               key={log.id} 
               className="relative pl-10"
