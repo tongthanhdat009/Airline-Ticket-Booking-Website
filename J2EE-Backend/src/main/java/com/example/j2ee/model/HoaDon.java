@@ -104,4 +104,17 @@ public class HoaDon {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    // ==================== RECONCILIATION FIELDS ====================
+    @Column(name = "ghichu_doisoat", length = 500)
+    private String ghiChuDoiSoat;
+
+    @Column(name = "nguoi_xuly_doisoat", length = 100)
+    private String nguoiXuLyDoiSoat;
+
+    @Column(name = "ngay_xuly_doisoat")
+    private LocalDateTime ngayXuLyDoiSoat;
+
+    @Column(name = "trangthai_doisoat", length = 20)
+    private String trangThaiDoiSoat = "PENDING"; // PENDING, RESOLVED, IGNORED
 }

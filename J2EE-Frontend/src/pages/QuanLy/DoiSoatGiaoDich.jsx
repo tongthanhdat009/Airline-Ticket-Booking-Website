@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   FaSearch,
   FaExchangeAlt,
@@ -12,128 +12,48 @@ import {
   FaRedo,
   FaClock,
   FaFilter,
-  FaDollarSign
+  FaDollarSign,
+  FaFileExcel,
+  FaDownload
 } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
 import ViewToggleButton from '../../components/common/ViewToggleButton';
 import { useViewToggle } from '../../hooks/useViewToggle';
+import doiSoatGiaoDichApi from '../../services/doiSoatGiaoDichApi';
+import VNPayLogTimeline from '../../components/QuanLy/QuanLyDoiSoat/VNPayLogTimeline';
+import ReconciliationNoteForm from '../../components/QuanLy/QuanLyDoiSoat/ReconciliationNoteForm';
 
-// Dữ liệu mẫu đối soát giao dịch
-const mockReconciliationData = [
-  {
-    id: 1,
-    maGiaoDich: 'VNP-20260215-001',
-    madonhang: 'ABC-2026-0215',
-    pnr: 'PNR001',
-    soTienHeThong: 2500000,
-    soTienVNPay: 2500000,
-    trangThaiHeThong: 'ĐÃ THANH TOÁN',
-    trangThaiVNPay: '00',
-    trangThaiDoiSoat: 'khop',
-    ngayGiaoDich: '2026-02-15 10:30:00',
-    ngayDoiSoat: '2026-02-16 02:00:00',
-    ghiChu: ''
-  },
-  {
-    id: 2,
-    maGiaoDich: 'VNP-20260215-002',
-    madonhang: 'DEF-2026-0215',
-    pnr: 'PNR002',
-    soTienHeThong: 3500000,
-    soTienVNPay: 3500000,
-    trangThaiHeThong: 'CHỜ THANH TOÁN',
-    trangThaiVNPay: '00',
-    trangThaiDoiSoat: 'lech_trang_thai',
-    ngayGiaoDich: '2026-02-15 14:20:00',
-    ngayDoiSoat: '2026-02-16 02:00:00',
-    ghiChu: 'VNPay báo thành công nhưng hệ thống chưa cập nhật. Đã tự động xử lý.'
-  },
-  {
-    id: 3,
-    maGiaoDich: 'VNP-20260216-001',
-    madonhang: 'GHI-2026-0216',
-    pnr: 'PNR003',
-    soTienHeThong: 1000000,
-    soTienVNPay: 1050000,
-    trangThaiHeThong: 'ĐÃ THANH TOÁN',
-    trangThaiVNPay: '00',
-    trangThaiDoiSoat: 'lech_so_tien',
-    ngayGiaoDich: '2026-02-16 09:15:00',
-    ngayDoiSoat: '2026-02-17 02:00:00',
-    ghiChu: 'Chênh lệch 50,000 VNĐ - cần kiểm tra thủ công'
-  },
-  {
-    id: 4,
-    maGiaoDich: 'VNP-20260216-002',
-    madonhang: null,
-    pnr: null,
-    soTienHeThong: 0,
-    soTienVNPay: 5000000,
-    trangThaiHeThong: 'KHÔNG TÌM THẤY',
-    trangThaiVNPay: '00',
-    trangThaiDoiSoat: 'chi_co_vnpay',
-    ngayGiaoDich: '2026-02-16 11:30:00',
-    ngayDoiSoat: '2026-02-17 02:00:00',
-    ghiChu: 'Giao dịch tồn tại trên VNPay nhưng không có đơn hàng tương ứng trên hệ thống'
-  },
-  {
-    id: 5,
-    maGiaoDich: 'VNP-20260217-001',
-    madonhang: 'JKL-2026-0217',
-    pnr: 'PNR005',
-    soTienHeThong: 1500000,
-    soTienVNPay: 1500000,
-    trangThaiHeThong: 'ĐÃ THANH TOÁN',
-    trangThaiVNPay: '00',
-    trangThaiDoiSoat: 'khop',
-    ngayGiaoDich: '2026-02-17 16:45:00',
-    ngayDoiSoat: '2026-02-18 02:00:00',
-    ghiChu: ''
-  },
-  {
-    id: 6,
-    maGiaoDich: null,
-    madonhang: 'MNO-2026-0218',
-    pnr: 'PNR006',
-    soTienHeThong: 2000000,
-    soTienVNPay: 0,
-    trangThaiHeThong: 'ĐÃ THANH TOÁN',
-    trangThaiVNPay: 'KHÔNG TÌM THẤY',
-    trangThaiDoiSoat: 'chi_co_he_thong',
-    ngayGiaoDich: '2026-02-18 08:00:00',
-    ngayDoiSoat: '2026-02-19 02:00:00',
-    ghiChu: 'Đơn hàng có trạng thái thanh toán nhưng VNPay không ghi nhận. Cần kiểm tra IPN.'
-  },
-  {
-    id: 7,
-    maGiaoDich: 'VNP-20260219-001',
-    madonhang: 'STU-2026-0219',
-    pnr: 'PNR007',
-    soTienHeThong: 4000000,
-    soTienVNPay: 4000000,
-    trangThaiHeThong: 'ĐÃ THANH TOÁN',
-    trangThaiVNPay: '00',
-    trangThaiDoiSoat: 'khop',
-    ngayGiaoDich: '2026-02-19 13:10:00',
-    ngayDoiSoat: '2026-02-20 02:00:00',
-    ghiChu: ''
-  },
-  {
-    id: 8,
-    maGiaoDich: 'VNP-20260220-001',
-    madonhang: 'VWX-2026-0220',
-    pnr: 'PNR008',
-    soTienHeThong: 3000000,
-    soTienVNPay: 3000000,
-    trangThaiHeThong: 'ĐÃ HỦY',
-    trangThaiVNPay: '00',
-    trangThaiDoiSoat: 'lech_trang_thai',
-    ngayGiaoDich: '2026-02-20 10:15:00',
-    ngayDoiSoat: '2026-02-21 02:00:00',
-    ghiChu: 'Đơn hàng đã hủy nhưng VNPay báo thành công. Cần hoàn tiền.'
+// Helper function to map API status to UI status
+const mapApiStatusToUiStatus = (apiStatus, hasInvoice, hasVnpay) => {
+  if (apiStatus === 'MATCHED') return 'khop';
+  if (apiStatus === 'UNMATCHED') {
+    // Determine type of mismatch based on data
+    if (!hasInvoice && hasVnpay) return 'chi_co_vnpay';
+    if (hasInvoice && !hasVnpay) return 'chi_co_he_thong';
+    return 'lech_so_tien'; // Default to amount mismatch
   }
-];
+  return 'lech_so_tien';
+};
+
+// Helper function to format API response for UI
+const formatApiDataForUi = (apiData) => {
+  if (!apiData) return [];
+  return apiData.map((item, index) => ({
+    id: item.maHoaDon || index + 1,
+    maGiaoDich: item.vnpayTransactionId || null,
+    madonhang: item.soHoaDon || null,
+    pnr: item.pnr || null,
+    soTienHeThong: item.invoiceAmount || 0,
+    soTienVNPay: item.vnpayAmount || 0,
+    trangThaiHeThong: item.invoiceAmount > 0 ? 'ĐÃ THANH TOÁN' : 'KHÔNG TÌM THẤY',
+    trangThaiVNPay: item.vnpayAmount > 0 ? '00' : 'KHÔNG TÌM THẤY',
+    trangThaiDoiSoat: mapApiStatusToUiStatus(item.status, item.invoiceAmount > 0, item.vnpayAmount > 0),
+    ngayGiaoDich: item.ngayGiaoDich || item.createdAt || new Date().toISOString().slice(0, 19).replace('T', ' '),
+    ngayDoiSoat: item.createdAt || new Date().toISOString().slice(0, 19).replace('T', ' '),
+    ghiChu: item.amountDifference > 0 ? `Chênh lệch ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.amountDifference)}` : ''
+  }));
+};
 
 // Hàm format tiền
 const formatCurrency = (amount) => {
@@ -152,14 +72,30 @@ const trangThaiConfig = {
 const DoiSoatGiaoDich = () => {
   const [search, setSearch] = useState('');
   const [filterTrangThai, setFilterTrangThai] = useState('all');
-  const [tuNgay, setTuNgay] = useState('2026-02-15');
-  const [denNgay, setDenNgay] = useState('2026-02-21');
+  const [tuNgay, setTuNgay] = useState('');
+  const [denNgay, setDenNgay] = useState('');
   const [isReconciling, setIsReconciling] = useState(false);
-  const [data] = useState(mockReconciliationData);
+  const [isExporting, setIsExporting] = useState(false);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedItemDetail, setSelectedItemDetail] = useState(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
   const { viewMode, setViewMode: handleViewChange } = useViewToggle('doi-soat-gd-view', 'table');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+
+  // Thống kê từ API
+  const [stats, setStats] = useState({
+    tongSoGiaoDich: 0,
+    soGiaoDichKhop: 0,
+    soGiaoDichKhongKhop: 0,
+    tongTienHoaDon: 0,
+    tongTienVNPAY: 0,
+    chenhLech: 0
+  });
+  const [statsLoading, setStatsLoading] = useState(false);
 
   // Toast state
   const [toast, setToast] = useState({
@@ -172,33 +108,172 @@ const DoiSoatGiaoDich = () => {
     setToast({ isVisible: true, message, type });
   };
 
-  // Lọc dữ liệu
-  const filteredData = data.filter(item => {
-    const matchSearch =
-      (item.maGiaoDich?.toLowerCase() || '').includes(search.toLowerCase()) ||
-      (item.madonhang?.toLowerCase() || '').includes(search.toLowerCase()) ||
-      (item.pnr?.toLowerCase() || '').includes(search.toLowerCase());
-    const matchStatus = filterTrangThai === 'all' || item.trangThaiDoiSoat === filterTrangThai;
-    return matchSearch && matchStatus;
-  });
-
-  // Thống kê
-  const stats = {
-    tongSo: data.length,
-    khop: data.filter(d => d.trangThaiDoiSoat === 'khop').length,
-    lech: data.filter(d => d.trangThaiDoiSoat !== 'khop').length,
-    tongTienLech: data
-      .filter(d => d.trangThaiDoiSoat !== 'khop')
-      .reduce((sum, d) => sum + Math.abs(d.soTienHeThong - d.soTienVNPay), 0)
+  // Load thống kê từ API
+  const loadThongKe = async () => {
+    setStatsLoading(true);
+    try {
+      const response = await doiSoatGiaoDichApi.getThongKeDoiSoat();
+      if (response.success && response.data) {
+        setStats({
+          tongSoGiaoDich: response.data.tongSoGiaoDich || 0,
+          soGiaoDichKhop: response.data.soGiaoDichKhop || 0,
+          soGiaoDichKhongKhop: response.data.soGiaoDichKhongKhop || 0,
+          tongTienHoaDon: response.data.tongTienHoaDon || 0,
+          tongTienVNPAY: response.data.tongTienVNPAY || 0,
+          chenhLech: response.data.chenhLech || 0
+        });
+      }
+    } catch (err) {
+      console.error('Lỗi khi tải thống kê:', err);
+    } finally {
+      setStatsLoading(false);
+    }
   };
 
-  // Chạy đối soát (mock)
-  const handleReconcile = () => {
+  // Load dữ liệu từ API
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const filters = {};
+      if (search) filters.search = search;
+      if (filterTrangThai !== 'all') {
+        // Map UI status to API status
+        filters.trangThai = filterTrangThai === 'khop' ? 'MATCHED' : 'UNMATCHED';
+      }
+      if (tuNgay) filters.tuNgay = tuNgay;
+      if (denNgay) filters.denNgay = denNgay;
+
+      const response = await doiSoatGiaoDichApi.getDanhSachDoiSoat(filters);
+
+      if (response.success && response.data) {
+        const formattedData = formatApiDataForUi(response.data);
+        setData(formattedData);
+      } else if (Array.isArray(response)) {
+        // Handle direct array response
+        const formattedData = formatApiDataForUi(response);
+        setData(formattedData);
+      } else {
+        setError(response.message || 'Không thể tải dữ liệu');
+        showToast(response.message || 'Không thể tải dữ liệu', 'error');
+      }
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || 'Lỗi khi tải dữ liệu đối soát';
+      setError(errorMsg);
+      showToast(errorMsg, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }, [search, filterTrangThai, tuNgay, denNgay]);
+
+  // Load dữ liệu khi component mount hoặc filters thay đổi
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // Load thống kê khi component mount
+  useEffect(() => {
+    loadThongKe();
+  }, []);
+
+  // Lọc dữ liệu (client-side filter cho search text)
+  const filteredData = data.filter(item => {
+    // Server-side filter already applied for search, trangThai, tuNgay, denNgay
+    // But we keep client-side filter for search text to support immediate feedback
+    return true;
+  });
+
+  // Chạy đối soát - gọi API thực sự
+  const handleReconcile = async () => {
     setIsReconciling(true);
-    setTimeout(() => {
+    try {
+      // Lấy ngày mặc định nếu không chọn
+      const defaultTuNgay = tuNgay || new Date().toISOString().split('T')[0];
+      const defaultDenNgay = denNgay || new Date().toISOString().split('T')[0];
+
+      const response = await doiSoatGiaoDichApi.runManualReconciliation({
+        tuNgay: defaultTuNgay,
+        denNgay: defaultDenNgay,
+        includeMatched: false
+      });
+
+      if (response.success || response.data) {
+        // Refresh lại data
+        await loadData();
+        await loadThongKe();
+        showToast(response.message || 'Đối soát hoàn tất!', 'success');
+      }
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || 'Lỗi khi đối soát giao dịch';
+      showToast(errorMsg, 'error');
+    } finally {
       setIsReconciling(false);
-      showToast('Đối soát hoàn tất! Đã xử lý 8 giao dịch.', 'success');
-    }, 3000);
+    }
+  };
+
+  // Cập nhật ghi chú xử lý
+  const handleUpdateNote = async (id, ghiChu, nguoiXuLy) => {
+    try {
+      await doiSoatGiaoDichApi.updateReconciliationNote(id, {
+        ghiChu,
+        nguoiXuLy,
+        trangThai: 'RESOLVED'
+      });
+      showToast('Đã cập nhật ghi chú xử lý', 'success');
+      await loadData();
+      await loadThongKe();
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || 'Lỗi khi cập nhật ghi chú';
+      showToast(errorMsg, 'error');
+    }
+  };
+
+  // Xuất báo cáo Excel
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      const defaultTuNgay = tuNgay || new Date().toISOString().split('T')[0];
+      const defaultDenNgay = denNgay || new Date().toISOString().split('T')[0];
+
+      const blob = await doiSoatGiaoDichApi.exportReconciliationReport({
+        tuNgay: defaultTuNgay,
+        denNgay: defaultDenNgay
+      });
+
+      // Tạo link download
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `doi-soat-giao-dich_${defaultTuNgay}_den_${defaultDenNgay}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      showToast('Xuất báo cáo thành công!', 'success');
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || 'Lỗi khi xuất báo cáo';
+      showToast(errorMsg, 'error');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  // Load chi tiết đối soát
+  const loadDetail = async (item) => {
+    setSelectedItem(item);
+    setLoadingDetail(true);
+    setSelectedItemDetail(null);
+    try {
+      const response = await doiSoatGiaoDichApi.getChiTietDoiSoat(item.id);
+      if (response.success && response.data) {
+        setSelectedItemDetail(response.data);
+      }
+    } catch (err) {
+      console.error('Lỗi khi tải chi tiết:', err);
+    } finally {
+      setLoadingDetail(false);
+    }
   };
 
   return (
@@ -228,7 +303,7 @@ const DoiSoatGiaoDich = () => {
             </div>
             <div>
               <p className="text-sm text-blue-600">Tổng giao dịch</p>
-              <p className="text-2xl font-bold text-blue-700">{stats.tongSo}</p>
+              <p className="text-2xl font-bold text-blue-700">{stats.tongSoGiaoDich}</p>
             </div>
           </div>
         </div>
@@ -239,7 +314,7 @@ const DoiSoatGiaoDich = () => {
             </div>
             <div>
               <p className="text-sm text-green-600">Khớp</p>
-              <p className="text-2xl font-bold text-green-700">{stats.khop}</p>
+              <p className="text-2xl font-bold text-green-700">{stats.soGiaoDichKhop}</p>
             </div>
           </div>
         </div>
@@ -250,7 +325,7 @@ const DoiSoatGiaoDich = () => {
             </div>
             <div>
               <p className="text-sm text-red-600">Lệch</p>
-              <p className="text-2xl font-bold text-red-700">{stats.lech}</p>
+              <p className="text-2xl font-bold text-red-700">{stats.soGiaoDichKhongKhop}</p>
             </div>
           </div>
         </div>
@@ -260,8 +335,8 @@ const DoiSoatGiaoDich = () => {
               <FaDollarSign className="text-orange-600" />
             </div>
             <div>
-              <p className="text-sm text-orange-600">Tổng tiền lệch</p>
-              <p className="text-2xl font-bold text-orange-700">{formatCurrency(stats.tongTienLech)}</p>
+              <p className="text-sm text-orange-600">Chênh lệch</p>
+              <p className="text-2xl font-bold text-orange-700">{formatCurrency(Math.abs(stats.chenhLech))}</p>
             </div>
           </div>
         </div>
@@ -312,26 +387,55 @@ const DoiSoatGiaoDich = () => {
           {isReconciling ? <FaSyncAlt className="animate-spin" /> : <FaRedo />}
           {isReconciling ? 'Đang đối soát...' : 'Chạy đối soát'}
         </button>
+        <button
+          onClick={handleExport}
+          disabled={isExporting}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white transition-all ${
+            isExporting ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
+          }`}
+        >
+          {isExporting ? <FaSyncAlt className="animate-spin" /> : <FaFileExcel />}
+          {isExporting ? 'Đang xuất...' : 'Xuất Excel'}
+        </button>
       </div>
+
+      {/* Loading state */}
+      {loading && (
+        <div className="flex items-center justify-center py-12">
+          <div className="flex flex-col items-center gap-3">
+            <FaSyncAlt className="text-4xl text-blue-600 animate-spin" />
+            <p className="text-gray-600">Đang tải dữ liệu đối soát...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Error state */}
+      {error && !loading && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <p className="text-red-700 text-center">{error}</p>
+        </div>
+      )}
 
       {/* Toggle view + Phân trang */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3">
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-600">
-            Hiển thị <span className="font-bold text-blue-600">{Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}</span> đến <span className="font-bold text-blue-600">{Math.min(currentPage * itemsPerPage, filteredData.length)}</span> của <span className="font-bold text-blue-600">{filteredData.length}</span>
-          </span>
-          <select value={itemsPerPage} onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
-            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 bg-white">
-            <option value={5}>5 / trang</option>
-            <option value={10}>10 / trang</option>
-            <option value={20}>20 / trang</option>
-          </select>
+      {!loading && (
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3">
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600">
+              Hiển thị <span className="font-bold text-blue-600">{Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}</span> đến <span className="font-bold text-blue-600">{Math.min(currentPage * itemsPerPage, filteredData.length)}</span> của <span className="font-bold text-blue-600">{filteredData.length}</span>
+            </span>
+            <select value={itemsPerPage} onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
+              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+              <option value={5}>5 / trang</option>
+              <option value={10}>10 / trang</option>
+              <option value={20}>20 / trang</option>
+            </select>
+          </div>
+          <ViewToggleButton currentView={viewMode} onViewChange={handleViewChange} />
         </div>
-        <ViewToggleButton currentView={viewMode} onViewChange={handleViewChange} />
-      </div>
+      )}
 
       {/* Bảng đối soát - Table view */}
-      {viewMode === 'table' ? (
+      {!loading && viewMode === 'table' ? (
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
@@ -376,7 +480,7 @@ const DoiSoatGiaoDich = () => {
                   <td className="px-3 py-3 text-xs text-gray-500">{item.ngayGiaoDich}</td>
                   <td className="px-3 py-3 text-center">
                     <button
-                      onClick={() => setSelectedItem(item)}
+                      onClick={() => loadDetail(item)}
                       className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
                       title="Xem chi tiết"
                     >
@@ -391,6 +495,7 @@ const DoiSoatGiaoDich = () => {
       </div>
       ) : (
       /* Card view */
+      !loading && (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((item) => {
           const config = trangThaiConfig[item.trangThaiDoiSoat];
@@ -430,7 +535,7 @@ const DoiSoatGiaoDich = () => {
                   <FaCalendar className="text-gray-400" />
                   <span>{item.ngayGiaoDich}</span>
                 </div>
-                <button onClick={() => setSelectedItem(item)} className="flex items-center gap-1 px-3 py-1.5 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 font-medium transition-colors">
+                <button onClick={() => loadDetail(item)} className="flex items-center gap-1 px-3 py-1.5 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 font-medium transition-colors">
                   <FaEye /> Chi tiết
                 </button>
               </div>
@@ -440,11 +545,12 @@ const DoiSoatGiaoDich = () => {
             </div>
           );
         })}
-      </div>
+        </div>
+      )
       )}
 
       {/* Phân trang phía dưới */}
-      {filteredData.length > 0 && Math.ceil(filteredData.length / itemsPerPage) > 1 && (
+      {!loading && filteredData.length > 0 && Math.ceil(filteredData.length / itemsPerPage) > 1 && (
         <div className="flex justify-center mt-4">
           <nav>
             <ul className="flex gap-2">
@@ -458,7 +564,7 @@ const DoiSoatGiaoDich = () => {
         </div>
       )}
 
-      {filteredData.length === 0 && (
+      {!loading && filteredData.length === 0 && (
         <div className="text-center py-12 text-gray-500">
           <FaExchangeAlt className="text-4xl mx-auto mb-3 text-gray-300" />
           <p>Không tìm thấy giao dịch nào phù hợp</p>
@@ -467,65 +573,120 @@ const DoiSoatGiaoDich = () => {
 
       {/* Modal chi tiết */}
       {selectedItem && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setSelectedItem(null)}>
-          <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full mx-4 p-6" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-y-auto py-10" onClick={() => setSelectedItem(null)}>
+          <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full mx-4 p-6 my-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold text-gray-800">Chi tiết đối soát</h3>
-              <button onClick={() => setSelectedItem(null)} className="text-gray-400 hover:text-gray-600">✕</button>
+              <button onClick={() => setSelectedItem(null)} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
             </div>
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <p className="text-gray-500">Mã GD VNPay</p>
-                  <p className="font-mono font-medium">{selectedItem.maGiaoDich || 'N/A'}</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <p className="text-gray-500">Mã đơn hàng</p>
-                  <p className="font-mono font-medium">{selectedItem.madonhang || 'N/A'}</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <p className="text-gray-500">Số tiền hệ thống</p>
-                  <p className="font-medium text-blue-600">{formatCurrency(selectedItem.soTienHeThong)}</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <p className="text-gray-500">Số tiền VNPay</p>
-                  <p className="font-medium text-green-600">{formatCurrency(selectedItem.soTienVNPay)}</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <p className="text-gray-500">Ngày giao dịch</p>
-                  <p className="font-medium">{selectedItem.ngayGiaoDich}</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <p className="text-gray-500">Ngày đối soát</p>
-                  <p className="font-medium">{selectedItem.ngayDoiSoat}</p>
-                </div>
+            
+            {loadingDetail ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span className="ml-2 text-gray-600">Đang tải...</span>
               </div>
-              {selectedItem.ghiChu && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                  <p className="text-xs text-yellow-600 font-semibold mb-1">Ghi chú</p>
-                  <p className="text-sm text-yellow-800">{selectedItem.ghiChu}</p>
+            ) : (
+              <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+                {/* Thông tin cơ bản */}
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <p className="text-gray-500 text-xs">Mã GD VNPay</p>
+                    <p className="font-mono font-medium">{selectedItem.maGiaoDich || 'N/A'}</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <p className="text-gray-500 text-xs">Mã đơn hàng</p>
+                    <p className="font-mono font-medium">{selectedItem.madonhang || 'N/A'}</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <p className="text-gray-500 text-xs">PNR</p>
+                    <p className="font-mono font-medium">{selectedItemDetail?.pnr || selectedItem.pnr || 'N/A'}</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <p className="text-gray-500 text-xs">Trạng thái đối soát</p>
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                      trangThaiConfig[selectedItem.trangThaiDoiSoat]?.color || 'bg-gray-100 text-gray-700'
+                    }`}>
+                      {trangThaiConfig[selectedItem.trangThaiDoiSoat]?.label || 'Không xác định'}
+                    </span>
+                  </div>
                 </div>
-              )}
-              <div className="flex gap-2 pt-2">
-                {selectedItem.trangThaiDoiSoat !== 'khop' && (
-                  <button
-                    onClick={() => {
-                      showToast('Đã đánh dấu xử lý thủ công', 'success');
-                      setSelectedItem(null);
-                    }}
-                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
-                  >
-                    Đánh dấu đã xử lý
-                  </button>
+
+                {/* So sánh số tiền */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <p className="text-blue-600 text-xs font-medium mb-1">Số tiền hệ thống</p>
+                    <p className="text-lg font-bold text-blue-700">{formatCurrency(selectedItem.soTienHeThong)}</p>
+                  </div>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <p className="text-green-600 text-xs font-medium mb-1">Số tiền VNPay</p>
+                    <p className="text-lg font-bold text-green-700">{formatCurrency(selectedItem.soTienVNPay)}</p>
+                  </div>
+                </div>
+
+                {Math.abs(selectedItem.soTienHeThong - selectedItem.soTienVNPay) > 0 && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                    <p className="text-red-600 text-xs font-medium mb-1">Chênh lệch</p>
+                    <p className="text-lg font-bold text-red-700">
+                      {formatCurrency(Math.abs(selectedItem.soTienHeThong - selectedItem.soTienVNPay))}
+                    </p>
+                  </div>
                 )}
-                <button
-                  onClick={() => setSelectedItem(null)}
-                  className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium"
-                >
-                  Đóng
-                </button>
+
+                {/* Thông tin khác */}
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <p className="text-gray-500 text-xs">Ngày giao dịch</p>
+                    <p className="font-medium">{selectedItem.ngayGiaoDich}</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <p className="text-gray-500 text-xs">Email người đặt</p>
+                    <p className="font-medium">{selectedItemDetail?.emailNguoiDat || 'N/A'}</p>
+                  </div>
+                </div>
+
+                {/* VNPay Logs Timeline */}
+                {selectedItem.maGiaoDich && (
+                  <div className="border-t pt-4">
+                    <VNPayLogTimeline txnRef={selectedItem.maGiaoDich} />
+                  </div>
+                )}
+
+                {/* Ghi chú xử lý */}
+                {selectedItem.ghiChu && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                    <p className="text-xs text-yellow-600 font-semibold mb-1">Ghi chú hiện tại</p>
+                    <p className="text-sm text-yellow-800">{selectedItem.ghiChu}</p>
+                  </div>
+                )}
+
+                {/* Form cập nhật ghi chú */}
+                {selectedItem.trangThaiDoiSoat !== 'khop' && (
+                  <div className="border-t pt-4">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Cập nhật xử lý</p>
+                    <ReconciliationNoteForm 
+                      itemId={selectedItem.id}
+                      onSuccess={() => {
+                        loadData();
+                        loadThongKe();
+                        setSelectedItem(null);
+                        showToast('Đã cập nhật ghi chú xử lý', 'success');
+                      }}
+                      onCancel={() => setSelectedItem(null)}
+                    />
+                  </div>
+                )}
+
+                {/* Nút đóng */}
+                <div className="flex gap-2 pt-2">
+                  <button
+                    onClick={() => setSelectedItem(null)}
+                    className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium"
+                  >
+                    Đóng
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       )}
