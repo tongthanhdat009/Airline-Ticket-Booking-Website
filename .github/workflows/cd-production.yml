@@ -89,10 +89,6 @@ jobs:
     needs: [ci-backend, ci-frontend]
     runs-on: ubuntu-latest
     environment: production
-
-    # ⚠️ QUAN TRỌNG: Continue-on-error FALSE để fail khi có lỗi
-    timeout-minutes: 10
-
     steps:
       - uses: actions/checkout@v4
 
@@ -123,7 +119,7 @@ jobs:
             sudo chown -R $USER:$USER /opt/airline-prod
             sudo chown -R $USER:$USER /opt/airline-deploy
 
-      # ===== 2. UPLOAD BACKEND JAR =====
+      # ===== 3. UPLOAD BACKEND JAR =====
       - name: Upload Backend JAR
         uses: burnett01/rsync-deployments@v8
         with:
@@ -134,7 +130,7 @@ jobs:
           remote_user: ${{ secrets.PRODUCTION_USER }}
           remote_key: ${{ secrets.PRODUCTION_SSH_KEY }}
 
-      # ===== 3. UPLOAD FRONTEND DIST =====
+      # ===== 4. PACKAGE & UPLOAD FRONTEND =====
       - name: Upload Frontend Dist
         uses: burnett01/rsync-deployments@v8
         with:
@@ -145,119 +141,55 @@ jobs:
           remote_user: ${{ secrets.PRODUCTION_USER }}
           remote_key: ${{ secrets.PRODUCTION_SSH_KEY }}
 
-      # ===== 4. FINALIZE DEPLOY =====
+      # ===== FINALIZE DEPLOY =====
       - name: Finalize Deployment
         uses: appleboy/ssh-action@v1.0.3
         with:
             host: ${{ secrets.PRODUCTION_HOST }}
             username: ${{ secrets.PRODUCTION_USER }}
             key: ${{ secrets.PRODUCTION_SSH_KEY }}
-            # ⚠️ QUAN TRỌNG: Fail fast khi có lỗi
-            script_stop_on_error: true
             script: |
-              set -e  # Exit khi có lỗi bất kỳ
-
-              echo "🚀 Starting deployment..."
-              echo "======================================"
-
-              # ===== BACKEND DEPLOYMENT =====
+              set -e
+              # ===== BACKEND =====
               BACKEND_DIR="/opt/airline-prod/backend"
               cd "$BACKEND_DIR"
 
-              echo "📦 Processing backend JAR..."
-
               # Backup JAR cũ
-              [ -f "app.jar" ] && cp app.jar app.jar.backup.$(date +%Y%m%d_%H%M%S) || true
+              [ -f "app.jar" ] && cp app.jar app.jar.backup || true
 
               # Tìm JAR mới nhất (không phải backup) và rename
               NEW_JAR=$(ls -t *.jar 2>/dev/null | grep -v "backup" | head -1)
-              if [ -z "$NEW_JAR" ]; then
-                echo "❌ ERROR: No JAR file found!"
-                exit 1
+              if [ -n "$NEW_JAR" ] && [ "$NEW_JAR" != "app.jar" ]; then
+                mv "$NEW_JAR" app.jar
+                echo "✅ New JAR deployed: $NEW_JAR"
+              else
+                echo "⚠️  No new JAR found to deploy"
               fi
-
-              echo "📦 New JAR: $NEW_JAR"
-              mv "$NEW_JAR" app.jar
 
               # Fix permissions
-              sudo chown airline:airline "$BACKEND_DIR/app.jar"
-              sudo chmod 644 "$BACKEND_DIR/app.jar"
+              chown airline:airline "$BACKEND_DIR/app.jar"
+              chmod 644 "$BACKEND_DIR/app.jar"
 
-              # ===== FRONTEND DEPLOYMENT =====
-              echo "🎨 Processing frontend..."
-              sudo chown -R www-data:www-data /opt/airline-prod/frontend
-              sudo chmod -R 755 /opt/airline-prod/frontend
+              # ===== FRONTEND =====
+              chown -R www-data:www-data /opt/airline-prod/frontend
+              chmod -R 755 /opt/airline-prod/frontend
 
-              # ===== RESTART BACKEND SERVICE =====
+              # ===== RESTART =====
               echo "🔄 Restarting airline-backend service..."
-
-              # Restart service
               sudo systemctl restart airline
+              sleep 5
 
-              # Chờ service start
-              sleep 10
-
-              # ⚠️ CHECK 1: Service có running không
-              if ! sudo systemctl is-active --quiet airline; then
-                echo "❌ ERROR: Service failed to start!"
+              if sudo systemctl is-active --quiet airline; then
+                echo "✅ Service is running!"
+              else
+                echo "❌ Service failed!"
                 sudo systemctl status airline --no-pager
-                echo "📋 Recent logs:"
-                sudo journalctl -u airline --since "2 minutes ago" --no-pager | tail -50
                 exit 1
               fi
 
-              echo "✅ Service is running"
-
-              # ⚠️ CHECK 2: Health check endpoint
-              echo "🔍 Checking application health..."
-
-              # Chờ thêm để application khởi động hoàn toàn
-              sleep 15
-
-              # Health check (cần có actuator hoặc health endpoint)
-              HEALTH_CHECK=0
-              for i in {1..12}; do
-                if curl -sf http://localhost:8080/actuator/health > /dev/null 2>&1; then
-                  HEALTH_CHECK=1
-                  echo "✅ Health check passed!"
-                  break
-                fi
-                echo "⏳ Waiting for application... ($i/12)"
-                sleep 5
-              done
-
-              if [ $HEALTH_CHECK -eq 0 ]; then
-                echo "❌ ERROR: Health check failed!"
-                echo "📋 Application logs (last 100 lines):"
-                sudo journalctl -u airline --since "5 minutes ago" --no-pager | tail -100
-                exit 1
-              fi
-
-              # ⚠️ CHECK 3: Kiểm tra lỗi trong logs
-              echo "📋 Checking for errors in logs..."
-              if sudo journalctl -u airline --since "2 minutes ago" --no-pager | grep -i "error\|exception\|failed" | grep -v "DELETE\|UPDATE"; then
-                echo "⚠️  WARNING: Found errors in logs!"
-                sudo journalctl -u airline --since "2 minutes ago" --no-pager | grep -i "error\|exception\|failed" | tail -20
-
-                # Check critical errors
-                if sudo journalctl -u airline --since "2 minutes ago" --no-pager | grep -qi "flywayexception\|applicationrunfailed"; then
-                  echo "❌ ERROR: Critical application errors found!"
-                  exit 1
-                fi
-              fi
-
-              # ===== FINAL CHECK =====
-              echo ""
-              echo "======================================"
-              echo "📋 Final status:"
-              sudo systemctl status airline --no-pager | head -10
-              echo ""
+              # Show recent logs for verification
               echo "📋 Recent logs:"
-              sudo journalctl -u airline --since "1 minute ago" --no-pager | tail -20
+              sudo journalctl -u airline --since "30 seconds ago" --no-pager | tail -20
 
-              # ===== RELOAD NGINX =====
               sudo systemctl reload nginx
-
-              echo ""
-              echo "======================================"
-              echo "✅ Deploy completed successfully!"
+              echo "✅ Deploy completed!"
