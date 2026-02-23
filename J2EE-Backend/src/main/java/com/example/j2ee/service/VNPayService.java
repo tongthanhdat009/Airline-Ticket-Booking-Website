@@ -76,7 +76,7 @@ public class VNPayService {
         // Sử dụng maThanhToan làm txnRef để VNPay trả về
         String txnRef = "MAT" + maThanhToan + "_" + System.currentTimeMillis();
         vnpParams.put("vnp_TxnRef", txnRef);
-        vnpParams.put("vnp_OrderInfo", "Thanh toan ve may bay - Ma thanh toan: " + maThanhToan);
+        vnpParams.put("vnp_OrderInfo", "Thanh-toan-ve-MAT" + maThanhToan);
         vnpParams.put("vnp_OrderType", VNPayConfig.ORDER_TYPE);
         vnpParams.put("vnp_Locale", VNPayConfig.LOCALE);
 
