@@ -105,14 +105,16 @@ public class VNPayService {
             String fieldName = itr.next();
             String fieldValue = vnpParams.get(fieldName);
             if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                // Build hash data
+                // Build hash data: KHÔNG encode value (dùng raw value)
                 hashData.append(fieldName);
                 hashData.append('=');
-                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-                // Build query
+                hashData.append(fieldValue); // Raw value, không encode
+                
+                // Build query: CÓ encode
                 query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
                 query.append('=');
                 query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                
                 if (itr.hasNext()) {
                     query.append('&');
                     hashData.append('&');
@@ -296,6 +298,119 @@ public class VNPayService {
             }
         }
 
+        return result;
+    }
+
+    /**
+     * Xử lý IPN (Instant Payment Notification) từ VNPay
+     * Endpoint này được VNPay gọi server-to-server để confirm kết quả giao dịch
+     * 
+     * @param params Các tham số từ VNPay
+     * @param request HttpServletRequest
+     * @return Map chứa responseCode ("00", "97", "99")
+     */
+    public Map<String, Object> handleIPN(Map<String, String> params, HttpServletRequest request) {
+        Map<String, Object> result = new HashMap<>();
+        
+        // Lấy thông tin request để log
+        String ipnUrl = request != null ? request.getRequestURL().toString() : "UNKNOWN";
+        String httpMethod = request != null ? request.getMethod() : "UNKNOWN";
+        String sourceIp = request != null ? VNPayUtil.getIpAddress(request) : "UNKNOWN";
+        
+        try {
+            String responseCode = params.get("vnp_ResponseCode");
+            String txnRef = params.get("vnp_TxnRef");
+            String vnpSecureHash = params.get("vnp_SecureHash");
+            
+            // Kiểm tra tham số bắt buộc
+            if (txnRef == null || txnRef.isEmpty()) {
+                vnPayTransactionLogService.saveTransactionLog(
+                        params, "FAILED", "IPN: Thiếu tham số vnp_TxnRef", ipnUrl, httpMethod, sourceIp);
+                result.put("responseCode", "97");
+                return result;
+            }
+            
+            // Verify chữ ký
+            Map<String, String> vnpParams = new HashMap<>(params);
+            vnpParams.remove("vnp_SecureHash");
+            vnpParams.remove("vnp_SecureHashType");
+            
+            String calculatedHash = VNPayUtil.hashAllFields(vnpParams, vnPayConfig.getSecretKey());
+            if (!calculatedHash.equals(vnpSecureHash)) {
+                vnPayTransactionLogService.saveTransactionLog(
+                        params, "FAILED", "IPN: Chữ ký không hợp lệ", ipnUrl, httpMethod, sourceIp);
+                result.put("responseCode", "97");
+                return result;
+            }
+            
+            // Trích xuất maThanhToan
+            int maThanhToan;
+            try {
+                String[] parts = txnRef.split("_");
+                maThanhToan = Integer.parseInt(parts[0].substring(3));
+            } catch (Exception e) {
+                vnPayTransactionLogService.saveTransactionLog(
+                        params, "FAILED", "IPN: Mã giao dịch không hợp lệ", ipnUrl, httpMethod, sourceIp);
+                result.put("responseCode", "97");
+                return result;
+            }
+            
+            // Xử lý kết quả giống như handlePaymentReturn nhưng không redirect
+            TrangThaiThanhToan thanhToan = trangThaiThanhToanRepository.findById(maThanhToan)
+                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thông tin thanh toán"));
+            
+            DonHang donHang = thanhToan.getDonHang();
+            if (donHang == null) {
+                throw new IllegalArgumentException("Không tìm thấy đơn hàng");
+            }
+            
+            if ("00".equals(responseCode)) {
+                // Chỉ xử lý nếu chưa thanh toán
+                if (thanhToan.getDaThanhToan() != 'Y') {
+                    thanhToan.setDaThanhToan('Y');
+                    thanhToan.setPhuongThucThanhToan("VNPAY");
+                    thanhToan.setTrangThai("COMPLETED");
+                    thanhToan.setTransactionCode(params.get("vnp_TransactionNo"));
+                    thanhToan.setThoigianThanhToan(LocalDateTime.now());
+                    trangThaiThanhToanRepository.save(thanhToan);
+                    
+                    donHang.setTrangThai("ĐÃ THANH TOÁN");
+                    donHangRepository.save(donHang);
+                    
+                    // Tạo hóa đơn
+                    try {
+                        donHangService.taoHoaDon(donHang);
+                    } catch (Exception e) {
+                        System.err.println("IPN: Failed to create invoice: " + e.getMessage());
+                    }
+                    
+                    // Gửi email
+                    try {
+                        sendTicketConfirmationEmail(thanhToan);
+                    } catch (Exception e) {
+                        System.err.println("IPN: Failed to send email: " + e.getMessage());
+                    }
+                }
+                
+                vnPayTransactionLogService.saveTransactionLog(
+                        params, "SUCCESS", "IPN: Thanh toán thành công", ipnUrl, httpMethod, sourceIp);
+                result.put("responseCode", "00");
+                
+            } else {
+                // Thanh toán thất bại
+                thanhToan.setTrangThai("FAILED");
+                trangThaiThanhToanRepository.save(thanhToan);
+                
+                vnPayTransactionLogService.saveTransactionLog(
+                        params, "FAILED", "IPN: Thanh toán thất bại - " + responseCode, ipnUrl, httpMethod, sourceIp);
+                result.put("responseCode", "00"); // Vẫn trả 00 để VNPay không retry
+            }
+            
+        } catch (Exception e) {
+            System.err.println("IPN Error: " + e.getMessage());
+            result.put("responseCode", "99");
+        }
+        
         return result;
     }
 

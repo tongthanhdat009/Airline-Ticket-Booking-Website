@@ -120,4 +120,34 @@ public class VNPayController {
             return ResponseEntity.badRequest().body(result);
         }
     }
+
+    /**
+     * IPN (Instant Payment Notification) Endpoint
+     * VNPay gọi endpoint này server-to-server để confirm kết quả giao dịch
+     * 
+     * Lưu ý quan trọng:
+     * - Endpoint này PHẢI là public (không cần authentication)
+     * - PHẢI trả về plain text "00" cho success, "97" cho invalid signature, "99" cho error
+     * - KHÔNG redirect, KHÔNG trả JSON
+     * 
+     * URL cấu hình trên VNPay: https://jadt-airline.io.vn/api/vnpay/ipn
+     */
+    @GetMapping("/ipn")
+    public ResponseEntity<String> handleIPN(
+            @RequestParam Map<String, String> params,
+            HttpServletRequest request) {
+        
+        try {
+            // Gọi service xử lý IPN
+            Map<String, Object> result = vnPayService.handleIPN(params, request);
+            
+            // Trả về mã theo chuẩn VNPay
+            String responseCode = (String) result.get("responseCode");
+            return ResponseEntity.ok(responseCode);
+            
+        } catch (Exception e) {
+            // Log lỗi và trả về mã lỗi
+            return ResponseEntity.ok("99"); // Unknown error
+        }
+    }
 }
