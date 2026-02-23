@@ -178,20 +178,29 @@ public class VNPayService {
                 return result;
             }
 
-            // Bước 7a: Verify chữ ký VNPay
-            Map<String, String> vnpParams = new HashMap<>(params);
-            vnpParams.remove("vnp_SecureHash");
-            vnpParams.remove("vnp_SecureHashType");
+            // Bước 7a: Verify chữ ký VNPay - dùng raw query string (bulletproof)
+            Map<String, Object> hashVerification = VNPayUtil.verifySecureHash(request, vnPayConfig.getSecretKey());
+            boolean isValidHash = (boolean) hashVerification.get("isValid");
 
-            String calculatedHash = VNPayUtil.hashAllFields(vnpParams, vnPayConfig.getSecretKey());
-            if (!calculatedHash.equals(vnpSecureHash)) {
+            // Debug logging
+            System.out.println("=== VNPAY CALLBACK VERIFY ===");
+            System.out.println("isValid: " + isValidHash);
+            System.out.println("receivedHash: " + hashVerification.get("receivedHash"));
+            System.out.println("calculatedHash: " + hashVerification.get("calculatedHash"));
+            System.out.println("hashData (first 200): " + String.valueOf(hashVerification.get("hashData")).substring(0, Math.min(200, String.valueOf(hashVerification.get("hashData")).length())));
+            System.out.println("secretKeyLen: " + vnPayConfig.getSecretKey().trim().length());
+            System.out.println("=============================");
+
+            if (!isValidHash) {
                 result.put("success", false);
                 result.put("message", "Chữ ký không hợp lệ");
                 result.put("data", null);
 
-                // Log trường hợp chữ ký không hợp lệ
+                // Log trường hợp chữ ký không hợp lệ - bao gồm debug info
+                String debugInfo = "Chữ ký không hợp lệ | received=" + hashVerification.get("receivedHash")
+                        + " | calculated=" + hashVerification.get("calculatedHash");
                 vnPayTransactionLogService.saveTransactionLog(
-                        params, "FAILED", "Chữ ký không hợp lệ", ipnUrl, httpMethod, sourceIp);
+                        params, "FAILED", debugInfo, ipnUrl, httpMethod, sourceIp);
                 return result;
             }
 
@@ -341,15 +350,21 @@ public class VNPayService {
                 return result;
             }
             
-            // Verify chữ ký
-            Map<String, String> vnpParams = new HashMap<>(params);
-            vnpParams.remove("vnp_SecureHash");
-            vnpParams.remove("vnp_SecureHashType");
-            
-            String calculatedHash = VNPayUtil.hashAllFields(vnpParams, vnPayConfig.getSecretKey());
-            if (!calculatedHash.equals(vnpSecureHash)) {
+            // Verify chữ ký - dùng raw query string (bulletproof)
+            Map<String, Object> hashVerification = VNPayUtil.verifySecureHash(request, vnPayConfig.getSecretKey());
+            boolean isValidHash = (boolean) hashVerification.get("isValid");
+
+            System.out.println("=== VNPAY IPN VERIFY ===");
+            System.out.println("isValid: " + isValidHash);
+            System.out.println("receivedHash: " + hashVerification.get("receivedHash"));
+            System.out.println("calculatedHash: " + hashVerification.get("calculatedHash"));
+            System.out.println("========================");
+
+            if (!isValidHash) {
+                String debugInfo = "IPN: Chữ ký không hợp lệ | received=" + hashVerification.get("receivedHash")
+                        + " | calculated=" + hashVerification.get("calculatedHash");
                 vnPayTransactionLogService.saveTransactionLog(
-                        params, "FAILED", "IPN: Chữ ký không hợp lệ", ipnUrl, httpMethod, sourceIp);
+                        params, "FAILED", debugInfo, ipnUrl, httpMethod, sourceIp);
                 result.put("responseCode", "97");
                 return result;
             }
