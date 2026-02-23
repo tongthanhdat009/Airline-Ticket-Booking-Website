@@ -6,6 +6,7 @@ import com.example.j2ee.model.DatCho;
 import com.example.j2ee.model.DonHang;
 import com.example.j2ee.model.HoaDon;
 import com.example.j2ee.model.TrangThaiThanhToan;
+import com.example.j2ee.model.VnPayTransactionLog;
 import com.example.j2ee.repository.DatChoRepository;
 import com.example.j2ee.repository.DonHangRepository;
 import com.example.j2ee.repository.TrangThaiThanhToanRepository;
@@ -36,6 +37,7 @@ public class VNPayService {
     private final EmailService emailService;
     private final DonHangService donHangService;
     private final DonHangRepository donHangRepository;
+    private final VnPayTransactionLogService vnPayTransactionLogService;
 
     /**
      * Lấy frontend URL
@@ -137,14 +139,31 @@ public class VNPayService {
                description = "Xử lý kết quả thanh toán VNPay", accountType = "CUSTOMER")
     @CacheEvict(value = { "thongKeTongQuan", "doanhThuTheoNgay", "thongKeNgay" }, allEntries = true)
     @Transactional
-    public Map<String, Object> handlePaymentReturn(Map<String, String> params) {
+    public Map<String, Object> handlePaymentReturn(Map<String, String> params, HttpServletRequest request) {
         Map<String, Object> result = new HashMap<>();
+
+        // Lấy thông tin request để log
+        String ipnUrl = request != null ? request.getRequestURL().toString() : "UNKNOWN";
+        String httpMethod = request != null ? request.getMethod() : "UNKNOWN";
+        String sourceIp = request != null ? VNPayUtil.getIpAddress(request) : "UNKNOWN";
 
         try {
             String responseCode = params.get("vnp_ResponseCode");
             String txnRef = params.get("vnp_TxnRef");
             String vnpSecureHash = params.get("vnp_SecureHash");
             String vnpTransactionNo = params.get("vnp_TransactionNo");
+
+            // Kiểm tra các tham số bắt buộc
+            if (txnRef == null || txnRef.isEmpty()) {
+                result.put("success", false);
+                result.put("message", "Thiếu tham số vnp_TxnRef");
+                result.put("data", null);
+
+                // Log trường hợp thiếu tham số
+                vnPayTransactionLogService.saveTransactionLog(
+                        params, "FAILED", "Thiếu tham số vnp_TxnRef", ipnUrl, httpMethod, sourceIp);
+                return result;
+            }
 
             // Bước 7a: Verify chữ ký VNPay
             Map<String, String> vnpParams = new HashMap<>(params);
@@ -156,6 +175,10 @@ public class VNPayService {
                 result.put("success", false);
                 result.put("message", "Chữ ký không hợp lệ");
                 result.put("data", null);
+
+                // Log trường hợp chữ ký không hợp lệ
+                vnPayTransactionLogService.saveTransactionLog(
+                        params, "FAILED", "Chữ ký không hợp lệ", ipnUrl, httpMethod, sourceIp);
                 return result;
             }
 
@@ -165,7 +188,25 @@ public class VNPayService {
                 String[] parts = txnRef.split("_");
                 maThanhToan = Integer.parseInt(parts[0].substring(3)); // Bỏ "MAT" prefix
             } catch (Exception e) {
+                // Log trường hợp mã giao dịch không hợp lệ
+                vnPayTransactionLogService.saveTransactionLog(
+                        params, "FAILED", "Mã giao dịch không hợp lệ: " + e.getMessage(), ipnUrl, httpMethod, sourceIp);
                 throw new IllegalArgumentException("Mã giao dịch không hợp lệ");
+            }
+
+            // Kiểm tra transaction duplicate (đã xử lý rồi)
+            if (vnPayTransactionLogService.existsByVnpTxnRef(txnRef)) {
+                VnPayTransactionLog existingLog = vnPayTransactionLogService.getLatestTransactionLog(txnRef);
+                if (existingLog != null && "SUCCESS".equals(existingLog.getProcessingResult())) {
+                    result.put("success", false);
+                    result.put("message", "Giao dịch này đã được xử lý trước đó");
+                    result.put("data", null);
+
+                    // Log trường hợp duplicate
+                    vnPayTransactionLogService.saveTransactionLog(
+                            params, "DUPLICATE", "Giao dịch đã được xử lý trước đó", ipnUrl, httpMethod, sourceIp);
+                    return result;
+                }
             }
 
             TrangThaiThanhToan thanhToan = trangThaiThanhToanRepository.findById(maThanhToan)
@@ -205,13 +246,33 @@ public class VNPayService {
                     System.err.println("Failed to send ticket email: " + e.getMessage());
                 }
 
+                // Log giao dịch thành công
+                vnPayTransactionLogService.saveTransactionLog(
+                        params, "SUCCESS", "Thanh toán thành công", ipnUrl, httpMethod, sourceIp);
+
                 result.put("success", true);
                 result.put("message", "Thanh toán thành công");
                 result.put("data", thanhToan);
+            } else if ("24".equals(responseCode)) {
+                // Giao dịch bị hủy (User cancelled)
+                thanhToan.setTrangThai("CANCELLED");
+                trangThaiThanhToanRepository.save(thanhToan);
+
+                // Log giao dịch bị hủy
+                vnPayTransactionLogService.saveTransactionLog(
+                        params, "CANCELLED", "Người dùng hủy giao dịch", ipnUrl, httpMethod, sourceIp);
+
+                result.put("success", false);
+                result.put("message", "Giao dịch đã bị hủy");
+                result.put("data", null);
             } else {
-                // Thanh toán thất bại
+                // Thanh toán thất bại (các mã lỗi khác)
                 thanhToan.setTrangThai("FAILED");
                 trangThaiThanhToanRepository.save(thanhToan);
+
+                // Log giao dịch thất bại
+                vnPayTransactionLogService.saveTransactionLog(
+                        params, "FAILED", "Thanh toán thất bại. Mã lỗi: " + responseCode, ipnUrl, httpMethod, sourceIp);
 
                 result.put("success", false);
                 result.put("message", "Thanh toán thất bại. Mã lỗi: " + responseCode);
@@ -221,6 +282,18 @@ public class VNPayService {
             result.put("success", false);
             result.put("message", "Lỗi xử lý kết quả thanh toán: " + e.getMessage());
             result.put("data", null);
+
+            // Log lỗi xử lý (chỉ log nếu chưa log trước đó)
+            // Kiểm tra xem đây có phải là lỗi từ IllegalArgumentException đã log không
+            if (!e.getMessage().contains("Mã giao dịch không hợp lệ")) {
+                try {
+                    vnPayTransactionLogService.saveTransactionLog(
+                            params, "FAILED", "Lỗi xử lý: " + e.getMessage(), ipnUrl, httpMethod, sourceIp);
+                } catch (Exception logException) {
+                    // Ignore logging errors to avoid masking the original exception
+                    System.err.println("Failed to log transaction error: " + logException.getMessage());
+                }
+            }
         }
 
         return result;

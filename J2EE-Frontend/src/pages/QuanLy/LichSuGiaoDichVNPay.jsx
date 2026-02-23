@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   FaSearch,
   FaServer,
@@ -12,156 +12,14 @@ import {
   FaEye,
   FaCopy,
   FaCode,
-  FaExchangeAlt
+  FaExchangeAlt,
+  FaSpinner
 } from 'react-icons/fa';
 import Card from '../../components/QuanLy/CardChucNang';
 import Toast from '../../components/common/Toast';
 import ViewToggleButton from '../../components/common/ViewToggleButton';
 import useViewToggle from '../../hooks/useViewToggle';
-
-// Dữ liệu mẫu log giao dịch VNPay IPN
-const mockTransactionLogs = [
-  {
-    id: 1,
-    vnpTxnRef: 'ORD-2026-0215-001',
-    vnpTransactionNo: '14268537',
-    vnpAmount: 250000000, // VNPay trả về đơn vị x100
-    vnpResponseCode: '00',
-    vnpTransactionStatus: '00',
-    vnpBankCode: 'NCB',
-    vnpBankTranNo: 'VNP14268537',
-    vnpPayDate: '20260215103045',
-    vnpOrderInfo: 'Thanh toan don hang ORD-2026-0215-001',
-    vnpSecureHash: 'abc123def456...',
-    ipnUrl: '/api/vnpay/ipn',
-    ipnReceivedAt: '2026-02-15 10:30:48',
-    httpMethod: 'GET',
-    sourceIp: '113.52.45.78',
-    processingResult: 'SUCCESS',
-    processingMessage: 'Đã xử lý thành công. Đơn hàng cập nhật thành ĐÃ THANH TOÁN.',
-    rawData: '{"vnp_Amount":"250000000","vnp_BankCode":"NCB","vnp_BankTranNo":"VNP14268537","vnp_CardType":"ATM","vnp_OrderInfo":"Thanh toan don hang ORD-2026-0215-001","vnp_PayDate":"20260215103045","vnp_ResponseCode":"00","vnp_TmnCode":"ABC123","vnp_TransactionNo":"14268537","vnp_TransactionStatus":"00","vnp_TxnRef":"ORD-2026-0215-001"}'
-  },
-  {
-    id: 2,
-    vnpTxnRef: 'ORD-2026-0215-002',
-    vnpTransactionNo: '14268538',
-    vnpAmount: 350000000,
-    vnpResponseCode: '00',
-    vnpTransactionStatus: '00',
-    vnpBankCode: 'VCB',
-    vnpBankTranNo: 'VNP14268538',
-    vnpPayDate: '20260215142020',
-    vnpOrderInfo: 'Thanh toan don hang ORD-2026-0215-002',
-    vnpSecureHash: 'xyz789ghi012...',
-    ipnUrl: '/api/vnpay/ipn',
-    ipnReceivedAt: '2026-02-15 14:20:23',
-    httpMethod: 'GET',
-    sourceIp: '113.52.45.78',
-    processingResult: 'FAILED',
-    processingMessage: 'Lỗi: Đơn hàng không tìm thấy trong hệ thống. vnp_TxnRef không khớp.',
-    rawData: '{"vnp_Amount":"350000000","vnp_BankCode":"VCB","vnp_BankTranNo":"VNP14268538","vnp_CardType":"ATM","vnp_OrderInfo":"Thanh toan don hang ORD-2026-0215-002","vnp_PayDate":"20260215142020","vnp_ResponseCode":"00","vnp_TmnCode":"ABC123","vnp_TransactionNo":"14268538","vnp_TransactionStatus":"00","vnp_TxnRef":"ORD-2026-0215-002"}'
-  },
-  {
-    id: 3,
-    vnpTxnRef: 'ORD-2026-0216-001',
-    vnpTransactionNo: '14268539',
-    vnpAmount: 100000000,
-    vnpResponseCode: '24',
-    vnpTransactionStatus: '02',
-    vnpBankCode: 'BIDV',
-    vnpBankTranNo: '',
-    vnpPayDate: '20260216091530',
-    vnpOrderInfo: 'Thanh toan don hang ORD-2026-0216-001',
-    vnpSecureHash: 'mno345pqr678...',
-    ipnUrl: '/api/vnpay/ipn',
-    ipnReceivedAt: '2026-02-16 09:15:33',
-    httpMethod: 'GET',
-    sourceIp: '113.52.45.78',
-    processingResult: 'CANCELLED',
-    processingMessage: 'Khách hàng hủy giao dịch (vnp_ResponseCode=24). Đơn hàng giữ trạng thái CHỜ THANH TOÁN.',
-    rawData: '{"vnp_Amount":"100000000","vnp_BankCode":"BIDV","vnp_OrderInfo":"Thanh toan don hang ORD-2026-0216-001","vnp_PayDate":"20260216091530","vnp_ResponseCode":"24","vnp_TmnCode":"ABC123","vnp_TransactionNo":"14268539","vnp_TransactionStatus":"02","vnp_TxnRef":"ORD-2026-0216-001"}'
-  },
-  {
-    id: 4,
-    vnpTxnRef: 'ORD-2026-0217-001',
-    vnpTransactionNo: '14268540',
-    vnpAmount: 500000000,
-    vnpResponseCode: '00',
-    vnpTransactionStatus: '00',
-    vnpBankCode: 'TCB',
-    vnpBankTranNo: 'VNP14268540',
-    vnpPayDate: '20260217113005',
-    vnpOrderInfo: 'Thanh toan don hang ORD-2026-0217-001',
-    vnpSecureHash: 'stu901vwx234...',
-    ipnUrl: '/api/vnpay/ipn',
-    ipnReceivedAt: '2026-02-17 11:30:08',
-    httpMethod: 'GET',
-    sourceIp: '113.52.45.78',
-    processingResult: 'SUCCESS',
-    processingMessage: 'Đã xử lý thành công. Đơn hàng cập nhật thành ĐÃ THANH TOÁN.',
-    rawData: '{"vnp_Amount":"500000000","vnp_BankCode":"TCB","vnp_BankTranNo":"VNP14268540","vnp_OrderInfo":"Thanh toan don hang ORD-2026-0217-001","vnp_PayDate":"20260217113005","vnp_ResponseCode":"00","vnp_TmnCode":"ABC123","vnp_TransactionNo":"14268540","vnp_TransactionStatus":"00","vnp_TxnRef":"ORD-2026-0217-001"}'
-  },
-  {
-    id: 5,
-    vnpTxnRef: 'ORD-2026-0218-001',
-    vnpTransactionNo: '14268541',
-    vnpAmount: 150000000,
-    vnpResponseCode: '00',
-    vnpTransactionStatus: '00',
-    vnpBankCode: 'MB',
-    vnpBankTranNo: 'VNP14268541',
-    vnpPayDate: '20260218164503',
-    vnpOrderInfo: 'Thanh toan don hang ORD-2026-0218-001',
-    vnpSecureHash: 'yza567bcd890...',
-    ipnUrl: '/api/vnpay/ipn',
-    ipnReceivedAt: '2026-02-18 16:45:06',
-    httpMethod: 'GET',
-    sourceIp: '113.52.45.78',
-    processingResult: 'SUCCESS',
-    processingMessage: 'Đã xử lý thành công. Đơn hàng cập nhật thành ĐÃ THANH TOÁN.',
-    rawData: '{"vnp_Amount":"150000000","vnp_BankCode":"MB","vnp_BankTranNo":"VNP14268541","vnp_OrderInfo":"Thanh toan don hang ORD-2026-0218-001","vnp_PayDate":"20260218164503","vnp_ResponseCode":"00","vnp_TmnCode":"ABC123","vnp_TransactionNo":"14268541","vnp_TransactionStatus":"00","vnp_TxnRef":"ORD-2026-0218-001"}'
-  },
-  {
-    id: 6,
-    vnpTxnRef: 'ORD-2026-0219-001',
-    vnpTransactionNo: '14268542',
-    vnpAmount: 200000000,
-    vnpResponseCode: '51',
-    vnpTransactionStatus: '02',
-    vnpBankCode: 'ACB',
-    vnpBankTranNo: '',
-    vnpPayDate: '20260219080010',
-    vnpOrderInfo: 'Thanh toan don hang ORD-2026-0219-001',
-    vnpSecureHash: 'efg123hij456...',
-    ipnUrl: '/api/vnpay/ipn',
-    ipnReceivedAt: '2026-02-19 08:00:13',
-    httpMethod: 'GET',
-    sourceIp: '113.52.45.78',
-    processingResult: 'FAILED',
-    processingMessage: 'Tài khoản không đủ số dư (vnp_ResponseCode=51).',
-    rawData: '{"vnp_Amount":"200000000","vnp_BankCode":"ACB","vnp_OrderInfo":"Thanh toan don hang ORD-2026-0219-001","vnp_PayDate":"20260219080010","vnp_ResponseCode":"51","vnp_TmnCode":"ABC123","vnp_TransactionNo":"14268542","vnp_TransactionStatus":"02","vnp_TxnRef":"ORD-2026-0219-001"}'
-  },
-  {
-    id: 7,
-    vnpTxnRef: 'ORD-2026-0220-001',
-    vnpTransactionNo: '14268543',
-    vnpAmount: 300000000,
-    vnpResponseCode: '00',
-    vnpTransactionStatus: '00',
-    vnpBankCode: 'VCB',
-    vnpBankTranNo: 'VNP14268543',
-    vnpPayDate: '20260220101520',
-    vnpOrderInfo: 'Thanh toan don hang ORD-2026-0220-001',
-    vnpSecureHash: 'klm789nop012...',
-    ipnUrl: '/api/vnpay/ipn',
-    ipnReceivedAt: '2026-02-20 10:15:23',
-    httpMethod: 'GET',
-    sourceIp: '113.52.45.78',
-    processingResult: 'DUPLICATE',
-    processingMessage: 'IPN trùng lặp. Đơn hàng đã được xử lý trước đó. Bỏ qua.',
-    rawData: '{"vnp_Amount":"300000000","vnp_BankCode":"VCB","vnp_BankTranNo":"VNP14268543","vnp_OrderInfo":"Thanh toan don hang ORD-2026-0220-001","vnp_PayDate":"20260220101520","vnp_ResponseCode":"00","vnp_TmnCode":"ABC123","vnp_TransactionNo":"14268543","vnp_TransactionStatus":"00","vnp_TxnRef":"ORD-2026-0220-001"}'
-  }
-];
+import vnPayTransactionLogService from '../../services/vnPayTransactionLogService';
 
 // Mapping VNPay response codes
 const vnpResponseCodes = {
@@ -194,23 +52,45 @@ const formatAmount = (vnpAmount) => {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 };
 
-// Format VNPay pay date  
+// Format VNPay pay date
 const formatVnpDate = (vnpDate) => {
   if (!vnpDate || vnpDate.length !== 14) return vnpDate;
   return `${vnpDate.slice(0, 4)}-${vnpDate.slice(4, 6)}-${vnpDate.slice(6, 8)} ${vnpDate.slice(8, 10)}:${vnpDate.slice(10, 12)}:${vnpDate.slice(12, 14)}`;
 };
 
+// Format ISO date time to display format
+const formatDateTime = (isoDateTime) => {
+  if (!isoDateTime) return '-';
+  try {
+    const date = new Date(isoDateTime);
+    return date.toLocaleString('vi-VN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
+  } catch (e) {
+    return isoDateTime;
+  }
+};
+
 const LichSuGiaoDichVNPay = () => {
   const [search, setSearch] = useState('');
   const [filterResult, setFilterResult] = useState('all');
-  const [tuNgay, setTuNgay] = useState('2026-02-15');
-  const [denNgay, setDenNgay] = useState('2026-02-21');
-  const [logs] = useState(mockTransactionLogs);
+  const [tuNgay, setTuNgay] = useState('');
+  const [denNgay, setDenNgay] = useState('');
+  const [logs, setLogs] = useState([]);
   const [selectedLog, setSelectedLog] = useState(null);
   const [showRawData, setShowRawData] = useState(false);
   const { viewMode, setViewMode } = useViewToggle('lich-su-gd-vnpay-view', 'table');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   // Toast
   const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
@@ -218,22 +98,120 @@ const LichSuGiaoDichVNPay = () => {
     setToast({ isVisible: true, message, type });
   };
 
-  // Lọc
-  const filteredLogs = logs.filter(log => {
-    const matchSearch =
-      log.vnpTxnRef.toLowerCase().includes(search.toLowerCase()) ||
-      log.vnpTransactionNo.toLowerCase().includes(search.toLowerCase()) ||
-      log.vnpBankCode.toLowerCase().includes(search.toLowerCase());
-    const matchResult = filterResult === 'all' || log.processingResult === filterResult;
-    return matchSearch && matchResult;
+  // Thống kê
+  const [stats, setStats] = useState({
+    total: 0,
+    success: 0,
+    failed: 0,
+    cancelled: 0,
+    duplicate: 0,
+    others: 0
   });
 
-  // Thống kê
-  const stats = {
-    total: logs.length,
-    success: logs.filter(l => l.processingResult === 'SUCCESS').length,
-    failed: logs.filter(l => l.processingResult === 'FAILED').length,
-    others: logs.filter(l => !['SUCCESS', 'FAILED'].includes(l.processingResult)).length
+  // Load dữ liệu transaction logs từ API
+  const loadTransactionLogs = async () => {
+    setLoading(true);
+    try {
+      const params = {
+        page: currentPage,
+        size: itemsPerPage,
+        search: search || undefined,
+        processingResult: filterResult !== 'all' ? filterResult : undefined,
+        tuNgay: tuNgay || undefined,
+        denNgay: denNgay || undefined
+      };
+
+      const response = await vnPayTransactionLogService.getTransactionLogs(params);
+      if (response.success) {
+        setLogs(response.data.content || []);
+        setTotalPages(response.data.totalPages || 0);
+        setTotalElements(response.data.totalElements || 0);
+      } else {
+        showToast(response.message || 'Không thể tải dữ liệu', 'error');
+        setLogs([]);
+        setTotalPages(0);
+        setTotalElements(0);
+      }
+    } catch (error) {
+      console.error('Error loading transaction logs:', error);
+      showToast('Có lỗi xảy ra khi tải dữ liệu', 'error');
+      setLogs([]);
+      setTotalPages(0);
+      setTotalElements(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load thống kê từ API
+  const loadStatistics = async () => {
+    try {
+      const params = {
+        tuNgay: tuNgay || undefined,
+        denNgay: denNgay || undefined
+      };
+      const response = await vnPayTransactionLogService.getStatistics(params);
+      if (response.success) {
+        const data = response.data || {};
+        setStats({
+          total: data.total || 0,
+          success: data.success || 0,
+          failed: data.failed || 0,
+          cancelled: data.cancelled || 0,
+          duplicate: data.duplicate || 0,
+          others: (data.cancelled || 0) + (data.duplicate || 0)
+        });
+      }
+    } catch (error) {
+      console.error('Error loading statistics:', error);
+    }
+  };
+
+  // Load dữ liệu khi component mount hoặc filter/page thay đổi
+  useEffect(() => {
+    loadTransactionLogs();
+  }, [currentPage, itemsPerPage]);
+
+  // Load thống kê khi component mount hoặc filter thay đổi
+  useEffect(() => {
+    loadStatistics();
+  }, [filterResult, tuNgay, denNgay]);
+
+  // Xử lý tìm kiếm
+  const handleSearch = () => {
+    setCurrentPage(0);
+    loadTransactionLogs();
+  };
+
+  // Xử lý khi Enter trong ô tìm kiếm
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  // Xử lý khi filter thay đổi
+  const handleFilterChange = (key, value) => {
+    if (key === 'filterResult') {
+      setFilterResult(value);
+    } else if (key === 'tuNgay') {
+      setTuNgay(value);
+    } else if (key === 'denNgay') {
+      setDenNgay(value);
+    }
+    setCurrentPage(0);
+    loadTransactionLogs();
+  };
+
+  // Xử lý phân trang
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const handleItemsPerPageChange = (e) => {
+    const newValue = parseInt(e.target.value);
+    setItemsPerPage(newValue);
+    setCurrentPage(0);
   };
 
   // Copy raw data
@@ -309,14 +287,22 @@ const LichSuGiaoDichVNPay = () => {
             placeholder="Tìm theo vnp_TxnRef, TransactionNo, BankCode..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            onKeyPress={handleSearchKeyPress}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm font-mono"
           />
         </div>
+        <button
+          onClick={handleSearch}
+          disabled={loading}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm"
+        >
+          <FaFilter /> Tìm kiếm
+        </button>
         <div className="flex items-center gap-2">
           <FaFilter className="text-gray-400" />
           <select
             value={filterResult}
-            onChange={(e) => setFilterResult(e.target.value)}
+            onChange={(e) => handleFilterChange('filterResult', e.target.value)}
             className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
           >
             <option value="all">Tất cả kết quả</option>
@@ -328,19 +314,21 @@ const LichSuGiaoDichVNPay = () => {
         </div>
         <div className="flex items-center gap-2">
           <FaCalendar className="text-gray-400" />
-          <input type="date" value={tuNgay} onChange={(e) => setTuNgay(e.target.value)}
+          <input type="date" value={tuNgay} onChange={(e) => handleFilterChange('tuNgay', e.target.value)}
             className="border border-gray-300 rounded-lg px-3 py-2 text-sm" />
           <span className="text-gray-400">-</span>
-          <input type="date" value={denNgay} onChange={(e) => setDenNgay(e.target.value)}
+          <input type="date" value={denNgay} onChange={(e) => handleFilterChange('denNgay', e.target.value)}
             className="border border-gray-300 rounded-lg px-3 py-2 text-sm" />
         </div>
-        <ViewToggleButton currentView={viewMode} onViewChange={(v) => { setViewMode(v); setCurrentPage(1); }} />
+        <ViewToggleButton currentView={viewMode} onViewChange={(v) => { setViewMode(v); setCurrentPage(0); }} />
       </div>
 
       {/* Pagination header */}
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-gray-500">Hiển thị {Math.min(filteredLogs.length, itemsPerPage)} / {filteredLogs.length} bản ghi</p>
-        <select value={itemsPerPage} onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }} className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm">
+        <p className="text-sm text-gray-500">
+          Hiển thị {logs.length > 0 ? currentPage * itemsPerPage + 1 : 0} đến {Math.min((currentPage + 1) * itemsPerPage, totalElements)} / {totalElements} bản ghi
+        </p>
+        <select value={itemsPerPage} onChange={handleItemsPerPageChange} className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm">
           <option value={5}>5 / trang</option>
           <option value={10}>10 / trang</option>
           <option value={20}>20 / trang</option>
@@ -348,14 +336,19 @@ const LichSuGiaoDichVNPay = () => {
       </div>
 
       {/* Bảng logs / Card view */}
-      {filteredLogs.length === 0 ? (
+      {loading ? (
+        <div className="text-center py-12 text-gray-500">
+          <FaSpinner className="text-4xl mx-auto mb-3 text-blue-500 animate-spin" />
+          <p>Đang tải dữ liệu...</p>
+        </div>
+      ) : logs.length === 0 ? (
         <div className="text-center py-12 text-gray-500">
           <FaServer className="text-4xl mx-auto mb-3 text-gray-300" />
           <p>Không tìm thấy log giao dịch nào</p>
         </div>
       ) : viewMode === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredLogs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((log) => {
+          {logs.map((log) => {
             const statusConfig = processingStatusConfig[log.processingResult] || processingStatusConfig.FAILED;
             const StatusIcon = statusConfig.icon;
             const responseInfo = vnpResponseCodes[log.vnpResponseCode] || { label: `Code ${log.vnpResponseCode}`, color: 'text-gray-600' };
@@ -422,7 +415,7 @@ const LichSuGiaoDichVNPay = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredLogs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((log, index) => {
+              {logs.map((log, index) => {
                 const statusConfig = processingStatusConfig[log.processingResult] || processingStatusConfig.FAILED;
                 const StatusIcon = statusConfig.icon;
                 const responseInfo = vnpResponseCodes[log.vnpResponseCode] || { label: `Code ${log.vnpResponseCode}`, color: 'text-gray-600' };
@@ -468,19 +461,15 @@ const LichSuGiaoDichVNPay = () => {
       )}
 
       {/* Pagination */}
-      {(() => {
-        const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
-        if (totalPages <= 1) return null;
-        return (
-          <div className="flex items-center justify-center gap-2 mt-6">
-            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-1.5 rounded-lg border text-sm disabled:opacity-50 hover:bg-gray-100">← Trước</button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-              <button key={page} onClick={() => setCurrentPage(page)} className={`w-9 h-9 rounded-lg text-sm font-medium ${page === currentPage ? 'bg-blue-600 text-white' : 'border hover:bg-gray-100'}`}>{page}</button>
-            ))}
-            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-3 py-1.5 rounded-lg border text-sm disabled:opacity-50 hover:bg-gray-100">Sau →</button>
-          </div>
-        );
-      })()}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-6">
+          <button onClick={() => paginate(currentPage - 1)} disabled={currentPage === 0} className="px-3 py-1.5 rounded-lg border text-sm disabled:opacity-50 hover:bg-gray-100">← Trước</button>
+          {Array.from({ length: totalPages }, (_, i) => i).map(page => (
+            <button key={page} onClick={() => paginate(page)} className={`w-9 h-9 rounded-lg text-sm font-medium ${page === currentPage ? 'bg-blue-600 text-white' : 'border hover:bg-gray-100'}`}>{page + 1}</button>
+          ))}
+          <button onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages - 1} className="px-3 py-1.5 rounded-lg border text-sm disabled:opacity-50 hover:bg-gray-100">Sau →</button>
+        </div>
+      )}
 
       {/* Modal chi tiết log */}
       {selectedLog && (
