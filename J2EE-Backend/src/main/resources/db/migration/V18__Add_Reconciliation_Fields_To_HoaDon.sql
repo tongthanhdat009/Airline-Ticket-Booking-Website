@@ -3,18 +3,97 @@
 -- Date: 2026-02-23
 -- Description: Add fields for tracking transaction reconciliation status and processing notes
 
--- Add reconciliation fields to hoadon table
-ALTER TABLE hoadon
-ADD COLUMN ghichu_doisoat VARCHAR(500) NULL COMMENT 'Ghi chú xử lý đối soát',
-ADD COLUMN nguoi_xuly_doisoat VARCHAR(100) NULL COMMENT 'Ngưởi xử lý đối soát',
-ADD COLUMN ngay_xuly_doisoat DATETIME NULL COMMENT 'Ngày xử lý đối soát',
-ADD COLUMN trangthai_doisoat VARCHAR(20) NULL DEFAULT 'PENDING' COMMENT 'Trạng thái đối soát: PENDING, RESOLVED, IGNORED';
+-- Use stored procedure to safely add columns (MySQL doesn't support IF NOT EXISTS for ADD COLUMN)
+DELIMITER $$
 
--- Create index for faster filtering by reconciliation status
-CREATE INDEX idx_hoadon_doisoat ON hoadon(trangthai_doisoat);
+DROP PROCEDURE IF EXISTS AddReconciliationColumns$$
 
--- Add index for processing date
-CREATE INDEX idx_hoadon_ngay_xuly_doisoat ON hoadon(ngay_xuly_doisoat);
+CREATE PROCEDURE AddReconciliationColumns()
+BEGIN
+    -- Add ghichu_doisoat column if not exists
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.COLUMNS 
+        WHERE TABLE_SCHEMA = DATABASE() 
+        AND TABLE_NAME = 'hoadon' 
+        AND COLUMN_NAME = 'ghichu_doisoat'
+    ) THEN
+        ALTER TABLE hoadon ADD COLUMN ghichu_doisoat VARCHAR(500) NULL COMMENT 'Ghi chú xử lý đối soát';
+    END IF;
+
+    -- Add nguoi_xuly_doisoat column if not exists
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.COLUMNS 
+        WHERE TABLE_SCHEMA = DATABASE() 
+        AND TABLE_NAME = 'hoadon' 
+        AND COLUMN_NAME = 'nguoi_xuly_doisoat'
+    ) THEN
+        ALTER TABLE hoadon ADD COLUMN nguoi_xuly_doisoat VARCHAR(100) NULL COMMENT 'Ngưởi xử lý đối soát';
+    END IF;
+
+    -- Add ngay_xuly_doisoat column if not exists
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.COLUMNS 
+        WHERE TABLE_SCHEMA = DATABASE() 
+        AND TABLE_NAME = 'hoadon' 
+        AND COLUMN_NAME = 'ngay_xuly_doisoat'
+    ) THEN
+        ALTER TABLE hoadon ADD COLUMN ngay_xuly_doisoat DATETIME NULL COMMENT 'Ngày xử lý đối soát';
+    END IF;
+
+    -- Add trangthai_doisoat column if not exists
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.COLUMNS 
+        WHERE TABLE_SCHEMA = DATABASE() 
+        AND TABLE_NAME = 'hoadon' 
+        AND COLUMN_NAME = 'trangthai_doisoat'
+    ) THEN
+        ALTER TABLE hoadon ADD COLUMN trangthai_doisoat VARCHAR(20) NULL DEFAULT 'PENDING' COMMENT 'Trạng thái đối soát: PENDING, RESOLVED, IGNORED';
+    END IF;
+END$$
+
+DELIMITER ;
+
+-- Execute the procedure
+CALL AddReconciliationColumns();
+
+-- Clean up
+DROP PROCEDURE IF EXISTS AddReconciliationColumns;
+
+-- Create indexes using stored procedure
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS AddReconciliationIndexes$$
+
+CREATE PROCEDURE AddReconciliationIndexes()
+BEGIN
+    -- Create index for reconciliation status if not exists
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.STATISTICS 
+        WHERE TABLE_SCHEMA = DATABASE() 
+        AND TABLE_NAME = 'hoadon' 
+        AND INDEX_NAME = 'idx_hoadon_doisoat'
+    ) THEN
+        CREATE INDEX idx_hoadon_doisoat ON hoadon(trangthai_doisoat);
+    END IF;
+
+    -- Create index for processing date if not exists
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.STATISTICS 
+        WHERE TABLE_SCHEMA = DATABASE() 
+        AND TABLE_NAME = 'hoadon' 
+        AND INDEX_NAME = 'idx_hoadon_ngay_xuly_doisoat'
+    ) THEN
+        CREATE INDEX idx_hoadon_ngay_xuly_doisoat ON hoadon(ngay_xuly_doisoat);
+    END IF;
+END$$
+
+DELIMITER ;
+
+-- Execute the procedure
+CALL AddReconciliationIndexes();
+
+-- Clean up
+DROP PROCEDURE IF EXISTS AddReconciliationIndexes;
 
 -- =================================================================
 -- DỮ LIỆU MẪU CHO CHỨC NĂNG ĐỐI SOÁT GIAO DỊCH
@@ -74,6 +153,7 @@ WHERE mahoadon IN (
 );
 
 -- Cập nhật hóa đơn bỏ qua đối soát (IGNORED)
+-- Sửa: Không có cột ghichu, dùng điều kiện khác (ví dụ: mã đơn hàng chứa 'TEST')
 UPDATE hoadon 
 SET 
     trangthai_doisoat = 'IGNORED',
@@ -86,7 +166,7 @@ WHERE mahoadon IN (
         FROM hoadon h
         INNER JOIN donhang dh ON h.madonhang = dh.madonhang
         WHERE h.trangthai = 'DA_PHAT_HANH'
-        AND h.ghichu LIKE '%test%'
+        AND dh.madonhang LIKE '%TEST%'
         LIMIT 1
     ) AS temp
 );
