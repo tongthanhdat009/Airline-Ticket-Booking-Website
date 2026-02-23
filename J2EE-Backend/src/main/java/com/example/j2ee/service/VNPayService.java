@@ -109,12 +109,12 @@ public class VNPayService {
                     hashData.append('&');
                     query.append('&');
                 }
-                // Build hash data: URL-encode (US-ASCII) - matching VNPay's Java demo
-                hashData.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
+                // Build hash data: fieldName NOT encoded + value URL-encode (matching VNPay SDK)
+                hashData.append(fieldName);
                 hashData.append('=');
                 hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
                 
-                // Build query: URL-encode (US-ASCII)
+                // Build query: cả 2 đều URL-encode
                 query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
                 query.append('=');
                 query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
@@ -178,17 +178,41 @@ public class VNPayService {
                 return result;
             }
 
-            // Bước 7a: Verify chữ ký VNPay - dùng raw query string (bulletproof)
-            Map<String, Object> hashVerification = VNPayUtil.verifySecureHash(request, vnPayConfig.getSecretKey());
-            boolean isValidHash = (boolean) hashVerification.get("isValid");
+            // Bước 7a: Verify chữ ký VNPay
+            // Kiểm tra vnp_SecureHash có tồn tại (nếu không thì đây không phải request từ VNPay)
+            if (vnpSecureHash == null || vnpSecureHash.isEmpty()) {
+                System.out.println("=== VNPAY ERROR: Thiếu vnp_SecureHash trong request ===");
+                result.put("success", false);
+                result.put("message", "Thiếu chữ ký VNPay");
+                result.put("data", null);
+                return result;
+            }
 
-            // Debug logging
+            // Phương pháp 1: Raw query string (bulletproof - không re-encode)
+            Map<String, Object> rawVerification = VNPayUtil.verifySecureHash(request, vnPayConfig.getSecretKey());
+            boolean rawValid = (boolean) rawVerification.get("isValid");
+
+            // Phương pháp 2: Re-encode decoded params (theo VNPay SDK Java)
+            Map<String, String> vnpParams = new HashMap<>(params);
+            vnpParams.remove("vnp_SecureHash");
+            vnpParams.remove("vnp_SecureHashType");
+            String reEncodedHash = VNPayUtil.hashAllFields(vnpParams, vnPayConfig.getSecretKey());
+            boolean reEncodedValid = reEncodedHash.equalsIgnoreCase(vnpSecureHash);
+
+            boolean isValidHash = rawValid || reEncodedValid;
+
+            // Debug logging chi tiết
             System.out.println("=== VNPAY CALLBACK VERIFY ===");
-            System.out.println("isValid: " + isValidHash);
-            System.out.println("receivedHash: " + hashVerification.get("receivedHash"));
-            System.out.println("calculatedHash: " + hashVerification.get("calculatedHash"));
-            System.out.println("hashData (first 200): " + String.valueOf(hashVerification.get("hashData")).substring(0, Math.min(200, String.valueOf(hashVerification.get("hashData")).length())));
+            System.out.println("Raw method valid: " + rawValid);
+            System.out.println("Re-encode method valid: " + reEncodedValid);
+            System.out.println("Final isValid: " + isValidHash);
+            System.out.println("receivedHash: " + vnpSecureHash);
+            System.out.println("rawCalcHash: " + rawVerification.get("calculatedHash"));
+            System.out.println("reEncodeHash: " + reEncodedHash);
+            String rawHashData = String.valueOf(rawVerification.get("hashData"));
+            System.out.println("rawHashData (first 300): " + rawHashData.substring(0, Math.min(300, rawHashData.length())));
             System.out.println("secretKeyLen: " + vnPayConfig.getSecretKey().trim().length());
+            System.out.println("params keys: " + params.keySet());
             System.out.println("=============================");
 
             if (!isValidHash) {
@@ -197,8 +221,9 @@ public class VNPayService {
                 result.put("data", null);
 
                 // Log trường hợp chữ ký không hợp lệ - bao gồm debug info
-                String debugInfo = "Chữ ký không hợp lệ | received=" + hashVerification.get("receivedHash")
-                        + " | calculated=" + hashVerification.get("calculatedHash");
+                String debugInfo = "Chữ ký không hợp lệ | received=" + vnpSecureHash
+                        + " | rawCalc=" + rawVerification.get("calculatedHash")
+                        + " | reEncodeCalc=" + reEncodedHash;
                 vnPayTransactionLogService.saveTransactionLog(
                         params, "FAILED", debugInfo, ipnUrl, httpMethod, sourceIp);
                 return result;
@@ -350,19 +375,31 @@ public class VNPayService {
                 return result;
             }
             
-            // Verify chữ ký - dùng raw query string (bulletproof)
-            Map<String, Object> hashVerification = VNPayUtil.verifySecureHash(request, vnPayConfig.getSecretKey());
-            boolean isValidHash = (boolean) hashVerification.get("isValid");
+            // Verify chữ ký - dùng cả 2 phương pháp
+            // Phương pháp 1: Raw query string
+            Map<String, Object> rawVerification = VNPayUtil.verifySecureHash(request, vnPayConfig.getSecretKey());
+            boolean rawValid = (boolean) rawVerification.get("isValid");
+
+            // Phương pháp 2: Re-encode decoded params (VNPay SDK)
+            Map<String, String> vnpParams = new HashMap<>(params);
+            vnpParams.remove("vnp_SecureHash");
+            vnpParams.remove("vnp_SecureHashType");
+            String reEncodedHash = VNPayUtil.hashAllFields(vnpParams, vnPayConfig.getSecretKey());
+            boolean reEncodedValid = reEncodedHash.equalsIgnoreCase(vnpSecureHash);
+
+            boolean isValidHash = rawValid || reEncodedValid;
 
             System.out.println("=== VNPAY IPN VERIFY ===");
-            System.out.println("isValid: " + isValidHash);
-            System.out.println("receivedHash: " + hashVerification.get("receivedHash"));
-            System.out.println("calculatedHash: " + hashVerification.get("calculatedHash"));
+            System.out.println("Raw valid: " + rawValid + " | ReEncode valid: " + reEncodedValid);
+            System.out.println("receivedHash: " + vnpSecureHash);
+            System.out.println("rawCalcHash: " + rawVerification.get("calculatedHash"));
+            System.out.println("reEncodeHash: " + reEncodedHash);
             System.out.println("========================");
 
             if (!isValidHash) {
-                String debugInfo = "IPN: Chữ ký không hợp lệ | received=" + hashVerification.get("receivedHash")
-                        + " | calculated=" + hashVerification.get("calculatedHash");
+                String debugInfo = "IPN: Chữ ký không hợp lệ | received=" + vnpSecureHash
+                        + " | rawCalc=" + rawVerification.get("calculatedHash")
+                        + " | reEncodeCalc=" + reEncodedHash;
                 vnPayTransactionLogService.saveTransactionLog(
                         params, "FAILED", debugInfo, ipnUrl, httpMethod, sourceIp);
                 result.put("responseCode", "97");

@@ -30,8 +30,14 @@ public class VNPayUtil {
     }
 
     /**
-     * Tính hash cho tất cả các fields (dùng khi TẠO payment URL).
-     * URL-encode field name và value theo chuẩn VNPay SDK v2.1.0
+     * Tính hash cho tất cả các fields - theo ĐÚNG VNPay Java SDK v2.1.0.
+     * 
+     * VNPay SDK verification flow:
+     * 1. Lấy decoded param values từ request.getParameter()
+     * 2. URL-encode values với US-ASCII
+     * 3. Build hashData: fieldName=URLEncode(fieldValue)&...
+     *    (field name KHÔNG encode vì vnp_* chỉ có ASCII chars)
+     * 4. HMAC-SHA512(secretKey, hashData)
      */
     public static String hashAllFields(Map<String, String> fields, String secretKey) {
         List<String> fieldNames = new ArrayList<>(fields.keySet());
@@ -41,11 +47,14 @@ public class VNPayUtil {
         while (itr.hasNext()) {
             String fieldName = itr.next();
             String fieldValue = fields.get(fieldName);
-            if (fieldValue != null && !fieldValue.isEmpty()) {
-                sb.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII));
+            if ((fieldValue != null) && (!fieldValue.isEmpty())) {
+                // Field name KHÔNG encode (matching VNPay SDK)
+                sb.append(fieldName);
                 sb.append('=');
+                // Field value URL-encode US-ASCII (matching VNPay SDK)
                 sb.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
             }
+            // Append '&' nếu còn field tiếp theo - matching VNPay SDK behavior
             if (itr.hasNext()) {
                 sb.append('&');
             }

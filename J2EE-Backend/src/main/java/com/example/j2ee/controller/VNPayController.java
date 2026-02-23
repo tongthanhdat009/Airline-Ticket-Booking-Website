@@ -61,6 +61,19 @@ public class VNPayController {
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
 
+        // GUARD: Ngăn redirect loop - nếu không có vnp_SecureHash thì đây KHÔNG phải request từ VNPay
+        // mà là redirect URL bị Nginx route lại vào backend
+        if (!params.containsKey("vnp_SecureHash")) {
+            System.out.println("=== VNPAY GUARD: Request không có vnp_SecureHash - redirect loop detected ===");
+            System.out.println("Query: " + request.getQueryString());
+            String frontendUrl = vnPayService.getFrontendUrl();
+            // Giữ nguyên query params hiện có, forward cho frontend xử lý
+            String queryString = request.getQueryString();
+            String redirectUrl = frontendUrl + (queryString != null ? "?" + queryString : "");
+            response.sendRedirect(redirectUrl);
+            return;
+        }
+
         try {
             Map<String, Object> result = vnPayService.handlePaymentReturn(params, request);
             
