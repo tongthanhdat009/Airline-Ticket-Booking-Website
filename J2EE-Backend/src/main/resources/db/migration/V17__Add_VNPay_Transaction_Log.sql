@@ -5,7 +5,7 @@
 
 CREATE TABLE `vnpay_transaction_log` (
   `id` BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `vnp_txn_ref` VARCHAR(100) NOT NULL COMMENT 'Mã giao dịch (订单号)',
+  `vnp_txn_ref` VARCHAR(100) NOT NULL COMMENT 'Mã giao dịch',
   `vnp_transaction_no` VARCHAR(50) COMMENT 'Mã giao dịch tại VNPay',
   `vnp_amount` BIGINT NOT NULL COMMENT 'Số tiền (x100)',
   `vnp_response_code` VARCHAR(10) COMMENT 'Mã phản hồi (00: thành công)',

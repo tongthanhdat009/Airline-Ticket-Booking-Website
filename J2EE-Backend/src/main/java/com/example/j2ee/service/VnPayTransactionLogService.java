@@ -53,27 +53,27 @@ public class VnPayTransactionLogService {
             // Convert params to JSON for raw_data column
             String rawData = objectMapper.writeValueAsString(vnpParams);
 
-            VnPayTransactionLog log = new VnPayTransactionLog();
-            log.setVnpTxnRef(vnpParams.get("vnp_TxnRef"));
-            log.setVnpTransactionNo(vnpParams.get("vnp_TransactionNo"));
-            log.setVnpAmount(parseSafeLong(vnpParams.get("vnp_Amount")));
-            log.setVnpResponseCode(vnpParams.get("vnp_ResponseCode"));
-            log.setVnpTransactionStatus(vnpParams.get("vnp_TransactionStatus"));
-            log.setVnpBankCode(vnpParams.get("vnp_BankCode"));
-            log.setVnpBankTranNo(vnpParams.get("vnp_BankTranNo"));
-            log.setVnpPayDate(vnpParams.get("vnp_PayDate"));
-            log.setVnpOrderInfo(vnpParams.get("vnp_OrderInfo"));
-            log.setVnpSecureHash(vnpParams.get("vnp_SecureHash"));
-            log.setIpnUrl(ipnUrl);
-            log.setIpnReceivedAt(LocalDateTime.now());
-            log.setHttpMethod(httpMethod);
-            log.setSourceIp(sourceIp);
-            log.setProcessingResult(processingResult);
-            log.setProcessingMessage(processingMessage);
-            log.setRawData(rawData);
-            log.setCreatedAt(LocalDateTime.now());
+            VnPayTransactionLog transactionLog = new VnPayTransactionLog();
+            transactionLog.setVnpTxnRef(vnpParams.get("vnp_TxnRef"));
+            transactionLog.setVnpTransactionNo(vnpParams.get("vnp_TransactionNo"));
+            transactionLog.setVnpAmount(parseSafeLong(vnpParams.get("vnp_Amount")));
+            transactionLog.setVnpResponseCode(vnpParams.get("vnp_ResponseCode"));
+            transactionLog.setVnpTransactionStatus(vnpParams.get("vnp_TransactionStatus"));
+            transactionLog.setVnpBankCode(vnpParams.get("vnp_BankCode"));
+            transactionLog.setVnpBankTranNo(vnpParams.get("vnp_BankTranNo"));
+            transactionLog.setVnpPayDate(vnpParams.get("vnp_PayDate"));
+            transactionLog.setVnpOrderInfo(vnpParams.get("vnp_OrderInfo"));
+            transactionLog.setVnpSecureHash(vnpParams.get("vnp_SecureHash"));
+            transactionLog.setIpnUrl(ipnUrl);
+            transactionLog.setIpnReceivedAt(LocalDateTime.now());
+            transactionLog.setHttpMethod(httpMethod);
+            transactionLog.setSourceIp(sourceIp);
+            transactionLog.setProcessingResult(processingResult);
+            transactionLog.setProcessingMessage(processingMessage);
+            transactionLog.setRawData(rawData);
+            transactionLog.setCreatedAt(LocalDateTime.now());
 
-            VnPayTransactionLog saved = vnPayTransactionLogRepository.save(log);
+            VnPayTransactionLog saved = vnPayTransactionLogRepository.save(transactionLog);
             log.debug("Đã lưu transaction log: vnpTxnRef={}, result={}",
                     vnpParams.get("vnp_TxnRef"), processingResult);
             return saved;
