@@ -314,7 +314,7 @@ public class FlightDataService {
         List<SanBay> airports = sanBayRepository.findAll();
         
         StringBuilder sb = new StringBuilder();
-        sb.append("🛫 DANH SÁCH SÂN BAY SGU AIRLINE:\n\n");
+        sb.append("🛫 DANH SÁCH SÂN BAY JADT AIRLINE:\n\n");
         
         for (SanBay airport : airports) {
             sb.append(String.format("• %s (%s)\n", airport.getTenSanBay(), airport.getMaIATA()));

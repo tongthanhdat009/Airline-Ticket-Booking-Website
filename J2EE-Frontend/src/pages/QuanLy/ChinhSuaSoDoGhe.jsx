@@ -555,7 +555,7 @@ const ChinhSuaSoDoGhe = () => {
                 {/* Right - Controls & Statistics */}
                 <div className="w-80 bg-white border-l border-gray-200 flex flex-col overflow-hidden shrink-0">
                     {/* Aircraft Info */}
-                    <div className="p-4 border-b border-gray-100 bg-slate-700">
+                    <div className="p-4 border-b border-gray-100 bg-blue-600">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
                                 <FaPlane className="text-white text-sm" />
@@ -579,7 +579,7 @@ const ChinhSuaSoDoGhe = () => {
                             <div className="space-y-2">
                                 <button
                                     onClick={() => setShowAutoGenerate(true)}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-700 text-white rounded-lg hover:bg-slate-800 font-medium transition-colors text-sm"
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors text-sm"
                                 >
                                     <FaMagic className="text-xs" />
                                     Tự động tạo
@@ -625,7 +625,7 @@ const ChinhSuaSoDoGhe = () => {
                                 <div className="space-y-2">
                                     <button
                                         onClick={() => setShowBulkEdit(true)}
-                                        className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 text-sm font-medium transition-colors"
+                                        className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition-colors"
                                     >
                                         <FaEdit size={11} />
                                         Sửa hàng loạt

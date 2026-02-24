@@ -55,7 +55,7 @@ function Navbar() {
   const handleLogout = async () => {
     // Gọi API logout để revoke refresh token trên server
     await logoutClient();
-    
+
     setIsLoggedIn(false);
 
     // Dispatch event để thông báo cho các component khác
@@ -81,24 +81,24 @@ function Navbar() {
     <nav className="bg-white/80 backdrop-blur-xl shadow-[0_4px_30px_rgb(0,0,0,0.05)] sticky top-0 z-[1000] border-b border-white/20 transition-all duration-300">
       {/* Top Bar - Right aligned items */}
       <div className="bg-slate-900 text-slate-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-2 flex justify-end items-center gap-4 text-xs font-medium tracking-wide">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-1.5 flex justify-end items-center gap-4 text-[11px] sm:text-[12px] font-medium tracking-wide">
           <Link to="/ho-tro" className="hover:text-white transition-colors flex items-center gap-1.5">
             <span className="text-blue-400">🏠</span>
             <span>{t('common.support')}</span>
           </Link>
-          
+
           {isLoggedIn ? (
             <>
               <span className="text-slate-600">|</span>
-              <Link 
-                to="/ca-nhan" 
+              <Link
+                to="/ca-nhan"
                 className="hover:text-white transition-colors flex items-center gap-1.5"
               >
                 <span className="text-blue-400">👤</span>
                 <span className="font-semibold text-white">{userName}</span>
               </Link>
               <span className="text-slate-600">|</span>
-              <button 
+              <button
                 onClick={handleLogout}
                 className="hover:text-red-400 transition-colors font-semibold"
               >
@@ -108,14 +108,14 @@ function Navbar() {
           ) : (
             <>
               <span className="text-slate-600">|</span>
-              <Link 
+              <Link
                 to="/dang-ky-client"
                 className="hover:text-white transition-colors font-semibold"
               >
                 {t('common.register')}
               </Link>
               <span className="text-slate-600">|</span>
-              <Link 
+              <Link
                 to="/dang-nhap-client"
                 className="hover:text-white transition-colors font-semibold"
               >
@@ -123,14 +123,14 @@ function Navbar() {
               </Link>
             </>
           )}
-          
+
           <span className="text-slate-600">|</span>
           <div className="flex items-center gap-1.5">
             <span className="text-blue-400">🌐</span>
-            <select 
+            <select
               value={currentLanguage}
               onChange={handleLanguageChange}
-              className="bg-transparent text-slate-300 text-xs border border-slate-700 rounded-md px-2 py-1 focus:outline-none focus:border-blue-500 cursor-pointer hover:text-white transition-colors"
+              className="bg-transparent text-slate-300 text-xs border border-slate-700 rounded-md px-2 py-1 focus:outline-none focus:border-slate-800 cursor-pointer hover:text-white transition-colors"
             >
               <option value="vi" className="bg-slate-800">Tiếng Việt</option>
               <option value="en" className="bg-slate-800">English</option>
@@ -140,46 +140,46 @@ function Navbar() {
       </div>
 
       {/* Main Navigation */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-3 flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex justify-between items-center">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5 group" onClick={closeMobileMenu}>
+        <Link to="/" className="flex items-center gap-2 group" onClick={closeMobileMenu}>
           <img
             src="/logo/jadt-logo.svg"
             alt="JadT Airline Logo"
-            className="h-10 sm:h-12 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+            className="h-8 sm:h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
           />
         </Link>
-        
+
         {/* Desktop Menu */}
-        <ul className="hidden lg:flex list-none gap-8 m-0 p-0 items-center">
+        <ul className="hidden lg:flex list-none gap-6 m-0 p-0 items-center">
           <li>
-            <Link 
-              to="/tra-cuu-chuyen-bay" 
-              className="text-slate-700 no-underline font-bold text-sm uppercase tracking-wider hover:text-blue-600 transition-colors relative after:content-[''] after:absolute after:-bottom-1.5 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 hover:after:w-full after:transition-all after:duration-300"
+            <Link
+              to="/tra-cuu-chuyen-bay"
+              className="text-slate-700 no-underline font-bold text-[11px] uppercase tracking-wider hover:text-slate-900 transition-colors relative after:content-[''] after:absolute after:-bottom-1.5 after:left-0 after:w-0 after:h-0.5 after:bg-slate-900 hover:after:w-full after:transition-all after:duration-300"
             >
               {t('navbar.lookup_flight')}
             </Link>
           </li>
           <li>
-            <Link 
-              to="/online-check-in" 
-              className="text-slate-700 no-underline font-bold text-sm uppercase tracking-wider hover:text-blue-600 transition-colors relative after:content-[''] after:absolute after:-bottom-1.5 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 hover:after:w-full after:transition-all after:duration-300"
+            <Link
+              to="/online-check-in"
+              className="text-slate-700 no-underline font-bold text-[11px] uppercase tracking-wider hover:text-slate-900 transition-colors relative after:content-[''] after:absolute after:-bottom-1.5 after:left-0 after:w-0 after:h-0.5 after:bg-slate-900 hover:after:w-full after:transition-all after:duration-300"
             >
               {t('navbar.online_checkin')}
             </Link>
           </li>
           <li>
-            <Link 
-              to="/dich-vu-chuyen-bay" 
-              className="text-slate-700 no-underline font-bold text-sm uppercase tracking-wider hover:text-blue-600 transition-colors relative after:content-[''] after:absolute after:-bottom-1.5 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 hover:after:w-full after:transition-all after:duration-300"
+            <Link
+              to="/dich-vu-chuyen-bay"
+              className="text-slate-700 no-underline font-bold text-[11px] uppercase tracking-wider hover:text-slate-900 transition-colors relative after:content-[''] after:absolute after:-bottom-1.5 after:left-0 after:w-0 after:h-0.5 after:bg-slate-900 hover:after:w-full after:transition-all after:duration-300"
             >
               {t('navbar.flight_services')}
             </Link>
           </li>
           <li>
-            <Link 
-              to="/dich-vu-khac" 
-              className="text-slate-700 no-underline font-bold text-sm uppercase tracking-wider hover:text-blue-600 transition-colors relative after:content-[''] after:absolute after:-bottom-1.5 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 hover:after:w-full after:transition-all after:duration-300"
+            <Link
+              to="/dich-vu-khac"
+              className="text-slate-700 no-underline font-bold text-[11px] uppercase tracking-wider hover:text-slate-900 transition-colors relative after:content-[''] after:absolute after:-bottom-1.5 after:left-0 after:w-0 after:h-0.5 after:bg-slate-900 hover:after:w-full after:transition-all after:duration-300"
             >
               {t('navbar.other_services')}
             </Link>
@@ -205,33 +205,32 @@ function Navbar() {
       </div>
 
       {/* Mobile Menu */}
-      <div 
-        className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-          mobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
-        }`}
+      <div
+        className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
+          }`}
       >
         <div className="px-4 pb-4 pt-2 bg-white/95 backdrop-blur-xl border-t border-slate-100 shadow-inner">
           {/* Mobile Top Actions */}
           <div className="mb-3 pb-3 border-b border-slate-200">
             <div className="flex flex-col gap-2 text-sm font-medium">
-              <Link 
-                to="/ho-tro" 
-                className="text-slate-700 py-2.5 px-4 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-colors flex items-center gap-2"
+              <Link
+                to="/ho-tro"
+                className="text-slate-700 py-2.5 px-4 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-colors flex items-center gap-2"
                 onClick={closeMobileMenu}
               >
-                <span className="text-blue-500">🏠</span> {t('common.support')}
+                <span className="text-slate-700">🏠</span> {t('common.support')}
               </Link>
-              
+
               {isLoggedIn ? (
                 <>
                   <Link
                     to="/ca-nhan"
-                    className="text-blue-700 py-2.5 px-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors flex items-center gap-2 font-bold"
+                    className="text-slate-800 py-2.5 px-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors flex items-center gap-2 font-bold"
                     onClick={closeMobileMenu}
                   >
-                    <span className="text-blue-500">👤</span> {userName}
+                    <span className="text-slate-700">👤</span> {userName}
                   </Link>
-                  <button 
+                  <button
                     onClick={handleLogout}
                     className="text-red-600 py-2.5 px-4 rounded-xl hover:bg-red-50 transition-colors text-left font-bold"
                   >
@@ -240,16 +239,16 @@ function Navbar() {
                 </>
               ) : (
                 <>
-                  <Link 
+                  <Link
                     to="/dang-ky-client"
-                    className="text-slate-700 py-2.5 px-4 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                    className="text-slate-700 py-2.5 px-4 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-colors"
                     onClick={closeMobileMenu}
                   >
                     {t('common.register')}
                   </Link>
-                  <Link 
+                  <Link
                     to="/dang-nhap-client"
-                    className="text-slate-700 py-2.5 px-4 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                    className="text-slate-700 py-2.5 px-4 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-colors"
                     onClick={closeMobileMenu}
                   >
                     {t('common.login')}
@@ -262,45 +261,45 @@ function Navbar() {
           {/* Mobile Main Menu */}
           <ul className="flex flex-col gap-1">
             <li>
-              <Link 
-                to="/" 
-                className="block text-slate-800 py-3 px-4 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-colors font-bold uppercase text-sm tracking-wide"
+              <Link
+                to="/"
+                className="block text-slate-800 py-3 px-4 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-colors font-bold uppercase text-sm tracking-wide"
                 onClick={closeMobileMenu}
               >
                 {t('common.home')}
               </Link>
             </li>
             <li>
-              <Link 
-                to="/tra-cuu-chuyen-bay" 
-                className="block text-slate-800 py-3 px-4 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-colors font-bold uppercase text-sm tracking-wide"
+              <Link
+                to="/tra-cuu-chuyen-bay"
+                className="block text-slate-800 py-3 px-4 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-colors font-bold uppercase text-sm tracking-wide"
                 onClick={closeMobileMenu}
               >
                 {t('navbar.lookup_flight')}
               </Link>
             </li>
             <li>
-              <Link 
-                to="/online-check-in" 
-                className="block text-slate-800 py-3 px-4 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-colors font-bold uppercase text-sm tracking-wide"
+              <Link
+                to="/online-check-in"
+                className="block text-slate-800 py-3 px-4 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-colors font-bold uppercase text-sm tracking-wide"
                 onClick={closeMobileMenu}
               >
                 {t('navbar.online_checkin')}
               </Link>
             </li>
             <li>
-              <Link 
-                to="/dich-vu-chuyen-bay" 
-                className="block text-slate-800 py-3 px-4 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-colors font-bold uppercase text-sm tracking-wide"
+              <Link
+                to="/dich-vu-chuyen-bay"
+                className="block text-slate-800 py-3 px-4 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-colors font-bold uppercase text-sm tracking-wide"
                 onClick={closeMobileMenu}
               >
                 {t('navbar.flight_services')}
               </Link>
             </li>
             <li>
-              <Link 
-                to="/dich-vu-khac" 
-                className="block text-slate-800 py-3 px-4 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-colors font-bold uppercase text-sm tracking-wide"
+              <Link
+                to="/dich-vu-khac"
+                className="block text-slate-800 py-3 px-4 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-colors font-bold uppercase text-sm tracking-wide"
                 onClick={closeMobileMenu}
               >
                 {t('navbar.other_services')}

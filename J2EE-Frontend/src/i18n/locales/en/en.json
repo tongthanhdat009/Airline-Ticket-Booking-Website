@@ -121,8 +121,7 @@
     "contact": "Contact Us",
     "policy": "Terms & Policies",
     "follow_us": "Follow Us",
-    "download_app": "Download App"
-  ,
+    "download_app": "Download App",
     "download_app_desc": "Download the JadT Airline mobile app to book and pay faster",
     "payment_help_title": "Payment Guide",
     "payment_help_desc": "Pay easily and securely with multiple methods"
@@ -194,21 +193,6 @@
       "info_card_payment_title": "Payment",
       "info_card_payment_desc": "Complete payments for add-on services"
     },
-    
-    "dich_vu_chuyen_bay_extra": {
-      "info_banner_title": "Add-on Services for Your Flight",
-      "info_banner_desc": "Browse and add baggage, meals, seat selection and more to improve your trip"
-    },
-    "other_services_list": {
-      "hotel": { "title": "Hotel Booking", "desc": "Quality hotels with special rates" },
-      "car": { "title": "Car Rental", "desc": "Self-drive or chauffeur-driven car rental at destination" },
-      "tour": { "title": "Tours", "desc": "Attractive tour packages across Vietnam and worldwide" },
-      "tickets": { "title": "Attraction Tickets", "desc": "Tickets for attractions and theme parks" },
-      "visa": { "title": "Visa & Passport", "desc": "Visa assistance and fast passport renewal" },
-      "sim": { "title": "Travel SIM", "desc": "Unlimited 4G data SIM for your trip" },
-      "currency": { "title": "Currency Exchange", "desc": "Currency exchange with the best rates" },
-      "vouchers": { "title": "Gifts & Vouchers", "desc": "Buy travel vouchers as meaningful gifts" }
-    },
     "dich_vu_chuyen_bay": {
       "title": "Flight Services",
       "subtitle": "Enhance your flight experience with add-on services",
@@ -232,6 +216,10 @@
       "special_offer_title": "Special Offers",
       "special_offer_desc": "Pre-book services to get the best prices and secure your spot on the flight",
       "info_enter_code": "Enter booking code above to see available services for your flight"
+    },
+    "dich_vu_chuyen_bay_extra": {
+      "info_banner_title": "Add-on Services for Your Flight",
+      "info_banner_desc": "Browse and add baggage, meals, seat selection and more to improve your trip"
     },
     "dich_vu_khac": {
       "title": "Other Services",
@@ -279,8 +267,7 @@
       "benefit_baggage": "Buy Extra Baggage",
       "note_title": "Note:",
       "note": "Online check-in opens from 24 hours to 1 hour before departure"
-    }
-    ,
+    },
     "online_checkin_extra": {
       "benefit_time_desc": "Skip queues at the airport; check-in in just a few minutes",
       "benefit_boarding_pass_desc": "Receive your boarding pass on your phone or print at home",
@@ -308,6 +295,16 @@
       "faq_q3": "When should I arrive for check-in?",
       "faq_a3": "We recommend arriving at least 2 hours for domestic and 3 hours for international flights."
     }
+  },
+  "other_services_list": {
+    "hotel": { "title": "Hotel Booking", "desc": "Quality hotels with special rates" },
+    "car": { "title": "Car Rental", "desc": "Self-drive or chauffeur-driven car rental at destination" },
+    "tour": { "title": "Tours", "desc": "Attractive tour packages across Vietnam and worldwide" },
+    "tickets": { "title": "Attraction Tickets", "desc": "Tickets for attractions and theme parks" },
+    "visa": { "title": "Visa & Passport", "desc": "Visa assistance and fast passport renewal" },
+    "sim": { "title": "Travel SIM", "desc": "Unlimited 4G data SIM for your trip" },
+    "currency": { "title": "Currency Exchange", "desc": "Currency exchange with the best rates" },
+    "vouchers": { "title": "Gifts & Vouchers", "desc": "Buy travel vouchers as meaningful gifts" }
   },
   "booking": {
     "errors": {
@@ -433,12 +430,10 @@
       "pay_now": "Pay Now",
       "status_success": "Payment Successful",
       "status_failed": "Payment Failed",
-      "transaction_id": "Transaction ID"
-      ,
+      "transaction_id": "Transaction ID",
       "vnpay_title": "Pay via VNPay",
       "vnpay_desc": "Supports ATM cards, credit cards and QR Code payments"
-    }
-    ,
+    },
     "booking_payment_errors": {
       "error_create_payment": "Unable to create payment link. Please try again.",
       "error_create_booking": "Unable to create booking. Please try again.",

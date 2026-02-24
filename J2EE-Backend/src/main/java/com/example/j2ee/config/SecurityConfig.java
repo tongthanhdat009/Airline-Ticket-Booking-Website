@@ -109,6 +109,8 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         // VNPay, Check-in, Booking endpoints
                         .requestMatchers("/vnpay/**", "/checkin/**", "/client/datcho/**").permitAll()
+                        // TaiKhoan endpoints
+                        .requestMatchers("/taikhoan/email/**").permitAll()
                         // Static resources
                         .requestMatchers("/ai/**", "/static/**").permitAll()
                         .requestMatchers("/admin/dashboard/dichvu/anh/**", "/admin/dashboard/dichvu/luachon/anh/**").permitAll()

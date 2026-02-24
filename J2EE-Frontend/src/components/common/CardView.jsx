@@ -27,9 +27,9 @@ const CardView = React.memo(({
 
         return (
             <div className="flex flex-col items-center justify-center py-12 px-4">
-                <div className="w-24 h-24 mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                <div className="w-24 h-24 mb-4 rounded-full bg-slate-100 flex items-center justify-center">
                     <svg
-                        className="w-12 h-12 text-gray-400"
+                        className="w-12 h-12 text-slate-400"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -43,7 +43,7 @@ const CardView = React.memo(({
                         />
                     </svg>
                 </div>
-                <p className="text-gray-500 text-center text-lg">{emptyMessage}</p>
+                <p className="text-slate-500 text-center text-lg">{emptyMessage}</p>
             </div>
         );
     }

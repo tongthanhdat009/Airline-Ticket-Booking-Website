@@ -290,7 +290,7 @@ const QuanLyTKAdmin = () => {
             <ResponsiveTable>
               <div className="overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
                 <table className="w-full text-sm">
-                  <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
+                  <thead className="bg-gray-50 text-gray-600">
                     <tr>
                       <th className="px-6 py-4 text-left font-semibold">ID</th>
                       <th className="px-6 py-4 text-left font-semibold">Họ và tên</th>

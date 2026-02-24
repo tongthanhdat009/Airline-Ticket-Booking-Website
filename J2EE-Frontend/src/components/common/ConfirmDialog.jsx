@@ -68,13 +68,13 @@ const ConfirmDialog = ({
     },
     info: {
       bgGradient: "from-blue-500 to-blue-600",
-      bgLight: "bg-blue-50",
+      bgLight: "bg-slate-50",
       border: "border-blue-500",
       icon: FaExclamationTriangle,
-      iconColor: "text-blue-500",
-      textColor: "text-blue-800",
-      buttonBg: "bg-blue-500 hover:bg-blue-600",
-      buttonBgHover: "hover:bg-blue-600"
+      iconColor: "text-slate-700",
+      textColor: "text-slate-900",
+      buttonBg: "bg-slate-500 hover:bg-slate-900",
+      buttonBgHover: "hover:bg-slate-900"
     }
   };
 
@@ -105,14 +105,14 @@ const ConfirmDialog = ({
 
         {/* Body */}
         <div className="p-6">
-          <p className="text-gray-700 text-base leading-relaxed">{message}</p>
+          <p className="text-slate-700 text-base leading-relaxed">{message}</p>
         </div>
 
         {/* Footer */}
         <div className="flex justify-end gap-3 px-6 pb-6">
           <button
             onClick={handleCancel}
-            className="px-5 py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold transition-all duration-200 flex items-center gap-2"
+            className="px-5 py-2.5 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-semibold transition-all duration-200 flex items-center gap-2"
           >
             <FaTimes size={14} />
             <span>{cancelText}</span>

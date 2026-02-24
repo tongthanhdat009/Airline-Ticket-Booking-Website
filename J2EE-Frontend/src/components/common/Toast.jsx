@@ -29,10 +29,10 @@ const Toast = ({ message, type = 'success', isVisible, onClose, duration = 3000 
             iconComponent: FaExclamationCircle
         },
         info: {
-            bg: 'bg-blue-50',
+            bg: 'bg-slate-50',
             border: 'border-blue-500',
-            icon: 'text-blue-500',
-            text: 'text-blue-800',
+            icon: 'text-slate-700',
+            text: 'text-slate-900',
             iconComponent: FaInfoCircle
         },
     };
@@ -59,9 +59,9 @@ const Toast = ({ message, type = 'success', isVisible, onClose, duration = 3000 
                     <FaTimes size={16} />
                 </button>
                 {/* Progress bar */}
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200 rounded-b-lg overflow-hidden">
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-slate-200 rounded-b-lg overflow-hidden">
                     <div 
-                        className={`h-full ${type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'} animate-progress`}
+                        className={`h-full ${type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-slate-500'} animate-progress`}
                         style={{ animationDuration: `${duration}ms` }}
                     ></div>
                 </div>

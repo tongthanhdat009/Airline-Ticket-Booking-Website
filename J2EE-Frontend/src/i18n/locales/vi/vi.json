@@ -121,8 +121,7 @@
     "contact": "Liên hệ",
     "policy": "Điều khoản & Chính sách",
     "follow_us": "Kết nối với chúng tôi",
-    "download_app": "Tải ứng dụng"
-  ,
+    "download_app": "Tải ứng dụng",
     "download_app_desc": "Tải ứng dụng di động JadT Airline để đặt chuyến và thanh toán nhanh chóng",
     "payment_help_title": "Hướng dẫn thanh toán",
     "payment_help_desc": "Thanh toán dễ dàng, an toàn với nhiều phương thức"
@@ -141,11 +140,10 @@
     "dob": "Ngày sinh",
     "confirm_password": "Xác nhận mật khẩu",
     "otp_sent": "Mã OTP đã được gửi đến email",
-    "verify_email": "Xác thực email"
-  ,
-  "register_intro": "Bắt đầu hành trình của bạn",
-  "password_hint": "Tối thiểu 6 ký tự",
-  "has_account": "Đã có tài khoản?"
+    "verify_email": "Xác thực email",
+    "register_intro": "Bắt đầu hành trình của bạn",
+    "password_hint": "Tối thiểu 6 ký tự",
+    "has_account": "Đã có tài khoản?"
   },
   "home": {
     "banner_title": "Mở bán vé Tết 2026",
@@ -265,47 +263,77 @@
       "benefit_baggage": "Mua thêm hành lý",
       "note_title": "Lưu ý:",
       "note": "Check-in trực tuyến mở từ 24 giờ đến 1 giờ trước giờ khởi hành"
+    },
+    "dich_vu_chuyen_bay_extra": {
+      "info_banner_title": "Dịch vụ bổ sung cho chuyến bay của bạn",
+      "info_banner_desc": "Duyệt và thêm hành lý, suất ăn, chọn chỗ và hơn thế nữa để nâng cao chuyến đi của bạn"
+    },
+    "online_checkin_extra": {
+      "benefit_time_desc": "Không cần xếp hàng tại sân bay, làm thủ tục chỉ trong vài phút",
+      "benefit_boarding_pass_desc": "Nhận thẻ lên máy bay ngay trên điện thoại, in tại nhà",
+      "benefit_seat_desc": "Tự do lựa chọn vị trí ghế ngồi yêu thích của bạn",
+      "benefit_baggage_desc": "Dễ dàng mua thêm hành lý ký gửi với giá ưu đãi",
+      "note": "Check-in trực tuyến mở từ 24 giờ đến 1 giờ trước giờ khởi hành"
+    },
+    "support_page": {
+      "title": "Hỗ trợ khách hàng",
+      "subtitle": "Chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7. Chọn một phương thức để liên hệ với đội ngũ hỗ trợ của JadT Airline.",
+      "phone_title": "Tổng đài",
+      "phone_desc": "Gọi ngay để được hỗ trợ nhanh chóng về vé, thay đổi hay hoàn vé.",
+      "phone_cta": "Gọi: 0123 456 789",
+      "chat_title": "Chat trực tuyến",
+      "chat_desc": "Nói chuyện với nhân viên ngay lập tức qua chat.",
+      "chat_cta": "Mở chat",
+      "email_title": "Email",
+      "email_desc": "Gửi yêu cầu chi tiết, chúng tôi sẽ phản hồi trong 24 giờ.",
+      "email_cta": "Gửi email",
+      "ticket_title": "Tạo phiếu hỗ trợ",
+      "ticket_desc": "Gửi câu hỏi và yêu cầu hỗ trợ, chúng tôi sẽ phản hồi sớm nhất.",
+      "ticket_cta": "Tạo phiếu",
+      "ticket_modal_title": "Tạo phiếu hỗ trợ",
+      "ticket_modal_subtitle": "Điền thông tin của bạn và câu hỏi, chúng tôi sẽ phản hồi trong thời gian sớm nhất.",
+      "ticket_full_name": "Họ và tên",
+      "ticket_full_name_placeholder": "Nhập họ và tên của bạn",
+      "ticket_email": "Email",
+      "ticket_email_placeholder": "email@example.com",
+      "ticket_phone": "Số điện thoại",
+      "ticket_phone_placeholder": "Nhập số điện thoại của bạn",
+      "ticket_booking_code": "Mã đặt chỗ (PNR)",
+      "ticket_booking_code_placeholder": "Nhập mã đặt chỗ (nếu có)",
+      "ticket_booking_code_note": "Để lại trống nếu không có mã đặt chỗ",
+      "ticket_category": "Danh mục",
+      "ticket_category_placeholder": "Chọn danh mục",
+      "ticket_category_payment": "Thanh toán",
+      "ticket_category_booking": "Đặt vé",
+      "ticket_category_refund": "Hoàn tiền",
+      "ticket_category_checkin": "Check-in",
+      "ticket_category_info": "Thông tin chung",
+      "ticket_category_feedback": "Góp ý",
+      "ticket_subject": "Chủ đề",
+      "ticket_subject_placeholder": "Nhập chủ đề câu hỏi của bạn",
+      "ticket_content": "Nội dung câu hỏi",
+      "ticket_content_placeholder": "Mô tả chi tiết câu hỏi hoặc vấn đề của bạn...",
+      "ticket_priority": "Mức độ ưu tiên",
+      "ticket_priority_low": "Thấp",
+      "ticket_priority_medium": "Trung bình",
+      "ticket_priority_high": "Cao",
+      "ticket_required": "Vui lòng nhập thông tin này",
+      "ticket_invalid_email": "Email không hợp lệ",
+      "ticket_invalid_phone": "Số điện thoại không hợp lệ",
+      "ticket_submit": "Gửi phiếu hỗ trợ",
+      "ticket_submitting": "Đang gửi...",
+      "ticket_cancel": "Hủy",
+      "ticket_success": "Đã gửi phiếu hỗ trợ thành công! Mã phiếu của bạn: ",
+      "ticket_success_desc": "Chúng tôi sẽ phản hồi trong thời gian sớm nhất qua email hoặc số điện thoại.",
+      "ticket_error": "Có lỗi xảy ra. Vui lòng thử lại.",
+      "faq_title": "Câu hỏi thường gặp (FAQ)",
+      "faq_q1": "Làm sao để đổi hoặc hoàn vé?",
+      "faq_a1": "Bạn có thể đổi/hủy vé trong phần \"Quản lý đặt chỗ\" hoặc liên hệ tổng đài để được hướng dẫn cụ thể và kiểm tra điều kiện vé.",
+      "faq_q2": "Tôi có thể mang bao nhiêu hành lý?",
+      "faq_a2": "Mỗi hạng vé có quy định hành lý khác nhau. Vui lòng kiểm tra thông tin hành lý trên vé hoặc trang dịch vụ hành lý của chúng tôi.",
+      "faq_q3": "Thời gian làm thủ tục trước chuyến bay?",
+      "faq_a3": "Chúng tôi khuyến nghị có mặt tại sân bay ít nhất 2 giờ cho chuyến nội địa và 3 giờ cho chuyến quốc tế."
     }
-  ,
-  "online_checkin_extra": {
-    "benefit_time_desc": "Không cần xếp hàng tại sân bay, làm thủ tục chỉ trong vài phút",
-    "benefit_boarding_pass_desc": "Nhận thẻ lên máy bay ngay trên điện thoại, in tại nhà",
-    "benefit_seat_desc": "Tự do lựa chọn vị trí ghế ngồi yêu thích của bạn",
-    "benefit_baggage_desc": "Dễ dàng mua thêm hành lý ký gửi với giá ưu đãi",
-    "note": "Check-in trực tuyến mở từ 24 giờ đến 1 giờ trước giờ khởi hành"
-  },
-  "dich_vu_chuyen_bay_extra": {
-    "info_banner_title": "Dịch vụ bổ sung cho chuyến bay của bạn",
-    "info_banner_desc": "Duyệt và thêm hành lý, suất ăn, chọn chỗ và hơn thế nữa để nâng cao chuyến đi của bạn"
-  }
-  ,
-  "support_page": {
-    "title": "Hỗ trợ khách hàng",
-    "subtitle": "Chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7. Chọn một phương thức để liên hệ với đội ngũ hỗ trợ của JadT Airline.",
-    "phone_title": "Tổng đài",
-    "phone_desc": "Gọi ngay để được hỗ trợ nhanh chóng về vé, thay đổi hay hoàn vé.",
-    "phone_cta": "Gọi: 0123 456 789",
-    "chat_title": "Chat trực tuyến",
-    "chat_desc": "Nói chuyện với nhân viên ngay lập tức qua chat.",
-    "chat_cta": "Mở chat",
-    "email_title": "Email",
-    "email_desc": "Gửi yêu cầu chi tiết, chúng tôi sẽ phản hồi trong 24 giờ.",
-    "email_cta": "Gửi email",
-    "faq_title": "Câu hỏi thường gặp (FAQ)",
-    "faq_q1": "Làm sao để đổi hoặc hoàn vé?",
-    "faq_a1": "Bạn có thể đổi/hủy vé trong phần \"Quản lý đặt chỗ\" hoặc liên hệ tổng đài để được hướng dẫn cụ thể và kiểm tra điều kiện vé.",
-    "faq_q2": "Tôi có thể mang bao nhiêu hành lý?",
-    "faq_a2": "Mỗi hạng vé có quy định hành lý khác nhau. Vui lòng kiểm tra thông tin hành lý trên vé hoặc trang dịch vụ hành lý của chúng tôi.",
-    "faq_q3": "Thời gian làm thủ tục trước chuyến bay?",
-    "faq_a3": "Chúng tôi khuyến nghị có mặt tại sân bay ít nhất 2 giờ cho chuyến nội địa và 3 giờ cho chuyến quốc tế."
-  }
-  },
-  "online_checkin_extra": {
-    "benefit_time_desc": "Không cần xếp hàng tại sân bay, làm thủ tục chỉ trong vài phút",
-    "benefit_boarding_pass_desc": "Nhận thẻ lên máy bay ngay trên điện thoại, in tại nhà",
-    "benefit_seat_desc": "Tự do lựa chọn vị trí ghế ngồi yêu thích của bạn",
-    "benefit_baggage_desc": "Dễ dàng mua thêm hành lý ký gửi với giá ưu đãi",
-    "note": "Check-in trực tuyến mở từ 24 giờ đến 1 giờ trước giờ khởi hành"
   },
   "other_services_list": {
     "hotel": { "title": "Đặt khách sạn", "desc": "Khách sạn chất lượng với giá ưu đãi đặc biệt" },
@@ -441,12 +469,10 @@
       "status_success": "Thanh toán thành công",
       "status_failed": "Thanh toán thất bại",
       "transaction_id": "Mã giao dịch",
-      "payment_details": "Chi tiết thanh toán"
-      ,
+      "payment_details": "Chi tiết thanh toán",
       "vnpay_title": "Thanh toán qua VNPay",
       "vnpay_desc": "Hỗ trợ thanh toán bằng thẻ ATM, thẻ tín dụng và mã QR"
-    }
-    ,
+    },
     "booking_payment_errors": {
       "error_create_payment": "Không thể tạo liên kết thanh toán. Vui lòng thử lại.",
       "error_create_booking": "Không thể tạo đặt chỗ. Vui lòng thử lại.",

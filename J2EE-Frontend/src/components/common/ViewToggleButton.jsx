@@ -18,13 +18,13 @@ const ViewToggleButton = ({ currentView = 'table', onViewChange, className = '' 
     const isGridActive = currentView === 'grid';
 
     return (
-        <div className={`inline-flex bg-gray-100 rounded-lg p-1 gap-1 ${className}`}>
+        <div className={`inline-flex bg-slate-100 rounded-lg p-1 gap-1 ${className}`}>
             <button
                 onClick={() => handleViewChange('table')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all font-medium ${
                     isTableActive
-                        ? 'bg-white text-blue-600 shadow-md'
-                        : 'text-gray-600 hover:text-gray-800 hover:bg-gray-200'
+                        ? 'bg-white text-slate-900 shadow-md'
+                        : 'text-slate-600 hover:text-slate-800 hover:bg-slate-200'
                 }`}
                 title="Xem dạng bảng"
                 aria-label="Xem dạng bảng"
@@ -36,8 +36,8 @@ const ViewToggleButton = ({ currentView = 'table', onViewChange, className = '' 
                 onClick={() => handleViewChange('grid')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all font-medium ${
                     isGridActive
-                        ? 'bg-white text-blue-600 shadow-md'
-                        : 'text-gray-600 hover:text-gray-800 hover:bg-gray-200'
+                        ? 'bg-white text-slate-900 shadow-md'
+                        : 'text-slate-600 hover:text-slate-800 hover:bg-slate-200'
                 }`}
                 title="Xem dạng thẻ"
                 aria-label="Xem dạng thẻ"

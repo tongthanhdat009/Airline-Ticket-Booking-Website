@@ -46,7 +46,7 @@
                 <textElement verticalAlignment="Middle">
                     <font fontName="DejaVu Sans" size="24" isBold="true" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
                 </textElement>
-                <text><![CDATA[✈ SGU AIRLINES]]></text>
+                <text><![CDATA[✈ JADT AIRLINES]]></text>
             </staticText>
 
             <staticText>
@@ -55,7 +55,7 @@
                     <font fontName="DejaVu Sans" size="9" isBold="false" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
                 </textElement>
                 <text><![CDATA[24/7 Support: 19001886
-www.sguairlines.vn]]></text>
+www.jadtairlines.vn]]></text>
             </staticText>
 
             <!-- ============ E-TICKET BANNER ============ -->
@@ -123,7 +123,7 @@ www.sguairlines.vn]]></text>
                 <textElement verticalAlignment="Middle">
                     <font fontName="DejaVu Sans" size="10" isBold="false" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
                 </textElement>
-                <textFieldExpression><![CDATA["SGU-" + $P{bookingCode}]]></textFieldExpression>
+                <textFieldExpression><![CDATA["JDT-" + $P{bookingCode}]]></textFieldExpression>
             </textField>
 
             <!-- ============ PASSENGER INFORMATION ============ -->
@@ -429,9 +429,9 @@ www.sguairlines.vn]]></text>
                     <font fontName="DejaVu Sans" size="8" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
                     <paragraph lineSpacing="1_1_2"/>
                 </textElement>
-                <text><![CDATA[SGU AIRLINES - Saigon University Airlines
+                <text><![CDATA[JADT AIRLINES - JadT Airlines
 Địa chỉ: 273 An Dương Vương, Phường 3, Quận 5, TP.HCM
-Email: support@sguairlines.vn | Website: www.sguairlines.vn | Hotline: 19001886]]></text>
+Email: support@jadtairlines.vn | Website: www.jadtairlines.vn | Hotline: 19001886]]></text>
             </staticText>
 
             <staticText>
@@ -439,7 +439,7 @@ Email: support@sguairlines.vn | Website: www.sguairlines.vn | Hotline: 19001886]
                 <textElement textAlignment="Center" verticalAlignment="Middle">
                     <font fontName="DejaVu Sans" size="7" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
                 </textElement>
-                <text><![CDATA[© 2025 SGU Airlines. All rights reserved. | This is an electronic ticket and does not require a signature.]]></text>
+                <text><![CDATA[© 2025 JadT Airlines. All rights reserved. | This is an electronic ticket and does not require a signature.]]></text>
             </staticText>
         </band>
     </title>

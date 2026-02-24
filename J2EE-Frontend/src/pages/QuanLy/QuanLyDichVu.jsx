@@ -427,7 +427,7 @@ const QuanLyDichVu = () => {
         /* Table View */
         <ResponsiveTable>
           <table className="w-full text-sm">
-            <thead className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
+            <thead className="bg-gray-50 text-gray-600">
               <tr>
                 <th className="px-6 py-4 text-left font-semibold">Tên dịch vụ</th>
                 <th className="px-6 py-4 text-left font-semibold">Mô tả</th>

@@ -101,13 +101,13 @@ function TimChuyenBayForm() {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6 bg-white/65 backdrop-blur-xl rounded-3xl border border-white/60 p-6 md:p-8 shadow-xl shadow-slate-300/30">
+        <form onSubmit={handleSubmit} className="space-y-3 bg-white/65 backdrop-blur-xl rounded-xl border border-white/60 p-3 md:p-4 shadow-xl shadow-slate-300/30">
             {/* Chọn loại vé */}
-            <div className="flex gap-3">
+            <div className="flex gap-2">
                 <button
                     type="button"
                     onClick={() => setFlightType('round')}
-                    className={`flex-1 py-3.5 rounded-2xl font-bold transition-all ${
+                    className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${
                         flightType === 'round'
                             ? "bg-linear-to-r from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/30"
                             : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -118,7 +118,7 @@ function TimChuyenBayForm() {
                 <button
                     type="button"
                     onClick={() => setFlightType('one')}
-                    className={`flex-1 py-3.5 rounded-2xl font-bold transition-all ${
+                    className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${
                         flightType === 'one'
                             ? "bg-linear-to-r from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/30"
                             : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -129,19 +129,19 @@ function TimChuyenBayForm() {
             </div>
 
             {/* Điểm khởi hành và điểm đến */}
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-2 gap-3">
                 <div className="relative">
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">
                         {t('booking.search_form.from')}
                     </label>
                     <div className="relative">
-                        <FaPlaneDeparture className='absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400' />
+                        <FaPlaneDeparture className='absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm' />
                         <select 
                             name="departure"
                             id="departure"
                             value={departureValue}
                             onChange={(e) => setDepartureValue(e.target.value)}
-                            className='w-full pl-12 pr-10 py-3.5 border border-slate-200 rounded-2xl bg-white/90 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all appearance-none cursor-pointer text-slate-700'
+                            className='w-full pl-8 pr-7 py-1.5 text-xs border border-slate-200 rounded-lg bg-white/90 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all appearance-none cursor-pointer text-slate-700'
                         >
                             <option value="">{t('booking.search_form.from')}</option>
                             {Object.entries(grouped).map(([country, cities]) => (
@@ -154,22 +154,22 @@ function TimChuyenBayForm() {
                                 </optgroup>
                             ))}
                         </select>
-                        <FaChevronDown className='absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400' size={12} />
+                        <FaChevronDown className='absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400' size={10} />
                     </div>
                 </div>
 
                 <div className="relative">
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">
                         {t('booking.search_form.to')}
                     </label>
                     <div className="relative">
-                        <FaPlaneArrival className='absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400' />
+                        <FaPlaneArrival className='absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm' />
                         <select 
                             name="arrival"
                             id="arrival"
                             value={arrivalValue}
                             onChange={(e) => setArrivalValue(e.target.value)}
-                            className='w-full pl-12 pr-10 py-3.5 border border-slate-200 rounded-2xl bg-white/90 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all appearance-none cursor-pointer text-slate-700'
+                            className='w-full pl-8 pr-7 py-1.5 text-xs border border-slate-200 rounded-lg bg-white/90 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all appearance-none cursor-pointer text-slate-700'
                         >
                             <option value="">{t('booking.search_form.to')}</option>
                             {Object.entries(grouped).map(([country, cities]) => (
@@ -182,15 +182,15 @@ function TimChuyenBayForm() {
                                 </optgroup>
                             ))}
                         </select>
-                        <FaChevronDown className='absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400' size={12} />
+                        <FaChevronDown className='absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400' size={10} />
                     </div>
                 </div>
             </div>
 
             {/* Ngày đi, ngày về và số hành khách */}
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-3 gap-3">
                 <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">
                         {t('booking.search_form.departure_date')}
                     </label>
                     <DatePicker
@@ -199,13 +199,13 @@ function TimChuyenBayForm() {
                         placeholderText={t('booking.search_form.departure_date')}
                         dateFormat="dd/MM/yyyy"
                         minDate={new Date()}
-                        className="w-full px-4 py-3.5 border border-slate-200 rounded-2xl bg-white/90 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-slate-700"
+                        className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white/90 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-slate-700"
                     />
                 </div>
                 
                 {flightType === 'round' && (
                     <div>
-                        <label className="block text-sm font-semibold text-slate-700 mb-2">
+                        <label className="block text-[11px] font-semibold text-slate-700 mb-1">
                             {t('booking.search_form.return_date')}
                         </label>
                         <DatePicker
@@ -214,28 +214,28 @@ function TimChuyenBayForm() {
                             placeholderText={t('booking.search_form.return_date')}
                             dateFormat="dd/MM/yyyy"
                             minDate={startDate || new Date()}
-                            className="w-full px-4 py-3.5 border border-slate-200 rounded-2xl bg-white/90 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-slate-700"
+                            className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white/90 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-slate-700"
                         />
                     </div>
                 )}
                 
                 <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">
                         {t('booking.search_form.passengers')}
                     </label>
                     <div className="relative">
-                        <HiUser className='absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400' />
+                        <HiUser className='absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm' />
                         <select
                             value={passengers}
                             onChange={(e) => setPassengers(e.target.value)}
-                            className="w-full pl-12 pr-10 py-3.5 border border-slate-200 rounded-2xl bg-white/90 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all appearance-none cursor-pointer text-slate-700"
+                            className="w-full pl-8 pr-7 py-1.5 text-xs border border-slate-200 rounded-lg bg-white/90 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all appearance-none cursor-pointer text-slate-700"
                         >
                             <option value="">{t('booking.search_form.passengers')}</option>
                             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
                                 <option key={num} value={num}>{num} {t('booking.search_form.passengers').toLowerCase()}</option>
                             ))}
                         </select>
-                        <FaChevronDown className='absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400' size={12} />
+                        <FaChevronDown className='absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400' size={10} />
                     </div>
                 </div>
             </div>
@@ -243,7 +243,7 @@ function TimChuyenBayForm() {
             {/* Nút tìm chuyến bay */}
             <button
                 type="submit"
-                className="w-full py-4 bg-linear-to-r from-orange-500 to-rose-500 hover:from-orange-400 hover:to-rose-400 text-white rounded-2xl font-bold text-lg shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:-translate-y-0.5 transition-all"
+                className="w-full py-2 mt-1 bg-linear-to-r from-orange-500 to-rose-500 hover:from-orange-400 hover:to-rose-400 text-white rounded-lg font-bold text-xs shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:-translate-y-0.5 transition-all"
             >
                 🔍 {t('booking.search_form.btn_search')}
             </button>

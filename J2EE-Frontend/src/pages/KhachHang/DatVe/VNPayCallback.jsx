@@ -91,7 +91,7 @@ function VNPayCallback() {
                             </h2>
 
                             <p className="text-gray-600 mb-6">
-                                Cảm ơn bạn đã sử dụng dịch vụ của J2EE Airline
+                                Cảm ơn bạn đã sử dụng dịch vụ của JadT Airline
                             </p>
 
                             <div className="bg-gray-50 p-6 rounded-lg mb-6 text-left">

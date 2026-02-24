@@ -7,30 +7,39 @@ export default {
         sans: ['Be Vietnam Pro', 'ui-sans-serif', 'system-ui', 'sans-serif', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'],
       },
       colors: {
-        // SGU Airline color scheme - Blue theme
+        // JADT Airline color scheme - Blue theme based on logo
         primary: {
-          DEFAULT: "#1E88E5",
-          dark: "#1565C0",
-          light: "#42A5F5",
+          DEFAULT: "#0EA5E9",
+          dark: "#0284C7",
+          light: "#38BDF8",
         },
         secondary: {
-          DEFAULT: "#64B5F6",
-          dark: "#42A5F5",
-          light: "#90CAF9",
+          DEFAULT: "#1D4ED8",
+          dark: "#1E40AF",
+          light: "#3B82F6",
         },
         accent: {
-          DEFAULT: "#FF7043",
-          dark: "#F4511E",
-          light: "#FF8A65",
+          DEFAULT: "#0EA5E9",
+          dark: "#0284C7",
+          light: "#7DD3FC",
         },
-        sguAirline: {
-          blue: "#1E88E5",
-          lightblue: "#64B5F6",
-          softbg: "#E3F2FD",
-          accent: "#FF7043",
+        jadtAirline: {
+          // From logo: main brand blue (accent T color)
+          primary: "#0EA5E9",
+          // From logo: medium blue gradient
+          secondary: "#1D4ED8",
+          // From logo: dark blue tones
+          dark: "#1E3A8A",
+          darker: "#1E40AF",
+          deepest: "#172554",
+          // From logo: light blue tones
+          light: "#38BDF8",
+          lighter: "#0284C7",
+          // Soft background
+          softbg: "#F0F9FF",
         },
-        pageBg: "#F5F7FA",
-        textMain: "#222222",
+        pageBg: "#F0F9FF",
+        textMain: "#1E3A8A",
       },
       animation: {
         "pulse-slow": "pulse 15s infinite",
@@ -48,9 +57,10 @@ export default {
         },
       },
       backgroundImage: {
-        "gradient-sguairline":
-          "linear-gradient(135deg, #E3F2FD 0%, #F5F7FA 50%, #FFFFFF 100%)",
-        "gradient-primary": "linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)",
+        "gradient-jadtairline":
+          "linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 50%, #FFFFFF 100%)",
+        "gradient-primary": "linear-gradient(135deg, #0EA5E9 0%, #1D4ED8 100%)",
+        "gradient-secondary": "linear-gradient(135deg, #1D4ED8 0%, #1E3A8A 100%)",
       },
     },
   },

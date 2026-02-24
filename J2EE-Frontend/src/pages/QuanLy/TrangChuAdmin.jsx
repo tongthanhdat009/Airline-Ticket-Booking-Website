@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect, createContext, useContext } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
-import { FaSignOutAlt, FaBars, FaTimes, FaUserCircle, FaChevronDown, FaChevronRight } from 'react-icons/fa';
+import { FaSignOutAlt, FaBars, FaTimes, FaUserCircle, FaChevronDown, FaChevronRight, FaPlaneDeparture } from 'react-icons/fa';
 import { logout } from '../../services/AuthService';
 import { getUserInfo, isAuthenticated, getAdminUserInfo } from '../../utils/cookieUtils';
 import { getMenuItemsGroupedByPermissions } from '../../data/adminMenuData';
@@ -127,6 +127,7 @@ function TrangChuAdmin() {
             'DichVu': 'Quản lý Dịch Vụ',
             'KhachHang': 'Quản lý Khách Hàng',
             'TKAdmin': 'Quản lý Tài Khoản',
+            'QuanLyTKAdmin': 'Quản lý Tài Khoản',
             'GiaBay': 'Quản lý Giá Bay',
             'KhuyenMai': 'Quản lý Khuyến Mãi',
             'DonHang': 'Quản lý Đơn Hàng',
@@ -138,6 +139,14 @@ function TrangChuAdmin() {
             'HangVe': 'Quản lý Hạng Vé',
             'DatCho': 'Quản lý Đặt Chỗ',
             'ThongKe': 'Thống Kê Doanh Thu',
+            'XuatBaoCao': 'Xuất Báo Cáo',
+            'DoiSoatGiaoDich': 'Đối Soát Giao Dịch',
+            'BannerTinTuc': 'Quản lý Banner & Tin Tức',
+            'LichSuGiaoDichVNPay': 'Lịch Sử Giao Dịch VNPay',
+            'HoTroLienHe': 'Hỗ Trợ & Liên Hệ',
+            'them': 'Thêm Mới',
+            'sua': 'Chỉnh Sửa',
+            'ghe': 'Sơ Đồ Ghế',
         };
         
         const breadcrumbs = [];
@@ -163,7 +172,7 @@ function TrangChuAdmin() {
     };
 
     return (
-        <div className="flex h-screen bg-linear-to-br from-slate-50 to-slate-200 font-sans overflow-hidden">
+        <div className="flex h-screen bg-[#f0f2f5] font-sans overflow-hidden">
             {/* Mobile overlay when sidebar is open */}
             {isSidebarOpen && (
                 <div
@@ -173,37 +182,42 @@ function TrangChuAdmin() {
             )}
 
             {/* Sidebar */}
-            <aside className={`${isSidebarOpen ? 'w-72' : 'w-0'} ${isSidebarOpen ? 'fixed md:relative' : ''} md:relative z-30 md:z-0 bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col justify-between shadow-2xl transition-all duration-300 ease-in-out overflow-hidden shrink-0 h-full`}>
+            <aside className={`${isSidebarOpen ? 'w-72' : 'w-0'} ${isSidebarOpen ? 'fixed md:relative' : ''} md:relative z-30 md:z-0 bg-linear-to-b from-[#001529] via-[#001d3d] to-[#00223a] text-white flex flex-col justify-between shadow-2xl transition-all duration-300 ease-in-out overflow-hidden shrink-0 h-full`}>
                 {/* Decorative gradient overlay */}
-                <div className="absolute inset-0 bg-linear-to-br from-sky-500/10 to-purple-500/10 pointer-events-none"></div>
+                <div className="absolute inset-0 bg-linear-to-br from-blue-500/5 to-cyan-500/5 pointer-events-none"></div>
 
                 <div className="relative z-10 flex flex-col h-full w-72">
                     {/* Logo */}
-                    <div className="flex items-center justify-center h-24 border-b border-slate-700/50 bg-slate-900/80">
-                        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 shadow-lg shadow-sky-500/50">
-                            <FaUserCircle className="text-white" size={28} />
-                            <h1 className="text-2xl font-bold text-white tracking-tight">Admin</h1>
+                    <div className="flex items-center h-15 px-5 border-b border-white/10">
+                        <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-lg bg-blue-500 flex items-center justify-center shadow-lg shadow-blue-500/25">
+                                <FaPlaneDeparture className="text-white" size={15} />
+                            </div>
+                            <div>
+                                <h1 className="text-[15px] font-bold text-white tracking-tight leading-tight">JadT Airline</h1>
+                                <p className="text-[10px] text-blue-300/70 font-medium tracking-widest uppercase">Admin Panel</p>
+                            </div>
                         </div>
                     </div>
                     
                     {/* Navigation */}
-                    <nav className="flex-1 mt-6 px-4 overflow-y-auto">
-                        <div className="space-y-3">
+                    <nav className="flex-1 mt-4 px-3 overflow-y-auto scrollbar-thin">
+                        <div className="space-y-1">
                             {Object.entries(groupedMenuItems).map(([groupName, groupData]) => {
                                 const isExpanded = isGroupExpanded(groupName);
 
                                 return (
-                                    <div key={groupName} className="mb-2">
+                                    <div key={groupName} className="mb-1">
                                         {/* Group Header - Collapsible */}
                                         <button
                                             onClick={() => toggleGroup(groupName)}
-                                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-slate-700/50 to-slate-600/50 hover:from-slate-700/70 hover:to-slate-600/70 text-white font-semibold text-sm tracking-wide transition-all duration-300 border border-slate-600/30"
+                                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-white/5 text-blue-200/60 font-semibold text-[11px] tracking-widest uppercase transition-all duration-200"
                                         >
-                                            <span className={`transform transition-transform duration-300 ${isExpanded ? 'rotate-0' : '-rotate-90'}`}>
-                                                <FaChevronDown size={14} />
+                                            <span className={`transform transition-transform duration-200 ${isExpanded ? 'rotate-0' : '-rotate-90'}`}>
+                                                <FaChevronDown size={10} />
                                             </span>
                                             <span className="flex-1 text-left">{groupName}</span>
-                                            <span className="text-xs bg-slate-800/50 px-2 py-0.5 rounded-full text-slate-400">
+                                            <span className="text-[10px] bg-white/10 px-1.5 py-0.5 rounded text-blue-300/50 font-normal">
                                                 {groupData.items.length}
                                             </span>
                                         </button>
@@ -211,7 +225,7 @@ function TrangChuAdmin() {
                                         {/* Group Items - Collapsible Content with Animation */}
                                         <div
                                             className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                                                isExpanded ? 'max-h-[1000px] opacity-100 mt-2 ml-2' : 'max-h-0 opacity-0'
+                                                isExpanded ? 'max-h-250 opacity-100 mt-0.5 ml-1' : 'max-h-0 opacity-0'
                                             }`}
                                         >
                                             <div className="space-y-1">
@@ -222,19 +236,17 @@ function TrangChuAdmin() {
                                                             key={item.path}
                                                             to={item.path}
                                                             className={({ isActive }) =>
-                                                                `group flex items-center gap-4 px-5 py-3.5 rounded-xl transition-all duration-200 relative overflow-hidden ${
+                                                                `group flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
                                                                     isActive
-                                                                    ? `bg-gradient-to-r ${item.color} text-white shadow-lg`
-                                                                    : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                                                                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/25'
+                                                                    : 'text-slate-400 hover:text-white hover:bg-white/5'
                                                                 }`
                                                             }
                                                         >
-                                                            <div className="relative z-10 flex items-center gap-4 w-full">
-                                                                <span className="transform group-hover:scale-110 transition-transform duration-200">
-                                                                    <Icon size={18} />
-                                                                </span>
-                                                                <span className="font-medium text-sm">{item.text}</span>
-                                                            </div>
+                                                            <span className="shrink-0 transition-transform duration-200 group-hover:scale-105">
+                                                                <Icon size={16} />
+                                                            </span>
+                                                            <span className="font-medium text-[13px]">{item.text}</span>
                                                         </NavLink>
                                                     );
                                                 })}
@@ -247,17 +259,17 @@ function TrangChuAdmin() {
                     </nav>
                 
                     {/* User Profile / Logout */}
-                    <div className="p-3 sm:p-4 border-t border-slate-700/50 bg-slate-900/50">
-                        <div className="mb-3 sm:mb-4 p-3 sm:p-4 rounded-xl bg-slate-800/50 border border-slate-700/50">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-sky-400 to-blue-500 flex items-center justify-center font-bold text-white shadow-lg shrink-0">
+                    <div className="p-3 border-t border-white/10">
+                        <div className="mb-2 p-2.5 rounded-lg bg-white/5">
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center font-bold text-white text-sm shrink-0">
                                     {getInitial()}
                                 </div>
                                 <div className="overflow-hidden min-w-0 flex-1">
-                                    <p className="font-semibold text-sm text-white truncate">
+                                    <p className="font-medium text-[13px] text-white truncate">
                                         {userInfo?.username || 'Admin User'}
                                     </p>
-                                    <p className="text-xs text-slate-400 truncate">
+                                    <p className="text-[11px] text-slate-400 truncate">
                                         {userInfo?.email || userInfo?.role || 'Administrator'}
                                     </p>
                                 </div>
@@ -266,10 +278,10 @@ function TrangChuAdmin() {
 
                         <button
                             onClick={handleLogout}
-                            className="group flex items-center justify-center sm:justify-start gap-3 sm:gap-4 px-4 sm:px-5 py-3 sm:py-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-red-500/20 hover:border-red-500/50 border border-transparent transition-all duration-200 w-full"
+                            className="group flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 w-full"
                         >
-                            <FaSignOutAlt size={18} className="group-hover:rotate-12 transition-transform duration-200 shrink-0" />
-                            <span className="font-semibold text-sm">Đăng xuất</span>
+                            <FaSignOutAlt size={14} className="group-hover:rotate-12 transition-transform duration-200 shrink-0" />
+                            <span className="font-medium text-[13px]">Đăng xuất</span>
                         </button>
                     </div>
                 </div>
@@ -278,29 +290,29 @@ function TrangChuAdmin() {
             {/* Main Content */}
             <main className="flex-1 flex flex-col overflow-hidden">
                 {/* Header with Breadcrumb */}
-                <header className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 shadow-lg">
+                <header className="bg-white border-b border-gray-200/80 shadow-sm">
                     <div className="w-full mx-auto px-3 sm:px-4 lg:px-6">
-                        <div className="flex items-center justify-between h-16">
+                        <div className="flex items-center justify-between h-14">
                             {/* Left side - Menu toggle + Breadcrumb */}
-                            <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
+                            <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                                 <button
                                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                                    className="flex items-center justify-center gap-2 px-2 sm:px-3 py-2 rounded-lg bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-all border border-white/20 shrink-0"
+                                    className="flex items-center justify-center p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all shrink-0"
                                 >
-                                    {isSidebarOpen ? <FaTimes size={18} /> : <FaBars size={18} />}
+                                    {isSidebarOpen ? <FaTimes size={16} /> : <FaBars size={16} />}
                                 </button>
 
                                 {/* Dynamic Breadcrumb - Responsive */}
-                                <div className="flex items-center gap-1 sm:gap-2 text-sm hidden sm:flex">
+                                <div className="flex items-center gap-1.5 text-sm hidden sm:flex">
                                     {getBreadcrumbs().map((crumb, index) => (
                                         <React.Fragment key={crumb.path}>
-                                            {index > 0 && <FaChevronRight className="text-blue-300 text-xs shrink-0" />}
+                                            {index > 0 && <FaChevronRight className="text-gray-300 text-[10px] shrink-0" />}
                                             {crumb.isLast ? (
-                                                <span className="text-white font-bold truncate">{crumb.label}</span>
+                                                <span className="text-gray-800 font-semibold truncate">{crumb.label}</span>
                                             ) : (
                                                 <Link
                                                     to={crumb.path}
-                                                    className="text-blue-100 hover:text-white transition-colors font-medium truncate"
+                                                    className="text-gray-400 hover:text-gray-600 transition-colors font-medium truncate"
                                                 >
                                                     {crumb.label}
                                                 </Link>
@@ -311,7 +323,7 @@ function TrangChuAdmin() {
                                 {/* Show only current page on mobile */}
                                 <div className="flex items-center sm:hidden text-sm">
                                     {getBreadcrumbs().length > 0 && (
-                                        <span className="text-white font-semibold truncate">
+                                        <span className="text-gray-800 font-semibold truncate">
                                             {getBreadcrumbs()[getBreadcrumbs().length - 1]?.label || ''}
                                         </span>
                                     )}

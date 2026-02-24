@@ -126,7 +126,7 @@ const Chatbot = () => {
                     className={`px-4 py-3 rounded-2xl shadow-md whitespace-pre-line ${
                       msg.type === 'user'
                         ? 'bg-linear-to-r from-[#1E88E5] to-[#1565C0] text-white rounded-br-sm'
-                        : 'bg-white text-gray-800 rounded-bl-sm border border-gray-200'
+                        : 'bg-white text-slate-800 rounded-bl-sm border border-slate-200'
                     }`}
                   >
                     <p className="text-sm leading-relaxed">{msg.text}</p>
@@ -141,7 +141,7 @@ const Chatbot = () => {
                   <div className="w-8 h-8 bg-linear-to-br from-[#1E88E5] to-[#1976D2] rounded-full flex items-center justify-center shadow-md">
                     <img src="/chatbot/logo-vj.png" alt="Bot" className="w-5 h-5" />
                   </div>
-                  <div className="bg-white px-5 py-3 rounded-2xl rounded-bl-sm shadow-md border border-gray-200">
+                  <div className="bg-white px-5 py-3 rounded-2xl rounded-bl-sm shadow-md border border-slate-200">
                     <div className="flex gap-1">
                       <div className="w-2 h-2 bg-[#1E88E5] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
                       <div className="w-2 h-2 bg-[#1E88E5] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
@@ -157,14 +157,14 @@ const Chatbot = () => {
 
           {/* Quick Questions */}
           {messages.length === 1 && (
-            <div className="px-5 py-3 bg-white border-t border-gray-200">
-              <p className="text-xs text-gray-600 mb-2 font-semibold">💡 Gợi ý câu hỏi:</p>
+            <div className="px-5 py-3 bg-white border-t border-slate-200">
+              <p className="text-xs text-slate-600 mb-2 font-semibold">💡 Gợi ý câu hỏi:</p>
               <div className="flex flex-wrap gap-2">
                 {quickQuestions.map((question, index) => (
                   <button
                     key={index}
                     onClick={() => handleQuickQuestion(question)}
-                    className="px-3 py-1.5 text-xs bg-linear-to-r from-blue-50 to-sky-50 text-[#1E88E5] rounded-full hover:from-blue-100 hover:to-sky-100 transition-all border border-blue-200 hover:shadow-md"
+                    className="px-3 py-1.5 text-xs bg-linear-to-r from-blue-50 to-sky-50 text-[#1E88E5] rounded-full hover:from-blue-100 hover:to-sky-100 transition-all border border-slate-200 hover:shadow-md"
                   >
                     {question}
                   </button>
@@ -174,7 +174,7 @@ const Chatbot = () => {
           )}
 
           {/* Input */}
-          <div className="p-4 bg-white border-t border-gray-200 shadow-lg">
+          <div className="p-4 bg-white border-t border-slate-200 shadow-lg">
             <div className="flex gap-2">
               <textarea
                 value={inputMessage}
@@ -183,7 +183,7 @@ const Chatbot = () => {
                 placeholder="Nhập câu hỏi của bạn..."
                 disabled={isLoading}
                 rows="1"
-                className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-[#1E88E5] focus:outline-none resize-none disabled:bg-gray-100 disabled:cursor-not-allowed transition-all text-sm"
+                className="flex-1 px-4 py-3 border-2 border-slate-200 rounded-2xl focus:border-[#1E88E5] focus:outline-none resize-none disabled:bg-slate-100 disabled:cursor-not-allowed transition-all text-sm"
               />
               <button
                 onClick={handleSendMessage}
@@ -195,7 +195,7 @@ const Chatbot = () => {
                 </svg>
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-2 text-center">
+            <p className="text-xs text-slate-500 mt-2 text-center">
               Powered by JadT AI • Luôn sẵn sàng hỗ trợ 24/7
             </p>
           </div>
@@ -215,7 +215,7 @@ const Chatbot = () => {
         </button>
       )}
 
-      <style jsx>{`
+      <style>{`
         @keyframes slideUp {
           from {
             opacity: 0;
@@ -226,7 +226,7 @@ const Chatbot = () => {
             transform: translateY(0);
           }
         }
-        
+
         @keyframes fadeIn {
           from {
             opacity: 0;

@@ -27,9 +27,9 @@ const ResponsiveTable = React.memo(({
 
         return (
             <div className="flex flex-col items-center justify-center py-12 px-4">
-                <div className="w-24 h-24 mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                <div className="w-24 h-24 mb-4 rounded-full bg-slate-100 flex items-center justify-center">
                     <svg
-                        className="w-12 h-12 text-gray-400"
+                        className="w-12 h-12 text-slate-400"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -43,13 +43,13 @@ const ResponsiveTable = React.memo(({
                         />
                     </svg>
                 </div>
-                <p className="text-gray-500 text-center text-lg">{emptyMessage}</p>
+                <p className="text-slate-500 text-center text-lg">{emptyMessage}</p>
             </div>
         );
     }
 
     return (
-        <div className={`overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200 ${className}`}>
+        <div className={`overflow-hidden bg-white rounded border border-slate-200 ${className}`}>
             <div className="overflow-x-auto">
                 {React.Children.map(children, (child) => {
                     // Add sticky header to thead if enabled and child is a table
@@ -59,7 +59,7 @@ const ResponsiveTable = React.memo(({
                             children: React.Children.map(child.props.children, (theadChild) => {
                                 if (React.isValidElement(theadChild) && theadChild.type === 'thead') {
                                     return React.cloneElement(theadChild, {
-                                        className: `${theadChild.props.className || ''} sticky top-0 z-10`,
+                                        className: `${theadChild.props.className || ''} sticky top-0 z-10 bg-slate-50 border-b border-slate-200`,
                                         children: theadChild.props.children
                                     });
                                 }

@@ -90,9 +90,9 @@ public class EmailVerificationService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             
-            helper.setFrom("noreply@sguairline.com");
+            helper.setFrom("noreply@jadtairline.com");
             helper.setTo(toEmail);
-            helper.setSubject("Xác thực tài khoản SGU Airline");
+            helper.setSubject("Xác thực tài khoản JadT Airline");
             
             // Create verification URL (hỗ trợ cả dev và production)
             String verificationUrl = frontendUrl + "/verify-email?token=" + token;
@@ -118,13 +118,13 @@ public class EmailVerificationService {
                 <body>
                     <div class="container">
                         <div class="header">
-                            <div class="logo">✈️ SGU Airline</div>
+                            <div class="logo">✈️ JadT Airline</div>
                             <h2>Xác thực tài khoản của bạn</h2>
                         </div>
                         <div class="content">
                             <p>Xin chào <strong>%s</strong>,</p>
                             
-                            <p>Cảm ơn bạn đã đăng ký tài khoản tại <strong>SGU Airline</strong>!</p>
+                            <p>Cảm ơn bạn đã đăng ký tài khoản tại <strong>JadT Airline</strong>!</p>
                             
                             <p>Để hoàn tất quá trình đăng ký và bảo mật tài khoản của bạn, 
                                vui lòng click vào nút bên dưới để xác thực email:</p>
@@ -147,11 +147,11 @@ public class EmailVerificationService {
                             
                             <p style="margin-top: 30px;">
                                 Trân trọng,<br>
-                                <strong>Đội ngũ SGU Airline</strong>
+                                <strong>Đội ngũ JadT Airline</strong>
                             </p>
                         </div>
                         <div class="footer">
-                            <p>© 2025 SGU Airline. All rights reserved.</p>
+                            <p>© 2025 JadT Airline. All rights reserved.</p>
                             <p>Email này được gửi tự động, vui lòng không phản hồi.</p>
                         </div>
                     </div>

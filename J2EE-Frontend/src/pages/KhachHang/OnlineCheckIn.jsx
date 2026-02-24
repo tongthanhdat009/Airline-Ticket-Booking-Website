@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 // eslint-disable-next-line no-unused-vars
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import CheckInService from '../../services/CheckInService';
 import useTitle from '../../hooks/useTitle';
 
@@ -96,10 +96,10 @@ function OnlineCheckIn() {
   };
 
   const benefits = [
-    { icon: "⏰", title: t('pages.online_checkin_extra.benefit_time_desc'), desc: "Không cần xếp hàng, check-in trong vài phút" },
-    { icon: "🎫", title: t('pages.online_checkin_extra.benefit_boarding_pass'), desc: "Nhận thẻ lên máy bay điện tử ngay trên điện thoại" },
-    { icon: "💺", title: t('pages.online_checkin_extra.benefit_seat'), desc: "Xem và chọn chỗ ngồi yêu thích của bạn" },
-    { icon: "🎒", title: t('pages.online_checkin_extra.benefit_baggage'), desc: "Mua thêm hành lý với giá ưu đãi" }
+    { icon: "⏰", title: t('pages.online_checkin.benefit_time'), desc: t('pages.online_checkin_extra.benefit_time_desc') },
+    { icon: "🎫", title: t('pages.online_checkin.benefit_boarding_pass'), desc: t('pages.online_checkin_extra.benefit_boarding_pass_desc') },
+    { icon: "💺", title: t('pages.online_checkin.benefit_seat'), desc: t('pages.online_checkin_extra.benefit_seat_desc') },
+    { icon: "🎒", title: t('pages.online_checkin.benefit_baggage'), desc: t('pages.online_checkin_extra.benefit_baggage_desc') }
   ];
 
   return (

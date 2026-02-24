@@ -4,6 +4,22 @@
 
 :root {
   --font-sans: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+
+  /* JADT Airline Brand Colors */
+  --jadt-primary: #0EA5E9;
+  --jadt-secondary: #1D4ED8;
+  --jadt-dark: #1E3A8A;
+  --jadt-darker: #1E40AF;
+  --jadt-deepest: #172554;
+  --jadt-light: #38BDF8;
+  --jadt-lighter: #0284C7;
+  --jadt-soft-bg: #F0F9FF;
+
+  /* Semantic colors */
+  --bg-primary: #F0F9FF;
+  --text-primary: #1E3A8A;
+  --text-secondary: #475569;
+  --border-color: #CBD5E1;
 }
 
 html,
@@ -15,8 +31,8 @@ body,
 }
 
 body{
-  background-color: #F5F7FA;
-  color: #222222;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 @layer utilities {
@@ -87,4 +103,19 @@ body{
 .hide-scrollbar {
   -ms-overflow-style: none;  /* IE và Edge */
   scrollbar-width: none;     /* Firefox */
+}
+
+/* Custom scrollbar for admin panel */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }

@@ -20,7 +20,7 @@ function TrangChu() {
       id: 1,
       image: "/banner/1topbannerpc-1756961025580.jpg",
       title: "Khám phá thế giới",
-      subtitle: "Cùng SGU Airline"
+      subtitle: "Cùng JadT Airline"
     },
     {
       id: 2,
@@ -236,7 +236,7 @@ function TrangChu() {
           <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-black text-slate-800 mb-4 tracking-tight">
             Ưu đãi <span className="text-blue-600">Độc Quyền</span>
           </motion.h2>
-          <motion.p variants={fadeInUp} className="text-slate-500 text-lg max-w-2xl mx-auto">Khám phá những chương trình khuyến mãi hấp dẫn nhất chỉ có tại SGU Airline.</motion.p>
+          <motion.p variants={fadeInUp} className="text-slate-500 text-lg max-w-2xl mx-auto">Khám phá những chương trình khuyến mãi hấp dẫn nhất chỉ có tại JadT Airline.</motion.p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[280px]">

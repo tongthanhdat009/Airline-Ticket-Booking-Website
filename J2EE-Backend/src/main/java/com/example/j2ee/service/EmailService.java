@@ -24,9 +24,9 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             
-            helper.setFrom("noreply@sguairline.com");
+            helper.setFrom("noreply@jadtairline.com");
             helper.setTo(toEmail);
-            helper.setSubject("Mã OTP đặt lại mật khẩu - SGU Airline");
+            helper.setSubject("Mã OTP đặt lại mật khẩu - JadT Airline");
             
             String htmlContent = String.format("""
                 <!DOCTYPE html>
@@ -55,7 +55,7 @@ public class EmailService {
                 <body>
                     <div class="container">
                         <div class="header">
-                            <div class="logo">✈️ SGU Airline</div>
+                            <div class="logo">✈️ JadT Airline</div>
                             <h2>Đặt lại mật khẩu</h2>
                         </div>
                         <div class="content">
@@ -65,7 +65,7 @@ public class EmailService {
                             
                             <p>Xin chào,</p>
                             
-                            <p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản <strong>SGU Airline</strong>.</p>
+                            <p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản <strong>JadT Airline</strong>.</p>
                             
                             <p>Vui lòng sử dụng mã OTP bên dưới để hoàn tất quá trình đặt lại mật khẩu:</p>
                             
@@ -88,14 +88,14 @@ public class EmailService {
                             
                             <p style="margin-top: 30px;">
                                 Trân trọng,<br>
-                                <strong>Đội ngũ SGU Airline</strong>
+                                <strong>Đội ngũ JadT Airline</strong>
                             </p>
                         </div>
                         <div class="footer">
-                            <p>© 2025 SGU Airline. All rights reserved.</p>
+                            <p>© 2025 JadT Airline. All rights reserved.</p>
                             <p>Email này được gửi tự động, vui lòng không phản hồi.</p>
                             <p style="color: #999; margin-top: 10px;">
-                                🌐 www.sguairline.edu.vn | ☎️ Hotline: 1900-xxxx | 📧 support@sguairline.edu.vn
+                                🌐 www.jadtairline.com.vn | ☎️ Hotline: 1900-xxxx | 📧 support@jadtairline.com.vn
                             </p>
                         </div>
                     </div>
@@ -116,9 +116,9 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             
-            helper.setFrom("noreply@sguairline.com");
+            helper.setFrom("noreply@jadtairline.com");
             helper.setTo(toEmail);
-            helper.setSubject("Chào mừng đến với SGU Airline! ✈️");
+            helper.setSubject("Chào mừng đến với JadT Airline! ✈️");
             
             String htmlContent = String.format("""
                 <!DOCTYPE html>
@@ -146,13 +146,13 @@ public class EmailService {
                     <div class="container">
                         <div class="header">
                             <div class="logo">✈️</div>
-                            <h1 style="margin: 0;">Chào mừng đến với SGU Airline!</h1>
+                            <h1 style="margin: 0;">Chào mừng đến với JadT Airline!</h1>
                             <p style="margin: 10px 0 0 0; opacity: 0.9;">Bay xa hơn, tiết kiệm hơn</p>
                         </div>
                         <div class="content">
                             <p>Xin chào <strong>%s</strong>,</p>
                             
-                            <p>🎉 Chúc mừng bạn đã trở thành thành viên của <strong>SGU Airline</strong>!</p>
+                            <p>🎉 Chúc mừng bạn đã trở thành thành viên của <strong>JadT Airline</strong>!</p>
                             
                             <p>Giờ đây bạn có thể:</p>
                             
@@ -190,13 +190,13 @@ public class EmailService {
                             <p style="margin-top: 30px;">
                                 Chúc bạn có những chuyến bay tuyệt vời! ✈️<br><br>
                                 Trân trọng,<br>
-                                <strong>Đội ngũ SGU Airline</strong>
+                                <strong>Đội ngũ JadT Airline</strong>
                             </p>
                         </div>
                         <div class="footer">
-                            <p>© 2025 SGU Airline. All rights reserved.</p>
+                            <p>© 2025 JadT Airline. All rights reserved.</p>
                             <p style="color: #999; margin-top: 10px;">
-                                🌐 www.sguairline.edu.vn | ☎️ Hotline: 1900-xxxx | 📧 support@sguairline.edu.vn
+                                🌐 www.jadtairline.com.vn | ☎️ Hotline: 1900-xxxx | 📧 support@jadtairline.com.vn
                             </p>
                         </div>
                     </div>
@@ -217,9 +217,9 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             
-            helper.setFrom("noreply@sguairline.com");
+            helper.setFrom("noreply@jadtairline.com");
             helper.setTo(toEmail);
-            helper.setSubject("Mật khẩu đã được đặt lại thành công - SGU Airline");
+            helper.setSubject("Mật khẩu đã được đặt lại thành công - JadT Airline");
             
             String htmlContent = String.format("""
                 <!DOCTYPE html>
@@ -249,7 +249,7 @@ public class EmailService {
                         <div class="content">
                             <p>Xin chào <strong>%s</strong>,</p>
                             
-                            <p>Mật khẩu tài khoản <strong>SGU Airline</strong> của bạn đã được đặt lại thành công.</p>
+                            <p>Mật khẩu tài khoản <strong>JadT Airline</strong> của bạn đã được đặt lại thành công.</p>
                             
                             <p>Bạn có thể đăng nhập bằng mật khẩu mới ngay bây giờ.</p>
                             
@@ -264,11 +264,11 @@ public class EmailService {
                             
                             <p style="margin-top: 30px;">
                                 Trân trọng,<br>
-                                <strong>Đội ngũ SGU Airline</strong>
+                                <strong>Đội ngũ JadT Airline</strong>
                             </p>
                         </div>
                         <div class="footer">
-                            <p>© 2025 SGU Airline. All rights reserved.</p>
+                            <p>© 2025 JadT Airline. All rights reserved.</p>
                         </div>
                     </div>
                 </body>
@@ -292,9 +292,9 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             
-            helper.setFrom("noreply@sguairline.com");
+            helper.setFrom("noreply@jadtairline.com");
             helper.setTo(toEmail);
-            helper.setSubject("Xác nhận đặt vé thành công - SGU Airline ✈️");
+            helper.setSubject("Xác nhận đặt vé thành công - JadT Airline ✈️");
             
             String htmlContent = String.format("""
                 <!DOCTYPE html>
@@ -329,7 +329,7 @@ public class EmailService {
                         <div class="header">
                             <div class="logo">✈️</div>
                             <h1 style="margin: 0;">Đặt vé thành công!</h1>
-                            <p style="margin: 10px 0 0 0; opacity: 0.9;">Cảm ơn bạn đã tin tưởng SGU Airline</p>
+                            <p style="margin: 10px 0 0 0; opacity: 0.9;">Cảm ơn bạn đã tin tưởng JadT Airline</p>
                         </div>
                         <div class="content">
                             <p>Xin chào <strong>%s</strong>,</p>
@@ -378,20 +378,20 @@ public class EmailService {
                             <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ:</p>
                             <ul style="color: #666;">
                                 <li>☎️ Hotline: 1900-xxxx (24/7)</li>
-                                <li>📧 Email: support@sguairline.edu.vn</li>
+                                <li>📧 Email: support@jadtairline.com.vn</li>
                                 <li>💬 Live chat trên website</li>
                             </ul>
                             
                             <p style="margin-top: 30px;">
                                 Chúc bạn có chuyến bay an toàn và thoải mái! ✈️<br><br>
                                 Trân trọng,<br>
-                                <strong>Đội ngũ SGU Airline</strong>
+                                <strong>Đội ngũ JadT Airline</strong>
                             </p>
                         </div>
                         <div class="footer">
-                            <p>© 2025 SGU Airline. All rights reserved.</p>
+                            <p>© 2025 JadT Airline. All rights reserved.</p>
                             <p style="color: #999; margin-top: 10px;">
-                                🌐 www.sguairline.edu.vn | ☎️ Hotline: 1900-xxxx | 📧 support@sguairline.edu.vn
+                                🌐 www.jadtairline.com.vn | ☎️ Hotline: 1900-xxxx | 📧 support@jadtairline.com.vn
                             </p>
                             <p style="color: #999; font-size: 10px; margin-top: 10px;">
                                 Email này được gửi tự động, vui lòng không phản hồi.
@@ -428,9 +428,9 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             
-            helper.setFrom("noreply@sguairline.com");
+            helper.setFrom("noreply@jadtairline.com");
             helper.setTo(toEmail);
-            helper.setSubject("Xác nhận đặt vé thành công - SGU Airline ✈️");
+            helper.setSubject("Xác nhận đặt vé thành công - JadT Airline ✈️");
             
             // Determine if round-trip
             int ticketCount = ticketPdfs.size();
@@ -472,7 +472,7 @@ public class EmailService {
                         <div class="header">
                             <div class="logo">✈️</div>
                             <h1 style="margin: 0;">Đặt vé thành công!</h1>
-                            <p style="margin: 10px 0 0 0; opacity: 0.9;">Cảm ơn bạn đã tin tưởng SGU Airline</p>
+                            <p style="margin: 10px 0 0 0; opacity: 0.9;">Cảm ơn bạn đã tin tưởng JadT Airline</p>
                         </div>
                         <div class="content">
                             <p>Xin chào <strong>%s</strong>,</p>
@@ -525,20 +525,20 @@ public class EmailService {
                             <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ:</p>
                             <ul style="color: #666;">
                                 <li>☎️ Hotline: 1900-xxxx (24/7)</li>
-                                <li>📧 Email: support@sguairline.edu.vn</li>
+                                <li>📧 Email: support@jadtairline.com.vn</li>
                                 <li>💬 Live chat trên website</li>
                             </ul>
                             
                             <p style="margin-top: 30px;">
                                 Chúc bạn có chuyến bay an toàn và thoải mái! ✈️<br><br>
                                 Trân trọng,<br>
-                                <strong>Đội ngũ SGU Airline</strong>
+                                <strong>Đội ngũ JadT Airline</strong>
                             </p>
                         </div>
                         <div class="footer">
-                            <p>© 2025 SGU Airline. All rights reserved.</p>
+                            <p>© 2025 JadT Airline. All rights reserved.</p>
                             <p style="color: #999; margin-top: 10px;">
-                                🌐 www.sguairline.edu.vn | ☎️ Hotline: 1900-xxxx | 📧 support@sguairline.edu.vn
+                                🌐 www.jadtairline.com.vn | ☎️ Hotline: 1900-xxxx | 📧 support@jadtairline.com.vn
                             </p>
                             <p style="color: #999; font-size: 10px; margin-top: 10px;">
                                 Email này được gửi tự động, vui lòng không phản hồi.
@@ -593,9 +593,9 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             
-            helper.setFrom("noreply@sguairline.com");
+            helper.setFrom("noreply@jadtairline.com");
             helper.setTo(toEmail);
-            helper.setSubject("Thông báo thay đổi ghế - SGU Airline ✈️");
+            helper.setSubject("Thông báo thay đổi ghế - JadT Airline ✈️");
             
             String lyDoText = lyDo != null && !lyDo.isEmpty() ? 
                 String.format("<p><strong>Lý do:</strong> %s</p>", lyDo) : "";
@@ -660,13 +660,13 @@ public class EmailService {
                             
                             <p style="margin-top: 30px;">
                                 Trân trọng,<br>
-                                <strong>Đội ngũ SGU Airline</strong>
+                                <strong>Đội ngũ JadT Airline</strong>
                             </p>
                         </div>
                         <div class="footer">
-                            <p>© 2025 SGU Airline. All rights reserved.</p>
+                            <p>© 2025 JadT Airline. All rights reserved.</p>
                             <p style="color: #999; margin-top: 10px;">
-                                🌐 www.sguairline.edu.vn | ☎️ Hotline: 1900-xxxx | 📧 support@sguairline.edu.vn
+                                🌐 www.jadtairline.com.vn | ☎️ Hotline: 1900-xxxx | 📧 support@jadtairline.com.vn
                             </p>
                         </div>
                     </div>
@@ -693,9 +693,9 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             
-            helper.setFrom("noreply@sguairline.com");
+            helper.setFrom("noreply@jadtairline.com");
             helper.setTo(toEmail);
-            helper.setSubject("Thông báo thay đổi chuyến bay - SGU Airline ✈️");
+            helper.setSubject("Thông báo thay đổi chuyến bay - JadT Airline ✈️");
             
             String lyDoText = lyDo != null && !lyDo.isEmpty() ? 
                 String.format("<p><strong>Lý do thay đổi:</strong> %s</p>", lyDo) : "";
@@ -788,13 +788,13 @@ public class EmailService {
                             
                             <p style="margin-top: 30px;">
                                 Trân trọng,<br>
-                                <strong>Đội ngũ SGU Airline</strong>
+                                <strong>Đội ngũ JadT Airline</strong>
                             </p>
                         </div>
                         <div class="footer">
-                            <p>© 2025 SGU Airline. All rights reserved.</p>
+                            <p>© 2025 JadT Airline. All rights reserved.</p>
                             <p style="color: #999; margin-top: 10px;">
-                                🌐 www.sguairline.edu.vn | ☎️ Hotline: 1900-xxxx | 📧 support@sguairline.edu.vn
+                                🌐 www.jadtairline.com.vn | ☎️ Hotline: 1900-xxxx | 📧 support@jadtairline.com.vn
                             </p>
                         </div>
                     </div>
