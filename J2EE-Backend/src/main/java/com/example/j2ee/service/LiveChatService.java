@@ -239,6 +239,8 @@ public class LiveChatService {
 
         // Broadcast cho customer qua WebSocket
         messagingTemplate.convertAndSend("/topic/chat/session/" + sessionId, dto);
+        // Broadcast cho admin panel qua WebSocket
+        messagingTemplate.convertAndSend("/topic/chat/admin/session/" + sessionId, dto);
         broadcastAdminUpdate();
 
         return dto;
@@ -320,6 +322,7 @@ public class LiveChatService {
     private ChatMessageDTO toMessageDTO(ChatMessage msg) {
         ChatMessageDTO dto = new ChatMessageDTO();
         dto.setMaMessage(msg.getMaMessage());
+        dto.setSessionId(msg.getChatSession().getSessionId());
         dto.setNoiDung(msg.getNoiDung());
         dto.setNguoiGui(msg.getNguoiGui());
         dto.setMessageType(msg.getMessageType());

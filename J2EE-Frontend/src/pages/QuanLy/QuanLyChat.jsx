@@ -70,7 +70,13 @@ const QuanLyChat = () => {
   const handleNewMessage = useCallback((data) => {
     // Tin nhắn mới cho session đang xem
     if (data.sessionId === activeSessionRef.current?.sessionId) {
-      setMessages(prev => [...prev, data]);
+      setMessages(prev => {
+        // Tránh trùng tin nhắn (có thể nhận từ cả REST response + WebSocket)
+        if (data.maMessage && prev.some(m => m.maMessage === data.maMessage)) {
+          return prev;
+        }
+        return [...prev, data];
+      });
     }
     // Refresh session list
     fetchSessions();
@@ -136,13 +142,15 @@ const QuanLyChat = () => {
         sessionId: activeSession.sessionId,
         noiDung: text.trim(),
       });
-      if (res.success) {
-        // Message sẽ được thêm qua WebSocket
-        // Nhưng fallback thêm vào local nếu WebSocket chậm
-        if (!isConnected) {
-          setMessages(prev => [...prev, res.data]);
-        }
-      } else {
+      if (res.success && res.data) {
+        // Thêm tin nhắn ngay vào UI (optimistic update)
+        setMessages(prev => {
+          if (res.data.maMessage && prev.some(m => m.maMessage === res.data.maMessage)) {
+            return prev;
+          }
+          return [...prev, res.data];
+        });
+      } else if (!res.success) {
         showToast(res.message || 'Không thể gửi tin nhắn', 'error');
       }
     } catch {

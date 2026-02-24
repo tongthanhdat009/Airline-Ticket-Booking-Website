@@ -17,6 +17,17 @@ const useAdminChatWebSocket = (activeSessionId, onNewMessage, onStatsUpdate) => 
   const stompClientRef = useRef(null);
   const activeSessionRef = useRef(activeSessionId);
   const sessionSubscriptionRef = useRef(null);
+  const onNewMessageRef = useRef(onNewMessage);
+  const onStatsUpdateRef = useRef(onStatsUpdate);
+
+  // Luôn cập nhật refs để tránh stale closure
+  useEffect(() => {
+    onNewMessageRef.current = onNewMessage;
+  }, [onNewMessage]);
+
+  useEffect(() => {
+    onStatsUpdateRef.current = onStatsUpdate;
+  }, [onStatsUpdate]);
 
   // Cập nhật ref khi activeSessionId thay đổi
   useEffect(() => {
@@ -37,8 +48,8 @@ const useAdminChatWebSocket = (activeSessionId, onNewMessage, onStatsUpdate) => 
           (message) => {
             try {
               const data = JSON.parse(message.body);
-              if (onNewMessage) {
-                onNewMessage(data);
+              if (onNewMessageRef.current) {
+                onNewMessageRef.current(data);
               }
             } catch (error) {
               console.error("Error parsing admin chat message:", error);
@@ -75,8 +86,8 @@ const useAdminChatWebSocket = (activeSessionId, onNewMessage, onStatsUpdate) => 
       stompClient.subscribe("/topic/chat/admin/updates", (message) => {
         try {
           const stats = JSON.parse(message.body);
-          if (onStatsUpdate) {
-            onStatsUpdate(stats);
+          if (onStatsUpdateRef.current) {
+            onStatsUpdateRef.current(stats);
           }
         } catch (error) {
           console.error("Error parsing admin stats:", error);
@@ -90,8 +101,8 @@ const useAdminChatWebSocket = (activeSessionId, onNewMessage, onStatsUpdate) => 
           (message) => {
             try {
               const data = JSON.parse(message.body);
-              if (onNewMessage) {
-                onNewMessage(data);
+              if (onNewMessageRef.current) {
+                onNewMessageRef.current(data);
               }
             } catch (error) {
               console.error("Error parsing admin chat message:", error);

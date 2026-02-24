@@ -7,6 +7,7 @@ import {
   FaTimesCircle,
   FaSyncAlt 
 } from 'react-icons/fa';
+import AISuggestionPanel from './AISuggestionPanel';
 
 /**
  * Chi tiết chat cho admin - hiển thị tin nhắn + thông tin KH + input reply
@@ -20,6 +21,16 @@ import {
 const ChatDetail = ({ session, messages = [], onSendMessage, onAssign, onClose, sending }) => {
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef(null);
+
+  // Xác định tin nhắn cuối là từ ai (customer/admin/system)
+  const lastMessageType = messages.length > 0
+    ? messages[messages.length - 1].nguoiGui
+    : null;
+
+  // Khi admin chọn gợi ý AI → chèn vào input (có thể edit trước khi gửi)
+  const handleSelectSuggestion = (suggestion) => {
+    setInputValue(suggestion);
+  };
 
   // Auto-scroll khi có tin nhắn mới
   useEffect(() => {
@@ -122,6 +133,16 @@ const ChatDetail = ({ session, messages = [], onSendMessage, onAssign, onClose, 
           {session.reopenCount > 0 && <span>Mở lại: {session.reopenCount} lần</span>}
         </div>
       </div>
+
+      {/* AI Suggestion Panel - Chỉ hiện khi KH vừa nhắn */}
+      {!isClosed && !needsAssignment && (
+        <AISuggestionPanel
+          sessionId={session?.sessionId}
+          messages={messages}
+          lastMessageType={lastMessageType}
+          onSelect={handleSelectSuggestion}
+        />
+      )}
 
       {/* Messages area */}
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 bg-gray-50">

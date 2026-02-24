@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class ChatMessageDTO {
 
     private Long maMessage;
+    private String sessionId;
     private String noiDung;
     private String nguoiGui; // "customer", "admin", "system"
     private String adminName; // Tên admin nếu admin gửi

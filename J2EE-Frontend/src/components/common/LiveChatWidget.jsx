@@ -28,7 +28,13 @@ const LiveChatWidget = () => {
 
   // Callback khi nhận tin nhắn mới qua WebSocket
   const handleNewMessage = useCallback((data) => {
-    setMessages(prev => [...prev, data]);
+    setMessages(prev => {
+      // Tránh trùng tin nhắn (REST response + WebSocket)
+      if (data.maMessage && prev.some(m => m.maMessage === data.maMessage)) {
+        return prev;
+      }
+      return [...prev, data];
+    });
     // Tăng unread nếu chat đang đóng
     if (!isOpenRef.current) {
       setUnreadCount(prev => prev + 1);
@@ -123,7 +129,13 @@ const LiveChatWidget = () => {
     try {
       const response = await sendMessage({ sessionId, noiDung });
       if (response.success && response.data) {
-        setMessages(prev => [...prev, response.data]);
+        // Thêm ngay vào UI, tránh trùng nếu WebSocket cũng gửi về
+        setMessages(prev => {
+          if (response.data.maMessage && prev.some(m => m.maMessage === response.data.maMessage)) {
+            return prev;
+          }
+          return [...prev, response.data];
+        });
       }
     } catch (error) {
       console.error('Lỗi gửi tin nhắn:', error);

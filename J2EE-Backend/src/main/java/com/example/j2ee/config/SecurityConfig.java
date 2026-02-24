@@ -111,6 +111,8 @@ public class SecurityConfig {
                         .requestMatchers("/vnpay/**", "/checkin/**", "/client/datcho/**").permitAll()
                         .requestMatchers("/api/chat/start", "/api/chat/message", "/api/chat/history/**", "/api/chat/session/**").permitAll()
                         .requestMatchers("/api/chat/admin/**").access(dynamicAdminAuthManager)
+                        // AI Chat suggestion (admin only)
+                        .requestMatchers("/ai-chat/**").access(dynamicAdminAuthManager)
                         // TaiKhoan endpoints
                         .requestMatchers("/taikhoan/email/**").permitAll()
                         // Static resources

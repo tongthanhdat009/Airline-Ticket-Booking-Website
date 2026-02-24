@@ -38,75 +38,10 @@ function ChonDichVu() {
         }
     }, [formData, navigate, location.state]);
 
-    const calculateTotal = () => {
-        let total = formData.totalPrice || 0;
-
-        ["di", "ve"].forEach(tabKey => {
-            const tabData = selectedServices[tabKey];
-            if (!tabData) return;
-
-            // OPTIONS
-            (tabData.options || []).forEach(opt => {
-            if (opt.quantity) {
-                total += opt.price * opt.quantity;
-            } else {
-                total += opt.price;
-            }
-            });
-        });
-        return total;
-    };
-
-    const dichVuChonChoNgoi = {
-        maDichVu: 99,
-        tenDichVu: t('booking.services.seat_selection'),
-        moTa: t('booking.services.select_seat_desc'),
-        anh: "/service/select-service_favorite-seat.cc6498ae.svg",
-    };
-
-    // Early return component nếu chưa có data
-    const EarlyReturn = () => (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="text-center">
-                <p className="text-gray-600 mb-4">Đang tải...</p>
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            </div>
-        </div>
-    );
-
-    if (!isValid || !formData) {
-        return <EarlyReturn />;
-    }
-
-    const tiepTucOnClick = () => {
-        const choNgoiDi = selectedServices.di?.selectedSeats?.length || 0;
-        const choNgoiVe = selectedServices.ve?.selectedSeats?.length || 0;
-        const soHanhKhach = Number(formData?.passengers ?? formData?.passengerInfo?.length ?? 1);
-
-        if (formData.flightType === "round") {
-            if (choNgoiDi !== soHanhKhach && choNgoiVe !== soHanhKhach) {
-                alert(t('booking.services.error_select_seats_round', { count: soHanhKhach }));
-                return;
-            }
-            if (choNgoiDi !== soHanhKhach) {
-                alert(t('booking.services.error_select_seats_oneway', { count: soHanhKhach }));
-                return;
-            }
-            if (choNgoiVe !== soHanhKhach) {
-                alert(t('booking.services.error_select_seats_return', { count: soHanhKhach }));
-                return;
-            }
-        } else {
-            if (choNgoiDi !== soHanhKhach) {
-                alert(t('booking.services.error_select_seats_oneway', { count: soHanhKhach }));
-                return;
-            }
-        }
-        navigate("/thanh-toan", { state: { ...formData, dichVu: selectedServices, totalPrice: calculateTotal() } });
-    };
-
+    // Fetch dịch vụ cung cấp
     useEffect(() => {
         const fetchDichVuCungCap = async () => {
+            if (!formData?.selectedTuyenBayDi) return;
             try {
                 // Lấy dịch vụ cho chuyến bay đi
                 const resDi = await getAllDichVuCungCapByChuyenBay(
@@ -145,6 +80,59 @@ function ChonDichVu() {
         fetchDichVuCungCap();
     }, [formData]);
 
+    const calculateTotal = () => {
+        let total = formData.totalPrice || 0;
+
+        ["di", "ve"].forEach(tabKey => {
+            const tabData = selectedServices[tabKey];
+            if (!tabData) return;
+
+            // OPTIONS
+            (tabData.options || []).forEach(opt => {
+            if (opt.quantity) {
+                total += opt.price * opt.quantity;
+            } else {
+                total += opt.price;
+            }
+            });
+        });
+        return total;
+    };
+
+    const dichVuChonChoNgoi = {
+        maDichVu: 99,
+        tenDichVu: t('booking.services.seat_selection'),
+        moTa: t('booking.services.select_seat_desc'),
+        anh: "/service/select-service_favorite-seat.cc6498ae.svg",
+    };
+
+    const tiepTucOnClick = () => {
+        const choNgoiDi = selectedServices.di?.selectedSeats?.length || 0;
+        const choNgoiVe = selectedServices.ve?.selectedSeats?.length || 0;
+        const soHanhKhach = Number(formData?.passengers ?? formData?.passengerInfo?.length ?? 1);
+
+        if (formData.flightType === "round") {
+            if (choNgoiDi !== soHanhKhach && choNgoiVe !== soHanhKhach) {
+                alert(t('booking.services.error_select_seats_round', { count: soHanhKhach }));
+                return;
+            }
+            if (choNgoiDi !== soHanhKhach) {
+                alert(t('booking.services.error_select_seats_oneway', { count: soHanhKhach }));
+                return;
+            }
+            if (choNgoiVe !== soHanhKhach) {
+                alert(t('booking.services.error_select_seats_return', { count: soHanhKhach }));
+                return;
+            }
+        } else {
+            if (choNgoiDi !== soHanhKhach) {
+                alert(t('booking.services.error_select_seats_oneway', { count: soHanhKhach }));
+                return;
+            }
+        }
+        navigate("/thanh-toan", { state: { ...formData, dichVu: selectedServices, totalPrice: calculateTotal() } });
+    };
+
     const handleOpenPanel = (dichVu) => {
         setSelectedDichVu(dichVu);
         setIsPanelOpen(true);
@@ -154,6 +142,18 @@ function ChonDichVu() {
         setIsPanelOpen(false);
         setSelectedDichVu(null);
     };
+
+    // Early return nếu chưa có data
+    if (!isValid || !formData) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                    <p className="text-gray-600 mb-4">Đang tải...</p>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div 
