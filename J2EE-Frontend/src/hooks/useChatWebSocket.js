@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
-
-// WebSocket URL
-const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL || "http://localhost:8080/ws";
+import { WS_BASE_URL } from "../config/api.config";
 
 /**
  * Hook kết nối WebSocket cho Customer live chat

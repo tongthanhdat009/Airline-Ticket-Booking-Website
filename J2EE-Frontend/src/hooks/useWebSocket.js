@@ -2,9 +2,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { getClientAccessToken, getAdminAccessToken } from "../utils/cookieUtils";
-
-// Lấy WebSocket URL từ biến môi trường, fallback về localhost khi phát triển
-const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL || "http://localhost:8080/ws";
+import { WS_BASE_URL } from "../config/api.config";
 
 // Hàm để lấy access token từ cookie (thử client trước, sau đó admin)
 const getAccessToken = () => {
