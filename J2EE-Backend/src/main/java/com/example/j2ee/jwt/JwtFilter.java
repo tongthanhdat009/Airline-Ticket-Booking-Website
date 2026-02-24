@@ -53,7 +53,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
         // WebSocket không dùng JWT filter (dùng handshake riêng)
-        if (path.startsWith("/ws/")) return true;
+        // Lưu ý: context-path=/api nên path là /api/ws
+        if (path.startsWith("/api/ws") || path.startsWith("/ws/")) return true;
 
         // Static resources
         String lower = path.toLowerCase();

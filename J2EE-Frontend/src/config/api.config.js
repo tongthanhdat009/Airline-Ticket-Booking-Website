@@ -7,7 +7,8 @@
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 // Lấy WebSocket URL từ biến môi trường, fallback về localhost khi phát triển
-export const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL || "http://localhost:8080/ws";
+// IMPORTANT: Must include /api prefix because server.servlet.context-path=/api
+export const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL || "http://localhost:8080/api/ws";
 
 // Helper function để build đầy đủ URL cho API endpoint
 export const getApiUrl = (path) => {
