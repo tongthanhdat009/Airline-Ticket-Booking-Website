@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.criteria.Predicate;
@@ -713,6 +714,7 @@ public class DonHangService {
      * @param donHang Đơn hàng cần tạo hóa đơn
      * @return HoaDon đã tạo
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public HoaDon taoHoaDon(DonHang donHang) {
         // Kiểm tra xem đã có hóa đơn cho đơn hàng này chưa
         List<HoaDon> existingHoaDon = hoaDonRepository.findByDonHang_MaDonHang(donHang.getMaDonHang());
@@ -743,7 +745,16 @@ public class DonHangService {
         hoaDon.setTrangThai("DA_PHAT_HANH");
         hoaDon.setNguoiLap("ADMIN");
 
-        return hoaDonRepository.save(hoaDon);
+        try {
+            return hoaDonRepository.save(hoaDon);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            // Race condition: another thread created the invoice concurrently
+            List<HoaDon> retryFind = hoaDonRepository.findByDonHang_MaDonHang(donHang.getMaDonHang());
+            if (!retryFind.isEmpty()) {
+                return retryFind.get(0);
+            }
+            throw e;
+        }
     }
 
     /**

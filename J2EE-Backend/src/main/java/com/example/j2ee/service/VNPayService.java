@@ -277,33 +277,38 @@ public class VNPayService {
             }
 
             if ("00".equals(responseCode)) {
-                // Bước 7b: Update trangthaithanhtoan
-                thanhToan.setDaThanhToan('Y');
-                thanhToan.setPhuongThucThanhToan("VNPAY");
-                thanhToan.setTrangThai("COMPLETED");
-                thanhToan.setTransactionCode(vnpTransactionNo);
-                thanhToan.setThoigianThanhToan(LocalDateTime.now());
-                trangThaiThanhToanRepository.save(thanhToan);
+                // Chỉ xử lý nếu chưa thanh toán (tránh race condition với IPN)
+                if (thanhToan.getDaThanhToan() != 'Y') {
+                    // Bước 7b: Update trangthaithanhtoan
+                    thanhToan.setDaThanhToan('Y');
+                    thanhToan.setPhuongThucThanhToan("VNPAY");
+                    thanhToan.setTrangThai("COMPLETED");
+                    thanhToan.setTransactionCode(vnpTransactionNo);
+                    thanhToan.setThoigianThanhToan(LocalDateTime.now());
+                    trangThaiThanhToanRepository.save(thanhToan);
 
-                // Bước 7c: Update donhang.trangThai
-                donHang.setTrangThai("ĐÃ THANH TOÁN");
-                donHangRepository.save(donHang);
+                    // Bước 7c: Update donhang.trangThai
+                    donHang.setTrangThai("ĐÃ THANH TOÁN");
+                    donHangRepository.save(donHang);
 
-                // Bước 7d: Tạo hoadon
-                try {
-                    HoaDon hoaDon = donHangService.taoHoaDon(donHang);
-                    System.out.println("Đã tạo hóa đơn: " + hoaDon.getSoHoaDon());
-                } catch (Exception e) {
-                    System.err.println("Failed to create invoice: " + e.getMessage());
-                }
+                    // Bước 7d: Tạo hoadon
+                    try {
+                        HoaDon hoaDon = donHangService.taoHoaDon(donHang);
+                        System.out.println("Đã tạo hóa đơn: " + hoaDon.getSoHoaDon());
+                    } catch (Exception e) {
+                        System.err.println("Failed to create invoice: " + e.getMessage());
+                    }
 
-                // Bước 7e: Gửi email xác nhận
-                try {
-                    sendTicketConfirmationEmail(thanhToan);
-                } catch (Exception e) {
-                    // Log error but don't fail the payment process
-                    System.err.println("Callback: Failed to send ticket email: " + e.getMessage());
-                    e.printStackTrace();
+                    // Bước 7e: Gửi email xác nhận
+                    try {
+                        sendTicketConfirmationEmail(thanhToan);
+                    } catch (Exception e) {
+                        // Log error but don't fail the payment process
+                        System.err.println("Callback: Failed to send ticket email: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                } else {
+                    System.out.println("Callback: Thanh toán đã được IPN xử lý, bỏ qua xử lý trùng lặp");
                 }
 
                 // Log giao dịch thành công
