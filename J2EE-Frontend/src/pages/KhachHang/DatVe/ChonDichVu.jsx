@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
@@ -17,12 +17,38 @@ function ChonDichVu() {
     const { t } = useTranslation();
     useTitle('Chọn dịch vụ bổ sung - Đặt vé máy bay | Airline Booking');
     const location = useLocation();
-    const formData = location.state || {};
+    const formData = useMemo(() => location.state, [location.state]);
     const navigate = useNavigate();
     const [dichVuCungCapList, setDichVuCungCapList] = useState([]);
     const [isPanelOpen, setIsPanelOpen] = useState(false);
     const [selectedDichVu, setSelectedDichVu] = useState(null);
     const [selectedServices, setSelectedServices] = useState({});
+    const [isValid, setIsValid] = useState(false);
+
+    // Fix: Kiểm tra formData hợp lệ
+    useEffect(() => {
+        if (location.state !== undefined) {
+            const hasRequiredData = formData?.selectedTuyenBayDi;
+            if (!hasRequiredData) {
+                console.warn('Missing required data, redirecting to home');
+                navigate('/');
+            } else {
+                setIsValid(true);
+            }
+        }
+    }, [formData, navigate, location.state]);
+
+    // Fix: Early return nếu chưa có data
+    if (!isValid || !formData) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                    <p className="text-gray-600 mb-4">Đang tải...</p>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                </div>
+            </div>
+        );
+    }
 
     const calculateTotal = () => {
         let total = formData.totalPrice || 0;

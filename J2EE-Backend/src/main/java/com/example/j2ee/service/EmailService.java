@@ -819,4 +819,176 @@ public class EmailService {
             throw new RuntimeException("Không thể gửi email thông báo đổi chuyến bay: " + e.getMessage());
         }
     }
+
+    // ==================== SUPPORT TICKET EMAILS ====================
+
+    /**
+     * Gửi email xác nhận đã nhận phiếu hỗ trợ
+     */
+    public void sendTicketConfirmationEmail(String toEmail, String ticketCode, String chuDe) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom("noreply@jadtairline.com");
+            helper.setTo(toEmail);
+            helper.setSubject("[JadT Airline] Đã nhận yêu cầu hỗ trợ - " + ticketCode);
+
+            String htmlContent = String.format("""
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background: linear-gradient(135deg, #7E57C2 0%%, #5E35B1 100%%);
+                                 color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                        .content { background: white; padding: 30px; }
+                        .ticket-box { background: #f3e8ff; border: 2px dashed #7E57C2;
+                                     padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px; }
+                        .ticket-code { font-size: 28px; font-weight: bold; color: #7E57C2;
+                                      letter-spacing: 4px; margin: 10px 0; }
+                        .info-box { background: #f8f9fa; padding: 15px; border-radius: 8px;
+                                   border-left: 4px solid #7E57C2; margin: 20px 0; }
+                        .footer { text-align: center; margin-top: 20px; color: #666;
+                                 font-size: 12px; padding: 20px; background: #f9f9f9;
+                                 border-radius: 0 0 10px 10px; }
+                        .logo { font-size: 32px; font-weight: bold; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <div class="logo">✈️ JadT Airline</div>
+                            <h2>Đã nhận yêu cầu hỗ trợ</h2>
+                        </div>
+                        <div class="content">
+                            <p>Xin chào,</p>
+                            <p>Cảm ơn bạn đã liên hệ với chúng tôi. Chúng tôi đã nhận được yêu cầu hỗ trợ của bạn.</p>
+
+                            <div class="ticket-box">
+                                <p style="margin: 0; color: #666; font-size: 14px;">MÃ PHIẾU HỖ TRỢ</p>
+                                <div class="ticket-code">%s</div>
+                                <p style="margin: 0; color: #666; font-size: 12px;">Vui lòng lưu lại mã này để tra cứu</p>
+                            </div>
+
+                            <div class="info-box">
+                                <p style="margin: 0;"><strong>📋 Chủ đề:</strong> %s</p>
+                                <p style="margin: 5px 0 0;"><strong>⏰ Thời gian phản hồi dự kiến:</strong> Trong vòng 24 giờ làm việc</p>
+                            </div>
+
+                            <p>Đội ngũ hỗ trợ của chúng tôi sẽ xem xét và phản hồi sớm nhất có thể. Bạn sẽ nhận được email thông báo khi có phản hồi mới.</p>
+
+                            <p>Bạn có thể tra cứu trạng thái phiếu hỗ trợ tại: <a href="%s/ho-tro">Trang hỗ trợ</a></p>
+
+                            <p style="margin-top: 30px;">
+                                Trân trọng,<br>
+                                <strong>Đội ngũ JadT Airline</strong>
+                            </p>
+                        </div>
+                        <div class="footer">
+                            <p>© 2026 JadT Airline. All rights reserved.</p>
+                            <p>Email này được gửi tự động, vui lòng không phản hồi.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """, ticketCode, chuDe, frontendUrl);
+
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+
+        } catch (MessagingException e) {
+            throw new RuntimeException("Không thể gửi email xác nhận ticket: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Gửi email thông báo có phản hồi mới cho phiếu hỗ trợ
+     */
+    public void sendTicketReplyEmail(String toEmail, String ticketCode, String chuDe, String noiDungPhanHoi) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom("noreply@jadtairline.com");
+            helper.setTo(toEmail);
+            helper.setSubject("[JadT Airline] Phản hồi yêu cầu hỗ trợ - " + ticketCode);
+
+            // Cắt ngắn nội dung phản hồi nếu quá dài
+            String replyPreview = noiDungPhanHoi.length() > 500
+                    ? noiDungPhanHoi.substring(0, 500) + "..."
+                    : noiDungPhanHoi;
+
+            String htmlContent = String.format("""
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background: linear-gradient(135deg, #1E88E5 0%%, #1565C0 100%%);
+                                 color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                        .content { background: white; padding: 30px; }
+                        .reply-box { background: #e8f5e9; border: 1px solid #a5d6a7;
+                                    padding: 20px; margin: 20px 0; border-radius: 8px; }
+                        .ticket-info { background: #f8f9fa; padding: 15px; border-radius: 8px;
+                                      border-left: 4px solid #1E88E5; margin: 20px 0; }
+                        .footer { text-align: center; margin-top: 20px; color: #666;
+                                 font-size: 12px; padding: 20px; background: #f9f9f9;
+                                 border-radius: 0 0 10px 10px; }
+                        .logo { font-size: 32px; font-weight: bold; }
+                        .btn { display: inline-block; padding: 12px 24px; background: #1E88E5;
+                              color: white; text-decoration: none; border-radius: 8px; font-weight: bold; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <div class="logo">✈️ JadT Airline</div>
+                            <h2>Phản hồi yêu cầu hỗ trợ</h2>
+                        </div>
+                        <div class="content">
+                            <p>Xin chào,</p>
+                            <p>Phiếu hỗ trợ của bạn đã có phản hồi mới từ đội ngũ hỗ trợ.</p>
+
+                            <div class="ticket-info">
+                                <p style="margin: 0;"><strong>🎫 Mã phiếu:</strong> %s</p>
+                                <p style="margin: 5px 0 0;"><strong>📋 Chủ đề:</strong> %s</p>
+                            </div>
+
+                            <div class="reply-box">
+                                <p style="margin: 0 0 10px; font-weight: bold; color: #2e7d32;">💬 Nội dung phản hồi:</p>
+                                <p style="margin: 0; white-space: pre-line;">%s</p>
+                            </div>
+
+                            <p>Nếu bạn cần hỗ trợ thêm, vui lòng trả lời tại trang hỗ trợ.</p>
+
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="%s/ho-tro" class="btn">Xem chi tiết phiếu hỗ trợ</a>
+                            </div>
+
+                            <p style="margin-top: 30px;">
+                                Trân trọng,<br>
+                                <strong>Đội ngũ JadT Airline</strong>
+                            </p>
+                        </div>
+                        <div class="footer">
+                            <p>© 2026 JadT Airline. All rights reserved.</p>
+                            <p>Email này được gửi tự động, vui lòng không phản hồi.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """, ticketCode, chuDe, replyPreview, frontendUrl);
+
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+
+        } catch (MessagingException e) {
+            throw new RuntimeException("Không thể gửi email phản hồi ticket: " + e.getMessage());
+        }
+    }
 }

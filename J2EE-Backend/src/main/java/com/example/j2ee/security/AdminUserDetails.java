@@ -135,12 +135,24 @@ public class AdminUserDetails implements UserDetails {
      * Tạo AdminUserDetails từ token (không cần database)
      * Sử dụng khi đã có thông tin roles và permissions từ JWT token
      */
-    public static AdminUserDetails fromToken(String username, Set<String> roles, Set<String> permissions) {
+    public static AdminUserDetails fromToken(String username, Integer adminId, Set<String> roles, Set<String> permissions) {
         // Tạo một TaiKhoanAdmin giả lập với chỉ có thông tin cần thiết
         TaiKhoanAdmin fakeAdmin = new TaiKhoanAdmin();
         fakeAdmin.setTenDangNhap(username);
         fakeAdmin.setMatKhauBam(""); // Password không cần thiết cho authentication
+        if (adminId != null) {
+            fakeAdmin.setMaTaiKhoan(adminId);
+        }
 
         return new AdminUserDetails(fakeAdmin, roles, permissions);
+    }
+
+    /**
+     * Tạo AdminUserDetails từ token (không cần database) - phiên bản không có adminId
+     * @deprecated Dùng fromToken(username, adminId, roles, permissions) thay thế
+     */
+    @Deprecated
+    public static AdminUserDetails fromToken(String username, Set<String> roles, Set<String> permissions) {
+        return fromToken(username, null, roles, permissions);
     }
 }

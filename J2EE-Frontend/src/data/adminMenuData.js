@@ -274,15 +274,15 @@ export const adminMenuItems = [
     description: 'Xem raw data IPN từ VNPay để debug và xử lý khiếu nại'
   },
   {
-    path: '/admin/dashboard/HoTroLienHe',
-    text: 'Hỗ trợ / Liên hệ',
+    path: '/admin/dashboard/QuanLyChat',
+    text: 'Chat trực tuyến',
     icon: FaHeadset,
     permissionKey: 'SUPPORT_VIEW',
     featureCode: 'SUPPORT',
-    featureName: 'Hỗ trợ / Liên hệ',
+    featureName: 'Chat trực tuyến',
     group: 'Dịch vụ',
     color: 'from-sky-500 to-cyan-500',
-    description: 'Tiếp nhận và xử lý yêu cầu hỗ trợ từ khách hàng'
+    description: 'Tiếp nhận và trả lời chat trực tuyến từ khách hàng'
   },
   {
     path: '/admin/dashboard/LichSuThaoTac',
@@ -357,7 +357,7 @@ export const permissionMapping = {
   RECONCILIATION: 'Đối soát giao dịch',
   BANNER_NEWS: 'Banner & Tin tức',
   TRANSACTION_LOG: 'Log giao dịch VNPay',
-  SUPPORT: 'Hỗ trợ / Liên hệ',
+  SUPPORT: 'Chat trực tuyến',
 
   // Mapping cũ để tương thích (nếu cần)
   REPORT: 'Thống kê & Báo cáo',
@@ -526,7 +526,7 @@ const checkPermissionMatch = (menuItem, feature, action) => {
     'RECONCILIATION': '/admin/dashboard/DoiSoatGiaoDich',
     'BANNER_NEWS': '/admin/dashboard/BannerTinTuc',
     'TRANSACTION_LOG': '/admin/dashboard/LichSuGiaoDichVNPay',
-    'SUPPORT': '/admin/dashboard/HoTroLienHe'
+    'SUPPORT': '/admin/dashboard/QuanLyChat'
   };
 
   // Special cases

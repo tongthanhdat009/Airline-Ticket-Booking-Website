@@ -110,7 +110,8 @@ public class JwtFilter extends OncePerRequestFilter {
             // ADMIN: Tạo từ token data (không query database)
             Set<String> roleSet = new HashSet<>(roles);
             Set<String> permissionSet = new HashSet<>(permissions);
-            userDetails = AdminUserDetails.fromToken(username, roleSet, permissionSet);
+            Integer adminId = jwtUtil.getAdminId(token);
+            userDetails = AdminUserDetails.fromToken(username, adminId, roleSet, permissionSet);
         } else {
             // REGULAR USER: Load từ database
             userDetails = userService.loadUserByUsername(username);

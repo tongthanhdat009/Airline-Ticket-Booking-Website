@@ -61,48 +61,48 @@ const FlightCard = ({
                 className="p-4 cursor-pointer hover:bg-blue-50/50 transition-colors"
                 onClick={handleToggle}
             >
-                <div className="flex items-center justify-between">
-                    {/* Left: Flight Route and Times */}
-                    <div className="flex items-center gap-6 flex-1">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                    {/* Top: Flight Route and Times */}
+                    <div className="flex items-center gap-4 md:gap-6 flex-1 w-full md:w-auto justify-between md:justify-start">
                         {/* Departure */}
-                        <div className="text-center min-w-[100px]">
-                            <div className="text-3xl font-bold text-gray-800">{formatTime(chuyenBay.gioDi)}</div>
-                            <div className="text-sm text-gray-500">{sanBayDi?.maIATA || '---'}</div>
-                            <div className="text-sm text-gray-600">{sanBayDi?.thanhPhoSanBay || chuyenBay.tuyenBay?.sanBayDi?.thanhPhoSanBay}</div>
+                        <div className="text-center min-w-[70px] md:min-w-[100px]">
+                            <div className="text-xl md:text-3xl font-bold text-gray-800">{formatTime(chuyenBay.gioDi)}</div>
+                            <div className="text-xs md:text-sm text-gray-500">{sanBayDi?.maIATA || '---'}</div>
+                            <div className="text-xs md:text-sm text-gray-600 hidden md:block">{sanBayDi?.thanhPhoSanBay || chuyenBay.tuyenBay?.sanBayDi?.thanhPhoSanBay}</div>
                         </div>
 
                         {/* Flight Duration and Arrow */}
-                        <div className="flex flex-col items-center px-4">
-                            <div className="text-sm text-blue-600 font-medium mb-1">
+                        <div className="flex flex-col items-center px-2 md:px-4">
+                            <div className="text-xs md:text-sm text-blue-600 font-medium mb-1">
                                 {calcFlightDuration(chuyenBay.gioDi, chuyenBay.ngayDi, chuyenBay.gioDen, chuyenBay.ngayDen)}
                             </div>
                             <div className="flex items-center gap-2">
                                 <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                                <div className="w-24 h-0.5 bg-gradient-to-r from-blue-600 to-blue-400 relative">
+                                <div className="w-16 md:w-24 h-0.5 bg-gradient-to-r from-blue-600 to-blue-400 relative">
                                     <IoAirplaneSharp className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-blue-600 rotate-90" />
                                 </div>
                                 <div className="w-2 h-2 rounded-full bg-blue-400"></div>
                             </div>
-                            <div className="text-xs text-gray-500 mt-1">Bay thẳng</div>
+                            <div className="text-xs text-gray-500 mt-1 hidden sm:block">Bay thẳng</div>
                         </div>
 
                         {/* Arrival */}
-                        <div className="text-center min-w-[100px]">
-                            <div className="text-3xl font-bold text-gray-800">{formatTime(chuyenBay.gioDen)}</div>
-                            <div className="text-sm text-gray-500">{sanBayDen?.maIATA || '---'}</div>
-                            <div className="text-sm text-gray-600">{sanBayDen?.thanhPhoSanBay || chuyenBay.tuyenBay?.sanBayDen?.thanhPhoSanBay}</div>
+                        <div className="text-center min-w-[70px] md:min-w-[100px]">
+                            <div className="text-xl md:text-3xl font-bold text-gray-800">{formatTime(chuyenBay.gioDen)}</div>
+                            <div className="text-xs md:text-sm text-gray-500">{sanBayDen?.maIATA || '---'}</div>
+                            <div className="text-xs md:text-sm text-gray-600 hidden md:block">{sanBayDen?.thanhPhoSanBay || chuyenBay.tuyenBay?.sanBayDen?.thanhPhoSanBay}</div>
                         </div>
                     </div>
 
-                    {/* Center: Flight Details */}
-                    <div className="flex flex-col items-center px-6 border-l border-r border-gray-200 mx-4">
-                        <div className="text-sm text-gray-500">Số hiệu chuyến bay</div>
-                        <div className="text-xl font-bold text-blue-600">{chuyenBay.soHieuChuyenBay}</div>
-                        <div className="text-sm text-gray-500 mt-1">{formatDateType(chuyenBay.ngayDi)}</div>
+                    {/* Center: Flight Details - Full width on mobile */}
+                    <div className="flex flex-row md:flex-col items-center justify-between md:justify-center px-4 md:px-6 border-t md:border-t-0 border-b md:border-b-0 md:border-l md:border-r border-gray-200 py-2 md:py-0 mx-0 md:mx-4 w-full md:w-auto">
+                        <div className="text-xs md:text-sm text-gray-500">Số hiệu</div>
+                        <div className="text-base md:text-xl font-bold text-blue-600">{chuyenBay.soHieuChuyenBay}</div>
+                        <div className="text-xs md:text-sm text-gray-500 hidden md:block">{formatDateType(chuyenBay.ngayDi)}</div>
                     </div>
 
                     {/* Right: Expand Icon */}
-                    <div className="flex items-center">
+                    <div className="flex items-center md:hidden">
                         {isExpanded ? (
                             <IoMdArrowDropup className="text-2xl text-blue-600" />
                         ) : (
@@ -155,7 +155,7 @@ const FlightCard = ({
                                                 />
                                             )}
                                             {/* 30% - Name and Price */}
-                                            <div className={`w-[30%] p-3 flex flex-col justify-center border-r relative z-10 ${
+                                            <div className={`w-full md:w-[30%] p-3 flex flex-col justify-center border-r-0 md:border-r relative z-10 border-b md:border-b-0 ${
                                                 isSelected ? 'bg-white/80 shadow-inner' : ''
                                             }`}
                                                 style={{
@@ -174,18 +174,18 @@ const FlightCard = ({
                                                         {isSelected && (
                                                             <div className="flex items-center gap-1">
                                                                 <FaCheck className="text-white text-lg" />
-                                                                <span className="text-xs text-white/90 font-medium">ĐÃ CHỌN</span>
+                                                                <span className="text-xs text-white/90 font-medium hidden sm:inline">ĐÃ CHỌN</span>
                                                             </div>
                                                         )}
                                                     </div>
                                                 </div>
                                                 {hangVe.giaVe != null && hangVe.giaVe !== '' ? (
-                                                    <div className="text-2xl font-bold relative"
+                                                    <div className="text-xl md:text-2xl font-bold relative"
                                                         style={{ color: config.textColor }}>
                                                         <span className={isSelected ? 'underline decoration-2 underline-offset-4' : ''}>
                                                             {formatCurrency(hangVe.giaVe)}
                                                         </span>
-                                                        <span className="text-sm font-normal text-gray-500"> VND</span>
+                                                        <span className="text-xs md:text-sm font-normal text-gray-500"> VND</span>
                                                     </div>
                                                 ) : (
                                                     <div className="text-sm text-red-500">Hết chỗ</div>
@@ -199,18 +199,18 @@ const FlightCard = ({
                                             </div>
 
                                             {/* 70% - Benefits */}
-                                            <div className={`w-[70%] p-3 relative z-10 ${isSelected ? 'bg-white/60' : ''}`}>
-                                                <div className="text-sm font-semibold text-gray-700 mb-2">Lợi ích:</div>
+                                            <div className={`w-full md:w-[70%] p-3 relative z-10 ${isSelected ? 'bg-white/60' : ''}`}>
+                                                <div className="text-xs md:text-sm font-semibold text-gray-700 mb-2">Lợi ích:</div>
                                                 {benefits.length > 0 ? (
-                                                    <div className="grid grid-cols-2 gap-1 text-sm">
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs md:text-sm">
                                                         {benefits.map((benefit, idx) => (
                                                             <div key={idx} className="flex items-center gap-1">
                                                                 {benefit.included ? (
-                                                                    <FaCheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: config.iconColor }} />
+                                                                    <FaCheckCircle className="w-3 h-3 md:w-4 md:h-4 shrink-0" style={{ color: config.iconColor }} />
                                                                 ) : (
-                                                                    <AiFillCloseCircle className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                                                                    <AiFillCloseCircle className="w-3 h-3 md:w-4 md:h-4 text-gray-400 shrink-0" />
                                                                 )}
-                                                                <span className={`text-gray-600 ${benefit.included ? '' : 'line-through text-gray-400'}`}>
+                                                                <span className={`text-gray-600 text-xs md:text-sm ${benefit.included ? '' : 'line-through text-gray-400'}`}>
                                                                     {benefit.text}
                                                                 </span>
                                                             </div>

@@ -5,6 +5,8 @@ import LoginAdmin from "./pages/QuanLy/DangNhap"
 import LoginClient from "./pages/KhachHang/DangNhap"
 import ProtectedRoute, { AdminProtectedRoute } from "./components/common/ProtectedRoute"
 import { LoginGuard, RegisterGuard, AdminLoginGuard } from "./components/common/AuthGuard"
+import ScrollToTop from "./components/common/ScrollToTop"
+import ErrorBoundary from "./components/common/ErrorBoundary"
 
 import ThongKeDoanhThu from './pages/QuanLy/ThongKeDoanhThu';
 import QuanLyKhachHang from './pages/QuanLy/QuanLyKhachHang';
@@ -31,14 +33,14 @@ import XuatBaoCao from "./pages/QuanLy/XuatBaoCao"
 import DoiSoatGiaoDich from "./pages/QuanLy/DoiSoatGiaoDich"
 import QuanLyBannerTinTuc from "./pages/QuanLy/QuanLyBannerTinTuc"
 import LichSuGiaoDichVNPay from "./pages/QuanLy/LichSuGiaoDichVNPay"
-import HoTroLienHe from "./pages/QuanLy/HoTroLienHe"
+import QuanLyChat from "./pages/QuanLy/QuanLyChat"
 import DichVuChuyenBay from "./pages/KhachHang/DichVuChuyenBay"
 import DichVuKhac from "./pages/KhachHang/DichVuKhac"
 import TraCuuChuyenBay from "./pages/KhachHang/TraCuuChuyenBay"
 import OnlineCheckIn from "./pages/KhachHang/OnlineCheckIn"
 import SignupClient from "./pages/KhachHang/DangKy"
 import QuenMatKhau from "./pages/KhachHang/QuenMatKhau"
-import HoTro from "./pages/KhachHang/HoTro"
+// HoTro page removed - replaced by LiveChatWidget
 import OAuth2Callback from "./pages/OAuth2Callback"
 import CaNhan from "./pages/KhachHang/CaNhan"
 import QuanLyChuyenBayClient from "./pages/KhachHang/QuanLyChuyenBay"
@@ -94,7 +96,7 @@ function AppContent() {
           <Route path="/online-check-in" element={<OnlineCheckIn/>}/>
           <Route path="/dich-vu-chuyen-bay" element={<DichVuChuyenBay/>}/>
           <Route path="/dich-vu-khac" element={<DichVuKhac/>}/>
-          <Route path="/ho-tro" element={<HoTro/>}/>
+          {/* /ho-tro route removed - live chat widget is available on all pages */}
           
           {/* Trang cá nhân - Yêu cầu hoàn thiện thông tin */}
           <Route path="/ca-nhan" element={
@@ -167,7 +169,7 @@ function AppContent() {
             <Route path="DoiSoatGiaoDich" element={<DoiSoatGiaoDich />} />
             <Route path="BannerTinTuc" element={<QuanLyBannerTinTuc />} />
             <Route path="LichSuGiaoDichVNPay" element={<LichSuGiaoDichVNPay />} />
-            <Route path="HoTroLienHe" element={<HoTroLienHe />} />
+            <Route path="QuanLyChat" element={<QuanLyChat />} />
           </Route>
         </Routes>
       </main>
@@ -177,9 +179,12 @@ function AppContent() {
 
 function App() {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <ScrollToTop />
+        <AppContent />
+      </Router>
+    </ErrorBoundary>
   )
 }
 

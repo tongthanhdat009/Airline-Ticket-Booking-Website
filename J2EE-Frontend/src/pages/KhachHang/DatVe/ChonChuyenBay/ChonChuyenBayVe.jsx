@@ -144,22 +144,22 @@ function ChonChuyenBayVe() {
             {/* Content wrapper */}
             <div className="relative z-10">
             <HeaderTimKiemChuyen data={{...formData, sanBayDi, sanBayDen}}/>
-            <div className="px-32 flex gap-8">
-                <div className="w-2/3 flex flex-col mb-50">
-                    <div className="flex items-center justify-between bg-white px-50">
-                        <div className="flex flex-col p-2 items-center max-w-[200px] min-w-[220px]">
-                            <span className="font-bold text-2xl">{sanBayDi?.maIATA}</span>
-                            <span>{formData.arrival}</span>
+            <div className="px-4 md:px-8 lg:px-16 xl:px-32 flex flex-col lg:flex-row gap-4 lg:gap-8">
+                <div className="w-full lg:w-2/3 flex flex-col mb-50">
+                    <div className="flex items-center justify-between bg-white px-4 md:px-8">
+                        <div className="flex flex-col p-2 items-center">
+                            <span className="font-bold text-xl md:text-2xl">{sanBayDi?.maIATA}</span>
+                            <span className="text-xs md:text-sm">{formData.arrival}</span>
                         </div>
-                        <div className="flex flex-col items-center ">
-                            <FaLongArrowAltRight className="text-3xl text-[#1E88E5]" />
+                        <div className="flex flex-col items-center">
+                            <FaLongArrowAltRight className="text-2xl md:text-3xl text-[#1E88E5]" />
                             {formData.flightType === 'round' && (
-                            <FaLongArrowAltLeft className="text-3xl text-gray-500" />
+                            <FaLongArrowAltLeft className="text-2xl md:text-3xl text-gray-500" />
                             )}
                         </div>
-                        <div className="flex flex-col p-2 items-center max-w-[200px] min-w-[220px]">
-                            <span className="font-bold text-2xl">{sanBayDen?.maIATA}</span>
-                            <span>{formData.departure}</span>
+                        <div className="flex flex-col p-2 items-center">
+                            <span className="font-bold text-xl md:text-2xl">{sanBayDen?.maIATA}</span>
+                            <span className="text-xs md:text-sm">{formData.departure}</span>
                         </div>
                     </div>
                     <DanhSachNgayBay ngayChon={formData.endDate?formatDate(formData.endDate):""} onSelect={handleSelectNgay} />
@@ -210,7 +210,7 @@ function ChonChuyenBayVe() {
                         </div>
                     )}
                 </div>
-                <div  className="my-10 mb-50">
+                <div  className="w-full lg:w-auto my-4 lg:my-10 mb-50">
                     {/* <ThongTinThanhToan cb={formData} tuyenBay={formData.chuyenBayDi} tuyenBayVe={selectedTuyenBayVe?.hangVe ? selectedTuyenBayVe : null} /> */}
                     <ThongTinThanhToan
                     cb={{...formData, selectedTuyenBayVe: selectedTuyenBayVe}}
@@ -219,18 +219,18 @@ function ChonChuyenBayVe() {
                     />
                 </div>
             </div>
-            <div className="flex justify-between fixed bottom-0 left-0 w-full bg-white p-4 h-[80px] px-32 shadow-[0_-4px_20px_rgba(0,0,0,0.25)] items-center z-50">
-                <span 
-                    className="bg-gray-200 rounded-xl flex items-center justify-center px-10 py-2 text-black cursor-pointer hover:bg-gray-300 transition mr-100"
+            <div className="flex flex-col md:flex-row justify-between fixed bottom-0 left-0 w-full bg-white p-4 px-4 md:px-8 lg:px-16 xl:px-32 h-auto md:h-20 shadow-[0_-4px_20px_rgba(0,0,0,0.25)] items-center z-50 gap-3 md:gap-0">
+                <span
+                    className="bg-gray-200 rounded-xl flex items-center justify-center px-6 md:px-10 py-2 text-black cursor-pointer hover:bg-gray-300 transition"
                     onClick={() => navigate(-1)}
                 >
                      {t('common.back')}
                 </span>
                 <div className="flex flex-col text-black">
-                    <span className="text-xl">{t('common.total_price')}</span>
-                    <span className="text-2xl font-bold">{selectedTuyenBayVe ? formatCurrencyWithCommas(calcTotalPrice())+" VND" : formatCurrencyWithCommas(formData.totalPrice)+" VND"}</span>
+                    <span className="text-base md:text-xl">{t('common.total_price')}</span>
+                    <span className="text-xl md:text-2xl font-bold">{selectedTuyenBayVe ? formatCurrencyWithCommas(calcTotalPrice())+" VND" : formatCurrencyWithCommas(formData.totalPrice)+" VND"}</span>
                 </div>
-                <span className="bg-linear-to-bl from-[#FF7043] to-[#F4511E] rounded-xl flex items-center justify-center px-10 py-2 text-black cursor-pointer" onClick={() => tiepTucOnClick()}>Đi tiếp</span>
+                <span className="bg-linear-to-bl from-[#FF7043] to-[#F4511E] rounded-xl flex items-center justify-center px-6 md:px-10 py-2 text-black cursor-pointer" onClick={() => tiepTucOnClick()}>Đi tiếp</span>
             </div>
             </div>
         </div>

@@ -73,6 +73,26 @@ public class JwtUtil {
         return build(subject, accessExpiration, claims);
     }
 
+    /**
+     * Generate access token cho Admin với adminId
+     */
+    public String generateAdminAccessToken(String subject, int adminId, Collection<String> roles, Collection<String> permissions) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("typ", "access");
+        claims.put("adminId", adminId);
+        claims.put("roles", roles);
+        claims.put("permissions", permissions);
+        return build(subject, accessExpiration, claims);
+    }
+
+    /**
+     * Lấy adminId từ token
+     */
+    public Integer getAdminId(String token) {
+        Integer adminId = getClaim(token, c -> c.get("adminId", Integer.class));
+        return adminId;
+    }
+
     /* ================== REFRESH TOKEN ================== */
 
     public String generateRefreshToken(String subject) {

@@ -14,16 +14,36 @@ function ThanhToan() {
     useTitle('Thanh toán - Đặt vé máy bay | Airline Booking');
     const location = useLocation();
     const navigate = useNavigate();
-    const formData = useMemo(() => location.state || {}, [location.state]);
-    
+    const formData = useMemo(() => location.state, [location.state]);
+
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState('');
+    const [isValid, setIsValid] = useState(false);
 
     useEffect(() => {
-        if (!formData.passengerInfo || !formData.selectedTuyenBayDi) {
-            navigate('/');
+        // Fix: Chỉ validate khi có location.state (không phải lần đầu render)
+        if (location.state !== undefined) {
+            const hasRequiredData = formData?.passengerInfo && formData?.selectedTuyenBayDi;
+            if (!hasRequiredData) {
+                console.warn('Missing required data, redirecting to home');
+                navigate('/');
+            } else {
+                setIsValid(true);
+            }
         }
-    }, [formData, navigate]);
+    }, [formData, navigate, location.state]);
+
+    // Fix: Early return nếu chưa có data hoặc không hợp lệ
+    if (!isValid || !formData) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                    <p className="text-gray-600 mb-4">Đang tải thông tin thanh toán...</p>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                </div>
+            </div>
+        );
+    }
 
     const createBookingAndPayment = async () => {
         setIsProcessing(true);
@@ -126,9 +146,9 @@ function ThanhToan() {
             <div className="relative z-10">
             <HeaderTimKiemChuyen data={{ ...formData }} />
 
-            <div className="px-32 py-8">
-                <div className="bg-white rounded-lg shadow-lg p-8">
-                    <h2 className="text-3xl font-bold mb-6 text-center text-[#1E88E5]">
+            <div className="px-4 md:px-8 lg:px-16 xl:px-32 py-6 md:py-8">
+                <div className="bg-white rounded-lg shadow-lg p-4 md:p-6 lg:p-8">
+                    <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-[#1E88E5]">
                         {t('booking.payment.title')}
                     </h2>
 
@@ -140,22 +160,22 @@ function ThanhToan() {
                         
                         {/* Outbound Flight */}
                         <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                            <div className="flex justify-between items-center">
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                                 <div>
                                     <p className="text-sm text-gray-600">{t('booking.flight_selection.outbound')}</p>
-                                    <p className="font-bold text-lg">
+                                    <p className="font-bold text-base md:text-lg">
                                         {formData.selectedTuyenBayDi?.soHieuChuyenBay}
                                     </p>
                                     <p className="text-sm">
                                         {formData.departure} → {formData.arrival}
                                     </p>
                                 </div>
-                                <div className="text-right">
+                                <div className="text-right sm:text-left">
                                     <p className="text-sm text-gray-600">
                                         {formatDate(formData.startDate)}
                                     </p>
                                     <p className="font-bold">
-                                        {formatTime(formData.selectedTuyenBayDi?.gioDi)} - 
+                                        {formatTime(formData.selectedTuyenBayDi?.gioDi)} -
                                         {formatTime(formData.selectedTuyenBayDi?.gioDen)}
                                     </p>
                                     <p className="text-sm text-gray-600">
@@ -168,22 +188,22 @@ function ThanhToan() {
                         {/* Return Flight */}
                         {formData.selectedTuyenBayVe && (
                             <div className="bg-gray-50 p-4 rounded-lg">
-                                <div className="flex justify-between items-center">
+                                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                                     <div>
                                         <p className="text-sm text-gray-600">{t('booking.flight_selection.inbound')}</p>
-                                        <p className="font-bold text-lg">
+                                        <p className="font-bold text-base md:text-lg">
                                             {formData.selectedTuyenBayVe?.soHieuChuyenBay}
                                         </p>
                                         <p className="text-sm">
                                             {formData.arrival} → {formData.departure}
                                         </p>
                                     </div>
-                                    <div className="text-right">
+                                    <div className="text-right sm:text-left">
                                         <p className="text-sm text-gray-600">
                                             {formatDate(formData.endDate)}
                                         </p>
                                         <p className="font-bold">
-                                            {formatTime(formData.selectedTuyenBayVe?.gioDi)} - 
+                                            {formatTime(formData.selectedTuyenBayVe?.gioDi)} -
                                             {formatTime(formData.selectedTuyenBayVe?.gioDen)}
                                         </p>
                                         <p className="text-sm text-gray-600">
@@ -269,19 +289,19 @@ function ThanhToan() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex justify-between items-center">
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
                         <button
                             onClick={() => navigate(-1)}
-                            className="px-8 py-3 bg-gray-300 text-black rounded-lg hover:bg-gray-400 transition"
+                            className="w-full sm:w-auto px-6 md:px-8 py-3 bg-gray-300 text-black rounded-lg hover:bg-gray-400 transition"
                             disabled={isProcessing}
                         >
                             {t('common.back')}
                         </button>
-                        
+
                         <button
                             onClick={handlePayment}
                             disabled={isProcessing}
-                            className={`px-8 py-3 rounded-lg font-bold transition ${
+                            className={`w-full sm:w-auto px-6 md:px-8 py-3 rounded-lg font-bold transition ${
                                 isProcessing
                                     ? 'bg-gray-400 cursor-not-allowed'
                                     : 'bg-linear-to-r from-[#FF7043] to-[#F4511E] hover:from-[#FF8A65] hover:to-[#FF7043]'

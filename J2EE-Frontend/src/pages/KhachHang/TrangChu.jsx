@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import Footer from "../../components/common/Footer";
-import Chatbot from "../../components/common/Chatbot";
+import LiveChatWidget from "../../components/common/LiveChatWidget";
 import ProfileCompleteBanner from "../../components/common/ProfileCompleteBanner";
 import TimChuyenBayForm from '../../components/KhachHang/TimChuyenBayForm'
 import useTitle from '../../hooks/useTitle';
@@ -445,7 +445,7 @@ function TrangChu() {
               transition={{ delay: 0.1 }}
               className="text-slate-500"
             >
-              {t('home_page.faq_contact')} <a href="/ho-tro" className="text-blue-600 font-semibold hover:underline">{t('home_page.faq_contact_team')}</a> {t('home_page.faq_contact_help')}
+              {t('home_page.faq_contact')} <a href="/#" className="text-blue-600 font-semibold hover:underline">{t('home_page.faq_contact_team')}</a> {t('home_page.faq_contact_help')}
             </motion.p>
           </div>
 
@@ -490,8 +490,8 @@ function TrangChu() {
         </div>
       </div>
 
-      {/* Chatbot Component */}
-      <Chatbot />
+      {/* Live Chat Widget */}
+      <LiveChatWidget />
 
       {/* Footer */}
       <Footer />

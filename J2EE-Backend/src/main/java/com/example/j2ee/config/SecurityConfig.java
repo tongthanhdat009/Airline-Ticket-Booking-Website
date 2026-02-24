@@ -107,8 +107,10 @@ public class SecurityConfig {
                         // OAuth2
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                         .requestMatchers("/error").permitAll()
-                        // VNPay, Check-in, Booking endpoints
+                        // VNPay, Check-in, Booking, Chat endpoints
                         .requestMatchers("/vnpay/**", "/checkin/**", "/client/datcho/**").permitAll()
+                        .requestMatchers("/api/chat/start", "/api/chat/message", "/api/chat/history/**", "/api/chat/session/**").permitAll()
+                        .requestMatchers("/api/chat/admin/**").access(dynamicAdminAuthManager)
                         // TaiKhoan endpoints
                         .requestMatchers("/taikhoan/email/**").permitAll()
                         // Static resources

@@ -59,13 +59,14 @@ public class DangNhapAdminController {
             // Load user details để lấy roles và permissions
             AdminUserDetails adminUser = (AdminUserDetails) adminDetailsService.loadUserByUsername(tenDangNhap);
 
-            // Lấy roles và permissions
+            // Lấy roles, permissions và adminId
             Set<String> roles = adminUser.getRoles();
             Set<String> permissions = adminUser.getPermissions();
+            int adminId = adminUser.getTaiKhoanAdmin().getMaTaiKhoan();
 
             // === Sinh token với multi-role và permissions ===
-            // Access token: typ=access, TTL ngắn, chứa cả roles và permissions
-            String accessToken = jwtUtil.generateAccessToken(tenDangNhap, roles, permissions);
+            // Access token: typ=access, TTL ngắn, chứa roles, permissions và adminId
+            String accessToken = jwtUtil.generateAdminAccessToken(tenDangNhap, adminId, roles, permissions);
 
             // Refresh token: typ=refresh, TTL dài và lưu vào database
             var refreshTokenEntity = refreshTokenService.createRefreshTokenForAdmin(tenDangNhap);
@@ -121,10 +122,11 @@ public class DangNhapAdminController {
             // Load user details để lấy roles và permissions mới nhất
             AdminUserDetails userDetails = (AdminUserDetails) adminDetailsService.loadUserByUsername(adminUser);
 
-            // Sinh access token mới với roles và permissions
+            // Sinh access token mới với roles, permissions và adminId
             Set<String> roles = userDetails.getRoles();
             Set<String> permissions = userDetails.getPermissions();
-            String newAccessToken = jwtUtil.generateAccessToken(adminUser, roles, permissions);
+            int adminId = userDetails.getTaiKhoanAdmin().getMaTaiKhoan();
+            String newAccessToken = jwtUtil.generateAdminAccessToken(adminUser, adminId, roles, permissions);
 
             Map<String, Object> response = new HashMap<>();
             response.put("accessToken", newAccessToken);

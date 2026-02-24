@@ -70,20 +70,20 @@ function ThongTinThanhToan({ cb, onBackToChonChuyenDi = () => {}, onBackToChonCh
     }, [cb.departure, cb.arrival]);
 
     return (
-        <div className="w-[400px]">
-            <div className="flex justify-start text-xl font-bold bg-[#1E88E5] text-white p-4 rounded-t-md">{t('booking.summary.header')}</div>
-            <div className="p-4 bg-white">
-                <div className="flex justify-between bg-gray-200 px-4 py-2 " onClick={() => toggleExpand("thongTinKhachHang")}>
-                    <div>{t('booking.summary.passenger_info')}</div>
+        <div className="w-full md:w-[400px]">
+            <div className="flex justify-start text-lg md:text-xl font-bold bg-[#1E88E5] text-white p-3 md:p-4 rounded-t-md">{t('booking.summary.header')}</div>
+            <div className="p-3 md:p-4 bg-white">
+                <div className="flex justify-between bg-gray-200 px-3 md:px-4 py-2" onClick={() => toggleExpand("thongTinKhachHang")}>
+                    <div className="text-sm md:text-base">{t('booking.summary.passenger_info')}</div>
                     {cb.passengerInfo && (
-                        expanded.thongTinKhachHang ? <IoMdArrowDropup className="ml-2 text-2xl cursor-pointer"/> : <IoMdArrowDropdown className="ml-2 text-2xl cursor-pointer"/>
+                        expanded.thongTinKhachHang ? <IoMdArrowDropup className="ml-2 text-xl md:text-2xl cursor-pointer"/> : <IoMdArrowDropdown className="ml-2 text-xl md:text-2xl cursor-pointer"/>
                     )}
                 </div>
-                {expanded.thongTinKhachHang && 
+                {expanded.thongTinKhachHang &&
                     cb.passengerInfo?.map((element, index) => (
-                        <div key={index} className="flex justify-between bg-gray-100 px-4 py-2 rounded-b-md text-sm">
-                            <span>{element.fullName}</span>
-                            <LuPencilLine className="mt-1 cursor-pointer text-[#1E88E5] text-xl" onClick={(e) => {
+                        <div key={index} className="flex justify-between bg-gray-100 px-3 md:px-4 py-2 rounded-b-md text-xs md:text-sm">
+                            <span className="truncate">{element.fullName}</span>
+                            <LuPencilLine className="mt-1 cursor-pointer text-[#1E88E5] text-lg md:text-xl flex-shrink-0" onClick={(e) => {
                                                                     e.stopPropagation();
                                                                     onBackToThongTinKhachHang?.();
                                                                 }}/>
@@ -91,9 +91,9 @@ function ThongTinThanhToan({ cb, onBackToChonChuyenDi = () => {}, onBackToChonCh
                 ))}
             </div>
                 <div className=" bg-[#E3F2FD]">
-                <div className="flex justify-between items-center px-4 py-2"> 
-                    <span className="text-xm">{t('booking.summary.outbound')}</span>
-                    <span className="flex text-[#1E88E5] font-bold">{cb.selectedTuyenBayDi ?<> {formatCurrencyWithCommas(calcTotalPrice())+" VND"} <LuPencilLine className="mt-1 cursor-pointer"   onClick={(e) => {
+                <div className="flex justify-between items-center px-3 md:px-4 py-2">
+                    <span className="text-xs md:text-sm">{t('booking.summary.outbound')}</span>
+                    <span className="flex text-[#1E88E5] font-bold text-sm md:text-base">{cb.selectedTuyenBayDi ?<> {formatCurrencyWithCommas(calcTotalPrice())+" VND"} <LuPencilLine className="mt-1 cursor-pointer text-lg md:text-xl"   onClick={(e) => {
                                                                                                                                                                                                     e.stopPropagation();
                                                                                                                                                                                                     onBackToChonChuyenDi?.(); // chỉ gọi khi click
                                                                                                                                                                                                 }}/></> : ""}</span>

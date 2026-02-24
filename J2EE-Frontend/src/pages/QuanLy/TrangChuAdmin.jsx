@@ -143,7 +143,7 @@ function TrangChuAdmin() {
             'DoiSoatGiaoDich': 'Đối Soát Giao Dịch',
             'BannerTinTuc': 'Quản lý Banner & Tin Tức',
             'LichSuGiaoDichVNPay': 'Lịch Sử Giao Dịch VNPay',
-            'HoTroLienHe': 'Hỗ Trợ & Liên Hệ',
+            'QuanLyChat': 'Chat Trực Tuyến',
             'them': 'Thêm Mới',
             'sua': 'Chỉnh Sửa',
             'ghe': 'Sơ Đồ Ghế',

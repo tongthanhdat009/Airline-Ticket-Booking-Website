@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import ThongTinThanhToan from "../../../components/KhachHang/ThongTinThanhToan";
 import { formatCurrencyWithCommas } from "../../../services/utils";
@@ -19,20 +19,24 @@ function NhapThongTin() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const [formData, _setFormData] = useState(location.state);
+    // Fix: Sử dụng useMemo để tránh tạo lại state không cần thiết khi location thay đổi
+    const formData = useMemo(() => location.state, [location.state]);
+
+    // Fix: Khởi tạo state an toàn với optional chaining
+    const passengersCount = formData?.passengers || 0;
     const [expanded, setExpanded] = useState(
-        Array(Number(location.state.passengers)).fill(true)
+        Array(Number(passengersCount)).fill(true)
     );
 
     // ĐÁNH DẤU LỖI
     const [errors, setErrors] = useState(
-        Array(Number(location.state.passengers)).fill({})
+        Array(Number(passengersCount)).fill({})
     );
 
     const scrollRefs = useRef([]);
 
     const [passengerInfo, setPassengerInfo] = useState(
-        Array(Number(formData.passengers)).fill({
+        Array(Number(passengersCount)).fill({
             sex: "",
             fullName: "",
             birthday: "",
@@ -48,6 +52,14 @@ function NhapThongTin() {
     const [countries, setCountries] = useState([]);
     const [accountInfo, setAccountInfo] = useState(null);
     const [useAccountInfo, setUseAccountInfo] = useState(false);
+
+    // Fix: Kiểm tra formData null/undefined và redirect về trang chủ
+    useEffect(() => {
+        if (!formData || !formData.passengers) {
+            console.warn('Missing form data, redirecting to home');
+            navigate('/');
+        }
+    }, [formData, navigate]);
 
     // Load countries và account info khi component mount
     useEffect(() => {
@@ -203,16 +215,28 @@ function NhapThongTin() {
         navigate("/chon-dich-vu", { state: { ...formData, passengerInfo, state: 2, useAccountInfo } });
     };
 
+    // Fix: Early return nếu formData không có (tránh crash khi back button)
+    if (!formData || !formData.passengers) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                    <p className="text-gray-600 mb-4">Đang chuyển hướng...</p>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="bg-blue-100 min-h-screen bg-no-repeat bg-cover bg-fixed"
         style={{ backgroundImage: 'url(/background/home/bgBannerHomePage.72a61446.webp)' }}>
             <HeaderTimKiemChuyen data={{ ...formData, state: 1 }} />
 
-            <div className="px-32 mt-4 text-xl font-semibold text-white drop-shadow-lg">{t('booking.passenger_info.title')}</div>
+            <div className="px-4 md:px-8 lg:px-16 xl:px-32 mt-4 text-lg md:text-xl font-semibold text-white drop-shadow-lg">{t('booking.passenger_info.title')}</div>
 
-            <div className="flex justify-between gap-8 mt-4 px-32 mb-20">
+            <div className="flex flex-col lg:flex-row justify-between gap-4 lg:gap-8 mt-4 px-4 md:px-8 lg:px-16 xl:px-32 mb-20">
                 <div className="w-full">
-                    {[...Array(Number(formData.passengers))].map((_, index) => (
+                    {formData && [...Array(Number(passengersCount))].map((_, index) => (
                         <div
                             key={index}
                             ref={(el) => (scrollRefs.current[index] = el)}
@@ -251,7 +275,7 @@ function NhapThongTin() {
                             </div>
 
                             {expanded[index] && (
-                                <div className="flex flex-col bg-white gap-6 rounded-b-lg shadow-md transition-all duration-300 p-6">
+                                <div className="flex flex-col bg-white gap-4 md:gap-6 rounded-b-lg shadow-md transition-all duration-300 p-4 md:p-6">
 
                                     {/* GIỚI TÍNH */}
                                     <div>
@@ -326,7 +350,7 @@ function NhapThongTin() {
                                                 )
                                             }
                                             disabled={index === 0 && useAccountInfo}
-                                            className={`text-lg border-b w-full focus:outline-none ${
+                                            className={`text-base md:text-lg border-b w-full focus:outline-none ${
                                                 errors[index]?.fullName
                                                     ? "border-red-500"
                                                     : "border-gray-300 hover:border-gray-500"
@@ -342,7 +366,7 @@ function NhapThongTin() {
                                     {/* Ngày sinh + Quốc gia */}
                                     <div>
                                         <div className="font-semibold mb-2">{t('booking.passenger_info.gender')} & {t('booking.passenger_info.nationality')}</div>
-                                        <div className="flex gap-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                                             <div className="w-full">
                                                 <input
                                                     type="date"
@@ -355,7 +379,7 @@ function NhapThongTin() {
                                                         )
                                                     }
                                                     disabled={index === 0 && useAccountInfo}
-                                                    className={`text-lg border-b w-full focus:outline-none ${
+                                                    className={`text-base md:text-lg border-b w-full focus:outline-none ${
                                                         errors[index]?.birthday
                                                             ? "border-red-500"
                                                             : "border-gray-300 hover:border-gray-500"
@@ -378,7 +402,7 @@ function NhapThongTin() {
                                                             e.target.value
                                                         )
                                                     }
-                                                    className={`text-lg border-b w-full focus:outline-none bg-white ${
+                                                    className={`text-base md:text-lg border-b w-full focus:outline-none bg-white ${
                                                         errors[index]?.country
                                                             ? "border-red-500"
                                                             : "border-gray-300 hover:border-gray-500"
@@ -403,7 +427,7 @@ function NhapThongTin() {
                                     {/* LIÊN HỆ */}
                                     <div>
                                         <div className="font-semibold mb-2">{t('booking.passenger_info.contact_info')}</div>
-                                        <div className="flex gap-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                                             <div className="w-full">
                                                 <input
                                                     type="number"
@@ -413,7 +437,7 @@ function NhapThongTin() {
                                                         handleChange(index, "phone", e.target.value)
                                                     }
                                                     disabled={index === 0 && useAccountInfo}
-                                                    className={`text-lg border-b w-full focus:outline-none ${
+                                                    className={`text-base md:text-lg border-b w-full focus:outline-none ${
                                                         errors[index]?.phone
                                                             ? "border-red-500"
                                                             : "border-gray-300 hover:border-gray-500"
@@ -435,7 +459,7 @@ function NhapThongTin() {
                                                         handleChange(index, "email", e.target.value)
                                                     }
                                                     disabled={index === 0 && useAccountInfo}
-                                                    className={`text-lg border-b w-full focus:outline-none ${
+                                                    className={`text-base md:text-lg border-b w-full focus:outline-none ${
                                                         errors[index]?.email
                                                             ? "border-red-500"
                                                             : "border-gray-300 hover:border-gray-500"
@@ -460,7 +484,7 @@ function NhapThongTin() {
                                             onChange={(e) =>
                                                 handleChange(index, "idCard", e.target.value)
                                             }
-                                            className={`text-lg border-b w-full focus:outline-none ${
+                                            className={`text-base md:text-lg border-b w-full focus:outline-none ${
                                                 errors[index]?.idCard
                                                     ? "border-red-500"
                                                     : "border-gray-300 hover:border-gray-500"
@@ -483,7 +507,7 @@ function NhapThongTin() {
                                             onChange={(e) =>
                                                 handleChange(index, "address", e.target.value)
                                             }
-                                            className={`mb-3 text-lg border-b w-full focus:outline-none ${
+                                            className={`mb-3 text-base md:text-lg border-b w-full focus:outline-none ${
                                                 errors[index]?.address
                                                     ? "border-red-500"
                                                     : "border-gray-300 hover:border-gray-500"
@@ -500,7 +524,7 @@ function NhapThongTin() {
                         </div>
                     ))}
 
-                    <div className="bg-white px-8 py-4 rounded-lg mt-8 text-gray-600 mb-50">
+                    <div className="bg-white px-4 md:px-8 py-4 rounded-lg mt-8 text-gray-600 mb-50 text-sm md:text-base">
                         {t('booking.passenger_info.privacy_ack')}
                         <span className="text-blue-700 cursor-pointer"> {t('footer.policy')}</span>
                         {` ${t('booking.passenger_info.of')} J2EEairline.`}
@@ -521,23 +545,23 @@ function NhapThongTin() {
             </div>
 
             {/* Footer */}
-            <div className="flex justify-between fixed bottom-0 left-0 w-full bg-white p-4 h-[80px] px-32 shadow-[0_-4px_20px_rgba(0,0,0,0.25)] items-center z-50">
-                <span 
-                    className="bg-gray-200 rounded-xl flex items-center justify-center px-10 py-2 text-black cursor-pointer hover:bg-gray-300 transition mr-100"
+            <div className="flex flex-col md:flex-row justify-between fixed bottom-0 left-0 w-full bg-white p-4 px-4 md:px-8 lg:px-16 xl:px-32 h-auto md:h-[80px] shadow-[0_-4px_20px_rgba(0,0,0,0.25)] items-center z-50 gap-3 md:gap-0">
+                <span
+                    className="bg-gray-200 rounded-xl flex items-center justify-center px-6 md:px-10 py-2 text-black cursor-pointer hover:bg-gray-300 transition"
                     onClick={() => navigate(-1)}
                 >
                     {t('common.back')}
                 </span>
                 <div className="flex flex-col text-black">
-                    <span className="text-xl">{t('common.total_price')}</span>
-                    <span className="text-2xl font-bold">
+                    <span className="text-base md:text-xl">{t('common.total_price')}</span>
+                    <span className="text-xl md:text-2xl font-bold">
                         {formData
                             ? formatCurrencyWithCommas(formData.totalPrice) + " VND"
                             : "0 VND"}
                     </span>
                 </div>
                 <span
-                    className="bg-linear-to-bl from-[#FF7043] to-[#F4511E] rounded-xl flex items-center justify-center px-10 py-2 text-black cursor-pointer"
+                    className="bg-linear-to-bl from-[#FF7043] to-[#F4511E] rounded-xl flex items-center justify-center px-6 md:px-10 py-2 text-black cursor-pointer"
                     onClick={tiepTucOnClick}
                 >
                     {t('common.continue')}

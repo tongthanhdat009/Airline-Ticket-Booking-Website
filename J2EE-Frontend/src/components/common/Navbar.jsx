@@ -82,7 +82,7 @@ function Navbar() {
       {/* Top Bar - Right aligned items */}
       <div className="bg-slate-900 text-slate-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-1.5 flex justify-end items-center gap-4 text-[11px] sm:text-[12px] font-medium tracking-wide">
-          <Link to="/ho-tro" className="hover:text-white transition-colors flex items-center gap-1.5">
+          <Link to="/" className="hover:text-white transition-colors flex items-center gap-1.5">
             <span className="text-blue-400">🏠</span>
             <span>{t('common.support')}</span>
           </Link>
@@ -214,7 +214,7 @@ function Navbar() {
           <div className="mb-3 pb-3 border-b border-slate-200">
             <div className="flex flex-col gap-2 text-sm font-medium">
               <Link
-                to="/ho-tro"
+                to="/"
                 className="text-slate-700 py-2.5 px-4 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-colors flex items-center gap-2"
                 onClick={closeMobileMenu}
               >

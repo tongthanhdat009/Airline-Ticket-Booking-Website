@@ -2,7 +2,7 @@ import { FaUser, FaEnvelope, FaIdCard, FaPlane, FaReceipt, FaHome, FaGoogle, FaC
 
 function ProfileCard({ accountInfo, onNavigate, activePage = 'profile' }) {
   return (
-    <div className="xl:w-96 shrink-0">
+    <div className="w-full xl:w-96 shrink-0">
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 sticky top-6 border-t-4 border-[#1E88E5]">
         {/* Profile Header */}
         <div className="relative bg-gradient-to-br from-[#1E88E5] via-[#1565C0] to-[#0D47A1] h-36">
