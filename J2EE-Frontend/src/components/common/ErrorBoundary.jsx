@@ -43,7 +43,7 @@ class ErrorBoundary extends React.Component {
             <p className="text-gray-600 mb-6">
               Chúng tôi xin lỗi vì sự bất tiện này. Vui lòng thử lại.
             </p>
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <details className="mb-6 text-left">
                 <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900">
                   Chi tiết lỗi (Development)

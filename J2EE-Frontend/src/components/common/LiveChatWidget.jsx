@@ -52,11 +52,11 @@ const LiveChatWidget = () => {
     const savedSession = localStorage.getItem(STORAGE_KEY);
     if (savedSession) {
       try {
-        const { sessionId: savedId, email } = JSON.parse(savedSession);
+        const { sessionId: savedId } = JSON.parse(savedSession);
         if (savedId) {
           restoreSession(savedId);
         }
-      } catch (e) {
+      } catch {
         localStorage.removeItem(STORAGE_KEY);
       }
     }

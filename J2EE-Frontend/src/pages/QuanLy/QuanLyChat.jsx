@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   FaComments,
   FaClock,
   FaExclamationTriangle,
-  FaCheckCircle,
   FaSyncAlt,
 } from 'react-icons/fa';
 import ChatSessionList from '../../components/QuanLy/ChatSessionList';
@@ -37,8 +36,8 @@ const QuanLyChat = () => {
       if (res.success) {
         setSessions(res.data || []);
       }
-    } catch (error) {
-      console.error('Error fetching sessions:', error);
+    } catch {
+      console.error('Error fetching sessions');
     }
   }, []);
 
@@ -49,8 +48,8 @@ const QuanLyChat = () => {
       if (res.success) {
         setStats(res.data);
       }
-    } catch (error) {
-      console.error('Error fetching stats:', error);
+    } catch {
+      console.error('Error fetching stats');
     }
   }, []);
 
@@ -62,8 +61,8 @@ const QuanLyChat = () => {
       if (res.success) {
         setMessages(res.data || []);
       }
-    } catch (error) {
-      console.error('Error fetching messages:', error);
+    } catch {
+      console.error('Error fetching messages');
     }
   }, []);
 
@@ -123,7 +122,7 @@ const QuanLyChat = () => {
       } else {
         showToast(res.message || 'Không thể nhận chat', 'error');
       }
-    } catch (error) {
+    } catch {
       showToast('Lỗi khi nhận chat', 'error');
     }
   }, [activeSession, fetchSessions, fetchStats, fetchMessages]);
@@ -146,7 +145,7 @@ const QuanLyChat = () => {
       } else {
         showToast(res.message || 'Không thể gửi tin nhắn', 'error');
       }
-    } catch (error) {
+    } catch {
       showToast('Lỗi khi gửi tin nhắn', 'error');
     } finally {
       setSending(false);
@@ -166,7 +165,7 @@ const QuanLyChat = () => {
       } else {
         showToast(res.message || 'Không thể đóng chat', 'error');
       }
-    } catch (error) {
+    } catch {
       showToast('Lỗi khi đóng chat', 'error');
     }
   }, [activeSession, fetchSessions, fetchStats]);

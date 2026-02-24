@@ -38,18 +38,6 @@ function ChonDichVu() {
         }
     }, [formData, navigate, location.state]);
 
-    // Fix: Early return nếu chưa có data
-    if (!isValid || !formData) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="text-center">
-                    <p className="text-gray-600 mb-4">Đang tải...</p>
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                </div>
-            </div>
-        );
-    }
-
     const calculateTotal = () => {
         let total = formData.totalPrice || 0;
 
@@ -75,6 +63,20 @@ function ChonDichVu() {
         moTa: t('booking.services.select_seat_desc'),
         anh: "/service/select-service_favorite-seat.cc6498ae.svg",
     };
+
+    // Early return component nếu chưa có data
+    const EarlyReturn = () => (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div className="text-center">
+                <p className="text-gray-600 mb-4">Đang tải...</p>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            </div>
+        </div>
+    );
+
+    if (!isValid || !formData) {
+        return <EarlyReturn />;
+    }
 
     const tiepTucOnClick = () => {
         const choNgoiDi = selectedServices.di?.selectedSeats?.length || 0;
