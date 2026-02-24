@@ -254,6 +254,15 @@ public class VNPayService {
                     vnPayTransactionLogService.saveTransactionLog(
                             params, "DUPLICATE", "Giao dịch đã được xử lý trước đó (IPN)", ipnUrl, httpMethod, sourceIp);
 
+                    // Thử gửi email nếu IPN gửi thất bại (ví dụ: LazyInitializationException)
+                    // Callback có @Transactional nên lazy loading sẽ hoạt động
+                    try {
+                        sendTicketConfirmationEmail(thanhToan);
+                        System.out.println("Callback: Đã gửi email bổ sung (IPN có thể đã gửi thất bại)");
+                    } catch (Exception emailEx) {
+                        System.err.println("Callback duplicate: Failed to send email: " + emailEx.getMessage());
+                    } 
+
                     // Trả success=true vì thanh toán đã thành công (IPN đã xử lý)
                     result.put("success", true);
                     result.put("message", "Thanh toán thành công");
@@ -293,7 +302,8 @@ public class VNPayService {
                     sendTicketConfirmationEmail(thanhToan);
                 } catch (Exception e) {
                     // Log error but don't fail the payment process
-                    System.err.println("Failed to send ticket email: " + e.getMessage());
+                    System.err.println("Callback: Failed to send ticket email: " + e.getMessage());
+                    e.printStackTrace();
                 }
 
                 // Log giao dịch thành công
@@ -357,6 +367,7 @@ public class VNPayService {
      * @param request HttpServletRequest
      * @return Map chứa responseCode ("00", "97", "99")
      */
+    @Transactional
     public Map<String, Object> handleIPN(Map<String, String> params, HttpServletRequest request) {
         Map<String, Object> result = new HashMap<>();
         
@@ -455,6 +466,7 @@ public class VNPayService {
                         sendTicketConfirmationEmail(thanhToan);
                     } catch (Exception e) {
                         System.err.println("IPN: Failed to send email: " + e.getMessage());
+                        e.printStackTrace();
                     }
                 }
                 
