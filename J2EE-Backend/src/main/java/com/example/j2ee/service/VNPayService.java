@@ -241,23 +241,26 @@ public class VNPayService {
                 throw new IllegalArgumentException("Mã giao dịch không hợp lệ");
             }
 
+            // Trích xuất thông tin thanh toán trước khi kiểm tra duplicate
+            TrangThaiThanhToan thanhToan = trangThaiThanhToanRepository.findById(maThanhToan)
+                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thông tin thanh toán"));
+
             // Kiểm tra transaction duplicate (đã xử lý rồi)
+            // Nếu IPN đã xử lý thành công trước callback → vẫn trả success=true cho frontend
             if (vnPayTransactionLogService.existsByVnpTxnRef(txnRef)) {
                 VnPayTransactionLog existingLog = vnPayTransactionLogService.getLatestTransactionLog(txnRef);
                 if (existingLog != null && "SUCCESS".equals(existingLog.getProcessingResult())) {
-                    result.put("success", false);
-                    result.put("message", "Giao dịch này đã được xử lý trước đó");
-                    result.put("data", null);
-
                     // Log trường hợp duplicate
                     vnPayTransactionLogService.saveTransactionLog(
-                            params, "DUPLICATE", "Giao dịch đã được xử lý trước đó", ipnUrl, httpMethod, sourceIp);
+                            params, "DUPLICATE", "Giao dịch đã được xử lý trước đó (IPN)", ipnUrl, httpMethod, sourceIp);
+
+                    // Trả success=true vì thanh toán đã thành công (IPN đã xử lý)
+                    result.put("success", true);
+                    result.put("message", "Thanh toán thành công");
+                    result.put("data", thanhToan);
                     return result;
                 }
             }
-
-            TrangThaiThanhToan thanhToan = trangThaiThanhToanRepository.findById(maThanhToan)
-                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thông tin thanh toán"));
 
             DonHang donHang = thanhToan.getDonHang();
             if (donHang == null) {

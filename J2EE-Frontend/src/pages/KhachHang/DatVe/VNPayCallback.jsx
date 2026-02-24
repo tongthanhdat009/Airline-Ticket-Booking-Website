@@ -23,7 +23,7 @@ function VNPayCallback() {
         if (success === 'true' && vnpResponseCode === '00') {
             setPaymentStatus('success');
             setPaymentInfo({
-                message: message || 'Thanh to�n th�nh c�ng',
+                message: message || 'Thanh toán thành công',
                 maThanhToan,
                 soTien,
                 bankCode: searchParams.get('vnp_BankCode'),
@@ -32,7 +32,7 @@ function VNPayCallback() {
         } else {
             setPaymentStatus('failed');
             setPaymentInfo({
-                message: message || 'Thanh to�n th?t b?i',
+                message: message || 'Thanh toán thất bại',
                 responseCode: vnpResponseCode
             });
         }
@@ -62,7 +62,7 @@ function VNPayCallback() {
                     {paymentStatus === 'processing' && (
                         <div className="text-center">
                             <div className="animate-spin rounded-full h-20 w-20 border-b-2 border-[#1E88E5] mx-auto mb-4"></div>
-                            <p className="text-xl">�ang x? l� k?t qu? thanh to�n...</p>
+                            <p className="text-xl">Đang xử lý kết quả thanh toán...</p>
                         </div>
                     )}
 
@@ -87,28 +87,28 @@ function VNPayCallback() {
                             </div>
 
                             <h2 className="text-3xl font-bold text-green-600 mb-4">
-                                Thanh to�n th�nh c�ng!
+                                Thanh toán thành công!
                             </h2>
 
                             <p className="text-gray-600 mb-6">
-                                C?m on b?n d� s? d?ng d?ch v? c?a J2EE Airline
+                                Cảm ơn bạn đã sử dụng dịch vụ của J2EE Airline
                             </p>
 
                             <div className="bg-gray-50 p-6 rounded-lg mb-6 text-left">
                                 <h3 className="font-bold text-lg mb-4 text-center border-b pb-2">
-                                    Th�ng tin thanh to�n
+                                    Thông tin thanh toán
                                 </h3>
                                 
                                 {paymentInfo?.maThanhToan && (
                                     <div className="flex justify-between py-2 border-b">
-                                        <span className="text-gray-600">M� thanh to�n:</span>
+                                        <span className="text-gray-600">Mã thanh toán:</span>
                                         <span className="font-semibold">#{paymentInfo.maThanhToan}</span>
                                     </div>
                                 )}
 
                                 {paymentInfo?.soTien && (
                                     <div className="flex justify-between py-2 border-b">
-                                        <span className="text-gray-600">S? ti?n:</span>
+                                        <span className="text-gray-600">Số tiền:</span>
                                         <span className="font-bold text-[#1E88E5]">
                                             {formatCurrencyWithCommas(paymentInfo.soTien)} VND
                                         </span>
@@ -117,14 +117,14 @@ function VNPayCallback() {
 
                                 {paymentInfo?.bankCode && (
                                     <div className="flex justify-between py-2 border-b">
-                                        <span className="text-gray-600">Ng�n h�ng:</span>
+                                        <span className="text-gray-600">Ngân hàng:</span>
                                         <span className="font-semibold">{paymentInfo.bankCode}</span>
                                     </div>
                                 )}
 
                                 {paymentInfo?.payDate && (
                                     <div className="flex justify-between py-2">
-                                        <span className="text-gray-600">Th?i gian:</span>
+                                        <span className="text-gray-600">Thời gian:</span>
                                         <span className="font-semibold">
                                             {new Date(
                                                 paymentInfo.payDate.substring(0, 4) + '-' +
@@ -156,11 +156,11 @@ function VNPayCallback() {
                                     </svg>
                                     <div className="text-left">
                                         <p className="font-semibold text-blue-900 mb-2">
-                                            ?? V� di?n t? d� du?c g?i qua email
+                                            Vé điện tử đã được gửi qua email
                                         </p>
                                         <p className="text-sm text-blue-800">
-                                            Vui l�ng ki?m tra h?p thu email c?a b?n. 
-                                            V� m�y bay di?n t? k�m chi ti?t chuy?n bay d� du?c g?i d?n d?a ch? email dang k�.
+                                            Vui lòng kiểm tra hộp thư email của bạn. 
+                                            Vé máy bay điện tử kèm chi tiết chuyến bay đã được gửi đến địa chỉ email đăng ký.
                                         </p>
                                     </div>
                                 </div>
@@ -172,14 +172,14 @@ function VNPayCallback() {
                                         onClick={handleViewHistory}
                                         className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
                                     >
-                                        Xem l?ch s? giao d?ch
+                                        Xem lịch sử giao dịch
                                     </button>
                                 )}
                                 <button
                                     onClick={handleBackHome}
                                     className="px-8 py-3 bg-linear-to-r from-[#FF7043] to-[#F4511E] text-white rounded-lg hover:from-[#F4511E] hover:to-[#E64A19] transition font-semibold"
                                 >
-                                    V? trang ch?
+                                    Về trang chủ
                                 </button>
                             </div>
                         </div>
@@ -206,17 +206,17 @@ function VNPayCallback() {
                             </div>
 
                             <h2 className="text-3xl font-bold text-red-600 mb-4">
-                                Thanh to�n th?t b?i
+                                Thanh toán thất bại
                             </h2>
 
                             <p className="text-gray-600 mb-6">
-                                {paymentInfo?.message || '�� x?y ra l?i trong qu� tr�nh thanh to�n'}
+                                {paymentInfo?.message || 'Đã xảy ra lỗi trong quá trình thanh toán'}
                             </p>
 
                             {paymentInfo?.responseCode && (
                                 <div className="bg-red-50 p-4 rounded-lg mb-6">
                                     <p className="text-sm text-gray-600">
-                                        M� l?i: <span className="font-semibold">{paymentInfo.responseCode}</span>
+                                        Mã lỗi: <span className="font-semibold">{paymentInfo.responseCode}</span>
                                     </p>
                                 </div>
                             )}
@@ -238,12 +238,12 @@ function VNPayCallback() {
                                     </svg>
                                     <div className="text-left">
                                         <p className="font-semibold text-yellow-900 mb-2">
-                                            Luu �
+                                            Lưu ý
                                         </p>
                                         <ul className="text-sm text-yellow-800 list-disc list-inside space-y-1">
-                                            <li>Vui l�ng ki?m tra l?i th�ng tin th? v� s? du t�i kho?n</li>
-                                            <li>�?m b?o k?t n?i internet ?n d?nh</li>
-                                            <li>Li�n h? ng�n h�ng n?u v?n d? v?n ti?p di?n</li>
+                                            <li>Vui lòng kiểm tra lại thông tin thẻ và số dư tài khoản</li>
+                                            <li>Đảm bảo kết nối internet ổn định</li>
+                                            <li>Liên hệ ngân hàng nếu vấn đề vẫn tiếp diễn</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -254,13 +254,13 @@ function VNPayCallback() {
                                     onClick={handleBackHome}
                                     className="px-8 py-3 bg-gray-300 text-black rounded-lg hover:bg-gray-400 transition font-semibold"
                                 >
-                                    V? trang ch?
+                                    Về trang chủ
                                 </button>
                                 <button
                                     onClick={() => navigate(-1)}
                                     className="px-8 py-3 bg-linear-to-r from-[#1E88E5] to-[#1565C0] text-white rounded-lg hover:from-[#1565C0] hover:to-[#0D47A1] transition font-semibold"
                                 >
-                                    Th? l?i
+                                    Thử lại
                                 </button>
                             </div>
                         </div>
