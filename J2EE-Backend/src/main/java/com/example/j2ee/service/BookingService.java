@@ -12,6 +12,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Service xử lý đặt vé với Transaction và chống Race Condition
  * Yêu cầu:
@@ -24,6 +27,8 @@ import java.util.*;
 @RequiredArgsConstructor
 public class BookingService {
 
+    private static final Logger logger = LoggerFactory.getLogger(BookingService.class);
+
     private final DonHangRepository donHangRepository;
     private final HanhKhachRepository hanhKhachRepository;
     private final DatChoRepository datChoRepository;
@@ -33,6 +38,8 @@ public class BookingService {
     private final GiaChuyenBayRepository giaChuyenBayRepository;
     private final ChiTietChuyenBayRepository chiTietChuyenBayRepository;
     private final HanhKhachService hanhKhachService;
+    private final DatChoDichVuRepository datChoDichVuRepository;
+    private final LuaChonDichVuRepository luaChonDichVuRepository;
 
     /**
      * Tạo đặt vé mới với Transaction hoàn chỉnh
@@ -135,6 +142,9 @@ public class BookingService {
             DatCho datChoVe = danhSachDatCho.get(danhSachGhe.size() + i);
             createGheDaDat(datChoVe.getChuyenBay(), gheVe, datChoVe);
         }
+
+        // Bước 6.5: Insert datchodichvu (dịch vụ đi kèm đặt chỗ)
+        saveServicesForBookings(request, danhSachDatCho, danhSachGhe.size());
 
         // Bước 7: Insert trangthaithanhtoan (PENDING)
         TrangThaiThanhToan thanhToan = createThanhToanPending(donHang, request.getTotalAmount());
@@ -374,5 +384,58 @@ public class BookingService {
         thanhToan.setNgayHetHan(java.sql.Date.valueOf(hetHan.toLocalDate()));
 
         return trangThaiThanhToanRepository.save(thanhToan);
+    }
+
+    /**
+     * Lưu dịch vụ đi kèm cho các đặt chỗ
+     * Dịch vụ chiều đi (key "di") được gán cho các DatCho chiều đi
+     * Dịch vụ chiều về (key "ve") được gán cho các DatCho chiều về
+     */
+    private void saveServicesForBookings(CreateBookingRequest request, List<DatCho> danhSachDatCho, int outboundCount) {
+        if (request.getServices() == null || request.getServices().isEmpty()) return;
+
+        // Xử lý dịch vụ chiều đi
+        CreateBookingRequest.DirectionServices diServices = request.getServices().get("di");
+        if (diServices != null && diServices.getOptions() != null && !diServices.getOptions().isEmpty()) {
+            for (int i = 0; i < outboundCount && i < danhSachDatCho.size(); i++) {
+                DatCho datCho = danhSachDatCho.get(i);
+                saveServicesForDatCho(datCho, diServices.getOptions());
+            }
+        }
+
+        // Xử lý dịch vụ chiều về
+        CreateBookingRequest.DirectionServices veServices = request.getServices().get("ve");
+        if (veServices != null && veServices.getOptions() != null && !veServices.getOptions().isEmpty()) {
+            for (int i = outboundCount; i < danhSachDatCho.size(); i++) {
+                DatCho datCho = danhSachDatCho.get(i);
+                saveServicesForDatCho(datCho, veServices.getOptions());
+            }
+        }
+    }
+
+    /**
+     * Lưu danh sách dịch vụ cho một đặt chỗ cụ thể
+     */
+    private void saveServicesForDatCho(DatCho datCho, List<CreateBookingRequest.ServiceOption> options) {
+        for (CreateBookingRequest.ServiceOption option : options) {
+            if (option.getMaLuaChon() == null) continue;
+
+            LuaChonDichVu luaChon = luaChonDichVuRepository.findById(option.getMaLuaChon())
+                .orElse(null);
+            if (luaChon == null) {
+                logger.warn("Không tìm thấy lựa chọn dịch vụ với mã: {}", option.getMaLuaChon());
+                continue;
+            }
+
+            DatChoDichVuId id = new DatChoDichVuId(datCho.getMaDatCho(), luaChon.getMaLuaChon());
+            DatChoDichVu datChoDichVu = new DatChoDichVu();
+            datChoDichVu.setId(id);
+            datChoDichVu.setDatCho(datCho);
+            datChoDichVu.setLuaChonDichVu(luaChon);
+            datChoDichVu.setSoLuong(option.getQuantity() != null ? option.getQuantity() : 1);
+            datChoDichVu.setDonGia(luaChon.getGia());
+
+            datChoDichVuRepository.save(datChoDichVu);
+        }
     }
 }

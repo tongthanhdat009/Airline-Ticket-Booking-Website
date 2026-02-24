@@ -248,27 +248,20 @@ public class JasperTicketService {
         mockPayment.setDonHang(booking.getDonHang());
         mockPayment.setDaThanhToan('Y');
         
-        // Calculate payment amount (you may need to adjust this based on your business logic)
-        // For now, use a default or calculate from flight price
-        BigDecimal amount = BigDecimal.ZERO;
-        if (booking.getChuyenBay() != null) {
-            var flight = booking.getChuyenBay();
-            // Assuming there's a price field in flight or you can calculate it
-            amount = new BigDecimal("1000000"); // Default value, adjust as needed
-        }
-        mockPayment.setSoTien(amount);
+        // Use actual booking price
+        mockPayment.setSoTien(booking.getGiaVe() != null ? booking.getGiaVe() : BigDecimal.ZERO);
 
         try {
-            // Prepare parameters
-            Map<String, Object> parameters = prepareTicketParameters(mockPayment);
+            // Prepare parameters with specific booking to avoid iterator().next() bug
+            Map<String, Object> parameters = prepareTicketParameters(mockPayment, booking);
 
             // Prepare dummy data source
             List<Map<String, Object>> dummyData = new ArrayList<>();
             Map<String, Object> flightData = new HashMap<>();
             flightData.put("description", "");
             flightData.put("quantity", "1");
-            flightData.put("unitPrice", amount);
-            flightData.put("amount", amount);
+            flightData.put("unitPrice", mockPayment.getSoTien());
+            flightData.put("amount", mockPayment.getSoTien());
             dummyData.add(flightData);
             
             JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(dummyData);
@@ -298,16 +291,25 @@ public class JasperTicketService {
     }
 
     /**
-     * Prepare ticket parameters for JasperReports
+     * Prepare ticket parameters for JasperReports (uses first booking from order)
      */
     private Map<String, Object> prepareTicketParameters(TrangThaiThanhToan payment) {
+        return prepareTicketParameters(payment, null);
+    }
+
+    /**
+     * Prepare ticket parameters for JasperReports
+     * @param payment Payment information
+     * @param specificBooking Specific booking to use (if null, uses first from order)
+     */
+    private Map<String, Object> prepareTicketParameters(TrangThaiThanhToan payment, DatCho specificBooking) {
         Map<String, Object> parameters = new HashMap<>();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
-        // Get booking from order (payment is now linked to DonHang)
-        DatCho booking = null;
-        if (payment.getDonHang() != null && payment.getDonHang().getDanhSachDatCho() != null
+        // Use specific booking if provided, otherwise get first from order
+        DatCho booking = specificBooking;
+        if (booking == null && payment.getDonHang() != null && payment.getDonHang().getDanhSachDatCho() != null
                 && !payment.getDonHang().getDanhSachDatCho().isEmpty()) {
             booking = payment.getDonHang().getDanhSachDatCho().iterator().next();
         }
@@ -322,7 +324,7 @@ public class JasperTicketService {
         // Issue date and booking date
         parameters.put("issueDate", LocalDate.now().format(dateFormatter));
         parameters.put("bookingDate", booking != null && booking.getNgayDatCho() != null ? 
-            new java.text.SimpleDateFormat("dd/MM/yyyy").format(booking.getNgayDatCho()) : "-");
+            booking.getNgayDatCho().format(dateFormatter) : "-");
 
         // Passenger information
         if (booking != null && booking.getHanhKhach() != null) {

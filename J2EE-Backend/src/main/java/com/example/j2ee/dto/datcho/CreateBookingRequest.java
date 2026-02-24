@@ -29,15 +29,34 @@ public class CreateBookingRequest {
     private FlightInfo flightInfo;
     
     /**
-     * Additional services selected
+     * Additional services selected per direction ("di" = outbound, "ve" = return)
      */
-    private Map<String, Object> services;
+    private Map<String, DirectionServices> services;
     
     /**
      * Total amount for the booking
      */
     private BigDecimal totalAmount;
     
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DirectionServices {
+        private List<ServiceOption> options;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ServiceOption {
+        private Integer maLuaChon;
+        private String label;
+        private BigDecimal price;
+        private Integer quantity; // null for checkbox items (defaults to 1)
+    }
+
     @Getter
     @Setter
     @NoArgsConstructor
