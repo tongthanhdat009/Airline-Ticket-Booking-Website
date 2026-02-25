@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAssetUrl } from '../../../config/api.config';
+import { getServiceImageUrl } from '../../../config/api.config';
 
 const ServiceModal = ({ service, onClose, onSave }) => {
  const [formData, setFormData] = useState({
@@ -14,10 +14,9 @@ const ServiceModal = ({ service, onClose, onSave }) => {
  // Load image preview when editing
  useEffect(() => {
  if (service?.anh) {
- // If editing, try to get image from cache or API
- const _imageName = service.anh.split('/').pop();
- // For now, just set the path, we'll handle preview in the component
- setImagePreview(service.anh);
+ // Lấy tên file từ đường dẫn và tạo URL ảnh
+ const imageName = service.anh.split('/').pop();
+ setImagePreview(getServiceImageUrl(imageName));
  }
  }, [service]);
 
@@ -125,10 +124,11 @@ const ServiceModal = ({ service, onClose, onSave }) => {
  {imagePreview && (
  <div className="flex justify-center">
  <img
- src={getAssetUrl(imagePreview)}
+ src={imagePreview}
  alt="Preview"
  className="w-20 h-20 md:w-24 md:h-24 object-contain border border-gray-300 rounded-lg"
  onError={(e) => {
+ e.target.onerror = null;
  e.target.src = '/no-product.png';
  }}
  />
