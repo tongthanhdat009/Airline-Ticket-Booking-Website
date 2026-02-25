@@ -2,6 +2,7 @@ package com.example.j2ee.service;
 
 import com.example.j2ee.dto.datcho.CreateBookingRequest;
 import com.example.j2ee.dto.datcho.CreateBookingResponse;
+import com.example.j2ee.dto.khuyenmai.ApplyCouponRequest;
 import com.example.j2ee.model.*;
 import com.example.j2ee.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,7 @@ public class BookingService {
     private final HanhKhachService hanhKhachService;
     private final DatChoDichVuRepository datChoDichVuRepository;
     private final LuaChonDichVuRepository luaChonDichVuRepository;
+    private final KhuyenMaiService khuyenMaiService;
 
     /**
      * Tạo đặt vé mới với Transaction hoàn chỉnh
@@ -145,6 +147,20 @@ public class BookingService {
 
         // Bước 6.5: Insert datchodichvu (dịch vụ đi kèm đặt chỗ)
         saveServicesForBookings(request, danhSachDatCho, danhSachGhe.size());
+
+        // Bước 6.6: Áp dụng mã khuyến mãi (nếu có)
+        if (request.getMaKhuyenMai() != null && !request.getMaKhuyenMai().trim().isEmpty()) {
+            try {
+                ApplyCouponRequest couponRequest = new ApplyCouponRequest();
+                couponRequest.setMaKM(request.getMaKhuyenMai());
+                couponRequest.setDanhSachMaDatCho(danhSachMaDatCho);
+                khuyenMaiService.applyCouponNewTx(couponRequest);
+                logger.info("Đã áp dụng mã khuyến mãi {} cho đơn hàng {}", request.getMaKhuyenMai(), donHang.getPnr());
+            } catch (Exception e) {
+                logger.warn("Không thể áp dụng mã khuyến mãi {}: {}", request.getMaKhuyenMai(), e.getMessage());
+                // Không throw - vẫn cho phép đặt vé nếu mã KM không hợp lệ
+            }
+        }
 
         // Bước 7: Insert trangthaithanhtoan (PENDING)
         TrangThaiThanhToan thanhToan = createThanhToanPending(donHang, request.getTotalAmount());
@@ -388,10 +404,18 @@ public class BookingService {
 
     /**
      * Lưu dịch vụ đi kèm cho các đặt chỗ
-     * Dịch vụ chiều đi (key "di") được gán cho các DatCho chiều đi
-     * Dịch vụ chiều về (key "ve") được gán cho các DatCho chiều về
+     * Hỗ trợ 2 format:
+     * 1. Per-direction (legacy): services map với key "di"/"ve"
+     * 2. Per-passenger (new): passengerServices list, mỗi phần tử có di/ve
      */
     private void saveServicesForBookings(CreateBookingRequest request, List<DatCho> danhSachDatCho, int outboundCount) {
+        // Format mới: per-passenger services
+        if (request.getPassengerServices() != null && !request.getPassengerServices().isEmpty()) {
+            savePerPassengerServices(request, danhSachDatCho, outboundCount);
+            return;
+        }
+
+        // Format cũ: per-direction services (backward compatible)
         if (request.getServices() == null || request.getServices().isEmpty()) return;
 
         // Xử lý dịch vụ chiều đi
@@ -409,6 +433,35 @@ public class BookingService {
             for (int i = outboundCount; i < danhSachDatCho.size(); i++) {
                 DatCho datCho = danhSachDatCho.get(i);
                 saveServicesForDatCho(datCho, veServices.getOptions());
+            }
+        }
+    }
+
+    /**
+     * Lưu dịch vụ theo từng hành khách (format mới)
+     * danhSachDatCho layout: [HK0_di, HK1_di, ..., HK0_ve, HK1_ve, ...]
+     */
+    private void savePerPassengerServices(CreateBookingRequest request, List<DatCho> danhSachDatCho, int outboundCount) {
+        List<CreateBookingRequest.PassengerServices> passengerServicesList = request.getPassengerServices();
+
+        for (int i = 0; i < passengerServicesList.size(); i++) {
+            CreateBookingRequest.PassengerServices ps = passengerServicesList.get(i);
+
+            // Dịch vụ chiều đi cho hành khách i
+            if (ps.getDi() != null && ps.getDi().getOptions() != null && !ps.getDi().getOptions().isEmpty()) {
+                if (i < outboundCount && i < danhSachDatCho.size()) {
+                    DatCho datChoDi = danhSachDatCho.get(i);
+                    saveServicesForDatCho(datChoDi, ps.getDi().getOptions());
+                }
+            }
+
+            // Dịch vụ chiều về cho hành khách i
+            if (ps.getVe() != null && ps.getVe().getOptions() != null && !ps.getVe().getOptions().isEmpty()) {
+                int veIndex = outboundCount + i;
+                if (veIndex < danhSachDatCho.size()) {
+                    DatCho datChoVe = danhSachDatCho.get(veIndex);
+                    saveServicesForDatCho(datChoVe, ps.getVe().getOptions());
+                }
             }
         }
     }

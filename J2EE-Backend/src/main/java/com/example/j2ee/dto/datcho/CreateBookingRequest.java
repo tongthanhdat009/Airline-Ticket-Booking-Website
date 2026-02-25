@@ -30,10 +30,22 @@ public class CreateBookingRequest {
     
     /**
      * Additional services selected per direction ("di" = outbound, "ve" = return)
+     * Legacy format: shared services for all passengers in a direction
      */
     private Map<String, DirectionServices> services;
-    
+
     /**
+     * Per-passenger services (new format)
+     * Each element corresponds to a passenger in passengerInfo by index
+     */
+    private List<PassengerServices> passengerServices;
+
+    /**
+     * Mã khuyến mãi (optional)
+     */
+    private String maKhuyenMai;
+    
+    /** 
      * Total amount for the booking
      */
     private BigDecimal totalAmount;
@@ -44,6 +56,18 @@ public class CreateBookingRequest {
     @AllArgsConstructor
     public static class DirectionServices {
         private List<ServiceOption> options;
+    }
+
+    /**
+     * Services for a single passenger (both directions)
+     */
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PassengerServices {
+        private DirectionServices di;   // Dịch vụ chiều đi
+        private DirectionServices ve;   // Dịch vụ chiều về (nếu có)
     }
 
     @Getter

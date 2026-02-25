@@ -459,7 +459,35 @@
       "added": "Added",
       "error_select_seats_round": "Please select {{count}} seats for both outbound and return flights.",
       "error_select_seats_oneway": "Please select {{count}} seats for the outbound flight.",
-      "error_select_seats_return": "Please select {{count}} seats for the return flight."
+      "error_select_seats_return": "Please select {{count}} seats for the return flight.",
+      "select_passenger": "Select passenger",
+      "services_for": "Services for",
+      "items": "services",
+      "passenger_total": "This passenger's service total"
+    },
+    "stepper": {
+      "flight": "Select Flight",
+      "info": "Information",
+      "services": "Services",
+      "payment": "Payment"
+    },
+    "discount": {
+      "title": "Discount Code",
+      "placeholder": "Enter discount code",
+      "apply": "Apply",
+      "saved": "You save",
+      "remove": "Remove",
+      "invalid_code": "Invalid discount code",
+      "check_error": "Unable to verify discount code"
+    },
+    "price_breakdown": {
+      "outbound_fare": "Outbound fare",
+      "return_fare": "Return fare",
+      "taxes_fees": "Taxes & Fees",
+      "services_total": "Add-on services",
+      "discount": "Discount",
+      "total": "Total",
+      "per_person": "x {{count}} passengers"
     },
     "payment": {
       "title": "Payment",

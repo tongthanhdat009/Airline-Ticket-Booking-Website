@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import ThongTinThanhToan from "../../../components/KhachHang/ThongTinThanhToan";
 import { formatCurrencyWithCommas } from "../../../services/utils";
 import HeaderTimKiemChuyen from "../../../components/KhachHang/HeaderTimKiemChuyen";
+import BookingStepper from "../../../components/KhachHang/Booking/BookingStepper";
 
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import { FaUser } from "react-icons/fa";
@@ -228,9 +229,15 @@ function NhapThongTin() {
     }
 
     return (
-        <div className="bg-blue-100 min-h-screen bg-no-repeat bg-cover bg-fixed"
+        <div className="min-h-screen bg-no-repeat bg-cover bg-fixed relative"
         style={{ backgroundImage: 'url(/background/home/bgBannerHomePage.72a61446.webp)' }}>
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-linear-to-br from-white/70 via-blue-50/60 to-[#F5F7FA]/60"></div>
+            
+            {/* Content wrapper */}
+            <div className="relative z-10">
             <HeaderTimKiemChuyen data={{ ...formData, state: 1 }} />
+            <BookingStepper currentStep={1} />
 
             <div className="px-4 md:px-8 lg:px-16 xl:px-32 mt-4 text-lg md:text-xl font-semibold text-white drop-shadow-lg">{t('booking.passenger_info.title')}</div>
 
@@ -244,7 +251,7 @@ function NhapThongTin() {
                         >
                             {/* Header */}
                             <div
-                                className="flex bg-gray-100 px-4 py-2 rounded-t-lg items-center cursor-pointer"
+                                className="flex bg-white/80 backdrop-blur-md px-4 py-2 rounded-t-lg items-center cursor-pointer border border-white/20"
                                 onClick={() =>
                                     setExpanded((prev) => {
                                         const updated = [...prev];
@@ -275,7 +282,7 @@ function NhapThongTin() {
                             </div>
 
                             {expanded[index] && (
-                                <div className="flex flex-col bg-white gap-4 md:gap-6 rounded-b-lg shadow-md transition-all duration-300 p-4 md:p-6">
+                                <div className="flex flex-col bg-white/90 backdrop-blur-sm gap-4 md:gap-6 rounded-b-lg shadow-md transition-all duration-300 p-4 md:p-6 border border-white/20">
 
                                     {/* GIỚI TÍNH */}
                                     <div>
@@ -524,7 +531,7 @@ function NhapThongTin() {
                         </div>
                     ))}
 
-                    <div className="bg-white px-4 md:px-8 py-4 rounded-lg mt-8 text-gray-600 mb-50 text-sm md:text-base">
+                    <div className="bg-white/80 backdrop-blur-md px-4 md:px-8 py-4 rounded-2xl mt-8 text-gray-600 mb-50 text-sm md:text-base shadow-lg border border-white/20">
                         {t('booking.passenger_info.privacy_ack')}
                         <span className="text-blue-700 cursor-pointer"> {t('footer.policy')}</span>
                         {` ${t('booking.passenger_info.of')} J2EEairline.`}
@@ -542,6 +549,7 @@ function NhapThongTin() {
                         }
                     />
                 </div>
+            </div>
             </div>
 
             {/* Footer */}

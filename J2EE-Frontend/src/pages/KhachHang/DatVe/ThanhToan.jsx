@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import HeaderTimKiemChuyen from '../../../components/KhachHang/HeaderTimKiemChuyen';
+import BookingStepper from '../../../components/KhachHang/Booking/BookingStepper';
+import DiscountCodeInput from '../../../components/KhachHang/Booking/DiscountCodeInput';
+import PriceBreakdown from '../../../components/KhachHang/Booking/PriceBreakdown';
 import { useTranslation } from 'react-i18next'
 
 import { formatCurrencyWithCommas, formatTime, formatDate } from '../../../services/utils';
@@ -19,6 +22,7 @@ function ThanhToan() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState('');
     const [isValid, setIsValid] = useState(false);
+    const [appliedDiscount, setAppliedDiscount] = useState(null);
 
     useEffect(() => {
         // Fix: Chỉ validate khi có location.state (không phải lần đầu render)
@@ -82,7 +86,9 @@ function ThanhToan() {
                     } : null
                 },
                 services: formData.dichVu || {},
-                totalAmount: formData.totalPrice
+                passengerServices: formData.passengerServices || null,
+                maKhuyenMai: appliedDiscount?.maKM || null,
+                totalAmount: appliedDiscount ? (formData.totalPrice - (appliedDiscount.giaTriGiam || 0)) : formData.totalPrice
             };
 
             // Prepare headers (token is optional for guest customers)
@@ -145,9 +151,10 @@ function ThanhToan() {
             {/* Content wrapper */}
             <div className="relative z-10">
             <HeaderTimKiemChuyen data={{ ...formData }} />
+            <BookingStepper currentStep={3} />
 
             <div className="px-4 md:px-8 lg:px-16 xl:px-32 py-6 md:py-8">
-                <div className="bg-white rounded-lg shadow-lg p-4 md:p-6 lg:p-8">
+                <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-4 md:p-6 lg:p-8 border border-white/20">
                     <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-[#1E88E5]">
                         {t('booking.payment.title')}
                     </h2>
@@ -232,31 +239,27 @@ function ThanhToan() {
                         ))}
                     </div>
 
-                    {/* Payment Summary */}
+                    {/* Discount Code */}
+                    <div className="mb-8">
+                        <DiscountCodeInput
+                            tongGiaDonHang={formData.totalPrice}
+                            soLuongVe={formData.passengerInfo?.length || 1}
+                            appliedDiscount={appliedDiscount}
+                            onApply={(discount) => setAppliedDiscount(discount)}
+                            onRemove={() => setAppliedDiscount(null)}
+                        />
+                    </div>
+
+                    {/* Payment Summary with Price Breakdown */}
                     <div className="mb-8">
                         <h3 className="text-xl font-semibold mb-4 border-b pb-2">
                             {t('booking.payment.payment_details') || t('booking.payment.title')}
                         </h3>
-                        <div className="bg-gray-50 p-6 rounded-lg">
-                            <div className="flex justify-between mb-2">
-                                <span>{t('booking.payment.ticket_price')}</span>
-                                <span className="font-semibold">
-                                    {formatCurrencyWithCommas(formData.basePrice || formData.totalPrice)} VND
-                                </span>
-                            </div>
-                            <div className="flex justify-between mb-2">
-                                <span>{t('booking.payment.tax_fee') || 'Thuế và phí'}</span>
-                                <span className="font-semibold">
-                                    {formatCurrencyWithCommas(formData.taxFee || 0)} VND
-                                </span>
-                            </div>
-                            <div className="border-t pt-2 mt-2">
-                                <div className="flex justify-between text-xl font-bold text-[#1E88E5]">
-                                    <span>{t('booking.payment.total') || 'Tổng cộng:'}</span>
-                                    <span>{formatCurrencyWithCommas(formData.totalPrice)} VND</span>
-                                </div>
-                            </div>
-                        </div>
+                        <PriceBreakdown
+                            formData={formData}
+                            appliedDiscount={appliedDiscount}
+                            totalPrice={formData.totalPrice}
+                        />
                     </div>
 
                     {/* Error Message */}
@@ -271,7 +274,7 @@ function ThanhToan() {
                         <h3 className="text-xl font-semibold mb-4 border-b pb-2">
                             {t('booking.payment.payment_method')}
                         </h3>
-                        <div className="bg-blue-50 p-4 rounded-lg border-2 border-blue-300">
+                        <div className="bg-blue-50/80 backdrop-blur-sm p-4 rounded-2xl border-2 border-blue-300/50">
                             <div className="flex items-center">
                                 <img 
                                     src="https://vnpay.vn/s1/statics.vnpay.vn/2023/6/0oxhzjmxbksr1686814746087.png" 

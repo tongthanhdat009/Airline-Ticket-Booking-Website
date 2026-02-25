@@ -5,6 +5,8 @@ import com.example.j2ee.dto.khuyenmai.ApplyCouponResponse;
 import com.example.j2ee.dto.khuyenmai.CreateKhuyenMaiRequest;
 import com.example.j2ee.dto.khuyenmai.KhuyenMaiResponse;
 import com.example.j2ee.dto.khuyenmai.UpdateKhuyenMaiRequest;
+import com.example.j2ee.dto.khuyenmai.ValidateCouponRequest;
+import com.example.j2ee.dto.khuyenmai.ValidateCouponResponse;
 import com.example.j2ee.model.DatCho;
 import com.example.j2ee.model.KhuyenMai;
 import com.example.j2ee.model.KhuyenMaiDatCho;
@@ -14,6 +16,7 @@ import com.example.j2ee.repository.KhuyenMaiRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -37,6 +40,56 @@ public class KhuyenMaiService {
 
     private final KhuyenMaiRepository khuyenMaiRepository;
     private final DatChoRepository datChoRepository;
+
+    /**
+     * Kiểm tra mã khuyến mãi (client-facing, không cần auth)
+     * Chỉ validate, KHÔNG áp dụng (không tăng soLuongDaDuocDung)
+     */
+    public ValidateCouponResponse validateCoupon(ValidateCouponRequest request) {
+        ValidateCouponResponse response = new ValidateCouponResponse();
+
+        try {
+            // Bước 1: Kiểm tra mã tồn tại
+            KhuyenMai khuyenMai = khuyenMaiRepository.findByMaKM(request.getMaKM().trim())
+                    .orElseThrow(() -> new IllegalArgumentException("Mã khuyến mãi không tồn tại"));
+
+            // Bước 2: Kiểm tra hiệu lực
+            validateCouponEffectiveness(khuyenMai);
+
+            // Bước 3: Kiểm tra lượt dùng
+            validateCouponQuota(khuyenMai, request.getSoLuongVe());
+
+            // Bước 4: Kiểm tra giá trị tối thiểu
+            validateMinimumOrderValue(khuyenMai, request.getTongGiaDonHang());
+
+            // Tính toán giảm giá
+            BigDecimal giaTriGiam = tinhGiaTriGiam(khuyenMai, request.getTongGiaDonHang());
+
+            response.setValid(true);
+            response.setTenKhuyenMai(khuyenMai.getTenKhuyenMai());
+            response.setLoaiKhuyenMai(khuyenMai.getLoaiKhuyenMai());
+            response.setGiaTriGiam(giaTriGiam);
+            response.setTongGiaSauKM(request.getTongGiaDonHang().subtract(giaTriGiam));
+            response.setMoTa(khuyenMai.getMoTa());
+            response.setMessage("Áp dụng mã khuyến mãi thành công");
+
+        } catch (IllegalArgumentException e) {
+            response.setValid(false);
+            response.setMessage(e.getMessage());
+        }
+
+        return response;
+    }
+
+    /**
+     * Áp dụng mã khuyến mãi trong transaction mới (REQUIRES_NEW).
+     * Dùng khi gọi từ bên trong một transaction khác (ví dụ: BookingService.createBooking)
+     * để tránh lỗi "rollback-only" khi mã KM không hợp lệ.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public ApplyCouponResponse applyCouponNewTx(ApplyCouponRequest request) {
+        return applyCoupon(request);
+    }
 
     /**
      * Áp dụng mã khuyến mãi cho đơn hàng

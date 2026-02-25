@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { getSoDoGheByChuyenBay, getLuaChonByDichVuId } from "../../services/datVeServices";
 import { getServiceOptionImageUrl } from "../../config/api.config";
 
@@ -9,6 +9,9 @@ function ChoNgoiPanel({
   formData = {},
   dichVu,
   onSave,
+  existingServices = { di: {}, ve: {} },
+  otherPassengerSeats = { di: [], ve: [] },
+  activePassengerName = '',
 }) {
   const [tab, setTab] = useState("di");
   const [serviceState, setServiceState] = useState({ di: {}, ve: {} });
@@ -46,6 +49,7 @@ function ChoNgoiPanel({
               picked.map(id => {
                 const opt = data.options.find(o => o.maLuaChon === parseInt(id));
                 return {
+                  maDichVu: numericId,
                   maLuaChon: parseInt(id),
                   label: opt?.tenLuaChon || "",
                   price: opt?.gia || 0
@@ -64,6 +68,7 @@ function ChoNgoiPanel({
                 const qty = data.quantities[id];
                 const opt = data.options.find(o => o.maLuaChon === parseInt(id));
                 return {
+                  maDichVu: numericId,
                   maLuaChon: parseInt(id),
                   label: opt?.tenLuaChon || "",
                   price: opt?.gia || 0,
@@ -83,9 +88,28 @@ function ChoNgoiPanel({
     return result;
   }, []);
 
+  const existingServicesSnapshot = useRef({ di: {}, ve: {} });
+
   useEffect(() => {
     if (isOpen) {
-      setTab("di"); // reset về tab đi mỗi khi panel mở
+      setTab("di");
+      // Snapshot dịch vụ hiện tại của hành khách khi mở panel
+      existingServicesSnapshot.current = existingServices || { di: {}, ve: {} };
+
+      if (dichVu?.maDichVu === 99) {
+        // Ghế: khởi tạo từ dữ liệu đã lưu của hành khách
+        const newState = { di: {}, ve: {} };
+        ['di', 've'].forEach(dir => {
+          const existing = existingServicesSnapshot.current[dir]?.selectedSeats;
+          if (existing?.length > 0) {
+            newState[dir][99] = { selectedSeats: [...existing] };
+          }
+        });
+        setServiceState(newState);
+      } else {
+        // Dịch vụ khác: reset state, sẽ khởi tạo sau khi fetch
+        setServiceState({ di: {}, ve: {} });
+      }
     }
   }, [isOpen]);
   // ================= UPDATE SERVICE =================
@@ -162,7 +186,39 @@ function ChoNgoiPanel({
         totalPrice: item.gia || 0,
       }));
 
-      updateService(tab, dichVu?.maDichVu, { options: optionsWithPrice });
+      // Khởi tạo từ dữ liệu đã lưu của hành khách hiện tại
+      const snapshot = existingServicesSnapshot.current;
+      const existingOpts = (snapshot[tab]?.options || [])
+        .filter(opt => opt.maDichVu === dichVu.maDichVu);
+      const payload = { options: optionsWithPrice };
+
+      if (existingOpts.length > 0) {
+        if (dichVu.maDichVu === 2) {
+          // Dịch vụ số lượng (hành lý)
+          const initialQuantities = {};
+          let totalPrice = 0;
+          existingOpts.forEach(opt => {
+            initialQuantities[opt.maLuaChon] = opt.quantity || 0;
+            totalPrice += (opt.price || 0) * (opt.quantity || 0);
+          });
+          payload.quantities = initialQuantities;
+          payload.totalPrice = totalPrice;
+          payload.currency = "VND";
+        } else {
+          // Dịch vụ checkbox (đồ ăn, v.v.)
+          const initialChecked = {};
+          let totalPrice = 0;
+          existingOpts.forEach(opt => {
+            initialChecked[opt.maLuaChon] = true;
+            totalPrice += opt.price || 0;
+          });
+          payload.checked = initialChecked;
+          payload.totalPrice = totalPrice;
+          payload.currency = "VND";
+        }
+      }
+
+      updateService(tab, dichVu?.maDichVu, payload);
     } catch (error) {
       console.error("Lỗi khi fetch service data:", error);
     }
@@ -191,14 +247,17 @@ function ChoNgoiPanel({
     // Chỉ cho chọn ghế cùng hạng vé với vé đã mua
     if (userMaHangVe && seat.hangVe?.maHangVe !== userMaHangVe) return;
 
+    // Không cho chọn ghế đã được hành khách khác chọn
+    if (otherPassengerSeats?.[tab]?.some(s => s.id === seat.id)) return;
+
     const isSelected = selectedSeats.some((s) => s.id === seat.id);
     let updated;
 
     if (isSelected) {
       updated = selectedSeats.filter((s) => s.id !== seat.id);
     } else {
-      const maxPassengers = Number(formData?.passengers ?? formData?.passengerInfo?.length ?? 1);
-      if (selectedSeats.length >= maxPassengers) return;
+      // Mỗi hành khách chỉ được chọn 1 ghế
+      if (selectedSeats.length >= 1) return;
       updated = [...selectedSeats, seat];
     }
 
@@ -209,6 +268,9 @@ function ChoNgoiPanel({
     if (!seat) return "bg-white border-gray-200 text-gray-400";
     // Ghế đã được đặt bởi người khác
     if (seat.daDat) return "bg-gray-300 border-gray-300 text-gray-400 cursor-not-allowed opacity-60";
+    // Ghế đã được chọn bởi hành khách khác trong cùng đơn
+    if (otherPassengerSeats?.[tab]?.some(s => s.id === seat.id))
+      return "bg-orange-200 border-orange-400 text-orange-600 cursor-not-allowed opacity-70";
     // Ghế đã được chọn bởi người dùng hiện tại
     if (selectedSeats.some((s) => s.id === seat.id))
       return "bg-sky-500 border-sky-600 text-white cursor-pointer";
@@ -371,13 +433,9 @@ function ChoNgoiPanel({
             <div className="w-full flex flex-col justify-center items-center py-4 px-4">
               <div className="flex flex-col justify-center items-center rounded-t-lg bg-linear-to-b from-[#1E88E5] to-[#1565C0] py-2 px-2 text-white w-4/5 min-h-[60px]">
                 <span className="text-sm">Hành Khách</span>
-                <div className="flex">
-                  {(formData?.passengerInfo || []).map((p, i) => (
-                    <span key={i} className="pl-2 font-bold text-md">
-                      {p.fullName}
-                    </span>
-                  ))}
-                </div>
+                <span className="pl-2 font-bold text-md">
+                  {activePassengerName || (formData?.passengerInfo || [])[0]?.fullName || ''}
+                </span>
               </div>
 
               <div className="flex flex-col justify-center items-center bg-white rounded-b-lg py-2 px-2 text-black w-4/5">
@@ -411,6 +469,7 @@ function ChoNgoiPanel({
                   <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded border bg-amber-50 border-amber-400"></div><span>First Class</span></div>
                   <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-sky-500"></div><span>Đã chọn</span></div>
                   <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-gray-300 opacity-60"></div><span>Đã đặt</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-orange-200 border border-orange-400"></div><span>HK khác chọn</span></div>
                   <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded border border-gray-200 opacity-50"></div><span>Khác hạng</span></div>
                 </div>
 
@@ -543,7 +602,7 @@ function ChoNgoiPanel({
                           ? selectedSeats.map((s) => s.soGhe || s.id).join(", ")
                           : "Chưa chọn"}
                       </span>
-                      ({selectedSeats.length}/{formData?.passengers ?? formData?.passengerInfo?.length ?? 0})
+                      ({selectedSeats.length}/1)
                     </>
                   ) : (
                     <span className="text-[#E3F2FD]">
@@ -553,7 +612,7 @@ function ChoNgoiPanel({
                 </div>
 
                 <button
-                  disabled={dichVu?.maDichVu === 99 && selectedSeats.length != (formData?.passengers ?? formData?.passengerInfo?.length ?? 0)}
+                  disabled={dichVu?.maDichVu === 99 && selectedSeats.length !== 1}
                   onClick={() => {
                     if (onSave) {
                       const allServices = extractAllServiceData(serviceState);
@@ -566,7 +625,7 @@ function ChoNgoiPanel({
                     }
                   }}
                   className={`px-6 py-2 rounded-lg font-semibold ${
-                    dichVu?.maDichVu === 99 && selectedSeats.length != (formData?.passengers ?? formData?.passengerInfo?.length ?? 0)
+                    dichVu?.maDichVu === 99 && selectedSeats.length !== 1
                       ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                       : "bg-blue-600 text-white hover:bg-blue-700"
                   }`}

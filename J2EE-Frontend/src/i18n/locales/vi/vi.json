@@ -458,7 +458,35 @@
       "added": "Đã thêm",
       "error_select_seats_round": "Vui lòng chọn đủ {{count}} ghế cho cả chuyến đi và chuyến về.",
       "error_select_seats_oneway": "Vui lòng chọn đủ {{count}} ghế cho chuyến đi.",
-      "error_select_seats_return": "Vui lòng chọn đủ {{count}} ghế cho chuyến về."
+      "error_select_seats_return": "Vui lòng chọn đủ {{count}} ghế cho chuyến về.",
+      "select_passenger": "Chọn hành khách",
+      "services_for": "Dịch vụ cho",
+      "items": "dịch vụ",
+      "passenger_total": "Tổng dịch vụ hành khách này"
+    },
+    "stepper": {
+      "flight": "Chọn chuyến bay",
+      "info": "Thông tin",
+      "services": "Dịch vụ",
+      "payment": "Thanh toán"
+    },
+    "discount": {
+      "title": "Mã giảm giá",
+      "placeholder": "Nhập mã giảm giá",
+      "apply": "Áp dụng",
+      "saved": "Bạn tiết kiệm được",
+      "remove": "Xóa",
+      "invalid_code": "Mã giảm giá không hợp lệ",
+      "check_error": "Không thể kiểm tra mã giảm giá"
+    },
+    "price_breakdown": {
+      "outbound_fare": "Giá vé chiều đi",
+      "return_fare": "Giá vé chiều về",
+      "taxes_fees": "Thuế và phí",
+      "services_total": "Dịch vụ bổ sung",
+      "discount": "Giảm giá",
+      "total": "Tổng cộng",
+      "per_person": "x {{count}} hành khách"
     },
     "payment": {
       "title": "Thanh toán",

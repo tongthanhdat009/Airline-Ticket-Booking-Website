@@ -71,8 +71,8 @@ function ThongTinThanhToan({ cb, onBackToChonChuyenDi = () => {}, onBackToChonCh
 
     return (
         <div className="w-full md:w-[400px]">
-            <div className="flex justify-start text-lg md:text-xl font-bold bg-[#1E88E5] text-white p-3 md:p-4 rounded-t-md">{t('booking.summary.header')}</div>
-            <div className="p-3 md:p-4 bg-white">
+            <div className="flex justify-start text-lg md:text-xl font-bold bg-[#1E88E5] text-white p-3 md:p-4 rounded-t-2xl">{t('booking.summary.header')}</div>
+            <div className="p-3 md:p-4 bg-white/80 backdrop-blur-md border border-white/20">
                 <div className="flex justify-between bg-gray-200 px-3 md:px-4 py-2" onClick={() => toggleExpand("thongTinKhachHang")}>
                     <div className="text-sm md:text-base">{t('booking.summary.passenger_info')}</div>
                     {cb.passengerInfo && (
@@ -99,7 +99,7 @@ function ThongTinThanhToan({ cb, onBackToChonChuyenDi = () => {}, onBackToChonCh
                                                                                                                                                                                                 }}/></> : ""}</span>
                 </div>
             </div>
-            <div className="p-4 bg-white">
+            <div className="p-4 bg-white/80 backdrop-blur-sm">
                 <div className="flex text-sm justify-start font-bold">
                     <span className="mr-1">{sanBayDi?.thanhPhoSanBay}</span>
                     <span>({sanBayDi?.maIATA})</span>
@@ -196,7 +196,7 @@ function ThongTinThanhToan({ cb, onBackToChonChuyenDi = () => {}, onBackToChonCh
                             </span>
                         </div>
                     </div>
-                    <div className="p-4 bg-white">
+                    <div className="p-4 bg-white/80 backdrop-blur-sm">
                         <div className="flex text-sm justify-start font-bold">
                             <span className="mr-1">{sanBayDen?.thanhPhoSanBay}</span>
                             <span>({sanBayDen?.maIATA})</span>

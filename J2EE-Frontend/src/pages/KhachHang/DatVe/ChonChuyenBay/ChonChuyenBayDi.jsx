@@ -9,6 +9,7 @@ import HeaderTimKiemChuyen from "../../../../components/KhachHang/HeaderTimKiemC
 import ThongTinThanhToan from "../../../../components/KhachHang/ThongTinThanhToan"
 import DanhSachNgayBay from "../../../../components/KhachHang/DanhSachNgayBay";
 import FlightCard from "../../../../components/KhachHang/FlightCard/FlightCard";
+import BookingStepper from "../../../../components/KhachHang/Booking/BookingStepper";
 import { useTranslation } from 'react-i18next';
 import useTitle from '../../../../hooks/useTitle';
 
@@ -149,9 +150,10 @@ function ChonChuyenBay() {
             {/* Content wrapper */}
             <div className="relative z-10">
             <HeaderTimKiemChuyen data={{...formData, sanBayDi, sanBayDen}}/>
+            <BookingStepper currentStep={0} />
             <div className="px-4 md:px-8 lg:px-16 xl:px-32 flex flex-col lg:flex-row gap-4 lg:gap-8">
                 <div className="w-full lg:w-2/3 flex flex-col mb-50">
-                    <div className="flex items-center justify-between bg-white px-4 md:px-8">
+                    <div className="flex items-center justify-between bg-white/80 backdrop-blur-md rounded-2xl shadow-lg px-4 md:px-8 border border-white/20">
                         <div className="flex flex-col p-2 items-center">
                             <span className="font-bold text-xl md:text-2xl">{sanBayDi?.maIATA}</span>
                             <span className="text-xs md:text-sm">{formData.departure}</span>
