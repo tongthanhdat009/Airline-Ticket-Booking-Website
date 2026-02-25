@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { FaEye, FaEdit, FaTrash, FaConciergeBell } from 'react-icons/fa';
 import PropTypes from 'prop-types';
+import { getServiceImageUrl } from '../../../config/api.config';
 
 /**
  * DichVuCard - Card component for displaying service information

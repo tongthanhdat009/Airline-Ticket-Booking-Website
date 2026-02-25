@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAssetUrl } from '../../../config/api.config';
+import { getServiceImageUrl } from '../../../config/api.config';
 
 const ServiceModal = ({ service, onClose, onSave }) => {
  const [formData, setFormData] = useState({

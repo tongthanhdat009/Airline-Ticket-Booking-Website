@@ -2,7 +2,7 @@
 import { FaPlus, FaEdit, FaTrash, FaConciergeBell } from 'react-icons/fa';
 import CreateOptionModal from './CreateOptionModal';
 import EditOptionModal from './EditOptionModal';
-import { getAssetUrl } from '../../../config/api.config';
+import { getServiceOptionImageUrl } from '../../../config/api.config';
 
 const ServiceDetailModal = ({ service, options, onClose, onCreateOption, onEditOption, onDeleteOption }) => {
  const [isCreateOptionModalOpen, setIsCreateOptionModalOpen] = useState(false);

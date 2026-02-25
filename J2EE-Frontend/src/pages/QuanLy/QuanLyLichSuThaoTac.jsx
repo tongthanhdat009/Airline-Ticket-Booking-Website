@@ -257,41 +257,41 @@ const QuanLyLichSuThaoTac = () => {
  return (
  <Card title="Lịch sử thao tác">
  {/* Thống kê tổng quan */}
- <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
- <div className="bg-linear-to-br from-green-500 to-emerald-600 rounded-xl p-5 text-white shadow-lg">
+ <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+ <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-4 sm:p-5 text-white shadow-lg">
  <div className="flex items-center justify-between">
- <div>
- <p className="text-sm font-medium opacity-90">Tổng thao tác</p>
- <p className="text-3xl font-bold mt-2">{statistics.totalLogs}</p>
+ <div className="min-w-0">
+ <p className="text-xs sm:text-sm font-medium opacity-90 truncate">Tổng thao tác</p>
+ <p className="text-2xl sm:text-3xl font-bold mt-1 sm:mt-2">{statistics.totalLogs}</p>
  </div>
- <FaHistory size={40} className="opacity-80" />
+ <FaHistory size={32} className="opacity-80 shrink-0 ml-2" />
  </div>
  </div>
- <div className="bg-linear-to-br from-blue-500 to-cyan-600 rounded-xl p-5 text-white shadow-lg">
+ <div className="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl p-4 sm:p-5 text-white shadow-lg">
  <div className="flex items-center justify-between">
- <div>
- <p className="text-sm font-medium opacity-90">Thao tác Admin</p>
- <p className="text-3xl font-bold mt-2">{statistics.adminActions}</p>
+ <div className="min-w-0">
+ <p className="text-xs sm:text-sm font-medium opacity-90 truncate">Thao tác Admin</p>
+ <p className="text-2xl sm:text-3xl font-bold mt-1 sm:mt-2">{statistics.adminActions}</p>
  </div>
- <FaHistory size={40} className="opacity-80" />
+ <FaHistory size={32} className="opacity-80 shrink-0 ml-2" />
  </div>
  </div>
- <div className="bg-linear-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
+ <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 sm:p-5 text-white shadow-lg">
  <div className="flex items-center justify-between">
- <div>
- <p className="text-sm font-medium opacity-90">Thao tác KH</p>
- <p className="text-3xl font-bold mt-2">{statistics.customerActions}</p>
+ <div className="min-w-0">
+ <p className="text-xs sm:text-sm font-medium opacity-90 truncate">Thao tác KH</p>
+ <p className="text-2xl sm:text-3xl font-bold mt-1 sm:mt-2">{statistics.customerActions}</p>
  </div>
- <FaHistory size={40} className="opacity-80" />
+ <FaHistory size={32} className="opacity-80 shrink-0 ml-2" />
  </div>
  </div>
- <div className="bg-linear-to-br from-orange-500 to-red-600 rounded-xl p-5 text-white shadow-lg">
+ <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-xl p-4 sm:p-5 text-white shadow-lg">
  <div className="flex items-center justify-between">
- <div>
- <p className="text-sm font-medium opacity-90">Hôm nay</p>
- <p className="text-3xl font-bold mt-2">{statistics.todayLogs}</p>
+ <div className="min-w-0">
+ <p className="text-xs sm:text-sm font-medium opacity-90 truncate">Hôm nay</p>
+ <p className="text-2xl sm:text-3xl font-bold mt-1 sm:mt-2">{statistics.todayLogs}</p>
  </div>
- <FaHistory size={40} className="opacity-80" />
+ <FaHistory size={32} className="opacity-80 shrink-0 ml-2" />
  </div>
  </div>
  </div>
@@ -299,14 +299,14 @@ const QuanLyLichSuThaoTac = () => {
  {/* Thanh công cụ */}
  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-3">
  <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full lg:w-auto">
- <div className="relative w-full sm:w-auto min-w-[250px]">
+ <div className="relative w-full sm:w-auto sm:min-w-[250px]">
  <input
  type="text"
  placeholder="Tìm kiếm theo mô tả, ngưởi thực hiện..."
  value={search}
  onChange={(e) => setSearch(e.target.value)}
  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
- className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm"
+ className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm text-sm"
  />
  <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
  </div>
@@ -316,7 +316,7 @@ const QuanLyLichSuThaoTac = () => {
  setFilterLoaiThaoTac(e.target.value);
  setCurrentPage(0);
  }}
- className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm"
+ className="w-full sm:w-auto px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm text-sm"
  >
  <option value="">Tất cả thao tác</option>
  {loaiThaoTacList.map((loai) => (
@@ -331,7 +331,7 @@ const QuanLyLichSuThaoTac = () => {
  setFilterBangAnhHuong(e.target.value);
  setCurrentPage(0);
  }}
- className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm"
+ className="w-full sm:w-auto px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm text-sm"
  >
  <option value="">Tất cả bảng</option>
  {bangAnhHuongList.map((bang) => (
@@ -350,10 +350,10 @@ const QuanLyLichSuThaoTac = () => {
  <button
  onClick={handleSearch}
  disabled={loading}
- className="flex items-center gap-2 bg-green-500 text-white px-5 py-3 rounded-lg hover:bg-green-600 transition-all shadow-lg hover:shadow-xl font-semibold shrink-0 disabled:opacity-50"
+ className="flex items-center gap-2 bg-green-500 text-white px-4 sm:px-5 py-3 rounded-lg hover:bg-green-600 transition-all shadow-lg hover:shadow-xl font-semibold shrink-0 disabled:opacity-50 text-sm"
  >
  {loading ? <FaSpinner className="animate-spin" /> : <FaFilter />}
- <span>Tìm kiếm</span>
+ <span className="hidden sm:inline">Tìm kiếm</span>
  </button>
  </div>
  </div>
@@ -363,18 +363,18 @@ const QuanLyLichSuThaoTac = () => {
  <button
  onClick={handleExportPdf}
  disabled={loading}
- className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all shadow-md disabled:opacity-50"
+ className="flex items-center gap-2 bg-red-500 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-red-600 transition-all shadow-md disabled:opacity-50 text-sm"
  >
  {loading ? <FaSpinner className="animate-spin" /> : <FaFilePdf />}
- <span>Export PDF</span>
+ <span className="hidden sm:inline">Export PDF</span>
  </button>
  <button
  onClick={handleExportExcel}
  disabled={loading}
- className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all shadow-md disabled:opacity-50"
+ className="flex items-center gap-2 bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-green-700 transition-all shadow-md disabled:opacity-50 text-sm"
  >
  {loading ? <FaSpinner className="animate-spin" /> : <FaFileExcel />}
- <span>Export Excel</span>
+ <span className="hidden sm:inline">Export Excel</span>
  </button>
  </div>
 
@@ -401,14 +401,14 @@ const QuanLyLichSuThaoTac = () => {
  <table className="w-full text-sm">
  <thead className="bg-gray-50 text-gray-600">
  <tr>
- <th className="px-6 py-4 text-left font-semibold">Mã Log</th>
- <th className="px-6 py-4 text-left font-semibold">Loại thao tác</th>
- <th className="px-6 py-4 text-left font-semibold">Bảng ảnh hưởng</th>
- <th className="px-6 py-4 text-left font-semibold">Người thực hiện</th>
- <th className="px-6 py-4 text-left font-semibold">Mô tả</th>
- <th className="px-6 py-4 text-left font-semibold">IP</th>
- <th className="px-6 py-4 text-left font-semibold">Thời gian</th>
- <th className="px-6 py-4 text-center font-semibold">Thao tác</th>
+ <th className="px-4 sm:px-6 py-3 sm:py-4 text-left font-semibold whitespace-nowrap">Mã Log</th>
+ <th className="px-4 sm:px-6 py-3 sm:py-4 text-left font-semibold whitespace-nowrap">Loại thao tác</th>
+ <th className="px-4 sm:px-6 py-3 sm:py-4 text-left font-semibold whitespace-nowrap">Bảng ảnh hưởng</th>
+ <th className="px-4 sm:px-6 py-3 sm:py-4 text-left font-semibold whitespace-nowrap">Người thực hiện</th>
+ <th className="px-4 sm:px-6 py-3 sm:py-4 text-left font-semibold whitespace-nowrap hidden md:table-cell">Mô tả</th>
+ <th className="px-4 sm:px-6 py-3 sm:py-4 text-left font-semibold whitespace-nowrap hidden lg:table-cell">IP</th>
+ <th className="px-4 sm:px-6 py-3 sm:py-4 text-left font-semibold whitespace-nowrap hidden sm:table-cell">Thời gian</th>
+ <th className="px-4 sm:px-6 py-3 sm:py-4 text-center font-semibold whitespace-nowrap">Thao tác</th>
  </tr>
  </thead>
  <tbody className="divide-y divide-gray-200">
@@ -427,32 +427,32 @@ const QuanLyLichSuThaoTac = () => {
  const loaiTaiKhoan = getLoaiTaiKhoanText(log.loaiTaiKhoan);
  return (
  <tr key={log.maLog} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-green-50 transition-colors`}>
- <td className="px-6 py-4 font-bold text-green-600">#{log.maLog}</td>
- <td className="px-6 py-4">
- <span className={`px-3 py-1 rounded-full text-xs font-semibold ${loaiThaoTac.color}`}>
+ <td className="px-4 sm:px-6 py-3 sm:py-4 font-bold text-green-600 whitespace-nowrap">#{log.maLog}</td>
+ <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+ <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${loaiThaoTac.color}`}>
  {loaiThaoTac.text}
  </span>
  </td>
- <td className="px-6 py-4">
+ <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
  <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-mono">
  {formatBangAnhHuong(log.bangAnhHuong)}
  </span>
- <span className="text-xs text-gray-500 ml-1">#{log.maBanGhi}</span>
+ <span className="text-xs text-gray-500 ml-1 hidden sm:inline">#{log.maBanGhi}</span>
  </td>
- <td className="px-6 py-4">
- <div>
- <p className="font-medium text-gray-900">{log.nguoiThucHien}</p>
+ <td className="px-4 sm:px-6 py-3 sm:py-4">
+ <div className="min-w-0">
+ <p className="font-medium text-gray-900 truncate max-w-[100px] sm:max-w-[150px]">{log.nguoiThucHien}</p>
  <span className={`inline-block px-2 py-0.5 rounded text-xs mt-1 ${loaiTaiKhoan.color}`}>
  {loaiTaiKhoan.text}
  </span>
  </div>
  </td>
- <td className="px-6 py-4 text-gray-700 max-w-xs truncate" title={log.moTa}>
+ <td className="px-4 sm:px-6 py-3 sm:py-4 text-gray-700 max-w-xs truncate hidden md:table-cell" title={log.moTa}>
  {log.moTa}
  </td>
- <td className="px-6 py-4 text-xs text-gray-500 font-mono">{log.diaChiIp || '-'}</td>
- <td className="px-6 py-4 text-gray-700">{formatDateTime(log.thoiGian)}</td>
- <td className="px-6 py-4">
+ <td className="px-4 sm:px-6 py-3 sm:py-4 text-xs text-gray-500 font-mono hidden lg:table-cell whitespace-nowrap">{log.diaChiIp || '-'}</td>
+ <td className="px-4 sm:px-6 py-3 sm:py-4 text-gray-700 hidden sm:table-cell whitespace-nowrap text-xs sm:text-sm">{formatDateTime(log.thoiGian)}</td>
+ <td className="px-4 sm:px-6 py-3 sm:py-4">
  <div className="flex justify-center items-center gap-2">
  <button
  onClick={() => handleViewDetail(log)}
@@ -501,36 +501,45 @@ const QuanLyLichSuThaoTac = () => {
  <option value={50}>50 / trang</option>
  </select>
  </div>
- <nav>
- <ul className="flex gap-2">
+ <nav className="w-full sm:w-auto overflow-x-auto">
+ <ul className="flex gap-1 sm:gap-2 justify-center sm:justify-start min-w-max">
  <li>
  <button
  onClick={() => paginate(currentPage - 1)}
  disabled={currentPage === 0}
- className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm"
+ className="px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm text-sm"
  >
  ← Trước
  </button>
  </li>
- {[...Array(totalPages)].map((_, index) => (
- <li key={index}>
+ {(() => {
+ // Hiển thị tối đa 5 trang, căn giữa trang hiện tại
+ const maxVisible = 5;
+ let startPage = Math.max(0, currentPage - Math.floor(maxVisible / 2));
+ let endPage = Math.min(totalPages, startPage + maxVisible);
+ if (endPage - startPage < maxVisible) {
+ startPage = Math.max(0, endPage - maxVisible);
+ }
+ return Array.from({ length: endPage - startPage }, (_, i) => startPage + i).map((pageIndex) => (
+ <li key={pageIndex}>
  <button
- onClick={() => paginate(index)}
- className={`px-4 py-2 rounded-lg font-medium transition-all ${
- currentPage === index
+ onClick={() => paginate(pageIndex)}
+ className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg font-medium transition-all text-sm ${
+ currentPage === pageIndex
  ? 'bg-green-600 text-white shadow-lg'
  : 'bg-white border border-gray-300 hover:bg-gray-100'
  }`}
  >
- {index + 1}
+ {pageIndex + 1}
  </button>
  </li>
- ))}
+ ));
+ })()}
  <li>
  <button
  onClick={() => paginate(currentPage + 1)}
  disabled={currentPage === totalPages - 1}
- className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm"
+ className="px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all shadow-sm text-sm"
  >
  Sau →
  </button>
@@ -542,17 +551,17 @@ const QuanLyLichSuThaoTac = () => {
 
  {/* Modal chi tiết */}
  {isDetailModalOpen && selectedLog && (
- <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4">
- <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
- <div className="bg-green-600 text-white p-6 rounded-t-xl sticky top-0">
- <div className="flex justify-between items-center">
- <div>
- <h2 className="text-2xl font-bold">Chi tiết thao tác</h2>
+ <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-2 sm:p-4">
+ <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+ <div className="bg-green-600 text-white p-4 sm:p-6 rounded-t-xl sticky top-0">
+ <div className="flex justify-between items-start sm:items-center gap-3">
+ <div className="min-w-0">
+ <h2 className="text-xl sm:text-2xl font-bold truncate">Chi tiết thao tác</h2>
  <p className="text-sm opacity-90 mt-1">Mã Log: #{selectedLog.maLog}</p>
  </div>
  <button
  onClick={handleCloseDetailModal}
- className="text-white hover:text-gray-200 transition-colors"
+ className="text-white hover:text-gray-200 transition-colors shrink-0 p-1"
  >
  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -561,14 +570,14 @@ const QuanLyLichSuThaoTac = () => {
  </div>
  </div>
 
- <div className="p-6">
+ <div className="p-4 sm:p-6">
  {/* Thông tin cơ bản */}
  <div className="mb-6">
- <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
- <div className="w-1 h-6 bg-green-600 rounded-full"></div>
+ <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
+ <div className="w-1 h-5 sm:h-6 bg-green-600 rounded-full"></div>
  Thông tin thao tác
  </h3>
- <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
+ <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 bg-gray-50 p-3 sm:p-4 rounded-lg">
  <div>
  <p className="text-xs text-gray-500 font-semibold">Loại thao tác</p>
  <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mt-1 ${getLoaiThaoTacText(selectedLog.loaiThaoTac).color}`}>
@@ -583,11 +592,11 @@ const QuanLyLichSuThaoTac = () => {
  </div>
  <div>
  <p className="text-xs text-gray-500 font-semibold">Ngưởi thực hiện</p>
- <p className="font-medium text-gray-900">{selectedLog.nguoiThucHien}</p>
+ <p className="font-medium text-gray-900 break-all">{selectedLog.nguoiThucHien}</p>
  </div>
  <div>
  <p className="text-xs text-gray-500 font-semibold">Địa chỉ IP</p>
- <p className="font-mono text-sm text-gray-700">{selectedLog.diaChiIp || '-'}</p>
+ <p className="font-mono text-sm text-gray-700 break-all">{selectedLog.diaChiIp || '-'}</p>
  </div>
  <div>
  <p className="text-xs text-gray-500 font-semibold">Bảng ảnh hưởng</p>
@@ -600,9 +609,9 @@ const QuanLyLichSuThaoTac = () => {
  <p className="text-xs text-gray-500 font-semibold">Thờ gian</p>
  <p className="font-medium text-gray-900">{formatDateTime(selectedLog.thoiGian)}</p>
  </div>
- <div className="md:col-span-2">
+ <div className="sm:col-span-2">
  <p className="text-xs text-gray-500 font-semibold">Mô tả</p>
- <p className="font-medium text-gray-900">{selectedLog.moTa || '-'}</p>
+ <p className="font-medium text-gray-900 break-all">{selectedLog.moTa || '-'}</p>
  </div>
  </div>
  </div>
@@ -610,12 +619,12 @@ const QuanLyLichSuThaoTac = () => {
  {/* Dữ liệu cũ */}
  {selectedLog.duLieuCu && (
  <div className="mb-6">
- <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
- <div className="w-1 h-6 bg-red-600 rounded-full"></div>
+ <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
+ <div className="w-1 h-5 sm:h-6 bg-red-600 rounded-full"></div>
  Dữ liệu trước khi thay đổi
  </h3>
- <div className="bg-gray-50 p-4 rounded-lg">
- <pre className="text-xs overflow-x-auto text-gray-800">
+ <div className="bg-gray-50 p-3 sm:p-4 rounded-lg overflow-x-auto">
+ <pre className="text-xs text-gray-800 whitespace-pre-wrap break-all">
  {JSON.stringify(JSON.parse(selectedLog.duLieuCu), null, 2)}
  </pre>
  </div>
@@ -625,12 +634,12 @@ const QuanLyLichSuThaoTac = () => {
  {/* Dữ liệu mới */}
  {selectedLog.duLieuMoi && (
  <div className="mb-6">
- <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
- <div className="w-1 h-6 bg-green-600 rounded-full"></div>
+ <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
+ <div className="w-1 h-5 sm:h-6 bg-green-600 rounded-full"></div>
  Dữ liệu sau khi thay đổi
  </h3>
- <div className="bg-gray-50 p-4 rounded-lg">
- <pre className="text-xs overflow-x-auto text-gray-800">
+ <div className="bg-gray-50 p-3 sm:p-4 rounded-lg overflow-x-auto">
+ <pre className="text-xs text-gray-800 whitespace-pre-wrap break-all">
  {JSON.stringify(JSON.parse(selectedLog.duLieuMoi), null, 2)}
  </pre>
  </div>
@@ -640,7 +649,7 @@ const QuanLyLichSuThaoTac = () => {
  <div className="flex justify-end gap-3 mt-6">
  <button
  onClick={handleCloseDetailModal}
- className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold transition-colors"
+ className="w-full sm:w-auto px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold transition-colors"
  >
  Đóng
  </button>

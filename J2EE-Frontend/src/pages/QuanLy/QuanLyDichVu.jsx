@@ -6,7 +6,8 @@ import ViewToggleButton from '../../components/common/ViewToggleButton';
 import CardView from '../../components/common/CardView';
 import ResponsiveTable from '../../components/common/ResponsiveTable';
 import { useViewToggle } from '../../hooks/useViewToggle';
-import { getAllServices, fetchImageByName, getServiceOptions, createServiceOption, createService, updateServiceImage, updateService, deleteService, updateOption, deleteOption, updateOptionImage } from '../../services/QLDichVuService';
+import { getAllServices, getServiceOptions, createServiceOption, createService, updateServiceImage, updateService, deleteService, updateOption, deleteOption, updateOptionImage } from '../../services/QLDichVuService';
+import { getServiceImageUrl } from '../../config/api.config';
 import ServiceModal from '../../components/QuanLy/QuanLyDichVu/ServiceModal';
 import DeleteConfirmationModal from '../../components/QuanLy/QuanLyDichVu/DeleteConfirmationModal';
 import ServiceDetailModal from '../../components/QuanLy/QuanLyDichVu/ServiceDetailModal';
@@ -21,7 +22,6 @@ const QuanLyDichVu = () => {
   const [currentServiceDetail, setCurrentServiceDetail] = useState(null);
   const [serviceOptions, setServiceOptions] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [imageCache, setImageCache] = useState({}); // Cache để lưu ảnh đã tải
   const [currentPage, setCurrentPage] = useState(1);
   const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
   const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -30,44 +30,6 @@ const QuanLyDichVu = () => {
   useEffect(() => {
     fetchServices();
   }, []);
-
-  // Load ảnh từ API
-  useEffect(() => {
-    const loadImages = async () => {
-      const cache = {};
-      for (const service of services) {
-        if (service.anh && !imageCache[service.anh]) {
-          try {
-            // Lấy tên file từ đường dẫn (ví dụ: /AnhDichVuCungCap/1.svg -> 1.svg)
-            const imageName = service.anh.split('/').pop();
-            const response = await fetchImageByName(imageName);
-            // Tạo URL từ blob
-            const imageUrl = URL.createObjectURL(response.data);
-            cache[service.anh] = imageUrl;
-          } catch (error) {
-            console.error(`Error loading image ${service.anh}:`, error);
-            cache[service.anh] = null; // Đánh dấu ảnh lỗi
-          }
-        }
-      }
-      if (Object.keys(cache).length > 0) {
-        setImageCache(prev => ({ ...prev, ...cache }));
-      }
-    };
-
-    if (services.length > 0) {
-      loadImages();
-    }
-
-    // Cleanup: revoke object URLs khi component unmount
-    return () => {
-      Object.values(imageCache).forEach(url => {
-        if (url && url.startsWith('blob:')) {
-          URL.revokeObjectURL(url);
-        }
-      });
-    };
-  }, [services, imageCache]);
 
   const fetchServices = async () => {
     try{
@@ -305,10 +267,12 @@ const QuanLyDichVu = () => {
       setCurrentPage(1); // Reset to first page when changing items per page
   };
 
-  // Helper để lấy URL ảnh từ cache hoặc trả về placeholder
+  // Helper để lấy URL ảnh dịch vụ (hỗ trợ cả dev và production)
   const getImageUrl = (imagePath) => {
     if (!imagePath || imagePath.trim() === '') return '/no-product.png';
-    return imageCache[imagePath] || '/no-product.png';
+    // Lấy tên file từ đường dẫn (ví dụ: /AnhDichVuCungCap/1.svg -> 1.svg)
+    const imageName = imagePath.split('/').pop();
+    return getServiceImageUrl(imageName);
   };
 
   return (
