@@ -6,7 +6,7 @@ import DiscountCodeInput from '../../../components/KhachHang/Booking/DiscountCod
 import PriceBreakdown from '../../../components/KhachHang/Booking/PriceBreakdown';
 import { useTranslation } from 'react-i18next'
 
-import { formatCurrencyWithCommas, formatTime, formatDate } from '../../../services/utils';
+import { formatTime, formatDate } from '../../../services/utils';
 import VNPayService from '../../../services/VNPayService';
 import apiClient from '../../../services/apiClient';
 import { getClientAccessToken } from '../../../utils/cookieUtils';

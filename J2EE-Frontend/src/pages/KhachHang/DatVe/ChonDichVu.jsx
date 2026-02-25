@@ -142,13 +142,6 @@ function ChonDichVu() {
         return result;
     };
 
-    const dichVuChonChoNgoi = {
-        maDichVu: 99,
-        tenDichVu: t('booking.services.seat_selection'),
-        moTa: t('booking.services.select_seat_desc'),
-        anh: "/service/select-service_favorite-seat.cc6498ae.svg",
-    };
-
     const tiepTucOnClick = () => {
         // Kiểm tra từng hành khách đã chọn ghế chưa
         const soHK = soHanhKhach;

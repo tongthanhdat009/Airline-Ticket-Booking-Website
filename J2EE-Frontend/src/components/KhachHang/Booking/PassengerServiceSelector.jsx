@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
 import { IoCheckmarkCircle } from 'react-icons/io5';
@@ -10,7 +10,6 @@ import { getServiceImageUrl } from '../../../config/api.config';
  * @param {Array} passengerInfo - Danh sách hành khách
  * @param {Array} dichVuList - Danh sách dịch vụ cung cấp
  * @param {object} selectedServices - Dịch vụ đã chọn { passengers: [...] }
- * @param {string} flightType - 'round' hoặc 'one_way'
  * @param {function} onOpenPanel - Callback khi mở panel chi tiết dịch vụ
  * @param {number} activePassenger - Index hành khách đang active
  * @param {function} onChangePassenger - Callback khi đổi hành khách
@@ -19,7 +18,6 @@ function PassengerServiceSelector({
     passengerInfo = [],
     dichVuList = [],
     selectedServices = {},
-    flightType = 'one_way',
     onOpenPanel,
     activePassenger = 0,
     onChangePassenger,
@@ -73,7 +71,6 @@ function PassengerServiceSelector({
                 </h3>
                 <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
                     {passengerInfo.map((p, idx) => {
-                        const serviceTotal = getPassengerServiceTotal(idx);
                         const serviceCount = getServiceCount(idx);
                         return (
                             <button
