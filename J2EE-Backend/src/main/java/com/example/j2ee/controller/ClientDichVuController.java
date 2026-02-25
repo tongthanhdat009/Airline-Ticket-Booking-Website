@@ -145,6 +145,7 @@ public class ClientDichVuController {
 
     /**
      * Thêm dịch vụ vào đặt chỗ
+     * Ràng buộc: Chuyến bay phải đang mở bán và đã thanh toán
      */
     @PostMapping("/add")
     public ResponseEntity<Map<String, Object>> addService(@RequestBody AddServiceRequest request) {
@@ -160,6 +161,40 @@ public class ClientDichVuController {
                 errorResponse.put("success", false);
                 errorResponse.put("message", "Không tìm thấy đặt chỗ");
                 return ResponseEntity.status(404).body(errorResponse);
+            }
+            
+            // Kiểm tra trạng thái chuyến bay - chỉ cho phép khi "Đang mở bán"
+            ChiTietChuyenBay chuyenBay = datCho.getChuyenBay();
+            if (chuyenBay == null) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "Không tìm thấy thông tin chuyến bay");
+                return ResponseEntity.status(400).body(errorResponse);
+            }
+            
+            if (!"Đang mở bán".equals(chuyenBay.getTrangThai())) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "Không thể đặt dịch vụ - Chuyến bay không còn mở bán (Trạng thái: " + chuyenBay.getTrangThai() + ")");
+                return ResponseEntity.status(400).body(errorResponse);
+            }
+            
+            // Kiểm tra trạng thái thanh toán - phải đã thanh toán
+            TrangThaiThanhToan thanhToan = datCho.getDonHang() != null 
+                ? trangThaiThanhToanRepository.findByDonHang_MaDonHang(datCho.getDonHang().getMaDonHang()) 
+                : null;
+            if (thanhToan == null) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "Không tìm thấy thông tin thanh toán");
+                return ResponseEntity.status(400).body(errorResponse);
+            }
+            
+            if (thanhToan.getDaThanhToan() != 'Y') {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "Vui lòng hoàn tất thanh toán vé trước khi đặt thêm dịch vụ");
+                return ResponseEntity.status(400).body(errorResponse);
             }
             
             // Kiểm tra lựa chọn dịch vụ
@@ -186,9 +221,6 @@ public class ClientDichVuController {
             datChoDichVuRepository.save(datChoDichVu);
             
             // Cập nhật tổng tiền thanh toán (thông qua DonHang)
-            TrangThaiThanhToan thanhToan = datCho.getDonHang() != null 
-                ? trangThaiThanhToanRepository.findByDonHang_MaDonHang(datCho.getDonHang().getMaDonHang()) 
-                : null;
             if (thanhToan != null) {
                 BigDecimal giaDichVu = luaChon.getGia().multiply(new BigDecimal(soLuong));
                 BigDecimal tongTienMoi = thanhToan.getSoTien().add(giaDichVu);

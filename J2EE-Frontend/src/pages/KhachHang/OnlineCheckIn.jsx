@@ -36,8 +36,12 @@ function OnlineCheckIn() {
         setError(response.message || t('pages.tra_cuu.error_not_found'));
       }
     } catch (err) {
-      setError(t('pages.online_checkin.error_connection'));
       console.error("Search error:", err);
+      if (err.response?.status === 429) {
+        setError("Bạn đã gửi quá nhiều yêu cầu. Vui lòng đợi một lát rồi thử lại.");
+      } else {
+        setError(err.response?.data?.message || t('pages.online_checkin.error_connection'));
+      }
     } finally {
       setLoading(false);
     }
@@ -56,8 +60,12 @@ function OnlineCheckIn() {
         setError(response.message || t('pages.online_checkin.error_connection'));
       }
     } catch (err) {
-      setError(t('pages.online_checkin.error_connection'));
       console.error("Check-in error:", err);
+      if (err.response?.status === 429) {
+        setError("Bạn đã gửi quá nhiều yêu cầu. Vui lòng đợi một lát rồi thử lại.");
+      } else {
+        setError(err.response?.data?.message || t('pages.online_checkin.error_connection'));
+      }
     } finally {
       setLoading(false);
     }

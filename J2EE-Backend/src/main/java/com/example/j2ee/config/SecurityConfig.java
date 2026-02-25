@@ -107,8 +107,8 @@ public class SecurityConfig {
                         // OAuth2
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                         .requestMatchers("/error").permitAll()
-                        // VNPay, Check-in, Booking, Coupon, Chat endpoints
-                        .requestMatchers("/vnpay/**", "/checkin/**", "/client/datcho/**", "/client/khuyenmai/**").permitAll()
+                        // VNPay, Check-in, Booking, Coupon, Services, Chat endpoints
+                        .requestMatchers("/vnpay/**", "/checkin/**", "/client/datcho/**", "/client/khuyenmai/**", "/client/dichvu/**").permitAll()
                         .requestMatchers("/api/chat/start", "/api/chat/message", "/api/chat/history/**", "/api/chat/session/**").permitAll()
                         .requestMatchers("/api/chat/admin/**").access(dynamicAdminAuthManager)
                         // AI Chat suggestion (admin only)

@@ -48,7 +48,11 @@ function DichVuChuyenBay() {
       }
     } catch (err) {
       console.error("Error fetching services:", err);
-      setError(err.response?.data?.message || t('pages.dich_vu_chuyen_bay.error_not_found'));
+      if (err.response?.status === 429) {
+        setError("Bạn đã gửi quá nhiều yêu cầu. Vui lòng đợi một lát rồi thử lại.");
+      } else {
+        setError(err.response?.data?.message || t('pages.dich_vu_chuyen_bay.error_not_found'));
+      }
     } finally {
       setLoading(false);
     }
@@ -102,7 +106,15 @@ function DichVuChuyenBay() {
       
     } catch (err) {
       console.error("Error adding services:", err);
-      setError(err.response?.data?.message || "Không thể thêm dịch vụ. Vui lòng thử lại.");
+      const errorMsg = err.response?.data?.message;
+      if (err.response?.status === 429) {
+        setError("Bạn đã gửi quá nhiều yêu cầu. Vui lòng đợi một lát rồi thử lại.");
+      } else if (err.response?.status === 400) {
+        // Lỗi nghiệp vụ: chuyến bay không mở bán hoặc chưa thanh toán
+        setError(errorMsg || "Không thể thêm dịch vụ. Chuyến bay có thể không còn mở bán hoặc chưa thanh toán.");
+      } else {
+        setError(errorMsg || "Không thể thêm dịch vụ. Vui lòng thử lại.");
+      }
     } finally {
       setLoading(false);
     }

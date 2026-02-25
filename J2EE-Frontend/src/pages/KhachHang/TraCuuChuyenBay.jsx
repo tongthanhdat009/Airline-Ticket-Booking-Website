@@ -36,7 +36,11 @@ function TraCuuChuyenBay() {
       }
     } catch (err) {
       console.error("Error searching booking:", err);
-      setError(err.response?.data?.message || "Không tìm thấy thông tin đặt chỗ. Vui lòng kiểm tra lại mã đặt chỗ và tên hành khách.");
+      if (err.response?.status === 429) {
+        setError("Bạn đã gửi quá nhiều yêu cầu. Vui lòng đợi một lát rồi thử lại.");
+      } else {
+        setError(err.response?.data?.message || "Không tìm thấy thông tin đặt chỗ. Vui lòng kiểm tra lại mã đặt chỗ và tên hành khách.");
+      }
     } finally {
       setLoading(false);
     }
