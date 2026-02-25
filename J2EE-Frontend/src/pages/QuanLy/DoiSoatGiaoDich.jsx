@@ -60,6 +60,20 @@ const formatCurrency = (amount) => {
  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 };
 
+// Hàm format tiền gọn (>= 1M → 1M ₫)
+const formatCompact = (amount) => {
+ const abs = Math.abs(amount);
+ if (abs >= 1_000_000_000) {
+ const val = (amount / 1_000_000_000).toLocaleString('vi-VN', { maximumFractionDigits: 1 });
+ return `${val}B ₫`;
+ }
+ if (abs >= 1_000_000) {
+ const val = (amount / 1_000_000).toLocaleString('vi-VN', { maximumFractionDigits: 1 });
+ return `${val}M ₫`;
+ }
+ return formatCurrency(amount);
+};
+
 // Trạng thái đối soát config
 const trangThaiConfig = {
  khop: { label: 'Khớp', color: 'bg-green-100 text-green-700', icon: FaCheckCircle },
@@ -307,12 +321,12 @@ const DoiSoatGiaoDich = () => {
  </div>
  <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
  <div className="flex items-center gap-3">
- <div className="p-2 bg-orange-100 rounded-lg">
+ <div className="p-2 bg-orange-100 rounded-lg shrink-0">
  <FaDollarSign className="text-orange-600" />
  </div>
- <div>
+ <div className="min-w-0">
  <p className="text-sm text-orange-600">Chênh lệch</p>
- <p className="text-2xl font-bold text-orange-700">{formatCurrency(Math.abs(stats.chenhLech))}</p>
+ <p className="text-base font-bold text-orange-700 leading-tight break-all">{formatCompact(Math.abs(stats.chenhLech))}</p>
  </div>
  </div>
  </div>

@@ -231,40 +231,49 @@ const QuanLyMayBay = () => {
 
             {/* Thống kê tổng quan */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div className="bg-linear-to-br from-sky-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
+                <div className="bg-white border-l-4 border-l-sky-500 rounded-xl p-5 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium opacity-90">Tổng số máy bay</p>
-                            <p className="text-3xl font-bold mt-2">{aircrafts.length}</p>
+                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Tổng số máy bay</p>
+                            <p className="text-2xl font-bold mt-1.5 text-gray-800">{aircrafts.length}</p>
                         </div>
-                        <FaFighterJet size={40} className="opacity-80" />
+                        <div className="p-3 bg-sky-50 rounded-lg">
+                            <FaFighterJet size={22} className="text-sky-500" />
+                        </div>
                     </div>
                 </div>
-                <div className="bg-linear-to-br from-green-500 to-emerald-600 rounded-xl p-5 text-white shadow-lg">
+                <div className="bg-white border-l-4 border-l-emerald-500 rounded-xl p-5 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium opacity-90">Đang hoạt động</p>
-                            <p className="text-3xl font-bold mt-2">{aircrafts.filter(a => a.trangThai === 'Active').length}</p>
+                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Đang hoạt động</p>
+                            <p className="text-2xl font-bold mt-1.5 text-gray-800">{aircrafts.filter(a => a.trangThai === 'Active').length}</p>
                         </div>
-                        <FaFighterJet size={40} className="opacity-80" />
+                        <div className="p-3 bg-emerald-50 rounded-lg">
+                            <FaFighterJet size={22} className="text-emerald-500" />
+                        </div>
                     </div>
                 </div>
-                <div className="bg-linear-to-br from-yellow-500 to-orange-600 rounded-xl p-5 text-white shadow-lg">
+                <div className="bg-white border-l-4 border-l-amber-500 rounded-xl p-5 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium opacity-90">Đang bảo trì</p>
-                            <p className="text-3xl font-bold mt-2">{aircrafts.filter(a => a.trangThai === 'Maintenance').length}</p>
+                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Đang bảo trì</p>
+                            <p className="text-2xl font-bold mt-1.5 text-gray-800">{aircrafts.filter(a => a.trangThai === 'Maintenance').length}</p>
                         </div>
-                        <FaFighterJet size={40} className="opacity-80" />
+                        <div className="p-3 bg-amber-50 rounded-lg">
+                            <FaWrench size={22} className="text-amber-500" />
+                        </div>
                     </div>
                 </div>
-                <div className="bg-linear-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
+                <div className="bg-white border-l-4 border-l-indigo-500 rounded-xl p-5 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium opacity-90">Tổng số ghế</p>
-                            <p className="text-3xl font-bold mt-2">{aircrafts.reduce((sum, a) => sum + (a.tongSoGhe || 0), 0).toLocaleString()}</p>
+                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Tổng số ghế</p>
+                            <p className="text-2xl font-bold mt-1.5 text-gray-800">{aircrafts.reduce((sum, a) => sum + (a.tongSoGhe || 0), 0).toLocaleString()}</p>
                         </div>
-                        <FaFighterJet size={40} className="opacity-80" />
+                        <div className="p-3 bg-indigo-50 rounded-lg">
+                            <FaChair size={22} className="text-indigo-500" />
+
+                        </div>
                     </div>
                 </div>
             </div>

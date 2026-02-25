@@ -256,40 +256,52 @@ const QuanLyHoaDon = () => {
 
  {/* Thống kê */}
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
- <div className="bg-linear-to-br from-blue-500 to-cyan-600 rounded-xl p-5 text-white shadow-lg">
+ <div className="bg-white border-l-4 border-l-blue-500 rounded-xl p-5 shadow-sm border border-gray-100">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium opacity-90">Tổng số hóa đơn</p>
- <p className="text-3xl font-bold mt-2">{thongKe.tongSoHoaDon}</p>
+ <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Tổng số hóa đơn</p>
+ <p className="text-2xl font-bold mt-1.5 text-gray-800">{thongKe.tongSoHoaDon}</p>
  </div>
- <FaFilePdf size={40} className="opacity-80" />
+ <div className="p-3 bg-blue-50 rounded-lg">
+ <FaFilePdf size={22} className="text-blue-500" />
  </div>
  </div>
- <div className="bg-linear-to-br from-green-500 to-emerald-600 rounded-xl p-5 text-white shadow-lg">
+ </div>
+ <div className="bg-white border-l-4 border-l-emerald-500 rounded-xl p-5 shadow-sm border border-gray-100">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium opacity-90">Đã phát hành</p>
- <p className="text-3xl font-bold mt-2">{thongKe.daPhatHanh}</p>
+ <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Đã phát hành</p>
+ <p className="text-2xl font-bold mt-1.5 text-gray-800">{thongKe.daPhatHanh}</p>
  </div>
- <FaPrint size={40} className="opacity-80" />
+ <div className="p-3 bg-emerald-50 rounded-lg">
+ <FaPrint size={22} className="text-emerald-500" />
  </div>
  </div>
- <div className="bg-linear-to-br from-red-500 to-rose-600 rounded-xl p-5 text-white shadow-lg">
+ </div>
+ <div className="bg-white border-l-4 border-l-red-500 rounded-xl p-5 shadow-sm border border-gray-100">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium opacity-90">Đã hủy</p>
- <p className="text-3xl font-bold mt-2">{thongKe.daHuy}</p>
+ <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Đã hủy</p>
+ <p className="text-2xl font-bold mt-1.5 text-gray-800">{thongKe.daHuy}</p>
  </div>
- <FaTimes size={40} className="opacity-80" />
+ <div className="p-3 bg-red-50 rounded-lg">
+ <FaTimes size={22} className="text-red-500" />
  </div>
  </div>
- <div className="bg-linear-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
+ </div>
+ <div className="bg-white border-l-4 border-l-indigo-500 rounded-xl p-5 shadow-sm border border-gray-100">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium opacity-90">Tổng doanh thu</p>
- <p className="text-xl font-bold mt-2">{formatCurrency(thongKe.tongDoanhThu)}</p>
+ <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Tổng doanh thu</p>
+ <p className="text-xl font-bold mt-1.5 text-gray-800">
+ {thongKe.tongDoanhThu >= 1_000_000
+ ? `${(thongKe.tongDoanhThu / 1_000_000).toLocaleString('vi-VN', { maximumFractionDigits: 1 })}M ₫`
+ : formatCurrency(thongKe.tongDoanhThu)}
+ </p>
  </div>
- <FaCalendar size={40} className="opacity-80" />
+ <div className="p-3 bg-indigo-50 rounded-lg">
+ <FaCalendar size={22} className="text-indigo-500" />
+ </div>
  </div>
  </div>
  </div>

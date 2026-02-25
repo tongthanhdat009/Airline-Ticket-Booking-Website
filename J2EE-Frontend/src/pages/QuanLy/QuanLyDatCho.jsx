@@ -566,44 +566,52 @@ const QuanLyDatCho = () => {
  <div>
  {/* Thống kê tổng quan */}
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
- <div className="bg-linear-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
+ <div className="bg-white border-l-4 border-l-blue-500 rounded-xl p-5 shadow-sm border border-gray-100">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium opacity-90">Tổng đặt chỗ</p>
- <p className="text-3xl font-bold mt-2">{totalElements}</p>
+ <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Tổng đặt chỗ</p>
+ <p className="text-2xl font-bold mt-1.5 text-gray-800">{totalElements}</p>
  </div>
- <FaTicketAlt size={40} className="opacity-80" />
+ <div className="p-3 bg-blue-50 rounded-lg">
+ <FaTicketAlt size={22} className="text-blue-500" />
  </div>
  </div>
- <div className="bg-linear-to-br from-green-500 to-emerald-600 rounded-xl p-5 text-white shadow-lg">
+ </div>
+ <div className="bg-white border-l-4 border-l-emerald-500 rounded-xl p-5 shadow-sm border border-gray-100">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium opacity-90">Đã check-in</p>
- <p className="text-3xl font-bold mt-2">
+ <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Đã check-in</p>
+ <p className="text-2xl font-bold mt-1.5 text-gray-800">
  {datChoList.filter(dc => dc.checkInStatus).length}
  </p>
  </div>
- <FaUserCheck size={40} className="opacity-80" />
+ <div className="p-3 bg-emerald-50 rounded-lg">
+ <FaUserCheck size={22} className="text-emerald-500" />
  </div>
  </div>
- <div className="bg-linear-to-br from-yellow-500 to-orange-600 rounded-xl p-5 text-white shadow-lg">
+ </div>
+ <div className="bg-white border-l-4 border-l-amber-500 rounded-xl p-5 shadow-sm border border-gray-100">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium opacity-90">Chưa check-in</p>
- <p className="text-3xl font-bold mt-2">
+ <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Chưa check-in</p>
+ <p className="text-2xl font-bold mt-1.5 text-gray-800">
  {datChoList.filter(dc => !dc.checkInStatus).length}
  </p>
  </div>
- <FaClock size={40} className="opacity-80" />
+ <div className="p-3 bg-amber-50 rounded-lg">
+ <FaClock size={22} className="text-amber-500" />
  </div>
  </div>
- <div className="bg-linear-to-br from-blue-500 to-cyan-600 rounded-xl p-5 text-white shadow-lg">
+ </div>
+ <div className="bg-white border-l-4 border-l-sky-500 rounded-xl p-5 shadow-sm border border-gray-100">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium opacity-90">Chuyến bay</p>
- <p className="text-3xl font-bold mt-2">{chuyenBayList.length}</p>
+ <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Chuyến bay</p>
+ <p className="text-2xl font-bold mt-1.5 text-gray-800">{chuyenBayList.length}</p>
  </div>
- <FaPlane size={40} className="opacity-80" />
+ <div className="p-3 bg-sky-50 rounded-lg">
+ <FaPlane size={22} className="text-sky-500" />
+ </div>
  </div>
  </div>
  </div>

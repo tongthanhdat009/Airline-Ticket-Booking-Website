@@ -272,40 +272,48 @@ const QuanLyHoanTien = () => {
 
  {/* Thống kê tổng quan */}
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
- <div className="bg-linear-to-br from-amber-500 to-yellow-600 rounded-xl p-5 text-white shadow-lg">
+ <div className="bg-white border-l-4 border-l-amber-500 rounded-xl p-5 shadow-sm border border-gray-100">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium opacity-90">Tổng yêu cầu</p>
- <p className="text-3xl font-bold mt-2">{thongKe.tongYeuCau || 0}</p>
+ <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Tổng yêu cầu</p>
+ <p className="text-2xl font-bold mt-1.5 text-gray-800">{thongKe.tongYeuCau || 0}</p>
  </div>
- <FaUndo size={40} className="opacity-80" />
+ <div className="p-3 bg-amber-50 rounded-lg">
+ <FaUndo size={22} className="text-amber-500" />
  </div>
  </div>
- <div className="bg-linear-to-br from-yellow-500 to-orange-600 rounded-xl p-5 text-white shadow-lg">
+ </div>
+ <div className="bg-white border-l-4 border-l-orange-500 rounded-xl p-5 shadow-sm border border-gray-100">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium opacity-90">Chờ xử lý</p>
- <p className="text-3xl font-bold mt-2">{pendingRefunds}</p>
+ <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Chờ xử lý</p>
+ <p className="text-2xl font-bold mt-1.5 text-gray-800">{pendingRefunds}</p>
  </div>
- <FaUndo size={40} className="opacity-80" />
+ <div className="p-3 bg-orange-50 rounded-lg">
+ <FaCalendar size={22} className="text-orange-500" />
  </div>
  </div>
- <div className="bg-linear-to-br from-green-500 to-emerald-600 rounded-xl p-5 text-white shadow-lg">
+ </div>
+ <div className="bg-white border-l-4 border-l-emerald-500 rounded-xl p-5 shadow-sm border border-gray-100">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium opacity-90">Đã hoàn tiền</p>
- <p className="text-3xl font-bold mt-2">{thongKe.daHoanTien || 0}</p>
+ <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Đã hoàn tiền</p>
+ <p className="text-2xl font-bold mt-1.5 text-gray-800">{thongKe.daHoanTien || 0}</p>
  </div>
- <FaCheck size={40} className="opacity-80" />
+ <div className="p-3 bg-emerald-50 rounded-lg">
+ <FaCheck size={22} className="text-emerald-500" />
  </div>
  </div>
- <div className="bg-linear-to-br from-red-500 to-rose-600 rounded-xl p-5 text-white shadow-lg">
+ </div>
+ <div className="bg-white border-l-4 border-l-red-500 rounded-xl p-5 shadow-sm border border-gray-100">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium opacity-90">Đã từ chối</p>
- <p className="text-3xl font-bold mt-2">{thongKe.daTuChoi || 0}</p>
+ <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Đã từ chối</p>
+ <p className="text-2xl font-bold mt-1.5 text-gray-800">{thongKe.daTuChoi || 0}</p>
  </div>
- <FaTimes size={40} className="opacity-80" />
+ <div className="p-3 bg-red-50 rounded-lg">
+ <FaTimes size={22} className="text-red-500" />
+ </div>
  </div>
  </div>
  </div>

@@ -258,40 +258,48 @@ const QuanLyLichSuThaoTac = () => {
  <Card title="Lịch sử thao tác">
  {/* Thống kê tổng quan */}
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
- <div className="bg-linear-to-br from-green-500 to-emerald-600 rounded-xl p-5 text-white shadow-lg">
+ <div className="bg-white border-l-4 border-l-emerald-500 rounded-xl p-5 shadow-sm border border-gray-100">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium opacity-90">Tổng thao tác</p>
- <p className="text-3xl font-bold mt-2">{statistics.totalLogs}</p>
+ <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Tổng thao tác</p>
+ <p className="text-2xl font-bold mt-1.5 text-gray-800">{statistics.totalLogs}</p>
  </div>
- <FaHistory size={40} className="opacity-80" />
+ <div className="p-3 bg-emerald-50 rounded-lg">
+ <FaHistory size={22} className="text-emerald-500" />
  </div>
  </div>
- <div className="bg-linear-to-br from-blue-500 to-cyan-600 rounded-xl p-5 text-white shadow-lg">
+ </div>
+ <div className="bg-white border-l-4 border-l-blue-500 rounded-xl p-5 shadow-sm border border-gray-100">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium opacity-90">Thao tác Admin</p>
- <p className="text-3xl font-bold mt-2">{statistics.adminActions}</p>
+ <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Thao tác Admin</p>
+ <p className="text-2xl font-bold mt-1.5 text-gray-800">{statistics.adminActions}</p>
  </div>
- <FaHistory size={40} className="opacity-80" />
+ <div className="p-3 bg-blue-50 rounded-lg">
+ <FaHistory size={22} className="text-blue-500" />
  </div>
  </div>
- <div className="bg-linear-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
+ </div>
+ <div className="bg-white border-l-4 border-l-indigo-500 rounded-xl p-5 shadow-sm border border-gray-100">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium opacity-90">Thao tác KH</p>
- <p className="text-3xl font-bold mt-2">{statistics.customerActions}</p>
+ <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Thao tác KH</p>
+ <p className="text-2xl font-bold mt-1.5 text-gray-800">{statistics.customerActions}</p>
  </div>
- <FaHistory size={40} className="opacity-80" />
+ <div className="p-3 bg-indigo-50 rounded-lg">
+ <FaHistory size={22} className="text-indigo-500" />
  </div>
  </div>
- <div className="bg-linear-to-br from-orange-500 to-red-600 rounded-xl p-5 text-white shadow-lg">
+ </div>
+ <div className="bg-white border-l-4 border-l-orange-500 rounded-xl p-5 shadow-sm border border-gray-100">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium opacity-90">Hôm nay</p>
- <p className="text-3xl font-bold mt-2">{statistics.todayLogs}</p>
+ <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Hôm nay</p>
+ <p className="text-2xl font-bold mt-1.5 text-gray-800">{statistics.todayLogs}</p>
  </div>
- <FaHistory size={40} className="opacity-80" />
+ <div className="p-3 bg-orange-50 rounded-lg">
+ <FaHistory size={22} className="text-orange-500" />
+ </div>
  </div>
  </div>
  </div>

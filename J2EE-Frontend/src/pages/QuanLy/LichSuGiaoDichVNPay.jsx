@@ -443,13 +443,71 @@ const LichSuGiaoDichVNPay = () => {
  )}
 
  {/* Pagination */}
- {totalPages > 1 && (
- <div className="flex items-center justify-center gap-2 mt-6">
- <button onClick={() => paginate(currentPage - 1)} disabled={currentPage === 0} className="px-3 py-1.5 rounded-lg border text-sm disabled:opacity-50 hover:bg-gray-100">← Trước</button>
- {Array.from({ length: totalPages }, (_, i) => i).map(page => (
- <button key={page} onClick={() => paginate(page)} className={`w-9 h-9 rounded-lg text-sm font-medium ${page === currentPage ? 'bg-blue-600 text-white' : 'border hover:bg-gray-100'}`}>{page + 1}</button>
- ))}
- <button onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages - 1} className="px-3 py-1.5 rounded-lg border text-sm disabled:opacity-50 hover:bg-gray-100">Sau →</button>
+ {totalPages > 0 && (
+ <div className="flex flex-wrap items-center justify-between gap-3 mt-6 pt-4 border-t">
+ {/* Info */}
+ <p className="text-sm text-gray-500">
+ Trang <span className="font-semibold text-gray-700">{currentPage + 1}</span> / <span className="font-semibold text-gray-700">{totalPages}</span>
+ </p>
+
+ {/* Page buttons */}
+ <div className="flex items-center gap-1">
+ {/* Nút đầu */}
+ <button
+ onClick={() => paginate(0)}
+ disabled={currentPage === 0}
+ className="px-2.5 py-1.5 rounded-lg border text-xs font-medium disabled:opacity-40 hover:bg-gray-100 transition-colors"
+ title="Trang đầu"
+ >«</button>
+
+ {/* Nút trước */}
+ <button
+ onClick={() => paginate(currentPage - 1)}
+ disabled={currentPage === 0}
+ className="px-3 py-1.5 rounded-lg border text-sm disabled:opacity-40 hover:bg-gray-100 transition-colors"
+ >← Trước</button>
+
+ {/* Số trang với ellipsis */}
+ {(() => {
+ const pages = [];
+ const delta = 2;
+ const left = Math.max(0, currentPage - delta);
+ const right = Math.min(totalPages - 1, currentPage + delta);
+
+ if (left > 0) {
+ pages.push(<button key={0} onClick={() => paginate(0)} className="w-9 h-9 rounded-lg border text-sm font-medium hover:bg-gray-100 transition-colors">1</button>);
+ if (left > 1) pages.push(<span key="ellipsis-left" className="w-9 h-9 flex items-center justify-center text-gray-400 text-sm">…</span>);
+ }
+ for (let i = left; i <= right; i++) {
+ pages.push(
+ <button key={i} onClick={() => paginate(i)}
+ className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
+ i === currentPage ? 'bg-blue-600 text-white shadow-sm' : 'border hover:bg-gray-100'
+ }`}>{i + 1}</button>
+ );
+ }
+ if (right < totalPages - 1) {
+ if (right < totalPages - 2) pages.push(<span key="ellipsis-right" className="w-9 h-9 flex items-center justify-center text-gray-400 text-sm">…</span>);
+ pages.push(<button key={totalPages - 1} onClick={() => paginate(totalPages - 1)} className="w-9 h-9 rounded-lg border text-sm font-medium hover:bg-gray-100 transition-colors">{totalPages}</button>);
+ }
+ return pages;
+ })()}
+
+ {/* Nút sau */}
+ <button
+ onClick={() => paginate(currentPage + 1)}
+ disabled={currentPage === totalPages - 1}
+ className="px-3 py-1.5 rounded-lg border text-sm disabled:opacity-40 hover:bg-gray-100 transition-colors"
+ >Sau →</button>
+
+ {/* Nút cuối */}
+ <button
+ onClick={() => paginate(totalPages - 1)}
+ disabled={currentPage === totalPages - 1}
+ className="px-2.5 py-1.5 rounded-lg border text-xs font-medium disabled:opacity-40 hover:bg-gray-100 transition-colors"
+ title="Trang cuối"
+ >»</button>
+ </div>
  </div>
  )}
 
