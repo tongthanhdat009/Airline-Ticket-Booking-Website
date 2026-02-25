@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { FaCog, FaTimes, FaPlus, FaTrash } from 'react-icons/fa';
 import { getDichVuByChuyenBay, addDichVuToChuyenBay, removeDichVuFromChuyenBay } from '../../../services/QLDichVuChuyenBayService';
-import { getAllServices, fetchImageByName } from '../../../services/QLDichVuService';
+import { getAllServices } from '../../../services/QLDichVuService';
+import { getServiceImageUrl } from '../../../config/api.config';
 
 const ManageServiceModal = ({ isOpen, onClose, flight, showToast }) => {
  const [services, setServices] = useState([]);
  const [assignedServices, setAssignedServices] = useState([]);
  const [loading, setLoading] = useState(false);
- const [serviceImages, setServiceImages] = useState({});
 
  useEffect(() => {
  if (isOpen && flight) {
@@ -30,7 +30,6 @@ const ManageServiceModal = ({ isOpen, onClose, flight, showToast }) => {
  setAssignedServices([]);
  }
 
- await loadServiceImages(allServices);
  } catch (error) {
  console.error('Error fetching services:', error);
  showToast('Không thể tải danh sách dịch vụ', 'error');
@@ -41,24 +40,7 @@ const ManageServiceModal = ({ isOpen, onClose, flight, showToast }) => {
  }
  };
 
- const loadServiceImages = async (servicesList) => {
- if (!Array.isArray(servicesList) || servicesList.length === 0) {
- return;
- }
- const images = {};
- for (const service of servicesList) {
- if (service.anh) {
- try {
- const imageRes = await fetchImageByName(service.anh);
- const imageUrl = URL.createObjectURL(imageRes.data);
- images[service.maDichVu] = imageUrl;
- } catch (error) {
- console.error(`Error loading image for service ${service.maDichVu}:`, error);
- }
- }
- }
- setServiceImages(images);
- };
+
 
  const handleAddService = async (maDichVu) => {
  try {
@@ -118,11 +100,12 @@ const ManageServiceModal = ({ isOpen, onClose, flight, showToast }) => {
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
  {assignedServices.map((service) => (
  <div key={service.maDichVu} className="bg-linear-to-br from-green-50 to-emerald-50 rounded-lg p-4 shadow-md border border-green-200 flex items-center gap-3">
- {serviceImages[service.maDichVu] && (
+ {service.anh && (
  <img
- src={serviceImages[service.maDichVu]}
+ src={getServiceImageUrl(service.anh)}
  alt={service.tenDichVu}
  className="w-16 h-16 rounded-lg object-cover shadow-sm"
+ onError={(e) => { e.target.style.display = 'none'; }}
  />
  )}
  <div className="flex-1">
@@ -156,11 +139,12 @@ const ManageServiceModal = ({ isOpen, onClose, flight, showToast }) => {
  .filter(service => !isServiceAssigned(service.maDichVu))
  .map((service) => (
  <div key={service.maDichVu} className="bg-white rounded-lg p-4 shadow-md border border-gray-200 hover:border-blue-300 transition-colors flex items-center gap-3">
- {serviceImages[service.maDichVu] && (
+ {service.anh && (
  <img
- src={serviceImages[service.maDichVu]}
+ src={getServiceImageUrl(service.anh)}
  alt={service.tenDichVu}
  className="w-16 h-16 rounded-lg object-cover shadow-sm"
+ onError={(e) => { e.target.style.display = 'none'; }}
  />
  )}
  <div className="flex-1">

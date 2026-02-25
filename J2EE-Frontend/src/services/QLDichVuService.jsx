@@ -53,23 +53,6 @@ export const createService = async (serviceData) => {
     }
 }
 
-export const uploadImage = async (imageFile) => {
-    try{
-        const formData = new FormData();
-        formData.append('file', imageFile);
-        const response = await apiClient.post('/admin/dashboard/dichvu/anh/upload', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
-        return response;
-    }
-    catch(error){
-        console.error("Error uploading image:", error);
-        throw error;
-    }
-}
-
 export const updateServiceImage = async (maDichVu, imageFile) => {
     try{
         const formData = new FormData();

@@ -1,34 +1,13 @@
 ﻿import React, { useState, useEffect, useCallback } from 'react';
 import { FaPlane, FaTimes, FaCog, FaPlus, FaTrash, FaCalendarAlt, FaClock } from 'react-icons/fa';
 import { getDichVuByChuyenBay, addDichVuToChuyenBay, removeDichVuFromChuyenBay } from '../../../services/QLDichVuChuyenBayService';
-import { getAllServices, fetchImageByName } from '../../../services/QLDichVuService';
+import { getAllServices } from '../../../services/QLDichVuService';
+import { getServiceImageUrl } from '../../../config/api.config';
 
 const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast }) => {
  const [services, setServices] = useState([]); // Tất cả dịch vụ có sẵn
  const [assignedServices, setAssignedServices] = useState([]); // Dịch vụ đã gán cho chuyến bay
  const [loading, setLoading] = useState(false);
- const [serviceImages, setServiceImages] = useState({});
-
- // Được khai báo trước vì fetchAllData phụ thuộc vào nó
- const loadServiceImages = useCallback(async (servicesList) => {
- if (!Array.isArray(servicesList) || servicesList.length === 0) {
- return;
- }
-
- const images = {};
- for (const service of servicesList) {
- if (service.anh) {
- try {
- const imageRes = await fetchImageByName(service.anh);
- const imageUrl = URL.createObjectURL(imageRes.data);
- images[service.maDichVu] = imageUrl;
- } catch {
- // Silently handle image load errors
- }
- }
- }
- setServiceImages(images);
- }, []);
 
  const fetchAllData = useCallback(async () => {
  setLoading(true);
@@ -48,8 +27,6 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
  setAssignedServices([]);
  }
 
- // Tải ảnh cho tất cả dịch vụ
- await loadServiceImages(allServices);
  } catch {
  showToast('Không thể tải danh sách dịch vụ', 'error');
  setServices([]);
@@ -57,7 +34,7 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
  } finally {
  setLoading(false);
  }
- }, [flight, showToast, loadServiceImages]);
+ }, [flight, showToast]);
 
  useEffect(() => {
  if (isOpen && flight) {
@@ -229,11 +206,12 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
  <div className="space-y-2 max-h-48 md:max-h-64 overflow-y-auto pr-2">
  {assignedServices.map((service) => (
  <div key={service.maDichVu} className="bg-white rounded-lg p-3 shadow-sm border border-gray-200 hover:shadow-md transition-shadow flex items-center gap-3">
- {serviceImages[service.maDichVu] ? (
+ {service.anh ? (
  <img
- src={serviceImages[service.maDichVu]}
+ src={getServiceImageUrl(service.anh)}
  alt={service.tenDichVu}
  className="w-14 h-14 rounded-lg object-cover shrink-0"
+ onError={(e) => { e.target.replaceWith(Object.assign(document.createElement('div'), { className: 'w-14 h-14 rounded-lg bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center shrink-0' })); }}
  />
  ) : (
  <div className="w-14 h-14 rounded-lg bg-linear-to-br from-purple-100 to-pink-100 flex items-center justify-center shrink-0">
@@ -274,11 +252,12 @@ const FlightDetailModal = ({ isOpen, onClose, flight, getRouteInfo, showToast })
  .filter(service => !isServiceAssigned(service.maDichVu))
  .map((service) => (
  <div key={service.maDichVu} className="bg-white rounded-lg p-3 shadow-sm border border-gray-200 hover:shadow-md hover:border-blue-300 transition-all flex items-center gap-3 cursor-pointer" onClick={() => handleAddService(service.maDichVu)}>
- {serviceImages[service.maDichVu] ? (
+ {service.anh ? (
  <img
- src={serviceImages[service.maDichVu]}
+ src={getServiceImageUrl(service.anh)}
  alt={service.tenDichVu}
  className="w-14 h-14 rounded-lg object-cover shrink-0"
+ onError={(e) => { e.target.replaceWith(Object.assign(document.createElement('div'), { className: 'w-14 h-14 rounded-lg bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center shrink-0' })); }}
  />
  ) : (
  <div className="w-14 h-14 rounded-lg bg-linear-to-br from-blue-100 to-indigo-100 flex items-center justify-center shrink-0">
