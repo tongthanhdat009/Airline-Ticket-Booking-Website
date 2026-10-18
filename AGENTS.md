@@ -1,3 +1,5 @@
+<!-- Generated: 2026-10-18 | Updated: 2026-10-18 -->
+
 # Airline Ticket Booking Website - Agent Documentation
 
 ## Project Overview

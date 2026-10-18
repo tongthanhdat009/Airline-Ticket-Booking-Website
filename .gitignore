@@ -17,3 +17,12 @@ logs/security/
 .env
 /deploy
 J2EE-Frontend/.env.production
+
+# Package managers: chuẩn pnpm, chặn npm lockfile gây nhiễu
+J2EE-Frontend/package-lock.json
+package-lock.json
+
+# Agent internal state (không commit)
+.omc/
+.omo/
+.freebuff/
