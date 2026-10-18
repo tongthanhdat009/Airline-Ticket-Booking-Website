@@ -3,7 +3,6 @@ package com.example.j2ee.aspect;
 import com.example.j2ee.annotation.Auditable;
 import com.example.j2ee.model.AuditLog;
 import com.example.j2ee.repository.AuditLogRepository;
-import com.example.j2ee.util.VNPayUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -181,7 +180,11 @@ public class AuditLogAspect {
             ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attributes != null) {
                 HttpServletRequest request = attributes.getRequest();
-                return VNPayUtil.getIpAddress(request);
+                String ip = request.getHeader("X-FORWARDED-FOR");
+                if (ip == null || ip.isEmpty()) {
+                    ip = request.getRemoteAddr();
+                }
+                return ip;
             }
         } catch (Exception e) {
             log.warn("Không thể lấy IP address: {}", e.getMessage());
