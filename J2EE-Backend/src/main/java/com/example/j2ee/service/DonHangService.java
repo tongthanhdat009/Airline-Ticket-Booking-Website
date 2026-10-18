@@ -709,7 +709,7 @@ public class DonHangService {
 
     /**
      * Tạo hóa đơn cho đơn hàng khi xác nhận thanh toán
-     * Public method để có thể gọi từ VNPayService
+     * Public method để service thanh toán gọi tới
      *
      * @param donHang Đơn hàng cần tạo hóa đơn
      * @return HoaDon đã tạo

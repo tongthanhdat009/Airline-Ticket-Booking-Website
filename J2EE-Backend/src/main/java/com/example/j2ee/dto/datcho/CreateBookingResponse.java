@@ -22,9 +22,15 @@ public class CreateBookingResponse {
     private Integer maDatCho;
     
     /**
-     * Payment ID (mã thanh toán) for VNPay
+     * Payment ID (mã thanh toán)
      */
     private Integer maThanhToan;
+
+    /**
+     * Mã token xác nhận thanh toán (dùng 1 lần, cho khách vãng lai).
+     * Gửi kèm khi gọi xác nhận thanh toán.
+     */
+    private String confirmToken;
     
     /**
      * Passenger ID (mã hành khách) - for backward compatibility

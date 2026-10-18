@@ -172,6 +172,7 @@ public class BookingService {
         response.setMaHanhKhach(danhSachMaHanhKhach.get(0));
         response.setDanhSachMaDatCho(danhSachMaDatCho);
         response.setDanhSachMaHanhKhach(danhSachMaHanhKhach);
+        response.setConfirmToken(thanhToan.getTransactionCode());
 
         return response;
     }
@@ -390,9 +391,11 @@ public class BookingService {
         thanhToan.setDonHang(donHang);
         thanhToan.setSoTien(totalAmount);
         thanhToan.setDaThanhToan('N');
-        thanhToan.setPhuongThucThanhToan("VNPAY"); // Set ngay vì hiện tại chỉ có VNPay
+        thanhToan.setPhuongThucThanhToan("THUONG"); // Thanh toán thường nội bộ
         thanhToan.setTrangThai("PENDING"); // V7 field
-        thanhToan.setTransactionCode(null); // Sẽ fill sau callback
+        // Token xác nhận dùng 1 lần cho khách vãng lai (không đăng nhập).
+        // Ghi đè bằng mã THUONG-* khi xác nhận thành công nên không tái dùng được.
+        thanhToan.setTransactionCode("CF-" + UUID.randomUUID().toString().replace("-", ""));
         thanhToan.setThoigianThanhToan(null); // Sẽ fill sau callback
 
         // Set expiration time (15 minutes from now)

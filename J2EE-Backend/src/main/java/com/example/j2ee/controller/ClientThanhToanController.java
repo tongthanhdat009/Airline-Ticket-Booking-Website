@@ -5,6 +5,7 @@ import com.example.j2ee.model.DatCho;
 import com.example.j2ee.repository.TrangThaiThanhToanRepository;
 import com.example.j2ee.repository.DatChoRepository;
 import com.example.j2ee.repository.HanhKhachRepository;
+import com.example.j2ee.service.ThanhToanThuongService;
 import com.example.j2ee.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,9 @@ public class ClientThanhToanController {
 
     @Autowired
     private HanhKhachRepository hanhKhachRepository;
+
+    @Autowired
+    private ThanhToanThuongService thanhToanThuongService;
 
     /**
      * Lấy lịch sử thanh toán của hành khách theo mã hành khách
@@ -116,6 +120,62 @@ public class ClientThanhToanController {
             errorResponse.put("message", "Lỗi khi lấy chi tiết thanh toán: " + e.getMessage());
             errorResponse.put("data", null);
             
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+
+    /**
+     * Xác nhận thanh toán thường (nội bộ, không qua cổng thanh toán ngoài)
+     */
+    @PostMapping("/{maThanhToan}/xac-nhan")
+    public ResponseEntity<Map<String, Object>> xacNhanThanhToan(
+            @PathVariable int maThanhToan,
+            @RequestParam(required = false) String token) {
+        try {
+            TrangThaiThanhToan thanhToan = trangThaiThanhToanRepository.findById(maThanhToan).orElse(null);
+
+            if (thanhToan == null) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "Không tìm thấy thanh toán");
+                errorResponse.put("data", null);
+
+                return ResponseEntity.status(404).body(errorResponse);
+            }
+
+            boolean owner = thanhToan.getDonHang() != null
+                    && SecurityUtil.isOwnerOf(thanhToan.getDonHang().getHanhKhachNguoiDat());
+            boolean tokenOk = token != null && !token.isBlank()
+                    && token.equals(thanhToan.getTransactionCode());
+            if (!owner && !tokenOk) {
+                Map<String, Object> forbidden = new HashMap<>();
+                forbidden.put("success", false);
+                forbidden.put("message", "Bạn không có quyền xác nhận thanh toán này");
+                forbidden.put("data", null);
+                return ResponseEntity.status(403).body(forbidden);
+            }
+
+            TrangThaiThanhToan confirmed = thanhToanThuongService.xacNhanThanhToan(maThanhToan);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Thanh toán thành công");
+            response.put("data", confirmed);
+
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            errorResponse.put("data", null);
+
+            return ResponseEntity.badRequest().body(errorResponse);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "Lỗi khi xác nhận thanh toán: " + e.getMessage());
+            errorResponse.put("data", null);
+
             return ResponseEntity.status(500).body(errorResponse);
         }
     }

@@ -107,13 +107,16 @@ public class SecurityConfig {
                         // OAuth2
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                         .requestMatchers("/error").permitAll()
-                        // VNPay, Check-in, Booking, Coupon, Services, Chat endpoints
+                        // Check-in, Booking, Coupon, Services, Chat endpoints
                         // Fix D-9/D-10: chỉ giữ ẩn danh cho tạo booking + tra cứu bằng
                         // mã kèm tên (proof-of-knowledge); các endpoint đọc/hủy theo ID
                         // số phải đăng nhập + kiểm tra ownership trong controller.
                         .requestMatchers(HttpMethod.POST, "/client/datcho/create").permitAll()
                         .requestMatchers(HttpMethod.GET, "/client/datcho/search").permitAll()
-                        .requestMatchers("/vnpay/**", "/checkin/**", "/client/khuyenmai/**", "/client/dichvu/**").permitAll()
+                        // Xác nhận thanh toán thường: cho phép ẩn danh, tự bảo vệ bằng
+                        // ownership (đã đăng nhập) hoặc confirm token dùng 1 lần (khách vãng lai)
+                        .requestMatchers(HttpMethod.POST, "/client/thanhtoan/*/xac-nhan").permitAll()
+                        .requestMatchers("/checkin/**", "/client/khuyenmai/**", "/client/dichvu/**").permitAll()
                         .requestMatchers("/api/chat/start", "/api/chat/message", "/api/chat/history/**", "/api/chat/session/**").permitAll()
                         .requestMatchers("/api/chat/admin/**").access(dynamicAdminAuthManager)
                         // AI Chat suggestion (admin only)
