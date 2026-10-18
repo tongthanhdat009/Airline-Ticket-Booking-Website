@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TaiKhoanService from '../../services/TaiKhoanService';
+import { getAllCountries } from '../../services/CountryService';
 import { getClientAccessToken, getClientUserEmail } from '../../utils/cookieUtils';
 import useTitle from '../../hooks/useTitle';
 import { isValidVnPhone, VN_PHONE_MESSAGE, VN_PHONE_MAX_LENGTH } from '../../utils/phoneValidation';
@@ -23,7 +24,6 @@ function HoanThienThongTin() {
 
   const [countries, setCountries] = useState([]);
   const [countriesLoading, setCountriesLoading] = useState(true);
-  const [countriesError, setCountriesError] = useState('');
 
   useEffect(() => {
     
@@ -71,30 +71,49 @@ function HoanThienThongTin() {
   }, [navigate]);
 
   useEffect(() => {
-    const controller = new AbortController();
+    let mounted = true;
+    const FALLBACK_COUNTRIES = [
+      { code: 'VN', name: 'Vietnam' },
+      { code: 'US', name: 'United States' },
+      { code: 'CN', name: 'China' },
+      { code: 'JP', name: 'Japan' },
+      { code: 'KR', name: 'South Korea' },
+      { code: 'TH', name: 'Thailand' },
+      { code: 'SG', name: 'Singapore' },
+      { code: 'MY', name: 'Malaysia' },
+      { code: 'ID', name: 'Indonesia' },
+      { code: 'PH', name: 'Philippines' },
+      { code: 'LA', name: 'Laos' },
+      { code: 'KH', name: 'Cambodia' },
+      { code: 'AU', name: 'Australia' },
+      { code: 'GB', name: 'United Kingdom' },
+      { code: 'FR', name: 'France' },
+      { code: 'DE', name: 'Germany' },
+      { code: 'CA', name: 'Canada' }
+    ];
     const fetchCountries = async () => {
       setCountriesLoading(true);
       try {
-        const res = await fetch('https://restcountries.com/v3.1/all?fields=name,cca2', { signal: controller.signal });
-        if (!res.ok) throw new Error('Network response was not ok');
-        const data = await res.json();
-        const list = data
-          .map(c => ({ code: c.cca2 || c.ccn3 || c.cioc || c.name.common, name: c.name?.common || '' }))
-          .filter(c => c.name)
+        const data = await getAllCountries();
+        const raw = Array.isArray(data) ? data : data?.data || [];
+        const list = raw
+          .map(c => ({
+            code: c.alpha2Code || c.cca2 || c.ccn3 || c.cioc || c.code,
+            name: typeof c.name === 'string' ? c.name : c.name?.common || ''
+          }))
+          .filter(c => c.name && c.code)
           .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
-        setCountries(list);
+        if (mounted) setCountries(list.length > 0 ? list : FALLBACK_COUNTRIES);
       } catch (err) {
-        if (err.name !== 'AbortError') {
-          console.error('Error fetching countries', err);
-          setCountriesError('Không thể tải danh sách quốc gia');
-        }
+        console.error('Error fetching countries', err);
+        if (mounted) setCountries(FALLBACK_COUNTRIES);
       } finally {
-        setCountriesLoading(false);
+        if (mounted) setCountriesLoading(false);
       }
     };
 
     fetchCountries();
-    return () => controller.abort();
+    return () => { mounted = false; };
   }, []);
 
   const handleChange = (e) => {
@@ -313,8 +332,6 @@ function HoanThienThongTin() {
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-lg">🌍</span>
                     {countriesLoading ? (
                       <div className="w-full py-3 pl-11 pr-4 border-2 border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-500">Đang tải danh sách quốc gia...</div>
-                    ) : countriesError ? (
-                      <div className="w-full py-3 pl-11 pr-4 border-2 border-gray-200 rounded-lg text-sm bg-gray-50 text-red-600">{countriesError}</div>
                     ) : (
                       <select
                         name="quocGia"

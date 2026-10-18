@@ -46,7 +46,7 @@
     "faq_q4": "Thời gian check-in trực tuyến và tại sân bay là bao lâu?",
     "faq_a4": "Check-in trực tuyến mở từ 24h trước giờ bay và đóng 1h trước giờ khởi hành. Tại sân bay, quầy check-in mở 2h và đóng 40 phút trước giờ bay. Vui lòng có mặt sớm để hoàn tất thủ tục.",
     "faq_q5": "Có những hình thức thanh toán nào?",
-    "faq_a5": "Chúng tôi chấp nhận nhiều hình thức thanh toán: thẻ tín dụng/ghi nợ (Visa, Mastercard, JCB), ví điện tử (MoMo, ZaloPay, VNPay), chuyển khoản ngân hàng và thanh toán tại các đại lý."
+    "faq_a5": "Chúng tôi chấp nhận nhiều hình thức thanh toán: thẻ tín dụng/ghi nợ (Visa, Mastercard, JCB), chuyển khoản ngân hàng và thanh toán tại các đại lý."
   },
   "destinations": {
     "tphcm": {
@@ -106,8 +106,8 @@
     "or": "hoặc"
   },
   "payment": {
-    "vnpay_title": "Thanh toán qua VNPay",
-    "vnpay_desc": "Hỗ trợ thanh toán bằng thẻ ATM, thẻ tín dụng và mã QR"
+    "normal_title": "Thanh toán thường",
+    "normal_desc": "Xác nhận thanh toán trực tiếp, vé điện tử gửi qua email ngay"
   },
   "navbar": {
     "lookup_flight": "Tra cứu chuyến bay",
@@ -500,8 +500,8 @@
       "status_failed": "Thanh toán thất bại",
       "transaction_id": "Mã giao dịch",
       "payment_details": "Chi tiết thanh toán",
-      "vnpay_title": "Thanh toán qua VNPay",
-      "vnpay_desc": "Hỗ trợ thanh toán bằng thẻ ATM, thẻ tín dụng và mã QR"
+      "normal_title": "Thanh toán thường",
+      "normal_desc": "Xác nhận thanh toán trực tiếp, vé điện tử gửi qua email ngay"
     },
     "booking_payment_errors": {
       "error_create_payment": "Không thể tạo liên kết thanh toán. Vui lòng thử lại.",
