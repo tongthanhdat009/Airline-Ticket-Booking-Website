@@ -137,7 +137,7 @@ END$$
 DELIMITER ;
 
 CALL insert_sample_donhang();
-DROP PROCEDURE insert_sample_donhang();
+DROP PROCEDURE insert_sample_donhang;
 
 -- ========================================
 -- 5. DỮ LIỆU CHO THỐNG KÊ KHUNG GIỜ CAO ĐIỂM
@@ -178,7 +178,7 @@ END$$
 DELIMITER ;
 
 CALL insert_sample_datcho_khunggio();
-DROP PROCEDURE insert_sample_datcho_khunggio();
+DROP PROCEDURE insert_sample_datcho_khunggio;
 
 -- ========================================
 -- 6. DỮ LIỆU CHO THỐNG KÊ TỶ LỆ CHUYỂN ĐỔI
@@ -226,7 +226,7 @@ END$$
 DELIMITER ;
 
 CALL insert_sample_hoadon_last_month();
-DROP PROCEDURE insert_sample_hoadon_last_month();
+DROP PROCEDURE insert_sample_hoadon_last_month;
 
 -- ========================================
 -- XÓA DỮ LIỆU TEST (OPTIONAL - Chạy khi muốn xóa)
