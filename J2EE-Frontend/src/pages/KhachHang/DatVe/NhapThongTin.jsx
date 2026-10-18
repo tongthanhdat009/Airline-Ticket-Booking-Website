@@ -13,6 +13,7 @@ import { getClientUserEmail } from "../../../utils/cookieUtils";
 
 import { useTranslation } from 'react-i18next'
 import useTitle from '../../../hooks/useTitle';
+import { isValidVnPhone, VN_PHONE_MESSAGE } from '../../../utils/phoneValidation';
 
 function NhapThongTin() {
     useTitle('Thông tin hành khách - Đặt vé máy bay | Airline Booking');
@@ -143,7 +144,6 @@ function NhapThongTin() {
         let firstErrorIndex = -1;
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const phoneRegex = /^[0-9]{9,12}$/;
         const nameRegex = /^[a-zA-ZÀ-ỹ\s'-]{2,}$/;
         const idCardRegex = /^[A-Za-z0-9]{9,}$/;
 
@@ -153,8 +153,10 @@ function NhapThongTin() {
             // Giới tính
             if (!p.sex) err.sex = t('validation.required_gender') || "Vui lòng chọn giới tính";
 
-            // Họ và tên
+            // Họ và tên (DB hanhkhach.hovaten varchar(50))
             if (!p.fullName.trim()) err.fullName = t('validation.required') || "Vui lòng nhập họ và tên";
+            else if (p.fullName.trim().length > 50)
+                err.fullName = "Họ và tên tối đa 50 ký tự";
             else if (!nameRegex.test(p.fullName))
                 err.fullName = t('validation.invalid_name') || "Họ và tên chỉ được chứa chữ cái và tối thiểu 2 ký tự";
 
@@ -164,23 +166,33 @@ function NhapThongTin() {
             // Quốc gia
             if (!p.country.trim()) err.country = t('validation.required') || "Vui lòng chọn quốc gia";
 
-            // Số điện thoại
+            // Số điện thoại (DB sodienthoai varchar(20))
             if (!p.phone.trim()) err.phone = t('validation.required') || "Vui lòng nhập số điện thoại";
-            else if (!phoneRegex.test(p.phone))
-                err.phone = t('validation.invalid_phone') || "Số điện thoại không hợp lệ (9-12 chữ số)";
+            else if (p.phone.trim().length > 20)
+                err.phone = "Số điện thoại tối đa 20 ký tự";
+            else if (!isValidVnPhone(p.phone))
+                err.phone = VN_PHONE_MESSAGE;
 
-            // Email
+            // Email (DB email varchar(100))
             if (!p.email.trim()) err.email = t('validation.required') || "Vui lòng nhập email";
+            else if (p.email.trim().length > 100)
+                err.email = "Email tối đa 100 ký tự";
             else if (!emailRegex.test(p.email))
                 err.email = t('validation.invalid_email') || "Email không hợp lệ";
 
-            // CCCD/Hộ chiếu
+            // CCCD/Hộ chiếu (DB madinhdanh varchar(50))
             if (!p.idCard.trim()) err.idCard = t('validation.required') || "Vui lòng nhập CCCD/Hộ chiếu";
+            else if (p.idCard.trim().length > 50)
+                err.idCard = "Mã định danh tối đa 50 ký tự";
             else if (!idCardRegex.test(p.idCard))
                 err.idCard = t('validation.invalid_idcard') || "CCCD/Hộ chiếu không hợp lệ (ít nhất 9 ký tự, chỉ chữ và số)";
 
-            // Địa chỉ
+            // Địa chỉ (DB diachi varchar(255)) + Quốc gia (varchar(100))
             if (!p.address.trim()) err.address = t('validation.required') || "Vui lòng nhập địa chỉ";
+            else if (p.address.trim().length > 255)
+                err.address = "Địa chỉ tối đa 255 ký tự";
+            if (p.country && p.country.trim().length > 100)
+                err.country = "Quốc gia tối đa 100 ký tự";
 
             if (Object.keys(err).length > 0) {
                 hasError = true;
@@ -348,6 +360,7 @@ function NhapThongTin() {
                                         <input
                                             type="text"
                                             placeholder={t('booking.passenger_info.full_name')}
+                                            maxLength={50}
                                             value={passengerInfo[index].fullName}
                                             onChange={(e) =>
                                                 handleChange(
@@ -437,8 +450,10 @@ function NhapThongTin() {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                                             <div className="w-full">
                                                 <input
-                                                    type="number"
+                                                    type="text"
+                                                    inputMode="numeric"
                                                     placeholder={t('auth.phone')}
+                                                    maxLength={20}
                                                     value={passengerInfo[index].phone}
                                                     onChange={(e) =>
                                                         handleChange(index, "phone", e.target.value)
@@ -461,6 +476,7 @@ function NhapThongTin() {
                                                 <input
                                                     type="email"
                                                     placeholder={t('auth.email_phone')}
+                                                    maxLength={100}
                                                     value={passengerInfo[index].email}
                                                     onChange={(e) =>
                                                         handleChange(index, "email", e.target.value)
@@ -487,6 +503,7 @@ function NhapThongTin() {
                                         <input
                                             type="text"
                                             placeholder={t('booking.passenger_info.id_card')}
+                                            maxLength={50}
                                             value={passengerInfo[index].idCard}
                                             onChange={(e) =>
                                                 handleChange(index, "idCard", e.target.value)
@@ -510,6 +527,7 @@ function NhapThongTin() {
                                         <input
                                             type="text"
                                             placeholder={t('booking.passenger_info.address')}
+                                            maxLength={255}
                                             value={passengerInfo[index].address}
                                             onChange={(e) =>
                                                 handleChange(index, "address", e.target.value)

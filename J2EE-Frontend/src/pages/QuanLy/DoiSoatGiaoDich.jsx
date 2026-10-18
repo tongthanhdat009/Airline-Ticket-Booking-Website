@@ -336,7 +336,7 @@ const DoiSoatGiaoDich = () => {
  <div className="flex flex-wrap items-center gap-4 mb-6">
  <div className="relative flex-1 min-w-[200px]">
  <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
- <input
+ <input maxLength={100}
  type="text"
  placeholder="Tìm theo mã giao dịch, mã đơn hàng, PNR..."
  value={search}

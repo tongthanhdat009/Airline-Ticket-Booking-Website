@@ -341,7 +341,7 @@ const QuanLyBannerTinTuc = () => {
  <div className="flex flex-wrap items-center gap-4 mb-4">
  <div className="relative flex-1 min-w-[200px]">
  <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
- <input
+ <input maxLength={100}
  type="text"
  placeholder={activeTab === 'banner' ? 'Tìm banner...' : 'Tìm tin tức...'}
  value={search}
@@ -672,6 +672,7 @@ const QuanLyBannerTinTuc = () => {
  <input
  type="text"
  value={bannerForm.tieuDe}
+ maxLength={255}
  onChange={(e) => setBannerForm(prev => ({ ...prev, tieuDe: e.target.value }))}
  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
  placeholder="VD: Khuyến mãi hè 2026..."
@@ -681,6 +682,7 @@ const QuanLyBannerTinTuc = () => {
  <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
  <textarea
  value={bannerForm.moTa}
+ maxLength={500}
  onChange={(e) => setBannerForm(prev => ({ ...prev, moTa: e.target.value }))}
  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
  rows={3}
@@ -692,6 +694,7 @@ const QuanLyBannerTinTuc = () => {
  <input
  type="url"
  value={bannerForm.hinhAnh}
+ maxLength={500}
  onChange={(e) => setBannerForm(prev => ({ ...prev, hinhAnh: e.target.value }))}
  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
  placeholder="https://example.com/image.jpg"
@@ -711,6 +714,7 @@ const QuanLyBannerTinTuc = () => {
  <input
  type="text"
  value={bannerForm.linkUrl}
+ maxLength={255}
  onChange={(e) => setBannerForm(prev => ({ ...prev, linkUrl: e.target.value }))}
  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
  placeholder="/khuyen-mai"
@@ -797,6 +801,7 @@ const QuanLyBannerTinTuc = () => {
  <input
  type="text"
  value={tinTucForm.tieuDe}
+ maxLength={255}
  onChange={(e) => setTinTucForm(prev => ({ ...prev, tieuDe: e.target.value }))}
  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
  placeholder="VD: Thông báo chuyến bay mới..."
@@ -804,7 +809,7 @@ const QuanLyBannerTinTuc = () => {
  </div>
  <div>
  <label className="block text-sm font-medium text-gray-700 mb-1">Tóm tắt *</label>
- <textarea
+ <textarea maxLength={2000}
  value={tinTucForm.tomTat}
  onChange={(e) => setTinTucForm(prev => ({ ...prev, tomTat: e.target.value }))}
  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
@@ -816,6 +821,7 @@ const QuanLyBannerTinTuc = () => {
  <label className="block text-sm font-medium text-gray-700 mb-1">Nội dung chi tiết</label>
  <textarea
  value={tinTucForm.noiDung}
+ maxLength={2000}
  onChange={(e) => setTinTucForm(prev => ({ ...prev, noiDung: e.target.value }))}
  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
  rows={8}
@@ -827,6 +833,7 @@ const QuanLyBannerTinTuc = () => {
  <input
  type="url"
  value={tinTucForm.hinhAnh}
+ maxLength={500}
  onChange={(e) => setTinTucForm(prev => ({ ...prev, hinhAnh: e.target.value }))}
  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
  placeholder="https://example.com/image.jpg"
@@ -880,6 +887,7 @@ const QuanLyBannerTinTuc = () => {
  <input
  type="text"
  value={tinTucForm.tacGia}
+ maxLength={100}
  onChange={(e) => setTinTucForm(prev => ({ ...prev, tacGia: e.target.value }))}
  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
  placeholder="Admin"

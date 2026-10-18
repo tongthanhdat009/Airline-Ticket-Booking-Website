@@ -288,7 +288,7 @@ function LichSuGiaoDich() {
                       <FaSearch className="w-4 h-4" />
                       Tìm kiếm
                     </label>
-                    <input
+                    <input maxLength={100}
                       type="text"
                       placeholder="Tìm theo mã giao dịch, số hiệu chuyến bay..."
                       value={filters.search}

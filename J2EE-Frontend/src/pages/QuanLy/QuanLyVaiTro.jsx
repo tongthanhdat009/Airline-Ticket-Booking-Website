@@ -278,7 +278,7 @@ const QuanLyVaiTro = () => {
  <div className="flex items-center gap-4">
  <div className="relative flex-1">
  <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400" />
- <input
+ <input maxLength={100}
  type="text"
  placeholder="Tìm kiếm vai trò..."
  value={searchTerm}
@@ -405,7 +405,7 @@ const QuanLyVaiTro = () => {
  <label className="block text-slate-700 font-semibold mb-2">
  Tên vai trò <span className="text-red-500">*</span>
  </label>
- <input
+ <input maxLength={50}
  type="text"
  required
  value={formData.tenVaiTro}
@@ -419,7 +419,7 @@ const QuanLyVaiTro = () => {
  <label className="block text-slate-700 font-semibold mb-2">
  Mô tả
  </label>
- <textarea
+ <textarea maxLength={255}
  value={formData.moTa}
  onChange={(e) => setFormData({...formData, moTa: e.target.value})}
  className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors resize-none"

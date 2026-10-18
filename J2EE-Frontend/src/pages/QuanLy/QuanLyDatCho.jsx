@@ -619,7 +619,7 @@ const QuanLyDatCho = () => {
  {/* Thanh tìm kiếm */}
  <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-3">
  <div className="relative w-full md:w-96">
- <input
+ <input maxLength={100}
  type="text"
  placeholder="Tìm kiếm theo mã đặt chỗ, tên, CCCD..."
  value={search}
@@ -923,7 +923,7 @@ const QuanLyDatCho = () => {
  {/* Thanh tìm kiếm va toggle chuyến bay */}
  <div className="mb-4 flex flex-col lg:flex-row lg:items-center gap-4">
  <div className="relative w-full md:w-96">
- <input
+ <input maxLength={100}
  type="text"
  placeholder="Tìm kiếm theo mã chuyến bay, sân bay..."
  value={flightSearch}

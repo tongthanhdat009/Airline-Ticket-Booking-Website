@@ -335,17 +335,17 @@
       "faq_a2": "Each fare class has different baggage allowance. Please check your ticket details or our baggage services page.",
       "faq_q3": "When should I arrive for check-in?",
       "faq_a3": "We recommend arriving at least 2 hours for domestic and 3 hours for international flights."
+    },
+    "other_services_list": {
+      "hotel": { "title": "Hotel Booking", "desc": "Quality hotels with special rates" },
+      "car": { "title": "Car Rental", "desc": "Self-drive or chauffeur-driven car rental at destination" },
+      "tour": { "title": "Tours", "desc": "Attractive tour packages across Vietnam and worldwide" },
+      "tickets": { "title": "Attraction Tickets", "desc": "Tickets for attractions and theme parks" },
+      "visa": { "title": "Visa & Passport", "desc": "Visa assistance and fast passport renewal" },
+      "sim": { "title": "Travel SIM", "desc": "Unlimited 4G data SIM for your trip" },
+      "currency": { "title": "Currency Exchange", "desc": "Currency exchange with the best rates" },
+      "vouchers": { "title": "Gifts & Vouchers", "desc": "Buy travel vouchers as meaningful gifts" }
     }
-  },
-  "other_services_list": {
-    "hotel": { "title": "Hotel Booking", "desc": "Quality hotels with special rates" },
-    "car": { "title": "Car Rental", "desc": "Self-drive or chauffeur-driven car rental at destination" },
-    "tour": { "title": "Tours", "desc": "Attractive tour packages across Vietnam and worldwide" },
-    "tickets": { "title": "Attraction Tickets", "desc": "Tickets for attractions and theme parks" },
-    "visa": { "title": "Visa & Passport", "desc": "Visa assistance and fast passport renewal" },
-    "sim": { "title": "Travel SIM", "desc": "Unlimited 4G data SIM for your trip" },
-    "currency": { "title": "Currency Exchange", "desc": "Currency exchange with the best rates" },
-    "vouchers": { "title": "Gifts & Vouchers", "desc": "Buy travel vouchers as meaningful gifts" }
   },
   "booking": {
     "errors": {

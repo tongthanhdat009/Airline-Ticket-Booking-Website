@@ -192,7 +192,7 @@ const QuanLyKhachHang = () => {
  {/* Thanh công cụ */}
  <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-3">
  <div className="relative w-full md:w-96">
- <input
+ <input maxLength={100}
  type="text"
  placeholder="Tìm kiếm theo tên, email, SĐT..."
  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
@@ -381,35 +381,38 @@ const QuanLyKhachHang = () => {
  <form onSubmit={handleSubmit} className="p-6 space-y-4">
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">Họ và tên *</label>
+ <label className="block text-sm font-medium text-gray-700 mb-2">Họ và tên * (tối đa 50 ký tự)</label>
  <input
  type="text"
  name="hoVaTen"
  value={formData.hoVaTen || ''}
  onChange={handleFormChange}
  required
+ maxLength={50}
  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  />
  </div>
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+ <label className="block text-sm font-medium text-gray-700 mb-2">Email * (tối đa 100 ký tự)</label>
  <input
  type="email"
  name="email"
  value={formData.email || ''}
  onChange={handleFormChange}
  required
+ maxLength={100}
  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  />
  </div>
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">Số điện thoại *</label>
+ <label className="block text-sm font-medium text-gray-700 mb-2">Số điện thoại * (tối đa 20 ký tự)</label>
  <input
  type="tel"
  name="soDienThoai"
  value={formData.soDienThoai || ''}
  onChange={handleFormChange}
  required
+ maxLength={20}
  pattern="^(0|\+84)(3|5|7|8|9)\d{8}$"
  title="Số điện thoại phải bắt đầu bằng 0 hoặc +84, theo sau là đầu số 3/5/7/8/9 và 8 chữ số. VD: 0987654321 hoặc +84987654321"
  placeholder="VD: 0987654321"
@@ -458,22 +461,24 @@ const QuanLyKhachHang = () => {
  </select>
  </div>
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">Mã định danh</label>
+ <label className="block text-sm font-medium text-gray-700 mb-2">Mã định danh (tối đa 50 ký tự)</label>
  <input
  type="text"
  name="maDinhDanh"
  value={formData.maDinhDanh || ''}
  onChange={handleFormChange}
+ maxLength={50}
  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  />
  </div>
  <div className="md:col-span-2">
- <label className="block text-sm font-medium text-gray-700 mb-2">Địa chỉ</label>
+ <label className="block text-sm font-medium text-gray-700 mb-2">Địa chỉ (tối đa 255 ký tự)</label>
  <textarea
  name="diaChi"
  value={formData.diaChi || ''}
  onChange={handleFormChange}
  rows={3}
+ maxLength={255}
  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  />
  </div>

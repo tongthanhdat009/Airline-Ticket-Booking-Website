@@ -288,7 +288,7 @@ const QuanLyDichVu = () => {
       {/* Header Actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div className="relative w-full sm:w-96">
-          <input
+          <input maxLength={100}
             type="text"
             placeholder="Tìm kiếm dịch vụ..."
             value={searchTerm}

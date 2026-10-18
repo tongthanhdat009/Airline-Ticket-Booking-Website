@@ -433,7 +433,7 @@ const ThemChuyenBay = () => {
  <label className="block text-sm font-bold text-gray-700 mb-2">
  Số hiệu chuyến bay <span className="text-red-500">*</span>
  </label>
- <input
+ <input maxLength={10}
  type="text"
  name="soHieuChuyenBay"
  value={formData.soHieuChuyenBay}
@@ -550,7 +550,7 @@ const ThemChuyenBay = () => {
  <label className="block text-sm font-bold text-gray-700 mb-2">
  Số hiệu chuyến bay về <span className="text-red-500">*</span>
  </label>
- <input
+ <input maxLength={10}
  type="text"
  name="soHieuChuyenBayVe"
  value={formData.soHieuChuyenBayVe}

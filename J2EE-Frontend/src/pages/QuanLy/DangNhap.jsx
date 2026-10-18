@@ -114,7 +114,7 @@ function DangNhapAdmin() {
  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
  <FaUser className="text-gray-400" size={18} />
  </div>
- <input
+ <input maxLength={50}
  type="text"
  name="username"
  value={formData.username}
@@ -135,7 +135,7 @@ function DangNhapAdmin() {
  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
  <FaLock className="text-gray-400" size={18} />
  </div>
- <input
+ <input maxLength={255}
  type="password"
  name="password"
  value={formData.password}

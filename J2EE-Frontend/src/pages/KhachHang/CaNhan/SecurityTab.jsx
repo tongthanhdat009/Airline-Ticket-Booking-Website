@@ -55,6 +55,7 @@ function SecurityTab({
               <div className="relative">
                 <input
                   type={showPassword.old ? 'text' : 'password'}
+                  maxLength={255}
                   name="oldPassword"
                   value={passwordData.oldPassword}
                   onChange={onPasswordChange}
@@ -78,6 +79,7 @@ function SecurityTab({
               <div className="relative">
                 <input
                   type={showPassword.new ? 'text' : 'password'}
+                  maxLength={255}
                   name="newPassword"
                   value={passwordData.newPassword}
                   onChange={onPasswordChange}
@@ -124,6 +126,7 @@ function SecurityTab({
               <div className="relative">
                 <input
                   type={showPassword.confirm ? 'text' : 'password'}
+                  maxLength={255}
                   name="confirmPassword"
                   value={passwordData.confirmPassword}
                   onChange={onPasswordChange}

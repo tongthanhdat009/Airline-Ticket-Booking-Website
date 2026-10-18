@@ -130,6 +130,7 @@ function TraCuuChuyenBay() {
                   </div>
                   <input
                     type="text"
+                    maxLength={50}
                     value={passengerName}
                     onChange={(e) => setPassengerName(e.target.value)}
                     placeholder={t('pages.tra_cuu.placeholder_passenger_name')}

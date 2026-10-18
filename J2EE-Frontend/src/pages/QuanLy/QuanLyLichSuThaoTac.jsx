@@ -308,7 +308,7 @@ const QuanLyLichSuThaoTac = () => {
  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-3">
  <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full lg:w-auto">
  <div className="relative w-full sm:w-auto min-w-[250px]">
- <input
+ <input maxLength={100}
  type="text"
  placeholder="Tìm kiếm theo mô tả, ngưởi thực hiện..."
  value={search}

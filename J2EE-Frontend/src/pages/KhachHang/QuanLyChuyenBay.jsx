@@ -254,7 +254,7 @@ function QuanLyChuyenBay() {
                       <FaSearch className="w-4 h-4" />
                       Tìm kiếm
                     </label>
-                    <input
+                    <input maxLength={100}
                       type="text"
                       placeholder="Tìm theo số hiệu, điểm đi, điểm đến..."
                       value={filters.search}

@@ -349,6 +349,7 @@ const QuanLyHoanTien = () => {
  <div className="relative w-full md:w-96">
  <input
  type="text"
+ maxLength={100}
  placeholder="Tìm kiếm yêu cầu hoàn tiền..."
  value={search}
  onChange={e => setSearch(e.target.value)}

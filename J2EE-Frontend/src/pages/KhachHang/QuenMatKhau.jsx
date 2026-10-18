@@ -195,7 +195,7 @@ function QuenMatKhau() {
                     </label>
                     <div className="relative flex items-center">
                       <span className="absolute left-4 text-lg pointer-events-none">📧</span>
-                      <input
+                      <input maxLength={100}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         id="email"
@@ -276,7 +276,7 @@ function QuenMatKhau() {
                     </label>
                     <div className="relative flex items-center">
                       <span className="absolute left-4 text-lg pointer-events-none">🔒</span>
-                      <input
+                      <input maxLength={255}
                         value={matKhauMoi}
                         onChange={(e) => setMatKhauMoi(e.target.value)}
                         id="new-password"
@@ -293,7 +293,7 @@ function QuenMatKhau() {
                     </label>
                     <div className="relative flex items-center">
                       <span className="absolute left-4 text-lg pointer-events-none">🔐</span>
-                      <input
+                      <input maxLength={255}
                         value={xacNhanMatKhau}
                         onChange={(e) => setXacNhanMatKhau(e.target.value)}
                         id="confirm-password"

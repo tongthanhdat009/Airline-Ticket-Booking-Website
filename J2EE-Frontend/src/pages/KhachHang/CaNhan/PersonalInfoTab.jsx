@@ -59,8 +59,7 @@ function PersonalInfoTab({
                 ? 'border-gray-300 bg-white'
                 : 'border-gray-200 bg-gray-50 text-gray-600'
             }`}
-            placeholder="Nhập họ và tên"
-          />
+            placeholder="Nhập họ và tên" maxLength={50} />
         </div>
 
         <div>
@@ -114,8 +113,7 @@ function PersonalInfoTab({
             type="email"
             value={formData.email}
             disabled
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
-          />
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed" maxLength={100} />
           <p className="text-xs text-gray-500 mt-1">Email không thể thay đổi</p>
         </div>
 
@@ -135,8 +133,7 @@ function PersonalInfoTab({
                 ? 'border-gray-300 bg-white'
                 : 'border-gray-200 bg-gray-50 text-gray-600'
             }`}
-            placeholder="Nhập số điện thoại"
-          />
+            placeholder="Nhập số điện thoại" maxLength={20} />
         </div>
       </div>
 

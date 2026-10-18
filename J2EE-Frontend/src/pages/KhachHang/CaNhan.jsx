@@ -8,6 +8,7 @@ import ProfileCard from './CaNhan/ProfileCard';
 import PersonalInfoTab from './CaNhan/PersonalInfoTab';
 import SecurityTab from './CaNhan/SecurityTab';
 import useTitle from '../../hooks/useTitle';
+import { isValidVnPhone, VN_PHONE_MESSAGE } from '../../utils/phoneValidation';
 
 function CaNhan() {
   const navigate = useNavigate();
@@ -96,10 +97,9 @@ function CaNhan() {
       return;
     }
 
-    // Validate phone number
-    const phoneRegex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/;
-    if (!phoneRegex.test(formData.soDienThoai)) {
-      setUpdateError('Số điện thoại không hợp lệ');
+    // Chuẩn SĐT thống nhất toàn hệ thống — trước đây regex thiếu ^/$ và cho phép tiền tố 84 không có +.
+    if (!isValidVnPhone(formData.soDienThoai)) {
+      setUpdateError(VN_PHONE_MESSAGE);
       return;
     }
 

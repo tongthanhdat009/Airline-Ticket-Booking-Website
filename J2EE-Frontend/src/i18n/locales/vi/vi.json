@@ -335,17 +335,17 @@
       "faq_a2": "Mỗi hạng vé có quy định hành lý khác nhau. Vui lòng kiểm tra thông tin hành lý trên vé hoặc trang dịch vụ hành lý của chúng tôi.",
       "faq_q3": "Thời gian làm thủ tục trước chuyến bay?",
       "faq_a3": "Chúng tôi khuyến nghị có mặt tại sân bay ít nhất 2 giờ cho chuyến nội địa và 3 giờ cho chuyến quốc tế."
+    },
+    "other_services_list": {
+      "hotel": { "title": "Đặt khách sạn", "desc": "Khách sạn chất lượng với giá ưu đãi đặc biệt" },
+      "car": { "title": "Thuê xe", "desc": "Thuê xe tự lái hoặc có tài xế tại điểm đến" },
+      "tour": { "title": "Tour du lịch", "desc": "Các gói tour hấp dẫn khắp Việt Nam và thế giới" },
+      "tickets": { "title": "Vé tham quan", "desc": "Vé các điểm tham quan, công viên giải trí" },
+      "visa": { "title": "Visa & Passport", "desc": "Hỗ trợ làm visa, gia hạn passport nhanh chóng" },
+      "sim": { "title": "SIM du lịch", "desc": "SIM 4G data không giới hạn cho chuyến đi" },
+      "currency": { "title": "Đổi ngoại tệ", "desc": "Dịch vụ đổi ngoại tệ với tỷ giá tốt nhất" },
+      "vouchers": { "title": "Quà tặng & Voucher", "desc": "Mua voucher du lịch làm quà tặng ý nghĩa" }
     }
-  },
-  "other_services_list": {
-    "hotel": { "title": "Đặt khách sạn", "desc": "Khách sạn chất lượng với giá ưu đãi đặc biệt" },
-    "car": { "title": "Thuê xe", "desc": "Thuê xe tự lái hoặc có tài xế tại điểm đến" },
-    "tour": { "title": "Tour du lịch", "desc": "Các gói tour hấp dẫn khắp Việt Nam và thế giới" },
-    "tickets": { "title": "Vé tham quan", "desc": "Vé các điểm tham quan, công viên giải trí" },
-    "visa": { "title": "Visa & Passport", "desc": "Hỗ trợ làm visa, gia hạn passport nhanh chóng" },
-    "sim": { "title": "SIM du lịch", "desc": "SIM 4G data không giới hạn cho chuyến đi" },
-    "currency": { "title": "Đổi ngoại tệ", "desc": "Dịch vụ đổi ngoại tệ với tỷ giá tốt nhất" },
-    "vouchers": { "title": "Quà tặng & Voucher", "desc": "Mua voucher du lịch làm quà tặng ý nghĩa" }
   },
   "booking": {
     "errors": {

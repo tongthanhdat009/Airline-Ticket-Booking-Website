@@ -175,6 +175,7 @@ function OnlineCheckIn() {
                         </div>
                         <input
                           type="text"
+                          maxLength={50}
                           value={lastName}
                           onChange={(e) => setLastName(e.target.value)}
                           placeholder={t('pages.online_checkin.placeholder_last_name')}

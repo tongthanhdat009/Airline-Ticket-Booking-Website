@@ -194,7 +194,7 @@ const QuanLyTuyenBay = () => {
  {/* Thanh công cụ */}
  <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-3">
  <div className="relative w-full md:w-96">
- <input
+ <input maxLength={100}
  type="text"
  placeholder="Tìm kiếm tuyến bay..."
  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"

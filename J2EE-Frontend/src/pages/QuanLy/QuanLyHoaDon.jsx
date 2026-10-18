@@ -311,6 +311,7 @@ const QuanLyHoaDon = () => {
  <div className="relative w-full lg:w-96">
  <input
  type="text"
+ maxLength={100}
  placeholder="Tìm kiếm theo số HĐ, PNR, tên, email..."
  value={search}
  onChange={(e) => setSearch(e.target.value)}

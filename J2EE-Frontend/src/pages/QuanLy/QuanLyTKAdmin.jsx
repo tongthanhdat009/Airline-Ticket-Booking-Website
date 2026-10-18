@@ -177,7 +177,7 @@ const QuanLyTKAdmin = () => {
       {/* Thanh công cụ */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-3">
         <div className="relative w-full md:w-96">
-          <input
+          <input maxLength={100}
             type="text"
             placeholder="Tìm kiếm theo tên, email, tên đăng nhập..."
             value={search}

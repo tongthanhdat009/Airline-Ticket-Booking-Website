@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import TaiKhoanService from '../../services/TaiKhoanService';
 import { getClientAccessToken, getClientUserEmail } from '../../utils/cookieUtils';
 import useTitle from '../../hooks/useTitle';
+import { isValidVnPhone, VN_PHONE_MESSAGE, VN_PHONE_MAX_LENGTH } from '../../utils/phoneValidation';
 
 function HoanThienThongTin() {
   const navigate = useNavigate();
@@ -107,11 +108,11 @@ function HoanThienThongTin() {
       }
     }
     
-    // Validate số điện thoại - chỉ cho phép số
+    // Chỉ cho phép số và dấu '+' (đầu số +84) — đồng bộ chuẩn SĐT thống nhất.
     if (name === 'soDienThoai') {
-      const phoneRegex = /^[0-9]*$/;
+      const phoneRegex = /^[0-9+]*$/;
       if (value && !phoneRegex.test(value)) {
-        return; // Không cập nhật nếu có ký tự không phải số
+        return; // Không cập nhật nếu có ký tự không phải số/+
       }
     }
     
@@ -143,10 +144,9 @@ function HoanThienThongTin() {
       return;
     }
     
-    // Kiểm tra số điện thoại: 10 số, bắt đầu bằng 0
-    const phoneRegex = /^0[0-9]{9}$/;
-    if (!phoneRegex.test(formData.soDienThoai)) {
-      setError('Số điện thoại không hợp lệ. Vui lòng nhập 10 số, bắt đầu bằng 0 (VD: 0912345678)');
+    // Chuẩn SĐT thống nhất toàn hệ thống (0/+84 + đầu số 3/5/7/8/9 + 8 số) — trước đây chỉ chấp nhận 0 + 10 số.
+    if (!isValidVnPhone(formData.soDienThoai)) {
+      setError(VN_PHONE_MESSAGE + ' (VD: 0912345678)');
       return;
     }
     
@@ -234,7 +234,7 @@ function HoanThienThongTin() {
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-lg">👤</span>
-                    <input
+                    <input maxLength={50}
                       type="text"
                       name="hoVaTen"
                       value={formData.hoVaTen}
@@ -259,12 +259,12 @@ function HoanThienThongTin() {
                       name="soDienThoai"
                       value={formData.soDienThoai}
                       onChange={handleChange}
-                      maxLength="10"
+                      maxLength={VN_PHONE_MAX_LENGTH}
                       className="w-full py-3 pl-11 pr-4 border-2 border-gray-200 rounded-lg text-sm transition-all bg-gray-50 focus:outline-none focus:border-[#1E88E5] focus:bg-white focus:shadow-[0_0_0_3px_rgba(30,136,229,0.1)]"
                       placeholder="0912345678"
-                      title="Nhập 10 số, bắt đầu bằng 0"
+                      title="0/+84 + đầu số 3/5/7/8/9 + 8 số (VD: 0912345678)"
                     />
-                    <p className="mt-1 text-xs text-gray-500">💡 Nhập 10 số, bắt đầu bằng 0 (VD: 0912345678)</p>
+                    <p className="mt-1 text-xs text-gray-500">💡 0/+84 + đầu số 3/5/7/8/9 + 8 số (VD: 0912345678)</p>
                   </div>
                 </div>
 
