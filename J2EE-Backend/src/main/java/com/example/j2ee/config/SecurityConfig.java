@@ -93,7 +93,7 @@ public class SecurityConfig {
                         // CORS preflight OPTIONS
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // Public endpoints - KHÁCH HÀNG
-                        .requestMatchers("/dangky").permitAll()
+                        .requestMatchers("/dangky", "/dangky/**", "/check-email", "/check-phone").permitAll()
                         .requestMatchers("/dangnhap/**").permitAll()
                         .requestMatchers("/current-user").permitAll()
                         .requestMatchers("/dangxuat").permitAll()
@@ -108,13 +108,16 @@ public class SecurityConfig {
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         // VNPay, Check-in, Booking, Coupon, Services, Chat endpoints
-                        .requestMatchers("/vnpay/**", "/checkin/**", "/client/datcho/**", "/client/khuyenmai/**", "/client/dichvu/**").permitAll()
+                        // Fix D-9/D-10: chỉ giữ ẩn danh cho tạo booking + tra cứu bằng
+                        // mã kèm tên (proof-of-knowledge); các endpoint đọc/hủy theo ID
+                        // số phải đăng nhập + kiểm tra ownership trong controller.
+                        .requestMatchers(HttpMethod.POST, "/client/datcho/create").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/client/datcho/search").permitAll()
+                        .requestMatchers("/vnpay/**", "/checkin/**", "/client/khuyenmai/**", "/client/dichvu/**").permitAll()
                         .requestMatchers("/api/chat/start", "/api/chat/message", "/api/chat/history/**", "/api/chat/session/**").permitAll()
                         .requestMatchers("/api/chat/admin/**").access(dynamicAdminAuthManager)
                         // AI Chat suggestion (admin only)
                         .requestMatchers("/ai-chat/**").access(dynamicAdminAuthManager)
-                        // TaiKhoan endpoints
-                        .requestMatchers("/taikhoan/email/**").permitAll()
                         // Static resources
                         .requestMatchers("/ai/**", "/static/**").permitAll()
                         .requestMatchers("/admin/dashboard/dichvu/anh/**", "/admin/dashboard/dichvu/luachon/anh/**").permitAll()

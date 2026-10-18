@@ -4,6 +4,8 @@ import com.example.j2ee.dto.ApiResponse;
 import com.example.j2ee.dto.TaiKhoanDTO;
 import com.example.j2ee.model.TaiKhoan;
 import com.example.j2ee.repository.TaiKhoanRepository;
+import com.example.j2ee.service.HanhKhachService;
+import com.example.j2ee.util.SecurityUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +33,12 @@ public class TaiKhoanController {
      */
     @GetMapping("/email/{email}")
     public ResponseEntity<ApiResponse<TaiKhoanDTO>> getTaiKhoanByEmail(@PathVariable String email) {
+        // Fix D-9 (IDOR đọc): chỉ chính chủ mới được xem hồ sơ của mình.
+        // Anonymous → 401 do SecurityConfig (anyRequest.authenticated).
+        if (!SecurityUtil.isSelf(email)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("Bạn không có quyền xem thông tin tài khoản này"));
+        }
         Optional<TaiKhoan> taiKhoanOpt = taiKhoanRepository.findByEmail(email);
 
         if (taiKhoanOpt.isEmpty()) {
@@ -83,6 +91,12 @@ public class TaiKhoanController {
         }
         
         TaiKhoan taiKhoan = optionalTaiKhoan.get();
+
+        // Fix D-10 (IDOR ghi): chỉ chính chủ mới được sửa hồ sơ của mình.
+        if (!SecurityUtil.isSelf(taiKhoan.getEmail())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("Bạn không có quyền sửa thông tin tài khoản này"));
+        }
         
         // Cập nhật thông tin hành khách nếu có
         if (updates.containsKey("hanhKhach") && taiKhoan.getHanhKhach() != null) {
@@ -96,10 +110,11 @@ public class TaiKhoanController {
                 taiKhoan.getHanhKhach().setGioiTinh((String) hanhKhachData.get("gioiTinh"));
             }
             if (hanhKhachData.containsKey("soDienThoai")) {
-                taiKhoan.getHanhKhach().setSoDienThoai((String) hanhKhachData.get("soDienThoai"));
+                // Fix D-30: blank → NULL để không vi phạm UK_madinhdanh / lưu "".
+                taiKhoan.getHanhKhach().setSoDienThoai(HanhKhachService.normalizeNullable((String) hanhKhachData.get("soDienThoai")));
             }
             if (hanhKhachData.containsKey("maDinhDanh")) {
-                taiKhoan.getHanhKhach().setMaDinhDanh((String) hanhKhachData.get("maDinhDanh"));
+                taiKhoan.getHanhKhach().setMaDinhDanh(HanhKhachService.normalizeNullable((String) hanhKhachData.get("maDinhDanh")));
             }
             if (hanhKhachData.containsKey("diaChi")) {
                 taiKhoan.getHanhKhach().setDiaChi((String) hanhKhachData.get("diaChi"));
@@ -152,6 +167,12 @@ public class TaiKhoanController {
         }
         
         TaiKhoan taiKhoan = optionalTaiKhoan.get();
+
+        // Fix D-10 (IDOR ghi): chỉ chính chủ mới được đổi mật khẩu của mình.
+        if (!SecurityUtil.isSelf(taiKhoan.getEmail())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("Bạn không có quyền đổi mật khẩu tài khoản này"));
+        }
         
         // Kiểm tra nếu tài khoản đăng nhập qua OAuth2
         if (taiKhoan.getOauth2Provider() != null) {

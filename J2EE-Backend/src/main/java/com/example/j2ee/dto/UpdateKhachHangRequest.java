@@ -19,7 +19,7 @@ import java.time.LocalDate;
 public class UpdateKhachHangRequest {
 
     @NotBlank(message = "Họ và tên không được để trống")
-    @Size(min = 2, max = 100, message = "Họ và tên phải từ 2 đến 100 ký tự")
+    @Size(min = 2, max = 50, message = "Họ và tên phải từ 2 đến 50 ký tự")
     private String hoVaTen;
 
     private LocalDate ngaySinh;
@@ -30,7 +30,7 @@ public class UpdateKhachHangRequest {
     @Size(max = 255, message = "Địa chỉ tối đa 255 ký tự")
     private String diaChi;
 
-    @Pattern(regexp = "^[0-9]{10,11}$", message = "Số điện thoại phải có 10-11 chữ số")
+    @Pattern(regexp = "^(0|\\+84)(3|5|7|8|9)\\d{8}$", message = "Số điện thoại không hợp lệ (0/+84 + đầu số 3/5/7/8/9 + 8 số, VD: 0987654321)")
     private String soDienThoai;
 
     @Size(max = 100, message = "Quốc gia tối đa 100 ký tự")

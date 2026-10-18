@@ -3,7 +3,7 @@ package com.example.j2ee.controller;
 import com.example.j2ee.model.*;
 import com.example.j2ee.repository.*;
 import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
@@ -96,12 +96,17 @@ public class ClientInvoiceController {
             BigDecimal ticketPrice = totalAmount.subtract(servicesTotalAmount);
             
             // Add flight ticket as first item
+            // Fix D-11: keys/types phải khớp invoice_report.jrxml
+            // (itemNo/quantity = Integer, formatted = String).
+            java.text.DecimalFormat vndFormat = new java.text.DecimalFormat("#,##0");
             Map<String, Object> ticketItem = new HashMap<>();
-            ticketItem.put("rowNumber", rowNum++);
+            ticketItem.put("itemNo", rowNum++);
             ticketItem.put("description", "Flight Ticket" + (chiTietGhe != null ? " - Seat " + chiTietGhe.getSoGhe() : ""));
-            ticketItem.put("quantity", "1");
-            ticketItem.put("unitPrice", ticketPrice);
-            ticketItem.put("amount", ticketPrice);
+            ticketItem.put("quantity", 1);
+            ticketItem.put("unitPrice", ticketPrice.doubleValue());
+            ticketItem.put("totalPrice", ticketPrice.doubleValue());
+            ticketItem.put("unitPriceFormatted", vndFormat.format(ticketPrice) + " VND");
+            ticketItem.put("totalPriceFormatted", vndFormat.format(ticketPrice) + " VND");
             items.add(ticketItem);
             
             // Add services
@@ -110,12 +115,14 @@ public class ClientInvoiceController {
                     BigDecimal amount = dichVu.getDonGia().multiply(BigDecimal.valueOf(dichVu.getSoLuong()));
                     
                     Map<String, Object> serviceItem = new HashMap<>();
-                    serviceItem.put("rowNumber", rowNum++);
-                    serviceItem.put("description", dichVu.getLuaChonDichVu().getDichVuCungCap().getTenDichVu() + 
+                    serviceItem.put("itemNo", rowNum++);
+                    serviceItem.put("description", dichVu.getLuaChonDichVu().getDichVuCungCap().getTenDichVu() +
                                                   " - " + dichVu.getLuaChonDichVu().getTenLuaChon());
-                    serviceItem.put("quantity", String.valueOf(dichVu.getSoLuong()));
-                    serviceItem.put("unitPrice", dichVu.getDonGia());
-                    serviceItem.put("amount", amount);
+                    serviceItem.put("quantity", dichVu.getSoLuong());
+                    serviceItem.put("unitPrice", dichVu.getDonGia().doubleValue());
+                    serviceItem.put("totalPrice", amount.doubleValue());
+                    serviceItem.put("unitPriceFormatted", vndFormat.format(dichVu.getDonGia()) + " VND");
+                    serviceItem.put("totalPriceFormatted", vndFormat.format(amount) + " VND");
                     items.add(serviceItem);
                 }
             }
@@ -126,12 +133,16 @@ public class ClientInvoiceController {
             BigDecimal subtotal = total.divide(BigDecimal.valueOf(1.10), 2, java.math.RoundingMode.HALF_UP);
             BigDecimal tax = total.subtract(subtotal);
             
-            parameters.put("subtotal", subtotal);
-            parameters.put("tax", tax);
-            parameters.put("total", total);
+            // Fix D-11: jrxml khai báo subtotal/tax/total là java.lang.Double.
+            parameters.put("subtotal", subtotal.doubleValue());
+            parameters.put("tax", tax.doubleValue());
+            parameters.put("total", total.doubleValue());
             
             // Create data source
-            JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(items);
+            // Fix D-11: items là List<Map> nên dùng JRMapCollectionDataSource
+            // (JRBean... introspect getter trên Map gây JRExpressionEvalException).
+            java.util.Collection<java.util.Map<String, ?>> mapItems = new java.util.ArrayList<>(items);
+            JRMapCollectionDataSource dataSource = new JRMapCollectionDataSource(mapItems);
             
             // Fill report
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);

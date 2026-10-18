@@ -19,6 +19,7 @@ import com.example.j2ee.repository.GheDaDatRepository;
 import com.example.j2ee.service.DatChoService;
 import com.example.j2ee.service.HanhKhachService;
 import com.example.j2ee.service.BookingService;
+import com.example.j2ee.util.SecurityUtil;
 import jakarta.validation.Valid;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,16 @@ public class ClientDatChoController {
     @GetMapping("/hanhkhach/{maHanhKhach}")
     public ResponseEntity<ApiResponse<List<DatCho>>> getDatChoByHanhKhach(@PathVariable int maHanhKhach) {
         try {
+            // Fix D-9 (IDOR đọc): chỉ chính chủ mới được liệt kê đặt chỗ của mình.
+            HanhKhach hk = hanhKhachRepository.findById(maHanhKhach).orElse(null);
+            if (hk == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Không tìm thấy hành khách"));
+            }
+            if (!SecurityUtil.isOwnerOf(hk)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("Bạn không có quyền xem đặt chỗ của hành khách này"));
+            }
             List<DatCho> danhSachDatCho = datChoService.getDatChoByHanhKhach(maHanhKhach);
             return ResponseEntity.ok(
                 ApiResponse.success("Lấy danh sách đặt chỗ thành công", danhSachDatCho)
@@ -68,6 +79,12 @@ public class ClientDatChoController {
         try {
             DatCho datCho = datChoService.getDatChoById(maDatCho)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đặt chỗ"));
+            // Fix D-9 (IDOR đọc): chỉ chính chủ mới được xem chi tiết đặt chỗ của mình.
+            // Khách guest tra cứu bằng mã + tên qua /search (proof-of-knowledge).
+            if (!SecurityUtil.isOwnerOf(datCho.getHanhKhach())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("Bạn không có quyền xem đặt chỗ này"));
+            }
             
             return ResponseEntity.ok(
                 ApiResponse.success("Lấy chi tiết đặt chỗ thành công", datCho)
@@ -87,6 +104,16 @@ public class ClientDatChoController {
     @DeleteMapping("/{maDatCho}")
     public ResponseEntity<ApiResponse<Void>> huyDatCho(@PathVariable int maDatCho) {
         try {
+            // Fix D-10 (IDOR ghi): chỉ chính chủ mới được hủy đặt chỗ của mình.
+            DatCho datCho = datChoService.getDatChoById(maDatCho).orElse(null);
+            if (datCho == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Không tìm thấy đặt chỗ"));
+            }
+            if (!SecurityUtil.isOwnerOf(datCho.getHanhKhach())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("Bạn không có quyền hủy đặt chỗ này"));
+            }
             datChoService.huyDatCho(maDatCho);
             return ResponseEntity.ok(ApiResponse.successMessage("Hủy đặt chỗ thành công"));
         } catch (IllegalArgumentException e) {
@@ -141,14 +168,29 @@ public class ClientDatChoController {
                 )
             );
         } catch (IllegalArgumentException e) {
-            // Business validation errors (ghế đã đặt, số lượng không khớp, etc.)
+            // Business validation errors (ghế đã đặt, số lượng không khớp, độ dài text field, etc.)
             return ResponseEntity.badRequest()
                 .body(ApiResponse.error(e.getMessage()));
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            // Fix D-30: trùng unique (kể cả race) → 409 sanitized, không lộ SQL.
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error("Dữ liệu bị trùng lặp, vui lòng kiểm tra lại thông tin"));
         } catch (Exception e) {
-            // Unexpected errors
-            e.printStackTrace(); // Log for debugging
+            // Fix D-30: unwrap Duplicate/unique ở cause chain (commit-time) → 409; còn lại 500 generic.
+            Throwable t = e;
+            while (t != null) {
+                String m = t.getMessage();
+                if (m != null && (m.contains("Duplicate entry") || m.contains("UK_madinhdanh")
+                        || m.contains("unique") || m.contains("Unique"))) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(ApiResponse.error("Dữ liệu bị trùng lặp, vui lòng kiểm tra lại thông tin"));
+                }
+                t = t.getCause();
+            }
+            org.slf4j.LoggerFactory.getLogger(ClientDatChoController.class)
+                .error("Lỗi khi tạo đặt chỗ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error("Lỗi khi tạo đặt chỗ: " + e.getMessage()));
+                .body(ApiResponse.error("Đã xảy ra lỗi hệ thống, vui lòng thử lại sau"));
         }
     }
 }

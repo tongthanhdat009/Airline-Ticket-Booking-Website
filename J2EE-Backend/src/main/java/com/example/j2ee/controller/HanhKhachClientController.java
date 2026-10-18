@@ -3,6 +3,7 @@ package com.example.j2ee.controller;
 import com.example.j2ee.dto.ApiResponse;
 import com.example.j2ee.model.HanhKhach;
 import com.example.j2ee.service.HanhKhachService;
+import com.example.j2ee.util.SecurityUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +38,18 @@ public class HanhKhachClientController {
             @RequestBody Map<String, Object> body) {
 
         try {
+            // Fix D-10 (IDOR ghi): chỉ chính chủ mới được sửa hồ sơ hành khách của mình.
+            java.util.Optional<HanhKhach> existing =
+                    hanhKhachService.getHanhKhachById(id);
+            if (existing.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ApiResponse.error("Không tìm thấy hành khách với id: " + id));
+            }
+            if (!SecurityUtil.isOwnerOf(existing.get())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(ApiResponse.error("Bạn không có quyền sửa thông tin hành khách này"));
+            }
+
             // Convert Map to HanhKhach entity
             HanhKhach hanhKhach = new HanhKhach();
 

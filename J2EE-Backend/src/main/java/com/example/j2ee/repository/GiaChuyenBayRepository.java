@@ -53,9 +53,12 @@ public interface GiaChuyenBayRepository extends JpaRepository<GiaChuyenBay, Inte
     );
 
     /**
-     * Tìm giá theo tuyến bay và hạng vé
+     * Tìm giá theo tuyến bay và hạng vé.
+     * Fix D-4: seed data có dòng trùng (route 1 tới 127 dòng/cặp) nên không thể
+     * trả về 1 entity duy nhất (gây IncorrectResultSizeDataAccessException).
+     * Caller tự chọn dòng phù hợp trong danh sách.
      */
-    GiaChuyenBay findByTuyenBay_MaTuyenBayAndHangVe_MaHangVe(int maTuyenBay, int maHangVe);
+    List<GiaChuyenBay> findAllByTuyenBay_MaTuyenBayAndHangVe_MaHangVe(int maTuyenBay, int maHangVe);
 
     /**
      * Tìm tất cả giá chuyến bay theo hạng vé

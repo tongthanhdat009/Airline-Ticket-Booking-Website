@@ -25,10 +25,47 @@ public class HanhKhachService {
     private final TaiKhoanRepository taiKhoanRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    // Regex chuẩn cho Việt Nam: bắt đầu bằng 0 hoặc +84, theo sau là đầu số 3/5/7/8/9 và 8 chữ số
-    private static final Pattern PHONE_PATTERN = Pattern.compile("^(0|\\+84)(3|5|7|8|9)\\d{8}$");
+    // Chuẩn SĐT duy nhất toàn hệ thống (VN): 0/+84 + đầu số 3/5/7/8/9 + 8 số.
+    // Các service/DTO khác PHẢI reuse hằng này, không tự định nghĩa regex riêng.
+    public static final Pattern PHONE_PATTERN = Pattern.compile("^(0|\\+84)(3|5|7|8|9)\\d{8}$");
+    public static final String PHONE_REGEX = "^(0|\\+84)(3|5|7|8|9)\\d{8}$";
+    public static final String PHONE_MESSAGE = "Số điện thoại không hợp lệ (0/+84 + đầu số 3/5/7/8/9 + 8 số, VD: 0987654321)";
     // Regex email thông dụng (đơn giản, thân thiện)
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+
+    /**
+     * Fix D-30: chuẩn hoá chuỗi rỗng/blank thành NULL.
+     * MySQL UNIQUE index coi "" là giá trị (gây Duplicate entry '' cho UK_madinhdanh),
+     * còn NULL được phép lặp. Mọi lookup/insert mã định danh phải qua hàm này.
+     */
+    public static String normalizeNullable(String s) {
+        if (s == null) return null;
+        String t = s.trim();
+        return t.isEmpty() ? null : t;
+    }
+
+    /**
+     * Fix D-30 + kiểm tra độ dài text field đúng giới hạn @Column của HanhKhach
+     * (hovaten 50, gioitinh 10, quocgia 100, email 100, sodienthoai 20, madinhdanh 50, diachi 255).
+     * Ném IllegalArgumentException (→ 400) thay vì để DB ném 500/DataTruncation.
+     */
+    private static void validateHanhKhachLengths(String hoVaTen, String gioiTinh, String quocGia,
+                                                 String email, String soDienThoai, String maDinhDanh, String diaChi) {
+        if (hoVaTen != null && hoVaTen.length() > 50)
+            throw new IllegalArgumentException("Họ và tên tối đa 50 ký tự");
+        if (gioiTinh != null && gioiTinh.length() > 10)
+            throw new IllegalArgumentException("Giới tính tối đa 10 ký tự");
+        if (quocGia != null && quocGia.length() > 100)
+            throw new IllegalArgumentException("Quốc gia tối đa 100 ký tự");
+        if (email != null && email.length() > 100)
+            throw new IllegalArgumentException("Email tối đa 100 ký tự");
+        if (soDienThoai != null && soDienThoai.length() > 20)
+            throw new IllegalArgumentException("Số điện thoại tối đa 20 ký tự");
+        if (maDinhDanh != null && maDinhDanh.length() > 50)
+            throw new IllegalArgumentException("Mã định danh tối đa 50 ký tự");
+        if (diaChi != null && diaChi.length() > 255)
+            throw new IllegalArgumentException("Địa chỉ tối đa 255 ký tự");
+    }
 
     public HanhKhachService(HanhKhachRepository hanhKhachRepository, TaiKhoanRepository taiKhoanRepository) {
         this.hanhKhachRepository = hanhKhachRepository;
@@ -56,9 +93,16 @@ public class HanhKhachService {
      * Thêm mới hành khách dựa trên schema hanhkhach.
      */
     public HanhKhach createHanhKhach(HanhKhach input) {
-        // Chuẩn hoá dữ liệu vào (trim khoảng trắng vô ý)
-        if (input.getEmail() != null) input.setEmail(input.getEmail().trim());
-        if (input.getSoDienThoai() != null) input.setSoDienThoai(input.getSoDienThoai().trim());
+        // Chuẩn hoá dữ liệu vào (trim + "" → NULL để không vi phạm UK_madinhdanh — Fix D-30)
+        input.setEmail(normalizeNullable(input.getEmail()));
+        input.setSoDienThoai(normalizeNullable(input.getSoDienThoai()));
+        input.setMaDinhDanh(normalizeNullable(input.getMaDinhDanh()));
+        if (input.getHoVaTen() != null) input.setHoVaTen(input.getHoVaTen().trim());
+        if (input.getDiaChi() != null && input.getDiaChi().trim().isEmpty()) input.setDiaChi(null);
+        if (input.getQuocGia() != null && input.getQuocGia().trim().isEmpty()) input.setQuocGia(null);
+        if (input.getGioiTinh() != null && input.getGioiTinh().trim().isEmpty()) input.setGioiTinh(null);
+        validateHanhKhachLengths(input.getHoVaTen(), input.getGioiTinh(), input.getQuocGia(),
+                input.getEmail(), input.getSoDienThoai(), input.getMaDinhDanh(), input.getDiaChi());
 
         // Validate định dạng email và số điện thoại bằng regex
         if (input.getEmail() != null && !EMAIL_PATTERN.matcher(input.getEmail()).matches()) {
@@ -105,9 +149,12 @@ public class HanhKhachService {
      * Cập nhật thông tin hành khách theo id. Trả về Optional của bản ghi đã cập nhật.
      */
     public Optional<HanhKhach> updateHanhKhach(int id, HanhKhach input) {
-        // Chuẩn hoá dữ liệu vào (trim khoảng trắng vô ý)
-        if (input.getEmail() != null) input.setEmail(input.getEmail().trim());
-        if (input.getSoDienThoai() != null) input.setSoDienThoai(input.getSoDienThoai().trim());
+        // Chuẩn hoá dữ liệu vào (trim + "" → NULL — Fix D-30)
+        input.setEmail(normalizeNullable(input.getEmail()));
+        input.setSoDienThoai(normalizeNullable(input.getSoDienThoai()));
+        input.setMaDinhDanh(normalizeNullable(input.getMaDinhDanh()));
+        validateHanhKhachLengths(input.getHoVaTen(), input.getGioiTinh(), input.getQuocGia(),
+                input.getEmail(), input.getSoDienThoai(), input.getMaDinhDanh(), input.getDiaChi());
 
         // Validate định dạng email và số điện thoại bằng regex (nếu được gửi lên để cập nhật)
         if (input.getEmail() != null && !EMAIL_PATTERN.matcher(input.getEmail()).matches()) {
@@ -312,19 +359,25 @@ public class HanhKhachService {
      */
     public HanhKhach findOrCreateHanhKhach(com.example.j2ee.dto.datcho.CreateBookingRequest.PassengerInfo passengerInfo) {
         HanhKhach hanhKhach = null;
-        
+        // Fix D-30: "" / blank coi như KHÔNG có CCCD (NULL), không lookup/insert "".
+        String cccdNorm = normalizeNullable(passengerInfo.getIdNumber());
+        String emailNorm = normalizeNullable(passengerInfo.getEmail());
+        String phoneNorm = normalizeNullable(passengerInfo.getPhone());
+        validateHanhKhachLengths(passengerInfo.getFullName(), passengerInfo.getGender(), null,
+                emailNorm, phoneNorm, cccdNorm, null);
+
         // ƯU TIÊN 1: Tìm theo mã định danh (CCCD/CMND/Passport) nếu có
-        if (passengerInfo.getIdNumber() != null && !passengerInfo.getIdNumber().trim().isEmpty()) {
-            HanhKhach hanhKhachByCCCD = hanhKhachRepository.findByMaDinhDanh(passengerInfo.getIdNumber()).orElse(null);
+        if (cccdNorm != null) {
+            HanhKhach hanhKhachByCCCD = hanhKhachRepository.findByMaDinhDanh(cccdNorm).orElse(null);
             
             if (hanhKhachByCCCD != null) {
                 // Tìm thấy theo CCCD → GHI ĐÈ toàn bộ thông tin
                 hanhKhach = hanhKhachByCCCD;
                 hanhKhach.setHoVaTen(passengerInfo.getFullName());
-                hanhKhach.setEmail(passengerInfo.getEmail());
-                hanhKhach.setSoDienThoai(passengerInfo.getPhone());
+                hanhKhach.setEmail(emailNorm);
+                hanhKhach.setSoDienThoai(phoneNorm);
                 hanhKhach.setGioiTinh(passengerInfo.getGender());
-                hanhKhach.setMaDinhDanh(passengerInfo.getIdNumber());
+                hanhKhach.setMaDinhDanh(cccdNorm);
                 
                 if (passengerInfo.getBirthDate() != null && !passengerInfo.getBirthDate().isEmpty()) {
                     try {
@@ -343,11 +396,13 @@ public class HanhKhachService {
         }
         
         // ƯU TIÊN 2: Nếu không có CCCD → Tìm theo email/phone (khách vãng lai)
-        // Tìm bằng email
-        HanhKhach hanhKhachByEmail = hanhKhachRepository.findByEmail(passengerInfo.getEmail()).orElse(null);
-        
+        // Chỉ lookup khi giá trị chuẩn hoá khác NULL (tránh findByEmail("")/findByEmail(null)).
+        HanhKhach hanhKhachByEmail = emailNorm != null
+                ? hanhKhachRepository.findByEmail(emailNorm).orElse(null) : null;
+
         // Tìm bằng số điện thoại
-        HanhKhach hanhKhachByPhone = hanhKhachRepository.findBySoDienThoai(passengerInfo.getPhone()).orElse(null);
+        HanhKhach hanhKhachByPhone = phoneNorm != null
+                ? hanhKhachRepository.findBySoDienThoai(phoneNorm).orElse(null) : null;
         
         if (hanhKhachByEmail != null) {
             hanhKhach = hanhKhachByEmail;
@@ -371,11 +426,15 @@ public class HanhKhachService {
                                       HanhKhach hanhKhachByPhone) {
         hanhKhach.setHoVaTen(passengerInfo.getFullName());
         hanhKhach.setGioiTinh(passengerInfo.getGender());
-        hanhKhach.setMaDinhDanh(passengerInfo.getIdNumber());
-        
-        if (!passengerInfo.getPhone().equals(hanhKhach.getSoDienThoai())) {
+        // Fix D-30: blank → NULL, không bao giờ lưu "" vào cột unique madinhdanh.
+        hanhKhach.setMaDinhDanh(normalizeNullable(passengerInfo.getIdNumber()));
+        String phoneNorm = normalizeNullable(passengerInfo.getPhone());
+        String curPhone = normalizeNullable(hanhKhach.getSoDienThoai());
+        boolean phoneChanged = (phoneNorm == null && curPhone != null)
+                || (phoneNorm != null && !phoneNorm.equals(curPhone));
+        if (phoneChanged) {
             if (hanhKhachByPhone == null || hanhKhachByPhone.getMaHanhKhach() == hanhKhach.getMaHanhKhach()) {
-                hanhKhach.setSoDienThoai(passengerInfo.getPhone());
+                hanhKhach.setSoDienThoai(phoneNorm);
             }
         }
         
@@ -394,10 +453,11 @@ public class HanhKhachService {
     private HanhKhach createNewPassenger(com.example.j2ee.dto.datcho.CreateBookingRequest.PassengerInfo passengerInfo) {
         HanhKhach hanhKhach = new HanhKhach();
         hanhKhach.setHoVaTen(passengerInfo.getFullName());
-        hanhKhach.setEmail(passengerInfo.getEmail());
-        hanhKhach.setSoDienThoai(passengerInfo.getPhone());
+        // Fix D-30: chuẩn hoá "" → NULL trước khi insert.
+        hanhKhach.setEmail(normalizeNullable(passengerInfo.getEmail()));
+        hanhKhach.setSoDienThoai(normalizeNullable(passengerInfo.getPhone()));
         hanhKhach.setGioiTinh(passengerInfo.getGender());
-        hanhKhach.setMaDinhDanh(passengerInfo.getIdNumber());
+        hanhKhach.setMaDinhDanh(normalizeNullable(passengerInfo.getIdNumber()));
         
         if (passengerInfo.getBirthDate() != null && !passengerInfo.getBirthDate().isEmpty()) {
             try {

@@ -466,11 +466,16 @@ public class QuanLyDatChoService {
         BigDecimal giaVeCu = datCho.getGiaVe();
         
         ChiTietChuyenBay chuyenBay = datCho.getChuyenBay();
+        // Fix D-4: dữ liệu seed có nhiều dòng giá trùng (tuyến, hạng) —
+        // lấy dòng đầu tiên theo mã giá thay vì nổ NonUniqueResult.
         GiaChuyenBay giaChuyenBayMoi = giaChuyenBayRepository
-            .findByTuyenBay_MaTuyenBayAndHangVe_MaHangVe(
-                chuyenBay.getTuyenBay().getMaTuyenBay(), 
+            .findAllByTuyenBay_MaTuyenBayAndHangVe_MaHangVe(
+                chuyenBay.getTuyenBay().getMaTuyenBay(),
                 maHangVeMoi
-            );
+            )
+            .stream()
+            .min(java.util.Comparator.comparing(GiaChuyenBay::getMaGia))
+            .orElse(null);
         
         if (giaChuyenBayMoi == null) {
             throw new IllegalStateException("Khong tim thay gia ve cho hang ve nay");

@@ -55,14 +55,20 @@ public class DangKyService {
     }
 
     public void dangKy(String hoVaTen, String email, String soDienThoai, String ngaySinh, String matKhau) {
-        // Validation: Họ và tên
+        // Validation: Họ và tên (DB hanhkhach.hovaten varchar(50))
         if (hoVaTen == null || hoVaTen.trim().isEmpty()) {
             throw new IllegalArgumentException("Họ và tên không được để trống.");
+        }
+        if (hoVaTen.trim().length() > 50) {
+            throw new IllegalArgumentException("Họ và tên tối đa 50 ký tự.");
         }
 
         // Validation: Email
         if (email == null || email.trim().isEmpty()) {
             throw new IllegalArgumentException("Email không được để trống.");
+        }
+        if (email.trim().length() > 100) {
+            throw new IllegalArgumentException("Email tối đa 100 ký tự.");
         }
         String emailRegex = "^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$";
         if (!Pattern.matches(emailRegex, email)) {
@@ -76,9 +82,12 @@ public class DangKyService {
         if (soDienThoai == null || soDienThoai.trim().isEmpty()) {
             throw new IllegalArgumentException("Số điện thoại không được để trống.");
         }
-        String phoneRegex = "^[0-9]{10,11}$";
-        if (!Pattern.matches(phoneRegex, soDienThoai)) {
-            throw new IllegalArgumentException("Số điện thoại phải có 10-11 chữ số.");
+        // Chuẩn SĐT thống nhất toàn hệ thống (reuse HanhKhachService) — trước đây 10-11 số chung chung.
+        if (soDienThoai.trim().length() > 20) {
+            throw new IllegalArgumentException("Số điện thoại tối đa 20 ký tự.");
+        }
+        if (!HanhKhachService.PHONE_PATTERN.matcher(soDienThoai.trim()).matches()) {
+            throw new IllegalArgumentException(HanhKhachService.PHONE_MESSAGE + ".");
         }
         if (hanhKhachRepository.existsBySoDienThoai(soDienThoai)) {
             throw new IllegalArgumentException("Số điện thoại đã được sử dụng.");

@@ -110,4 +110,43 @@ public class SecurityUtil {
         AdminUserDetails adminUser = getAdminUserDetails();
         return adminUser != null ? adminUser.getTaiKhoanAdmin().getMaTaiKhoan() : null;
     }
+
+    // ==================== CUSTOMER OWNERSHIP (fix D-9/D-10 IDOR) ====================
+    /**
+     * Email của khách hàng đang đăng nhập (JWT subject của customer token).
+     * Trả về null nếu ẩn danh, token không hợp lệ, hoặc là admin
+     * (admin dùng API /admin riêng, không dùng API client).
+     */
+    public static String getCurrentCustomerEmail() {
+        Authentication auth = getAuthentication();
+        if (auth == null || !auth.isAuthenticated()
+                || "anonymousUser".equals(auth.getName())
+                || auth.getPrincipal() instanceof AdminUserDetails) {
+            return null;
+        }
+        return auth.getName();
+    }
+
+    /**
+     * Kiểm tra email có phải của chính khách hàng đang đăng nhập không.
+     */
+    public static boolean isSelf(String email) {
+        String current = getCurrentCustomerEmail();
+        return current != null && email != null && current.equalsIgnoreCase(email.trim());
+    }
+
+    /**
+     * Kiểm tra khách hàng đang đăng nhập có sở hữu hồ sơ hành khách này không.
+     * Ưu tiên link TaiKhoan (đăng ký tài khoản), fallback so email hành khách
+     * (vé guest đặt trước khi đăng ký cùng email).
+     */
+    public static boolean isOwnerOf(com.example.j2ee.model.HanhKhach hk) {
+        if (hk == null || getCurrentCustomerEmail() == null) {
+            return false;
+        }
+        if (hk.getTaiKhoan() != null && hk.getTaiKhoan().getEmail() != null) {
+            return isSelf(hk.getTaiKhoan().getEmail());
+        }
+        return isSelf(hk.getEmail());
+    }
 }

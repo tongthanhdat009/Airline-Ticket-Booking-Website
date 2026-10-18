@@ -229,10 +229,16 @@ public class HoanTienService {
         int maHangVe = datCho.getHangVe().getMaHangVe();
         int maTuyenBay = datCho.getChuyenBay().getTuyenBay().getMaTuyenBay();
 
+        // Fix D-4: dữ liệu seed có nhiều dòng giá trùng (tuyến, hạng).
+        // Trừ vào dòng đang có số lượng đã bán cao nhất, bỏ qua nếu không có.
         GiaChuyenBay giaChuyenBay = giaChuyenBayRepository
-                .findByTuyenBay_MaTuyenBayAndHangVe_MaHangVe(maTuyenBay, maHangVe);
+                .findAllByTuyenBay_MaTuyenBayAndHangVe_MaHangVe(maTuyenBay, maHangVe)
+                .stream()
+                .filter(g -> g.getSoLuongDaBan() != null && g.getSoLuongDaBan() > 0)
+                .max(java.util.Comparator.comparing(GiaChuyenBay::getSoLuongDaBan))
+                .orElse(null);
 
-        if (giaChuyenBay != null && giaChuyenBay.getSoLuongDaBan() > 0) {
+        if (giaChuyenBay != null) {
             giaChuyenBay.setSoLuongDaBan(giaChuyenBay.getSoLuongDaBan() - 1);
             giaChuyenBayRepository.save(giaChuyenBay);
 

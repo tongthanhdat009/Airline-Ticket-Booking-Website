@@ -7,6 +7,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -16,6 +17,26 @@ public interface ChiTietChuyenBayRepository extends JpaRepository<ChiTietChuyenB
 
     // Spring Data JPA will automatically implement this based on the naming convention
     List<ChiTietChuyenBay> findByDaXoaTrue();
+
+    /**
+     * Lấy chuyến bay theo ngày đi (@SQLRestriction tự loại da_xoa = 1).
+     * Dùng cho job tự sinh lịch bay tương lai.
+     */
+    List<ChiTietChuyenBay> findByNgayDi(LocalDate ngayDi);
+
+    /**
+     * Lấy chuyến bay trong khoảng ngày (1 query thay cho N query theo ngày).
+     * Eager-load tuyến/máy bay/dịch vụ để clone ngoài transaction không lỗi lazy.
+     */
+    @EntityGraph(attributePaths = {"tuyenBay", "mayBay", "dichVuCungCap"})
+    List<ChiTietChuyenBay> findByNgayDiBetween(LocalDate start, LocalDate end);
+
+    /**
+     * Ngày bay xa nhất hiện có trong DB.
+     * Dùng làm fallback khi không có lịch mẫu cùng thứ tuần trước.
+     */
+    @Query("SELECT MAX(c.ngayDi) FROM ChiTietChuyenBay c")
+    LocalDate findMaxNgayDi();
 
     boolean existsByTuyenBay_MaTuyenBay(int maTuyenBay);
     boolean existsBySoHieuChuyenBayAndNgayDiAndGioDiAndNgayDenAndGioDen(

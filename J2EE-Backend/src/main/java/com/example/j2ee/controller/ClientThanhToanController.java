@@ -4,6 +4,8 @@ import com.example.j2ee.model.TrangThaiThanhToan;
 import com.example.j2ee.model.DatCho;
 import com.example.j2ee.repository.TrangThaiThanhToanRepository;
 import com.example.j2ee.repository.DatChoRepository;
+import com.example.j2ee.repository.HanhKhachRepository;
+import com.example.j2ee.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,12 +27,32 @@ public class ClientThanhToanController {
     @Autowired
     private DatChoRepository datChoRepository;
 
+    @Autowired
+    private HanhKhachRepository hanhKhachRepository;
+
     /**
      * Lấy lịch sử thanh toán của hành khách theo mã hành khách
      */
     @GetMapping("/hanhkhach/{maHanhKhach}")
     public ResponseEntity<Map<String, Object>> getLichSuThanhToan(@PathVariable int maHanhKhach) {
         try {
+            // Fix D-9 (IDOR đọc): chỉ chính chủ mới được xem lịch sử thanh toán của mình.
+            com.example.j2ee.model.HanhKhach hk =
+                    hanhKhachRepository.findById(maHanhKhach).orElse(null);
+            if (hk == null) {
+                Map<String, Object> notFound = new HashMap<>();
+                notFound.put("success", false);
+                notFound.put("message", "Không tìm thấy hành khách");
+                notFound.put("data", null);
+                return ResponseEntity.status(404).body(notFound);
+            }
+            if (!SecurityUtil.isOwnerOf(hk)) {
+                Map<String, Object> forbidden = new HashMap<>();
+                forbidden.put("success", false);
+                forbidden.put("message", "Bạn không có quyền xem lịch sử thanh toán này");
+                forbidden.put("data", null);
+                return ResponseEntity.status(403).body(forbidden);
+            }
             // Lấy tất cả thanh toán và filter theo mã hành khách
             List<TrangThaiThanhToan> allPayments = trangThaiThanhToanRepository.findAll();
 
@@ -73,6 +95,15 @@ public class ClientThanhToanController {
                 return ResponseEntity.status(404).body(errorResponse);
             }
             
+            // Fix D-9 (IDOR đọc): chỉ người đặt mới được xem chi tiết thanh toán.
+            if (thanhToan.getDonHang() == null
+                    || !SecurityUtil.isOwnerOf(thanhToan.getDonHang().getHanhKhachNguoiDat())) {
+                Map<String, Object> forbidden = new HashMap<>();
+                forbidden.put("success", false);
+                forbidden.put("message", "Bạn không có quyền xem thanh toán này");
+                forbidden.put("data", null);
+                return ResponseEntity.status(403).body(forbidden);
+            }
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Lấy chi tiết thanh toán thành công");
