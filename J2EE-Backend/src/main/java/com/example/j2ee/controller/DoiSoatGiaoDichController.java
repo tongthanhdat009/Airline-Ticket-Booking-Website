@@ -6,7 +6,6 @@ import com.example.j2ee.dto.doi_soat.DoiSoatDetailResponse;
 import com.example.j2ee.dto.doi_soat.DoiSoatResponse;
 import com.example.j2ee.dto.doi_soat.RunReconciliationRequest;
 import com.example.j2ee.dto.doi_soat.UpdateReconciliationNoteRequest;
-import com.example.j2ee.model.VnPayTransactionLog;
 import com.example.j2ee.service.DoiSoatGiaoDichService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -28,11 +27,10 @@ import java.util.List;
  * - Getting reconciliation statistics
  * - Updating reconciliation notes
  * - Running manual reconciliation
- * - Getting VNPay transaction logs
  * - Exporting reconciliation reports
  *
  * Transaction reconciliation compares invoice amounts (HoaDon.tongThanhToan)
- * with VNPAY payment amounts (TrangThaiThanhToan.soTien) to identify
+ * with internal payment amounts (TrangThaiThanhToan.soTien) to identify
  * matched and unmatched transactions.
  */
 @Slf4j
@@ -97,7 +95,7 @@ public class DoiSoatGiaoDichController {
      *
      * Retrieves complete reconciliation details including:
      * - Invoice information (invoice number, PNR, amounts, status)
-     * - VNPAY transaction details (transaction ID, amounts, status, pay date)
+     * - Payment transaction details (transaction ID, amounts, status, pay date)
      * - Reconciliation status (MATCHED/UNMATCHED, amount difference)
      * - Customer information (name, email, phone)
      *
@@ -127,10 +125,10 @@ public class DoiSoatGiaoDichController {
      * Retrieves statistics including:
      * - Total number of transactions
      * - Number of valid transactions (DA_PHAT_HANH)
-     * - Number of matched transactions (invoice amount = VNPAY amount)
+     * - Total number of matched transactions (invoice amount = payment amount)
      * - Number of unmatched transactions (amounts differ)
      * - Total invoice amount
-     * - Total VNPAY amount
+     * - Total payment amount
      * - Difference amount (invoice total - VNPAY total)
      *
      * @return Reconciliation statistics DTO
@@ -196,28 +194,6 @@ public class DoiSoatGiaoDichController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.error("Lỗi khi chạy đối soát: " + e.getMessage()));
-        }
-    }
-
-    // ==================== GET VNPAY LOGS ENDPOINT ====================
-
-    /**
-     * GET /doisuatgiaoDich/vnpay-log/{txnRef} - Get VNPay transaction logs
-     *
-     * Lấy danh sách logs từ VNPay theo mã giao dịch
-     *
-     * @param txnRef VNPay transaction reference
-     * @return List of VNPay transaction logs
-     */
-    @GetMapping("/vnpay-log/{txnRef}")
-    @RequirePermission(feature = "ORDER", action = "VIEW")
-    public ResponseEntity<ApiResponse<List<VnPayTransactionLog>>> getVNPayLogs(@PathVariable String txnRef) {
-        try {
-            List<VnPayTransactionLog> logs = doiSoatGiaoDichService.getVNPayLogsByTxnRef(txnRef);
-            return ResponseEntity.ok(ApiResponse.success(logs));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.error("Lỗi khi lấy logs VNPay: " + e.getMessage()));
         }
     }
 

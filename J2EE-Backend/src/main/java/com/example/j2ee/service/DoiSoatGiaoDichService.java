@@ -7,11 +7,9 @@ import com.example.j2ee.dto.doi_soat.UpdateReconciliationNoteRequest;
 import com.example.j2ee.model.DonHang;
 import com.example.j2ee.model.HoaDon;
 import com.example.j2ee.model.TrangThaiThanhToan;
-import com.example.j2ee.model.VnPayTransactionLog;
 import com.example.j2ee.repository.DonHangRepository;
 import com.example.j2ee.repository.HoaDonRepository;
 import com.example.j2ee.repository.TrangThaiThanhToanRepository;
-import com.example.j2ee.repository.VnPayTransactionLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
@@ -27,7 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Service quản lý đối soát giao dịch - so khớp số tiền hóa đơn với VNPAY
+ * Service quản lý đối soát giao dịch - so khớp số tiền hóa đơn với thanh toán nội bộ
  */
 @Slf4j
 @Service
@@ -37,7 +35,6 @@ public class DoiSoatGiaoDichService {
     private final HoaDonRepository hoaDonRepository;
     private final TrangThaiThanhToanRepository trangThaiThanhToanRepository;
     private final DonHangRepository donHangRepository;
-    private final VnPayTransactionLogRepository vnPayTransactionLogRepository;
 
     /**
      * Kiểm tra đối soát cho một hóa đơn cụ thể
@@ -289,27 +286,15 @@ public class DoiSoatGiaoDichService {
         private BigDecimal chenhLech;
     }
 
-    // ==================== RECONCILIATION WITH VNPAY METHODS ====================
+    // ==================== RECONCILIATION WITH PAYMENT LOG METHODS ====================
 
     /**
-     * Lấy danh sách VNPay logs theo mã giao dịch (vnpTxnRef)
-     *
-     * @param vnpTxnRef Mã giao dịch VNPay
-     * @return Danh sách VNPay logs
-     */
-    public List<VnPayTransactionLog> getVNPayLogsByTxnRef(String vnpTxnRef) {
-        log.info("Lấy VNPay logs theo vnpTxnRef: {}", vnpTxnRef);
-        return vnPayTransactionLogRepository.findByVnpTxnRefOrderByIpnReceivedAtDesc(vnpTxnRef);
-    }
-
-    /**
-     * So sánh chi tiết với VNPay logs cho một hóa đơn
-     * Cải thiện từ checkReconciliation - bao gồm cả VNPay logs
+     * So sánh chi tiết với log thanh toán cho một hóa đơn
      *
      * @param maHoaDon Mã hóa đơn
      * @return DoiSoatDetailResponse với đầy đủ thông tin
      */
-    public DoiSoatDetailResponse reconcileWithVNPay(Integer maHoaDon) {
+    public DoiSoatDetailResponse reconcileWithPaymentLog(Integer maHoaDon) {
         HoaDon hoaDon = hoaDonRepository.findById(maHoaDon)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy hóa đơn"));
 
@@ -319,11 +304,8 @@ public class DoiSoatGiaoDichService {
 
         DoiSoatDetailResponse response = mapToDoiSoatDetailResponse(hoaDon, thanhToan);
 
-        // Thêm thông tin VNPay logs nếu có transaction code
         if (thanhToan != null && thanhToan.getTransactionCode() != null) {
-            List<VnPayTransactionLog> vnPayLogs = getVNPayLogsByTxnRef(thanhToan.getTransactionCode());
-            // Có thể thêm thông tin logs vào response nếu cần
-            log.debug("Tìm thấy {} VNPay logs cho transaction {}", vnPayLogs.size(), thanhToan.getTransactionCode());
+            log.debug("Tìm thấy mã giao dịch {} cho hóa đơn {}", thanhToan.getTransactionCode(), maHoaDon);
         }
 
         return response;
@@ -353,7 +335,7 @@ public class DoiSoatGiaoDichService {
 
     /**
      * Chạy đối soát thủ công theo khoảng thời gian
-     * So sánh các hóa đơn trong khoảng thời gian với VNPay logs
+     * So sánh các hóa đơn trong khoảng thời gian với thanh toán nội bộ
      *
      * @param request Request chứa khoảng thời gian và options
      * @return Danh sách kết quả đối soát
@@ -466,8 +448,8 @@ public class DoiSoatGiaoDichService {
             // Tạo header row
             org.apache.poi.xssf.usermodel.XSSFRow headerRow = sheet.createRow(0);
             String[] headers = {
-                    "STT", "Mã Hóa Đơn", "Số Hóa Đơn", "PNR", "Mã GD VNPay",
-                    "Số Tiền Hệ Thống", "Số Tiền VNPay", "Chênh Lệch",
+                    "STT", "Mã Hóa Đơn", "Số Hóa Đơn", "PNR", "Mã GD",
+                    "Số Tiền Hệ Thống", "Số Tiền TT", "Chênh Lệch",
                     "Trạng Thái", "Ngày Lập"
             };
             for (int i = 0; i < headers.length; i++) {

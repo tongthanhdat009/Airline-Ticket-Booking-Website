@@ -19,7 +19,7 @@ public class UpdateReconciliationNoteRequest {
 
     /**
      * Ghi chú về việc xử lý giao dịch lệch
-     * Ví dụ: "Đã liên hệ VNPay xác nhận", "Khách đã hoàn trả", "Giao dịch hợp lệ"
+     * Ví dụ: "Đã liên hệ ngân hàng xác nhận", "Khách đã hoàn trả", "Giao dịch hợp lệ"
      */
     @NotBlank(message = "Ghi chú không được để trống")
     @Size(max = 500, message = "Ghi chú không được quá 500 ký tự")
