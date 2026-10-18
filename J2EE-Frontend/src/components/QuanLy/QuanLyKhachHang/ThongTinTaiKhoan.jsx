@@ -261,7 +261,7 @@ const ThongTinTaiKhoan = ({ customer }) => {
  <label className="block text-sm font-medium text-gray-700 mb-1">
  Mật khẩu mới <span className="text-red-500">*</span>
  </label>
- <input
+ <input maxLength={255}
  type="password"
  name="matKhauMoi"
  value={passwordForm.matKhauMoi}
@@ -277,7 +277,7 @@ const ThongTinTaiKhoan = ({ customer }) => {
  <label className="block text-sm font-medium text-gray-700 mb-1">
  Xác nhận mật khẩu <span className="text-red-500">*</span>
  </label>
- <input
+ <input maxLength={255}
  type="password"
  name="xacNhanMatKhau"
  value={passwordForm.xacNhanMatKhau}

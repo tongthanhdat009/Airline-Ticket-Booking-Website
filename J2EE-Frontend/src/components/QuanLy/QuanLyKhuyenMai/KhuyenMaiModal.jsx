@@ -190,8 +190,7 @@ const KhuyenMaiModal = ({ isOpen, onClose, onSave, promotion, showToast }) => {
  }`}
  placeholder="VD: SUMMER20"
  disabled={!!promotion}
- required
- />
+ required maxLength={20} />
  {errors.maKM && <p className="text-red-500 text-xs mt-1">{errors.maKM}</p>}
  </div>
 
@@ -207,8 +206,7 @@ const KhuyenMaiModal = ({ isOpen, onClose, onSave, promotion, showToast }) => {
  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent shadow-sm ${
  errors.tenKhuyenMai ? 'border-red-500' : 'border-gray-300'
  }`}
- required
- />
+ required maxLength={255} />
  {errors.tenKhuyenMai && <p className="text-red-500 text-xs mt-1">{errors.tenKhuyenMai}</p>}
  </div>
 
@@ -223,7 +221,7 @@ const KhuyenMaiModal = ({ isOpen, onClose, onSave, promotion, showToast }) => {
  rows="2"
  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent shadow-sm"
  placeholder="Mô tả về khuyến mãi..."
- />
+ maxLength={500} />
  </div>
 
  <div>

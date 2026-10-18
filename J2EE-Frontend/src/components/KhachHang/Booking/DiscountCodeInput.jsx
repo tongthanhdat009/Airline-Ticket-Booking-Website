@@ -81,6 +81,7 @@ function DiscountCodeInput({ tongGiaDonHang, soLuongVe, appliedDiscount, onApply
                         <input
                             type="text"
                             value={discountCode}
+                            maxLength={20}
                             onChange={(e) => {
                                 setDiscountCode(e.target.value.toUpperCase());
                                 if (error) setError('');

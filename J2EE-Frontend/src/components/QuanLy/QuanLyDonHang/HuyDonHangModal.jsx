@@ -54,7 +54,7 @@ const HuyDonHangModal = ({ isVisible, maDonHang, onCancel, onConfirm }) => {
  <label className="block text-sm font-semibold text-gray-700 mb-2">
  Lý do hủy <span className="text-red-500">*</span>
  </label>
- <textarea
+ <textarea maxLength={500}
  value={lyDoHuy}
  onChange={(e) => setLyDoHuy(e.target.value)}
  placeholder="Nhập lý do hủy đơn hàng..."

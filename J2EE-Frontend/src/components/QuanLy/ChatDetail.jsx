@@ -196,7 +196,7 @@ const ChatDetail = ({ session, messages = [], onSendMessage, onAssign, onClose, 
       ) : (
         <div className="px-4 py-3 border-t border-gray-200 bg-white flex-shrink-0">
           <div className="flex items-end gap-2">
-            <textarea
+            <textarea maxLength={2000}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}

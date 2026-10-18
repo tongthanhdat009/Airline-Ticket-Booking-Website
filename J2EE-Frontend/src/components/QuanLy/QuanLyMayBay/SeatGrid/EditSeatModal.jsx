@@ -90,7 +90,7 @@ const EditSeatModal = ({ seat, seats, onSave, onClose }) => {
  <label className="block text-sm font-bold text-gray-700 mb-2">
  Số ghế <span className="text-red-500">*</span>
  </label>
- <input
+ <input maxLength={10}
  type="text"
  value={formData.soGhe}
  onChange={(e) => setFormData({ ...formData, soGhe: e.target.value.toUpperCase() })}

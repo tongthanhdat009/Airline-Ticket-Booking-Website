@@ -95,8 +95,7 @@ const CreateOptionModal = ({ onClose, onSave, options }) => {
  onChange={handleChange} 
  className="w-full border border-gray-300 rounded-lg shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" 
  required 
- placeholder="Nhập tên lựa chọn"
- />
+ placeholder="Nhập tên lựa chọn" maxLength={100} />
  </div>
  <div>
  <label htmlFor="moTa" className="block text-sm font-bold text-gray-700 mb-2">Mô tả</label>
@@ -109,7 +108,7 @@ const CreateOptionModal = ({ onClose, onSave, options }) => {
  required 
  placeholder="Nhập mô tả lựa chọn"
  rows="3"
- />
+ maxLength={500} />
  </div>
  <div>
  <label htmlFor="gia" className="block text-sm font-bold text-gray-700 mb-2">Giá (VNĐ)</label>

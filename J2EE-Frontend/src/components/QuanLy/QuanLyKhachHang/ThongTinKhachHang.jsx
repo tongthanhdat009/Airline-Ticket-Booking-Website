@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { updateKhachHangPartial } from '../../../services/QLKhachHangService';
+import { isValidVnPhone, VN_PHONE_MESSAGE } from '../../../utils/phoneValidation';
 
 const ThongTinKhachHang = ({ customer, onUpdate, initialEditMode = false }) => {
  const [isEditing, setIsEditing] = useState(initialEditMode);
@@ -44,8 +45,8 @@ const ThongTinKhachHang = ({ customer, onUpdate, initialEditMode = false }) => {
  if (!formData.hoVaTen || formData.hoVaTen.trim().length < 2) {
  newErrors.hoVaTen = 'Họ và tên phải từ 2 ký tự trở lên';
  }
- if (formData.hoVaTen && formData.hoVaTen.length > 100) {
- newErrors.hoVaTen = 'Họ và tên không được vượt quá 100 ký tự';
+ if (formData.hoVaTen && formData.hoVaTen.length > 50) {
+ newErrors.hoVaTen = 'Họ và tên không được vượt quá 50 ký tự';
  }
 
  // Validate ngày sinh - phải là ngày trong quá khứ
@@ -67,9 +68,9 @@ const ThongTinKhachHang = ({ customer, onUpdate, initialEditMode = false }) => {
  newErrors.gioiTinh = 'Giới tính phải là Nam, Nữ hoặc Khác';
  }
 
- // Validate số điện thoại
- if (formData.soDienThoai && !/^[0-9]{10,11}$/.test(formData.soDienThoai)) {
- newErrors.soDienThoai = 'Số điện thoại phải có 10-11 chữ số';
+ // Validate số điện thoại (chuẩn thống nhất toàn hệ thống)
+ if (formData.soDienThoai && !isValidVnPhone(formData.soDienThoai)) {
+ newErrors.soDienThoai = VN_PHONE_MESSAGE;
  }
 
  // Validate địa chỉ
@@ -163,14 +164,14 @@ const ThongTinKhachHang = ({ customer, onUpdate, initialEditMode = false }) => {
  { label: 'Mã định danh', value: customer.maDinhDanh || '-' }
  ];
 
- // Editable fields
+ // Editable fields (maxLength khớp DB hanhkhach)
  const editableFields = [
- { label: 'Họ và tên', name: 'hoVaTen', type: 'text', required: true },
+ { label: 'Họ và tên', name: 'hoVaTen', type: 'text', required: true, maxLength: 50 },
  { label: 'Ngày sinh', name: 'ngaySinh', type: 'date' },
  { label: 'Giới tính', name: 'gioiTinh', type: 'select', options: ['Nam', 'Nữ', 'Khác'] },
- { label: 'Số điện thoại', name: 'soDienThoai', type: 'tel' },
- { label: 'Địa chỉ', name: 'diaChi', type: 'textarea', rows: 3 },
- { label: 'Quốc gia', name: 'quocGia', type: 'text' }
+ { label: 'Số điện thoại', name: 'soDienThoai', type: 'tel', maxLength: 20 },
+ { label: 'Địa chỉ', name: 'diaChi', type: 'textarea', rows: 3, maxLength: 255 },
+ { label: 'Quốc gia', name: 'quocGia', type: 'text', maxLength: 100 }
  ];
 
  return (
@@ -238,6 +239,7 @@ const ThongTinKhachHang = ({ customer, onUpdate, initialEditMode = false }) => {
  value={formData[field.name]}
  onChange={handleInputChange}
  rows={field.rows}
+ maxLength={field.maxLength}
  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors[field.name] ? 'border-red-500' : 'border-gray-300'}`}
  />
  ) : (
@@ -246,6 +248,7 @@ const ThongTinKhachHang = ({ customer, onUpdate, initialEditMode = false }) => {
  name={field.name}
  value={formData[field.name]}
  onChange={handleInputChange}
+ maxLength={field.maxLength}
  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors[field.name] ? 'border-red-500' : 'border-gray-300'}`}
  />
  )

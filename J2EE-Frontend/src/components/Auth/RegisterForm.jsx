@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { validatePassword, validateBirthDate, calculateAge } from '../../services/validationService';
 import apiClient from '../../services/apiClient';
+import { isValidVnPhone, VN_PHONE_MESSAGE, VN_PHONE_MAX_LENGTH } from '../../utils/phoneValidation';
 
 // Steps configuration
 const STEPS = [
@@ -116,8 +117,8 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
         return;
       }
 
-      const phoneRegex = /^[0-9]{10,11}$/;
-      if (!phoneRegex.test(debouncedPhone)) {
+      // Chuẩn SĐT thống nhất toàn hệ thống (đồng bộ backend) — trước đây 10-11 số chung chung.
+      if (!isValidVnPhone(debouncedPhone)) {
         return;
       }
 
@@ -170,7 +171,8 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
       else if (emailExists) errors.email = 'Email đã được sử dụng';
 
       if (!soDienThoai.trim()) errors.soDienThoai = t('validation.required');
-      else if (!/^[0-9]{10,11}$/.test(soDienThoai)) errors.soDienThoai = t('validation.invalid_phone');
+      else if (soDienThoai.trim().length > VN_PHONE_MAX_LENGTH) errors.soDienThoai = 'Số điện thoại tối đa 20 ký tự';
+      else if (!isValidVnPhone(soDienThoai)) errors.soDienThoai = VN_PHONE_MESSAGE;
       else if (phoneExists) errors.soDienThoai = 'Số điện thoại đã được sử dụng';
     } else if (step === 3) {
       if (!matKhau.trim()) errors.matKhau = t('validation.required');
@@ -347,6 +349,7 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
                     </div>
                     <input
                       value={hoVaTen}
+                      maxLength={50}
                       onChange={(e) => { setHoVaTen(e.target.value); setFieldErrors(prev => ({ ...prev, hoVaTen: '' })); }}
                       id="username"
                       type="text"
@@ -406,6 +409,7 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
                     </div>
                     <input
                       value={email}
+                      maxLength={100}
                       onChange={(e) => { setEmail(e.target.value); setFieldErrors(prev => ({ ...prev, email: '' })); }}
                       id="email"
                       type="email"
@@ -450,14 +454,15 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
                     </div>
                     <input
                       value={soDienThoai}
+                      maxLength={20}
                       onChange={(e) => {
-                        const value = e.target.value.replace(/[^0-9]/g, '');
+                        // Cho phép '+' để nhập đầu số +84 (chuẩn SĐT thống nhất).
+                        const value = e.target.value.replace(/[^0-9+]/g, '');
                         setSoDienThoai(value);
                         setFieldErrors(prev => ({ ...prev, soDienThoai: '' }));
                       }}
                       id="phone"
                       type="tel"
-                      maxLength={11}
                       className={`w-full pl-12 pr-10 py-3.5 bg-slate-50/50 border-2 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-slate-700 font-medium ${
                         fieldErrors.soDienThoai ? 'border-red-300' : phoneExists ? 'border-orange-300' : 'border-slate-200'
                       }`}
@@ -474,7 +479,7 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
                         <span className="text-lg">⚠️</span>
                       </div>
                     )}
-                    {!checkingPhone && soDienThoai && !phoneExists && /^[0-9]{10,11}$/.test(soDienThoai) && (
+                    {!checkingPhone && soDienThoai && !phoneExists && isValidVnPhone(soDienThoai) && (
                       <div className="absolute inset-y-0 right-0 pr-4 flex items-center text-green-500">
                         <span className="text-lg">✓</span>
                       </div>
@@ -504,6 +509,7 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
                     </div>
                     <input
                       value={matKhau}
+                      maxLength={255}
                       onChange={(e) => {
                         setMatKhau(e.target.value);
                         setFieldErrors(prev => ({ ...prev, matKhau: '' }));
@@ -576,6 +582,7 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
                     </div>
                     <input
                       value={xacNhanMatKhau}
+                      maxLength={255}
                       onChange={(e) => {
                         setXacNhanMatKhau(e.target.value);
                         setFieldErrors(prev => ({ ...prev, xacNhanMatKhau: '' }));

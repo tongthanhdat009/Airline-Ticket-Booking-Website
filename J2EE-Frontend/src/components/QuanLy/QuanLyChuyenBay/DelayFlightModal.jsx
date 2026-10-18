@@ -14,7 +14,7 @@ const DelayFlightModal = ({ isOpen, onClose, onSubmit, delayData, onDelayDataCha
  <div className="space-y-4">
  <div>
  <label className="block text-sm font-bold text-gray-700 mb-2">Lý do delay</label>
- <textarea
+ <textarea maxLength={255}
  value={delayData.lyDoDelay}
  onChange={(e) => onDelayDataChange({ ...delayData, lyDoDelay: e.target.value })}
  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"

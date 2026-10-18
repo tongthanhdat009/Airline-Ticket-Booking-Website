@@ -73,8 +73,7 @@ const LoginForm = ({ onSubmit, onGoogleLogin, isLoading }) => {
               type="email"
               className="w-full pl-12 pr-4 py-4 bg-slate-50/50 border-2 border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-slate-700 font-medium"
               placeholder={t('auth.email_phone')}
-              autoComplete="email"
-            />
+              autoComplete="email" maxLength={100} />
           </div>
         </div>
 
@@ -94,6 +93,7 @@ const LoginForm = ({ onSubmit, onGoogleLogin, isLoading }) => {
               className="w-full pl-12 pr-12 py-4 bg-slate-50/50 border-2 border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-slate-700 font-medium"
               placeholder={t('auth.password')}
               autoComplete="current-password"
+              maxLength={255}
             />
             <button
               type="button"

@@ -58,6 +58,7 @@ const ReconciliationNoteForm = ({ itemId, onSuccess, onCancel }) => {
  </label>
  <textarea
  value={ghiChu}
+ maxLength={500}
  onChange={(e) => setGhiChu(e.target.value)}
  placeholder="Nhập ghi chú về việc xử lý giao dịch lệch..."
  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm resize-none"
@@ -73,6 +74,7 @@ const ReconciliationNoteForm = ({ itemId, onSuccess, onCancel }) => {
  <input
  type="text"
  value={nguoiXuLy}
+ maxLength={100}
  onChange={(e) => setNguoiXuLy(e.target.value)}
  placeholder="Email hoặc tên đăng nhập"
  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"

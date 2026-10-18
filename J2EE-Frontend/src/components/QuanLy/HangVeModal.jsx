@@ -417,7 +417,7 @@ const HangVeModal = ({ isOpen, onClose, onSave, isEditMode, hangVe }) => {
  <label className="block text-sm font-bold text-gray-700 mb-2">
  Tên hạng vé <span className="text-red-500">*</span>
  </label>
- <input
+ <input maxLength={255}
  type="text"
  name="tenHangVe"
  placeholder="VD: Economy, Business, First Class"
@@ -443,7 +443,7 @@ const HangVeModal = ({ isOpen, onClose, onSave, isEditMode, hangVe }) => {
  <label className="block text-sm font-bold text-gray-700 mb-2">
  Mô tả lợi ích
  </label>
- <textarea
+ <textarea maxLength={2000}
  name="moTa"
  placeholder="Nhập mô tả lợi ích (mỗi dòng 1 lợi ích)"
  value={formData.moTa}

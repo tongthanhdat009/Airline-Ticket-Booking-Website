@@ -88,7 +88,7 @@ const HoanTienModal = ({
  <label className="block text-sm font-semibold text-gray-700 mb-2">
  Lý do hoàn tiền <span className="text-red-500">*</span>
  </label>
- <textarea
+ <textarea maxLength={500}
  value={lyDoHoanTien}
  onChange={(e) => {
  setLyDoHoanTien(e.target.value);

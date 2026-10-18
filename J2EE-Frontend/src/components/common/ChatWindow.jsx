@@ -133,7 +133,7 @@ const ChatWindow = ({ messages = [], onSendMessage, status, sending }) => {
       ) : (
         <div className="px-3 py-2 border-t border-gray-100 bg-white">
           <div className="flex items-end gap-2">
-            <textarea
+            <textarea maxLength={2000}
               ref={inputRef}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}

@@ -112,8 +112,7 @@ const MayBayModal = ({ isOpen, onClose, onSave, aircraft }) => {
  errors.tenMayBay ? 'border-red-500' : 'border-gray-300'
  }`}
  placeholder="VD: Boeing 787-9 Dreamliner"
- required
- />
+ required maxLength={255} />
  {errors.tenMayBay && <p className="text-red-500 text-xs mt-1">{errors.tenMayBay}</p>}
  </div>
 
@@ -172,8 +171,7 @@ const MayBayModal = ({ isOpen, onClose, onSave, aircraft }) => {
  errors.soHieu ? 'border-red-500' : 'border-gray-300'
  }`}
  placeholder="VD: VN-A12345"
- required
- />
+ required maxLength={50} />
  {errors.soHieu && <p className="text-red-500 text-xs mt-1">{errors.soHieu}</p>}
  </div>
 

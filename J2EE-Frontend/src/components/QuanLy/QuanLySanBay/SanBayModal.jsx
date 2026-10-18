@@ -138,8 +138,7 @@ const SanBayModal = ({ isOpen, onClose, onSave }) => {
  name="maIATA"
  value={formData.maIATA}
  className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600"
- readOnly
- />
+ readOnly maxLength={3} />
  </div>
 
  <div>
@@ -149,8 +148,7 @@ const SanBayModal = ({ isOpen, onClose, onSave }) => {
  name="tenSanBay"
  value={formData.tenSanBay}
  onChange={handleChange}
- className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
- />
+ className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm" maxLength={255} />
  </div>
 
  <div>
@@ -160,8 +158,7 @@ const SanBayModal = ({ isOpen, onClose, onSave }) => {
  name="thanhPhoSanBay"
  value={formData.thanhPhoSanBay}
  onChange={handleChange}
- className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
- />
+ className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm" maxLength={255} />
  </div>
 
  <div>
@@ -171,8 +168,7 @@ const SanBayModal = ({ isOpen, onClose, onSave }) => {
  name="quocGiaSanBay"
  value={formData.quocGiaSanBay}
  className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600"
- readOnly
- />
+ readOnly maxLength={255} />
  </div>
  </div>
 

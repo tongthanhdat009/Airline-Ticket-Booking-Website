@@ -275,7 +275,7 @@ const AutoGenerateModal = ({
  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
  <div>
  <label className="block text-xs font-bold text-gray-600 mb-1">Tên cabin</label>
- <input
+ <input maxLength={50}
  type="text"
  value={config.cabinName}
  onChange={(e) => updateCabinConfig(config.id, 'cabinName', e.target.value)}
@@ -349,7 +349,7 @@ const AutoGenerateModal = ({
  Cột trái
  <span className="text-gray-400 ml-1">(A,B,C)</span>
  </label>
- <input
+ <input maxLength={20}
  type="text"
  value={getColumnInputValue(config.id, 'columnsLeft', config.columnsLeft)}
  onChange={(e) => handleColumnInputChange(config.id, 'columnsLeft', e.target.value)}
@@ -363,7 +363,7 @@ const AutoGenerateModal = ({
  Cột giữa
  <span className="text-gray-400 ml-1">(D,E,F)</span>
  </label>
- <input
+ <input maxLength={20}
  type="text"
  value={getColumnInputValue(config.id, 'columnsMiddle', config.columnsMiddle)}
  onChange={(e) => handleColumnInputChange(config.id, 'columnsMiddle', e.target.value)}
@@ -377,7 +377,7 @@ const AutoGenerateModal = ({
  Cột phải
  <span className="text-gray-400 ml-1">(G,H,K)</span>
  </label>
- <input
+ <input maxLength={20}
  type="text"
  value={getColumnInputValue(config.id, 'columnsRight', config.columnsRight)}
  onChange={(e) => handleColumnInputChange(config.id, 'columnsRight', e.target.value)}

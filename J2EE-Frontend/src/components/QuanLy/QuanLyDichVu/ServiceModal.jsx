@@ -97,8 +97,7 @@ const ServiceModal = ({ service, onClose, onSave }) => {
  onChange={handleChange}
  className="w-full border border-gray-300 rounded-lg shadow-sm py-2 md:py-3 px-3 md:px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm md:text-base"
  required
- placeholder="Nhập tên dịch vụ"
- />
+ placeholder="Nhập tên dịch vụ" maxLength={100} />
  </div>
 
  {/* Description */}
@@ -113,7 +112,7 @@ const ServiceModal = ({ service, onClose, onSave }) => {
  required
  placeholder="Nhập mô tả dịch vụ"
  rows="4"
- />
+ maxLength={500} />
  </div>
 
  {/* Image Upload */}

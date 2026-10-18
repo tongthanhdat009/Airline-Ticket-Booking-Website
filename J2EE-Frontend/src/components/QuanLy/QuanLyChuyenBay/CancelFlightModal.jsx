@@ -31,7 +31,7 @@ const CancelFlightModal = ({ isOpen, onClose, onSubmit, cancelData, onCancelData
  <label className="block text-sm font-semibold text-gray-700 mb-2">
  Lý do hủy chuyến bay <span className="text-red-500">*</span>
  </label>
- <textarea
+ <textarea maxLength={255}
  value={cancelData.lyDoHuy}
  onChange={(e) => onCancelDataChange({ ...cancelData, lyDoHuy: e.target.value })}
  placeholder="Nhập lý do hủy chuyến bay..."

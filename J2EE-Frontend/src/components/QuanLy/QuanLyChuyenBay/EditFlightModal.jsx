@@ -165,7 +165,7 @@ const EditFlightModal = ({ isOpen, onClose, onSubmit, formData, onFormChange, ro
  </div>
  <div>
  <label className="block text-sm font-bold text-gray-700 mb-2">Số hiệu chuyến bay</label>
- <input
+ <input maxLength={10}
  type="text"
  name="soHieuChuyenBay"
  value={formData.soHieuChuyenBay}
@@ -249,7 +249,7 @@ const EditFlightModal = ({ isOpen, onClose, onSubmit, formData, onFormChange, ro
  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
  <div>
  <label className="block text-xs md:text-sm font-bold text-gray-700 mb-1 md:mb-2">Số hiệu chuyến bay về</label>
- <input 
+ <input maxLength={10}
  type="text" 
  name="soHieuChuyenBayVe" 
  value={formData.soHieuChuyenBayVe || ''} 

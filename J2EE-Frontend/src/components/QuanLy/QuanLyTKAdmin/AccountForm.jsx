@@ -132,7 +132,7 @@ const AccountForm = ({ account, roles = [], onClose, onSave }) => {
  <label className="block text-sm font-bold text-gray-700 mb-2">
  Tên đăng nhập <span className="text-red-500">*</span>
  </label>
- <input
+ <input maxLength={50}
  name="tenDangNhap"
  value={formData.tenDangNhap}
  onChange={handleChange}
@@ -154,7 +154,7 @@ const AccountForm = ({ account, roles = [], onClose, onSave }) => {
  <label className="block text-sm font-bold text-gray-700 mb-2">
  Họ và tên <span className="text-red-500">*</span>
  </label>
- <input
+ <input maxLength={100}
  name="hoVaTen"
  value={formData.hoVaTen}
  onChange={handleChange}
@@ -168,7 +168,7 @@ const AccountForm = ({ account, roles = [], onClose, onSave }) => {
  <label className="block text-sm font-bold text-gray-700 mb-2">
  Email <span className="text-red-500">*</span>
  </label>
- <input
+ <input maxLength={100}
  name="email"
  type="email"
  value={formData.email}
@@ -190,7 +190,7 @@ const AccountForm = ({ account, roles = [], onClose, onSave }) => {
  <label className="block text-sm font-bold text-gray-700 mb-2">
  Mật khẩu {!account && <span className="text-red-500">*</span>}
  </label>
- <input
+ <input maxLength={255}
  name="matKhauBang"
  type="password"
  value={formData.matKhauBang}

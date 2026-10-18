@@ -316,7 +316,7 @@ const SeatLayoutEditor = ({ maMayBay, onClose }) => {
 
  <div>
  <label className="block text-sm font-bold text-gray-700 mb-2">Cột (ngăn cách bằng dấu phẩy)</label>
- <input
+ <input maxLength={20}
  type="text"
  value={autoGenConfig.columns.join(',')}
  onChange={(e) => setAutoGenConfig({...autoGenConfig, columns: e.target.value.split(',').map(s => s.trim().toUpperCase())})}
@@ -526,7 +526,7 @@ const SeatForm = ({ seat, hangVeList, onSave, onCancel }) => {
  <form onSubmit={handleSubmit} className="space-y-4">
  <div>
  <label className="block text-sm font-bold text-gray-700 mb-2">Số ghế</label>
- <input
+ <input maxLength={10}
  type="text"
  value={formData.soGhe}
  onChange={(e) => setFormData({...formData, soGhe: e.target.value.toUpperCase()})}

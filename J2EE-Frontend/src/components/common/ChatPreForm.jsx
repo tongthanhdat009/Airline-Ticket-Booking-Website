@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FaUser, FaEnvelope, FaPhone } from 'react-icons/fa';
+import { isValidVnPhone, VN_PHONE_MESSAGE, VN_PHONE_MAX_LENGTH } from '../../utils/phoneValidation';
 
 /**
  * Form nhập thông tin trước khi bắt đầu chat
@@ -26,8 +27,8 @@ const ChatPreForm = ({ onSubmit, loading }) => {
     }
     if (!formData.soDienThoai.trim()) {
       newErrors.soDienThoai = 'Vui lòng nhập số điện thoại';
-    } else if (!/^(0|\+84)[0-9]{9,10}$/.test(formData.soDienThoai)) {
-      newErrors.soDienThoai = 'Số điện thoại không hợp lệ';
+    } else if (!isValidVnPhone(formData.soDienThoai)) {
+      newErrors.soDienThoai = VN_PHONE_MESSAGE;
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -71,6 +72,7 @@ const ChatPreForm = ({ onSubmit, loading }) => {
               type="text"
               placeholder="Họ và tên"
               value={formData.hoTen}
+              maxLength={100}
               onChange={(e) => handleChange('hoTen', e.target.value)}
               className={`w-full pl-10 pr-3 py-2.5 rounded-xl border ${
                 errors.hoTen ? 'border-red-400 bg-red-50' : 'border-gray-200'
@@ -90,6 +92,7 @@ const ChatPreForm = ({ onSubmit, loading }) => {
               type="email"
               placeholder="Email"
               value={formData.email}
+              maxLength={100}
               onChange={(e) => handleChange('email', e.target.value)}
               className={`w-full pl-10 pr-3 py-2.5 rounded-xl border ${
                 errors.email ? 'border-red-400 bg-red-50' : 'border-gray-200'
@@ -109,6 +112,7 @@ const ChatPreForm = ({ onSubmit, loading }) => {
               type="tel"
               placeholder="Số điện thoại"
               value={formData.soDienThoai}
+              maxLength={20}
               onChange={(e) => handleChange('soDienThoai', e.target.value)}
               className={`w-full pl-10 pr-3 py-2.5 rounded-xl border ${
                 errors.soDienThoai ? 'border-red-400 bg-red-50' : 'border-gray-200'
