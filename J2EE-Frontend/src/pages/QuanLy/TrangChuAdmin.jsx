@@ -142,7 +142,6 @@ function TrangChuAdmin() {
             'XuatBaoCao': 'Xuất Báo Cáo',
             'DoiSoatGiaoDich': 'Đối Soát Giao Dịch',
             'BannerTinTuc': 'Quản lý Banner & Tin Tức',
-            'LichSuGiaoDichVNPay': 'Lịch Sử Giao Dịch VNPay',
             'QuanLyChat': 'Chat Trực Tuyến',
             'them': 'Thêm Mới',
             'sua': 'Chỉnh Sửa',

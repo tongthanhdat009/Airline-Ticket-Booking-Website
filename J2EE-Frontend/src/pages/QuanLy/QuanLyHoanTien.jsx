@@ -237,7 +237,8 @@ const QuanLyHoanTien = () => {
 
  const getPhuongThucText = (phuongThuc) => {
  switch (phuongThuc) {
- case 'VNPAY': return 'VNPay';
+ case 'VNPAY': return 'VNPay (cũ)';
+ case 'THUONG': return 'Thanh toán thường';
  case 'CHUYEN_KHOAN': return 'Chuyển khoản ngân hàng';
  case 'TIEN_MAT': return 'Tiền mặt';
  default: return phuongThuc || 'Chưa xác định';

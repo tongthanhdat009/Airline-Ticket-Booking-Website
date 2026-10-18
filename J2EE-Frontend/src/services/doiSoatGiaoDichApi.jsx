@@ -58,16 +58,6 @@ const doiSoatGiaoDichApi = {
   },
 
   /**
-   * Lấy VNPay logs theo mã giao dịch
-   * @param {string} txnRef - Mã giao dịch VNPay
-   * @returns {Promise} Danh sách VNPay logs
-   */
-  getVNPayLogs: async (txnRef) => {
-    const response = await apiClient.get(`${DOI_SOAT_API_BASE}/vnpay-log/${txnRef}`);
-    return response.data;
-  },
-
-  /**
    * Lấy danh sách đối soát đang chờ xử lý
    * @returns {Promise} Danh sách đối soát PENDING
    */

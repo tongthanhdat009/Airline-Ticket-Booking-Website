@@ -21,16 +21,15 @@ import Toast from '../../components/common/Toast';
 import ViewToggleButton from '../../components/common/ViewToggleButton';
 import { useViewToggle } from '../../hooks/useViewToggle';
 import doiSoatGiaoDichApi from '../../services/doiSoatGiaoDichApi';
-import VNPayLogTimeline from '../../components/QuanLy/QuanLyDoiSoat/VNPayLogTimeline';
 import ReconciliationNoteForm from '../../components/QuanLy/QuanLyDoiSoat/ReconciliationNoteForm';
 
 // Helper function to map API status to UI status
-const mapApiStatusToUiStatus = (apiStatus, hasInvoice, hasVnpay) => {
+const mapApiStatusToUiStatus = (apiStatus, hasInvoice, hasPayment) => {
  if (apiStatus === 'MATCHED') return 'khop';
  if (apiStatus === 'UNMATCHED') {
  // Determine type of mismatch based on data
- if (!hasInvoice && hasVnpay) return 'chi_co_vnpay';
- if (hasInvoice && !hasVnpay) return 'chi_co_he_thong';
+ if (!hasInvoice && hasPayment) return 'chi_co_thanh_toan';
+ if (hasInvoice && !hasPayment) return 'chi_co_he_thong';
  return 'lech_so_tien'; // Default to amount mismatch
  }
  return 'lech_so_tien';
@@ -45,9 +44,9 @@ const formatApiDataForUi = (apiData) => {
  madonhang: item.soHoaDon || null,
  pnr: item.pnr || null,
  soTienHeThong: item.invoiceAmount || 0,
- soTienVNPay: item.vnpayAmount || 0,
+ soTienTT: item.vnpayAmount || 0,
  trangThaiHeThong: item.invoiceAmount > 0 ? 'ĐÃ THANH TOÁN' : 'KHÔNG TÌM THẤY',
- trangThaiVNPay: item.vnpayAmount > 0 ? '00' : 'KHÔNG TÌM THẤY',
+ trangThaiTT: item.vnpayAmount > 0 ? 'ĐÃ THANH TOÁN' : 'KHÔNG TÌM THẤY',
  trangThaiDoiSoat: mapApiStatusToUiStatus(item.status, item.invoiceAmount > 0, item.vnpayAmount > 0),
  ngayGiaoDich: item.ngayGiaoDich || item.createdAt || new Date().toISOString().slice(0, 19).replace('T', ' '),
  ngayDoiSoat: item.createdAt || new Date().toISOString().slice(0, 19).replace('T', ' '),
@@ -79,7 +78,7 @@ const trangThaiConfig = {
  khop: { label: 'Khớp', color: 'bg-green-100 text-green-700', icon: FaCheckCircle },
  lech_trang_thai: { label: 'Lệch trạng thái', color: 'bg-orange-100 text-orange-700', icon: FaExclamationTriangle },
  lech_so_tien: { label: 'Lệch số tiền', color: 'bg-red-100 text-red-700', icon: FaTimesCircle },
- chi_co_vnpay: { label: 'Chỉ có VNPay', color: 'bg-purple-100 text-purple-700', icon: FaExclamationTriangle },
+  chi_co_thanh_toan: { label: 'Chỉ có thanh toán', color: 'bg-purple-100 text-purple-700', icon: FaExclamationTriangle },
  chi_co_he_thong: { label: 'Chỉ có hệ thống', color: 'bg-yellow-100 text-yellow-700', icon: FaExclamationTriangle }
 };
 
@@ -280,7 +279,7 @@ const DoiSoatGiaoDich = () => {
  <FaInfoCircle className="text-amber-500 mt-0.5 shrink-0" />
  <div className="text-sm text-amber-700">
  <p className="font-semibold mb-1">Về đối soát giao dịch</p>
- <p>Hệ thống tự động đối soát giao dịch với VNPay mỗi ngày lúc 2:00 AM. Các giao dịch lệch pha sẽ được đánh dấu và xử lý tự động nếu có thể. Các trường hợp phức tạp cần xử lý thủ công.</p>
+ <p>Hệ thống đối soát giao dịch thanh toán nội bộ. Các giao dịch lệch pha sẽ được đánh dấu và xử lý tự động nếu có thể. Các trường hợp phức tạp cần xử lý thủ công.</p>
  </div>
  </div>
 
@@ -355,7 +354,7 @@ const DoiSoatGiaoDich = () => {
  <option value="khop">Khớp</option>
  <option value="lech_trang_thai">Lệch trạng thái</option>
  <option value="lech_so_tien">Lệch số tiền</option>
- <option value="chi_co_vnpay">Chỉ có VNPay</option>
+  <option value="chi_co_thanh_toan">Chỉ có thanh toán</option>
  <option value="chi_co_he_thong">Chỉ có hệ thống</option>
  </select>
  </div>
@@ -431,12 +430,12 @@ const DoiSoatGiaoDich = () => {
  <thead>
  <tr className="bg-gray-50 text-gray-600">
  <th className="px-3 py-3 text-left text-xs font-semibold">#</th>
- <th className="px-3 py-3 text-left text-xs font-semibold">Mã GD VNPay</th>
+ <th className="px-3 py-3 text-left text-xs font-semibold">Mã GD</th>
  <th className="px-3 py-3 text-left text-xs font-semibold">Mã đơn hàng</th>
  <th className="px-3 py-3 text-right text-xs font-semibold">Số tiền HT</th>
- <th className="px-3 py-3 text-right text-xs font-semibold">Số tiền VNPay</th>
+ <th className="px-3 py-3 text-right text-xs font-semibold">Số tiền TT</th>
  <th className="px-3 py-3 text-left text-xs font-semibold">TT Hệ thống</th>
- <th className="px-3 py-3 text-left text-xs font-semibold">TT VNPay</th>
+ <th className="px-3 py-3 text-left text-xs font-semibold">TT thanh toán</th>
  <th className="px-3 py-3 text-center text-xs font-semibold">Kết quả</th>
  <th className="px-3 py-3 text-left text-xs font-semibold">Ngày GD</th>
  <th className="px-3 py-3 text-center text-xs font-semibold">Chi tiết</th>
@@ -452,13 +451,13 @@ const DoiSoatGiaoDich = () => {
  <td className="px-3 py-3 text-sm font-mono text-gray-700">{item.maGiaoDich || <span className="text-gray-400 italic">N/A</span>}</td>
  <td className="px-3 py-3 text-sm font-mono text-gray-700">{item.madonhang || <span className="text-gray-400 italic">N/A</span>}</td>
  <td className="px-3 py-3 text-sm text-right font-medium text-gray-800">{formatCurrency(item.soTienHeThong)}</td>
- <td className="px-3 py-3 text-sm text-right font-medium text-gray-800">{formatCurrency(item.soTienVNPay)}</td>
+ <td className="px-3 py-3 text-sm text-right font-medium text-gray-800">{formatCurrency(item.soTienTT)}</td>
  <td className="px-3 py-3 text-xs">{item.trangThaiHeThong}</td>
  <td className="px-3 py-3 text-xs">
- {item.trangThaiVNPay === '00' ? (
- <span className="text-green-600">Thành công (00)</span>
+ {item.trangThaiTT === 'ĐÃ THANH TOÁN' ? (
+ <span className="text-green-600">Thanh toán thành công</span>
  ) : (
- <span className="text-gray-400">{item.trangThaiVNPay}</span>
+ <span className="text-gray-400">{item.trangThaiTT}</span>
  )}
  </td>
  <td className="px-3 py-3 text-center">
@@ -490,7 +489,7 @@ const DoiSoatGiaoDich = () => {
  {filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((item) => {
  const config = trangThaiConfig[item.trangThaiDoiSoat];
  const StatusIcon = config.icon;
- const chenhLech = Math.abs(item.soTienHeThong - item.soTienVNPay);
+ const chenhLech = Math.abs(item.soTienHeThong - item.soTienTT);
  return (
  <div key={item.id} className={`border rounded-xl p-4 hover:shadow-md transition-all bg-white ${
  item.trangThaiDoiSoat === 'khop' ? 'border-green-200' : 'border-red-200'
@@ -511,8 +510,8 @@ const DoiSoatGiaoDich = () => {
  <p className="font-medium text-sm text-blue-700">{formatCurrency(item.soTienHeThong)}</p>
  </div>
  <div className="bg-green-50 rounded-lg p-2.5">
- <p className="text-xs text-green-600">Số tiền VNPay</p>
- <p className="font-medium text-sm text-green-700">{formatCurrency(item.soTienVNPay)}</p>
+ <p className="text-xs text-green-600">Số tiền TT</p>
+ <p className="font-medium text-sm text-green-700">{formatCurrency(item.soTienTT)}</p>
  </div>
  </div>
  {chenhLech > 0 && (
@@ -580,7 +579,7 @@ const DoiSoatGiaoDich = () => {
  {/* Thông tin cơ bản */}
  <div className="grid grid-cols-2 gap-3 text-sm">
  <div className="bg-gray-50 rounded-lg p-3">
- <p className="text-gray-500 text-xs">Mã GD VNPay</p>
+ <p className="text-gray-500 text-xs">Mã GD</p>
  <p className="font-mono font-medium">{selectedItem.maGiaoDich || 'N/A'}</p>
  </div>
  <div className="bg-gray-50 rounded-lg p-3">
@@ -608,16 +607,16 @@ const DoiSoatGiaoDich = () => {
  <p className="text-lg font-bold text-blue-700">{formatCurrency(selectedItem.soTienHeThong)}</p>
  </div>
  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
- <p className="text-green-600 text-xs font-medium mb-1">Số tiền VNPay</p>
- <p className="text-lg font-bold text-green-700">{formatCurrency(selectedItem.soTienVNPay)}</p>
+ <p className="text-green-600 text-xs font-medium mb-1">Số tiền TT</p>
+ <p className="text-lg font-bold text-green-700">{formatCurrency(selectedItem.soTienTT)}</p>
  </div>
  </div>
 
- {Math.abs(selectedItem.soTienHeThong - selectedItem.soTienVNPay) > 0 && (
+ {Math.abs(selectedItem.soTienHeThong - selectedItem.soTienTT) > 0 && (
  <div className="bg-red-50 border border-red-200 rounded-lg p-3">
  <p className="text-red-600 text-xs font-medium mb-1">Chênh lệch</p>
  <p className="text-lg font-bold text-red-700">
- {formatCurrency(Math.abs(selectedItem.soTienHeThong - selectedItem.soTienVNPay))}
+ {formatCurrency(Math.abs(selectedItem.soTienHeThong - selectedItem.soTienTT))}
  </p>
  </div>
  )}
@@ -634,12 +633,12 @@ const DoiSoatGiaoDich = () => {
  </div>
  </div>
 
- {/* VNPay Logs Timeline */}
- {selectedItem.maGiaoDich && (
- <div className="border-t pt-4">
- <VNPayLogTimeline txnRef={selectedItem.maGiaoDich} />
- </div>
- )}
+  {/* Lịch sử mã giao dịch */}
+  {selectedItem.maGiaoDich && (
+  <div className="border-t pt-4">
+  <p className="text-sm text-gray-600">Mã giao dịch: <span className="font-mono">{selectedItem.maGiaoDich}</span></p>
+  </div>
+  )}
 
  {/* Ghi chú xử lý */}
  {selectedItem.ghiChu && (

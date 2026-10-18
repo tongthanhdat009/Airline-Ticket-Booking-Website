@@ -249,7 +249,7 @@ export const adminMenuItems = [
     featureName: 'Đối soát giao dịch',
     group: 'Tài chính',
     color: 'from-amber-500 to-yellow-500',
-    description: 'Đối soát giao dịch với cổng thanh toán VNPay'
+    description: 'Đối soát giao dịch thanh toán nội bộ'
   },
   {
     path: '/admin/dashboard/BannerTinTuc',
@@ -261,17 +261,6 @@ export const adminMenuItems = [
     group: 'Marketing',
     color: 'from-fuchsia-500 to-pink-500',
     description: 'Quản lý banner quảng cáo và tin tức trang chủ'
-  },
-  {
-    path: '/admin/dashboard/LichSuGiaoDichVNPay',
-    text: 'Log giao dịch VNPay',
-    icon: FaServer,
-    permissionKey: 'TRANSACTION_LOG_VIEW',
-    featureCode: 'TRANSACTION_LOG',
-    featureName: 'Lịch sử giao dịch VNPay',
-    group: 'Tài chính',
-    color: 'from-slate-500 to-gray-600',
-    description: 'Xem raw data IPN từ VNPay để debug và xử lý khiếu nại'
   },
   {
     path: '/admin/dashboard/QuanLyChat',
@@ -356,7 +345,6 @@ export const permissionMapping = {
   EXPORT_REPORT: 'Xuất báo cáo',
   RECONCILIATION: 'Đối soát giao dịch',
   BANNER_NEWS: 'Banner & Tin tức',
-  TRANSACTION_LOG: 'Log giao dịch VNPay',
   SUPPORT: 'Chat trực tuyến',
 
   // Mapping cũ để tương thích (nếu cần)
@@ -525,7 +513,6 @@ const checkPermissionMatch = (menuItem, feature, action) => {
     'EXPORT_REPORT': '/admin/dashboard/XuatBaoCao',
     'RECONCILIATION': '/admin/dashboard/DoiSoatGiaoDich',
     'BANNER_NEWS': '/admin/dashboard/BannerTinTuc',
-    'TRANSACTION_LOG': '/admin/dashboard/LichSuGiaoDichVNPay',
     'SUPPORT': '/admin/dashboard/QuanLyChat'
   };
 
@@ -605,7 +592,6 @@ export const rolePermissions = {
     'EXPORT_REPORT_MANAGE',
     'RECONCILIATION_MANAGE',
     'BANNER_NEWS_MANAGE',
-    'TRANSACTION_LOG_MANAGE',
     'SUPPORT_MANAGE'
   ],
 
@@ -642,8 +628,7 @@ export const rolePermissions = {
     'REPORT_VIEW', 'REPORT_EXPORT',
     'ORDER_VIEW',
     'EXPORT_REPORT_VIEW', 'EXPORT_REPORT_EXPORT',
-    'RECONCILIATION_VIEW', 'RECONCILIATION_UPDATE',
-    'TRANSACTION_LOG_VIEW'
+    'RECONCILIATION_VIEW', 'RECONCILIATION_UPDATE'
   ],
 
   // VAN_HANH - Vận hành
@@ -652,8 +637,7 @@ export const rolePermissions = {
     'ROUTE_VIEW', 'ROUTE_CREATE', 'ROUTE_UPDATE',
     'AIRPORT_VIEW',
     'AIRCRAFT_VIEW', 'AIRCRAFT_UPDATE',
-    'BOOKING_VIEW',
-    'TRANSACTION_LOG_VIEW'
+    'BOOKING_VIEW'
   ]
 };
 
