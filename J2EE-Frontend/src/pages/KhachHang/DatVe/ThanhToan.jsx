@@ -7,7 +7,7 @@ import PriceBreakdown from '../../../components/KhachHang/Booking/PriceBreakdown
 import { useTranslation } from 'react-i18next'
 
 import { formatTime, formatDate } from '../../../services/utils';
-import VNPayService from '../../../services/VNPayService';
+import ThanhToanService from '../../../services/ThanhToanService';
 import apiClient from '../../../services/apiClient';
 import { getClientAccessToken } from '../../../utils/cookieUtils';
 import useTitle from '../../../hooks/useTitle';
@@ -108,15 +108,16 @@ function ThanhToan() {
 
             if (response.data.success) {
                 const maThanhToan = response.data.data.maThanhToan;
-                
-                // Create VNPay payment URL
-                const vnpayResponse = await VNPayService.createPayment(maThanhToan);
-                
-                if (vnpayResponse.success && vnpayResponse.data.paymentUrl) {
-                    // Redirect to VNPay
-                    window.location.href = vnpayResponse.data.paymentUrl;
+                const confirmToken = response.data.data.confirmToken;
+
+                // Xác nhận thanh toán thường (nội bộ, không redirect cổng ngoài)
+                const confirmResponse = await ThanhToanService.xacNhanThanhToan(maThanhToan, confirmToken);
+
+                if (confirmResponse.success) {
+                    const soTien = confirmResponse.data?.soTien ?? bookingData.totalAmount;
+                    navigate(`/payment-result?success=true&message=${encodeURIComponent(confirmResponse.message || 'Thanh toán thành công')}&maThanhToan=${maThanhToan}&soTien=${soTien}`);
                 } else {
-                    setError(t('booking_payment_errors.error_create_payment'));
+                    setError(confirmResponse.message || t('booking_payment_errors.error_create_payment'));
                     setIsProcessing(false);
                 }
             } else {
@@ -276,15 +277,10 @@ function ThanhToan() {
                         </h3>
                         <div className="bg-blue-50/80 backdrop-blur-sm p-4 rounded-2xl border-2 border-blue-300/50">
                             <div className="flex items-center">
-                                <img 
-                                    src="https://vnpay.vn/s1/statics.vnpay.vn/2023/6/0oxhzjmxbksr1686814746087.png" 
-                                    alt="VNPay" 
-                                    className="h-12 mr-4"
-                                />
                                 <div>
-                                    <p className="font-bold">{t('booking.payment.vnpay_title') || 'Thanh toán qua VNPay'}</p>
+                                    <p className="font-bold">{t('booking.payment.normal_title') || 'Thanh toán thường'}</p>
                                     <p className="text-sm text-gray-600">
-                                        {t('booking.payment.vnpay_desc') || 'Hỗ trợ thanh toán bằng thẻ ATM, thẻ tín dụng, QR Code'}
+                                        {t('booking.payment.normal_desc') || 'Xác nhận thanh toán trực tiếp, vé điện tử gửi qua email ngay'}
                                     </p>
                                 </div>
                             </div>

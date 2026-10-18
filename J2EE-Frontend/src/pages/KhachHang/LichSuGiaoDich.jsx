@@ -6,7 +6,7 @@ import ConfirmDialog from '../../components/common/ConfirmDialog';
 import ModalDetailHoaDon from '../../components/KhachHang/ModalDetailHoaDon';
 import TaiKhoanService from '../../services/TaiKhoanService';
 import DatChoService from '../../services/DatChoService';
-import VNPayService from '../../services/VNPayService';
+import ThanhToanService from '../../services/ThanhToanService';
 import { getClientUserEmail, getClientAccessToken } from '../../utils/cookieUtils';
 import { getPdfUrl } from '../../config/api.config';
 import ProfileCard from './CaNhan/ProfileCard';
@@ -165,17 +165,20 @@ function LichSuGiaoDich() {
     );
   };
 
-  const handlePayment = async (maThanhToan) => {
+  const handlePayment = async (maThanhToan, token) => {
     try {
-      const response = await VNPayService.createPayment(maThanhToan);
-      if (response.success && response.data.paymentUrl) {
-        window.location.href = response.data.paymentUrl;
+      const response = await ThanhToanService.xacNhanThanhToan(maThanhToan, token);
+      if (response.success) {
+        showToast('Thanh toán thành công!', 'success');
+        const refresh = await DatChoService.getLichSuThanhToan(accountInfo.hanhKhach.maHanhKhach);
+        setPaymentHistory(refresh.data || []);
+        navigate(`/payment-result?success=true&message=${encodeURIComponent(response.message || 'Thanh toán thành công')}&maThanhToan=${maThanhToan}&soTien=${response.data?.soTien ?? ''}`);
       } else {
-        showToast('Không thể tạo URL thanh toán: ' + response.message, 'error');
+        showToast('Không thể thanh toán: ' + response.message, 'error');
       }
     } catch (error) {
-      console.error('Lỗi khi tạo thanh toán:', error);
-      showToast('Có lỗi xảy ra khi tạo thanh toán', 'error');
+      console.error('Lỗi khi xác nhận thanh toán:', error);
+      showToast('Có lỗi xảy ra khi thanh toán', 'error');
     }
   };
 
@@ -403,11 +406,11 @@ function LichSuGiaoDich() {
                             ) : (
                               <>
                                 <button
-                                  onClick={() => handlePayment(payment.maThanhToan)}
+                                  onClick={() => handlePayment(payment.maThanhToan, payment.transactionCode)}
                                   className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition font-medium"
                                 >
                                   <FaCreditCard />
-                                  Thanh toán VNPay
+                                  Thanh toán
                                 </button>
                                 {payment.datCho?.chiTietGhe?.chiTietChuyenBay?.trangThai !== 'Đã bay' &&
                                  payment.datCho?.chiTietGhe?.chiTietChuyenBay?.trangThai !== 'Đã hủy' && (
@@ -440,7 +443,7 @@ function LichSuGiaoDich() {
         selectedPayment={selectedPayment}
         bookingDetails={bookingDetails}
         onDownloadPDF={handleDownloadPDF}
-        onPayment={handlePayment}
+        onPayment={(maTT) => handlePayment(maTT, selectedPayment?.transactionCode)}
       />
 
       {/* Toast Component */}

@@ -229,7 +229,7 @@ const ModalDetailHoaDon = ({
               onClick={() => onPayment(selectedPayment.maThanhToan)}
               className="px-4 sm:px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition text-sm sm:text-base"
             >
-              💳 Thanh toán VNPay
+              💳 Thanh toán
             </button>
           )}
         </div>

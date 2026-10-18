@@ -10,7 +10,7 @@ function PaymentResult() {
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  const [vnpayParams, setVnpayParams] = useState({});
+  const [queryParams, setQueryParams] = useState({});
 
   useEffect(() => {
     const handlePaymentResult = () => {
@@ -23,7 +23,7 @@ function PaymentResult() {
           params[key] = value;
         }
 
-        setVnpayParams(params);
+        setQueryParams(params);
 
         // Parse kết quả từ backend
         const success = params.success === 'true';
@@ -98,8 +98,8 @@ function PaymentResult() {
                   <span className="font-semibold text-lg">#{result.data.maThanhToan}</span>
                 </div>
                 <div className="flex justify-between items-center border-b border-gray-200 pb-3">
-                  <span className="text-gray-600">Mã giao dịch VNPay:</span>
-                  <span className="font-mono text-sm">{vnpayParams.vnp_TxnRef}</span>
+                  <span className="text-gray-600">Mã giao dịch:</span>
+                  <span className="font-mono text-sm">{queryParams.maGiaoDich || result.data.maThanhToan}</span>
                 </div>
                 <div className="flex justify-between items-center border-b border-gray-200 pb-3">
                   <span className="text-gray-600">Số tiền:</span>
@@ -107,24 +107,17 @@ function PaymentResult() {
                     {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(result.data.soTien)}
                   </span>
                 </div>
-                {vnpayParams.vnp_BankCode && (
+                {queryParams.nganHang && (
                   <div className="flex justify-between items-center border-b border-gray-200 pb-3">
                     <span className="text-gray-600">Ngân hàng:</span>
-                    <span className="font-semibold">{vnpayParams.vnp_BankCode}</span>
+                    <span className="font-semibold">{queryParams.nganHang}</span>
                   </div>
                 )}
-                {vnpayParams.vnp_PayDate && (
+                {queryParams.thoiGian && (
                   <div className="flex justify-between items-center border-b border-gray-200 pb-3">
                     <span className="text-gray-600">Thời gian thanh toán:</span>
                     <span className="font-semibold">
-                      {new Date(
-                        vnpayParams.vnp_PayDate.substring(0, 4),
-                        vnpayParams.vnp_PayDate.substring(4, 6) - 1,
-                        vnpayParams.vnp_PayDate.substring(6, 8),
-                        vnpayParams.vnp_PayDate.substring(8, 10),
-                        vnpayParams.vnp_PayDate.substring(10, 12),
-                        vnpayParams.vnp_PayDate.substring(12, 14)
-                      ).toLocaleString('vi-VN')}
+                      {new Date(queryParams.thoiGian).toLocaleString('vi-VN')}
                     </span>
                   </div>
                 )}
@@ -137,14 +130,14 @@ function PaymentResult() {
               </div>
             )}
 
-            {!isSuccess && vnpayParams.vnp_ResponseCode && (
+            {!isSuccess && queryParams.maLoi && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-sm text-red-800">
-                  <span className="font-semibold">Mã lỗi:</span> {vnpayParams.vnp_ResponseCode}
+                  <span className="font-semibold">Mã lỗi:</span> {queryParams.maLoi}
                 </p>
-                {vnpayParams.vnp_TxnRef && (
+                {(queryParams.maGiaoDich || result?.data?.maThanhToan) && (
                   <p className="text-sm text-red-800 mt-2">
-                    <span className="font-semibold">Mã giao dịch:</span> {vnpayParams.vnp_TxnRef}
+                    <span className="font-semibold">Mã giao dịch:</span> {queryParams.maGiaoDich || result?.data?.maThanhToan}
                   </p>
                 )}
               </div>
