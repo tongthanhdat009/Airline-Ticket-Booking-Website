@@ -87,21 +87,10 @@ This guide explains how to configure environment variables for the Airline Ticke
 3. Create a new App Password for "Mail"
 4. Use the generated 16-character password as `EMAIL_PASSWORD`
 
-### VNPay Payment Configuration
+### Thanh toán thường (nội bộ)
 
-| Variable | Description | How to Obtain |
-|----------|-------------|---------------|
-| `VNPAY_TMN_CODE` | VNPay Terminal Code | [VNPay Sandbox](https://sandbox.vnpayment.vn/) |
-| `VNPAY_SECRET_KEY` | VNPay Secret Key | [VNPay Sandbox](https://sandbox.vnpayment.vn/) |
-| `VNPAY_PAY_URL` | Payment URL | `https://sandbox.vnpayment.vn/paymentv2/vpcpay.html` |
-| `VNPAY_API_URL` | API URL | `https://sandbox.vnpayment.vn/merchant_webapi/api/transaction` |
-| `VNPAY_RETURN_URL` | Backend callback URL | `http://localhost:8080/api/vnpay/payment-callback` |
-| `VNPAY_FRONTEND_URL` | Frontend callback URL | `http://localhost:5173/vnpay-callback` |
-
-**Setup Steps:**
-1. Register at [VNPay Sandbox](https://sandbox.vnpayment.vn/)
-2. Get your TMN Code and Secret Key from the merchant portal.
-3. Configure the return URLs in your VNPay dashboard
+Không cần cấu hình cổng thanh toán ngoài. Backend tự xác nhận thanh toán qua
+`POST /client/thanhtoan/{maThanhToan}/xac-nhan`, tạo hóa đơn và gửi vé qua email.
 
 ---
 

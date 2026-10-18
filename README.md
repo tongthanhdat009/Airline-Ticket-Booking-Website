@@ -27,9 +27,9 @@ Một ứng dụng web đặt vé máy bay hoàn chỉnh với đầy đủ tín
 | 8 | **Chọn chuyến bay về** | Chọn chuyến bay khứ hồi (nếu có) |
 | 9 | **Chọn dịch vụ** | Chọn hành lý, suất ăn, chỗ ưu tiên... |
 | 10 | **Nhập thông tin hành khách** | Nhập thông tin cá nhân cho từng hành khách |
-| 11 | **Thanh toán** | Chọn phương thức thanh toán (VNPay) và áp dụng mã giảm giá |
+| 11 | **Thanh toán** | Chọn phương thức thanh toán (thanh toán thường) và áp dụng mã giảm giá |
 | 12 | **Kết quả thanh toán** | Hiển thị trạng thái thanh toán thành công/thất bại |
-| 13 | **VNPay Callback** | Xử lý kết quả trả về từ cổng VNPay |
+| 13 | **Xác nhận thanh toán** | Xác nhận thanh toán thường, tạo hóa đơn + gửi vé ngay |
 
 #### 1.3. Quản lý cá nhân
 | STT | Chức năng | Mô tả |
@@ -51,7 +51,7 @@ Một ứng dụng web đặt vé máy bay hoàn chỉnh với đầy đủ tín
 
 ---
 
-### 2. Chức năng dành cho QUẢN TRỊ VIÊN (30 trang)
+### 2. Chức năng dành cho QUẢN TRỊ VIÊN (29 trang)
 
 #### 2.1. Quản lý hệ thống (6 trang)
 | STT | Chức năng | File | Mô tả |
@@ -90,15 +90,14 @@ Một ứng dụng web đặt vé máy bay hoàn chỉnh với đầy đủ tín
 | 20 | **Quản lý đơn hàng** | QuanLyDonHang | Quản lý orders, chi tiết đơn hàng |
 | 21 | **Quản lý hành khách** | QuanLyHanhKhach | Thông tin hành khách trên các chuyến bay |
 
-#### 2.5. Quản lý tài chính (6 trang)
+#### 2.5. Quản lý tài chính (5 trang)
 | STT | Chức năng | File | Mô tả |
 |-----|-----------|------|-------|
 | 22 | **Quản lý hóa đơn** | QuanLyHoaDon | Xuất/xem/ gửi hóa đơn điện tử |
 | 23 | **Quản lý thanh toán** | ThanhToan | Xem danh sách thanh toán |
 | 24 | **Quản lý hoàn tiền** | QuanLyHoanTien | Xử lý yêu cầu hoàn tiền |
-| 25 | **Lịch sử giao dịch VNPay** | LichSuGiaoDichVNPay | Log chi tiết các giao dịch VNPay |
-| 26 | **Đối soát giao dịch** | DoiSoatGiaoDich | Kiểm tra sự khớp lệ giữa hệ thống và VNPay |
-| 27 | **Quản lý giá chuyến bay** | GiaChuyenBay | Cấu hình giá theo từng chuyến |
+| 25 | **Đối soát giao dịch** | DoiSoatGiaoDich | Kiểm tra sự khớp lệ giữa hóa đơn và thanh toán nội bộ |
+| 26 | **Quản lý giá chuyến bay** | GiaChuyenBay | Cấu hình giá theo từng chuyến |
 
 #### 2.6. Báo cáo & Hỗ trợ (4 trang)
 | STT | Chức năng | File | Mô tả |
@@ -163,7 +162,7 @@ Một ứng dụng web đặt vé máy bay hoàn chỉnh với đầy đủ tín
 
 | Dịch vụ | Mục đích |
 |---------|----------|
-| **VNPay** | Cổng thanh toán trực tuyến |
+| **Thanh toán thường** | Xác nhận nội bộ, tạo hóa đơn + gửi vé ngay |
 | **Google OAuth2** | Đăng nhập bằng tài khoản Google |
 | **OpenRouter AI** | AI chatbot hỗ trợ khách hàng (RAG) |
 | **Gmail SMTP** | Gửi email xác thực, reset password |
@@ -194,7 +193,7 @@ Airline-Ticket-Booking-Website/
 │   ├── src/
 │   │   ├── pages/
 │   │   │   ├── KhachHang/    # 23 trang khách hàng
-│   │   │   └── QuanLy/       # 30 trang admin
+│   │   │   └── QuanLy/       # 29 trang admin
 │   │   ├── components/
 │   │   │   ├── KhachHang/    # Components khách hàng
 │   │   │   ├── QuanLy/       # Components admin
@@ -221,7 +220,7 @@ Airline-Ticket-Booking-Website/
 | Hạng mục | Số lượng |
 |----------|----------|
 | **Trang khách hàng** | 23 |
-| **Trang quản trị** | 30 |
+| **Trang quản trị** | 29 |
 | **Backend Services** | 52 |
 | **Backend Controllers** | 49 |
 | **JPA Entities** | 40+ |
@@ -256,7 +255,7 @@ Airline-Ticket-Booking-Website/
 3. **Chỉnh sửa file `.env` với các giá trị thực tế:**
    - Database connection (`DB_URL`, `DB_USERNAME`, `DB_PASSWORD`)
    - JWT secret (`JWT_SECRET`)
-   - API keys (OpenRouter, VNPay, Google OAuth2)
+   - API keys (OpenRouter, Google OAuth2)
    - Email configuration
 
    Xem [README_ENV_SETUP.md](README_ENV_SETUP.md) để biết chi tiết.

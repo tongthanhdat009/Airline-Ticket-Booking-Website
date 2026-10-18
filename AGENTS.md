@@ -23,7 +23,7 @@ This is a full-stack Airline Ticket Booking System (Hệ thống đặt vé máy
 - **WebSocket**: STOMP for real-time features
 - **AI Integration**: Spring AI with OpenRouter
 - **Reports**: JasperReports (4 templates: audit_log, invoice, revenue, ticket)
-- **Payment**: VNPay integration
+- **Payment**: Thanh toán thường nội bộ (xác nhận trực tiếp, không cổng ngoài)
 - **Email**: Spring Mail (Gmail SMTP)
 - **Caching**: Spring Cache + Caffeine
 - **Excel Export**: Apache POI
@@ -54,7 +54,7 @@ Airline-Ticket-Booking-Website/
 │   ├── src/main/java/com/example/j2ee/
 │   │   ├── annotation/        # Custom annotations (@RequirePermission, @RequireRole, @Auditable)
 │   │   ├── aspect/            # AOP aspects (PermissionAspect, AuditLogAspect)
-│   │   ├── config/            # Configuration classes (Security, WebSocket, OAuth2, VNPay, Cache, Flyway)
+│   │   ├── config/            # Configuration classes (Security, WebSocket, OAuth2, ThanhToanThuong, Cache, Flyway)
 │   │   ├── controller/        # REST API controllers (60+ controllers)
 │   │   ├── dto/               # Data Transfer Objects (organized by feature)
 │   │   ├── exception/         # Global exception handler
@@ -64,7 +64,7 @@ Airline-Ticket-Booking-Website/
 │   │   ├── scheduler/         # Scheduled tasks (PaymentExpiryScheduler)
 │   │   ├── security/          # Security components (AdminRoleVoter, AdminUserDetails, DynamicAdminAuthorizationManager)
 │   │   ├── service/           # Business logic services (50+ services)
-│   │   ├── util/              # Utility classes (SecurityUtil, VNPayUtil)
+│   │   ├── util/              # Utility classes (SecurityUtil)
 │   │   └── validation/        # Custom validators
 │   └── src/main/resources/
 │       ├── db/migration/      # Flyway migrations (V1-V16 + test data)
@@ -184,10 +184,6 @@ GOOGLE_OAUTH_CLIENT_SECRET=your_client_secret
 EMAIL_USERNAME=your_email@gmail.com
 EMAIL_PASSWORD=your_app_password
 
-# VNPay (Sandbox)
-VNPAY_TMN_CODE=your_tmn_code
-VNPAY_SECRET_KEY=your_secret_key
-VNPAY_RETURN_URL=http://localhost:8080/api/vnpay/payment-callback
 FRONTEND_URL=http://localhost:5173
 ```
 
@@ -279,7 +275,7 @@ Key tables (see `V1__Initial_Schema.sql` for full schema):
 | `khuyenmai` | Promotions |
 | `vaitro` / `phanquyen` | Roles and permissions |
 | `audit_log` | Audit trail |
-| `vnpay_transaction_log` | Payment transaction logs |
+| `vnpay_transaction_log` | Dropped in V24 (was VNPay logs) |
 
 **Migration Strategy**: Flyway versioned migrations (V1__Initial_Schema.sql through V16__...)
 
@@ -393,7 +389,7 @@ Key tables (see `V1__Initial_Schema.sql` for full schema):
 
 4. **Sensitive Data**:
    - API keys and secrets in `.env` file (never commit)
-   - Email passwords, VNPay credentials, OAuth2 secrets
+   - Email passwords, OAuth2 secrets
    - JWT secret must be at least 256 bits
 
 5. **CORS**:
@@ -404,7 +400,7 @@ Key tables (see `V1__Initial_Schema.sql` for full schema):
 
 ## External Integrations
 
-1. **VNPay**: Payment gateway for ticket purchases (sandbox/production)
+1. **Thanh toán thường**: Xác nhận nội bộ, tạo hóa đơn + gửi vé ngay (không cổng ngoài)
 2. **Google OAuth2**: Social login for customers
 3. **OpenRouter**: AI chatbot integration (Spring AI)
 4. **AirportDB**: Airport data API
