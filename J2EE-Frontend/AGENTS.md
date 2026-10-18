@@ -4,7 +4,7 @@
 # J2EE-Frontend
 
 ## Purpose
-React 19 + Vite customer site + admin dashboard (Tailwind 4, Ant Design 5). Customer: 6-step booking flow, VNPay, check-in, live chat. Admin: 25+ management pages, Recharts stats, Jasper-backed exports.
+React 19 + Vite customer site + admin dashboard (Tailwind 4, Ant Design 5). Customer: 6-step booking flow, thanh toán thường nội bộ, check-in, live chat. Admin: 25+ management pages, Recharts stats, Jasper-backed exports.
 
 ## Key Files
 | File | Description |
