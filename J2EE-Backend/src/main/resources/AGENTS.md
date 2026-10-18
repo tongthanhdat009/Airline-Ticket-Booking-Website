@@ -9,7 +9,7 @@ Backend config + versioned schema + report templates. Flyway auto-runs `db/migra
 ## Key Files
 | File | Description |
 |------|-------------|
-| `application.properties` | Reads `.env` (DB, JWT, CORS, mail, VNPay, OAuth2). Never commit secrets. |
+| `application.properties` | Reads `.env` (DB, JWT, CORS, mail, OAuth2). Never commit secrets. |
 
 ## Subdirectories
 | Directory | Purpose |

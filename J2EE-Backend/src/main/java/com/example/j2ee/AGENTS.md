@@ -19,13 +19,13 @@ All backend code, `com.example.j2ee`. 16 single-purpose packages + Spring Boot e
 | `repository/` | 35 Spring Data JPA repos, one per entity |
 | `model/` | 40+ JPA entities, soft-delete via `@SQLDelete`/`@SQLRestriction` |
 | `dto/` | Request/response DTOs grouped by feature (`auth/`, `datcho/`, `hoadon/`, `payment/`, …) |
-| `config/` | Security, WebSocket, OAuth2, VNPay, Cache, Flyway, OpenRouter |
+| `config/` | Security, WebSocket, OAuth2, Cache, Flyway, OpenRouter |
 | `security/` | `DynamicAdminAuthorizationManager`, `AdminRoleVoter`, `AdminUserDetails` (DB-driven RBAC) |
 | `jwt/` | `JwtFilter` + `JwtUtil` (access/refresh, rotation) |
 | `scheduler/` | `PaymentExpiryScheduler`, `FlightAutoGenerationScheduler`, `ReconciliationScheduler`, `ChatIdleTimeoutScheduler` |
 | `aspect/` + `annotation/` | `@RequirePermission`→`PermissionAspect`, `@Auditable`→`AuditLogAspect` |
 | `exception/` | `GlobalExceptionHandler` (single file, all error mapping here) |
-| `util/` | `SecurityUtil`, `VNPayUtil` (hand-rolled VNPay signing) |
+| `util/` | `SecurityUtil` (current user, roles, client IP) |
 | `validation/` | `@ValidDateRange` + `DateRangeValidator` |
 | `serializer/` | `CustomLocalTimeDeserializer` |
 
@@ -36,14 +36,14 @@ All backend code, `com.example.j2ee`. 16 single-purpose packages + Spring Boot e
 - Admin endpoints: `@RequirePermission` (checked by `PermissionAspect` + `DynamicAdminAuthorizationManager`), not ad-hoc role checks.
 - Audited entities: add `@Auditable`, don't hand-write audit rows.
 - Vietnamese user messages; `ApiResponse<T>` wrapper; never return entities.
-- Reuse `SecurityUtil` (current user/roles) and `VNPayUtil` — don't reimplement.
+- Reuse `SecurityUtil` (current user/roles) (current user/roles, client IP) — don't reimplement.
 
 ### Testing Requirements
 - Mirror package under `src/test/`; JUnit 5 + Mockito, H2. Run `./mvnw test` from `J2EE-Backend/`.
 
 ### Common Patterns
 - PNR order code on `donhang`; guest customers allowed (unique constraints removed, V8).
-- Reconciliation fields on `hoadon` (V18); VNPay log in `vnpay_transaction_log` (V17).
+- Reconciliation fields on `hoadon` (V18); `vnpay_transaction_log` dropped in V24; TRANSACTION_LOG menu dropped in V25.
 
 ## Dependencies
 - `resources/db/migration/` for schema; `resources/jasper/` for report templates used by `Jasper*Service`.

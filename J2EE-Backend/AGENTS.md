@@ -4,14 +4,14 @@
 # J2EE-Backend
 
 ## Purpose
-Spring Boot 3.5.5 / Java 21 REST API: auth (JWT + Google OAuth2), booking, VNPay payment, check-in, live chat + AI (Spring AI/OpenRouter), admin management, JasperReports, audit log. Builds with Maven wrapper.
+Spring Boot 3.5.5 / Java 21 REST API: auth (JWT + Google OAuth2), booking, thanh toán thường nội bộ, check-in, live chat + AI (Spring AI/OpenRouter), admin management, JasperReports, audit log. Builds with Maven wrapper.
 
 ## Key Files
 | File | Description |
 |------|-------------|
 | `pom.xml` | Deps + build (Java 21, Spring Boot 3.5.5) |
 | `mvnw` / `mvnw.cmd` | Maven wrapper, no local install needed |
-| `src/main/resources/application.properties` | App config (DB, JWT, CORS, mail, VNPay) |
+| `src/main/resources/application.properties` | App config (DB, JWT, CORS, mail, OAuth2) |
 | `test_data_simple.sql` | Local manual test data (not Flyway) |
 
 ## Subdirectories
@@ -47,6 +47,6 @@ Spring Boot 3.5.5 / Java 21 REST API: auth (JWT + Google OAuth2), booking, VNPay
 - `J2EE-Frontend/src/services/` consumes this API (`VITE_API_BASE_URL`)
 
 ### External
-- Spring Data JPA, Security, Validation, Mail, Cache/Caffeine, WebSocket STOMP, OAuth2 client; JJWT; Flyway; JasperReports; Apache POI; Spring AI OpenAI + WebFlux; VNPay (hand-rolled `VNPayUtil`)
+- Spring Data JPA, Security, Validation, Mail, Cache/Caffeine, WebSocket STOMP, OAuth2 client; JJWT; Flyway; JasperReports; Apache POI; Spring AI OpenAI + WebFlux; thanh toán thường (`ThanhToanThuongService`)
 
 <!-- MANUAL: -->
