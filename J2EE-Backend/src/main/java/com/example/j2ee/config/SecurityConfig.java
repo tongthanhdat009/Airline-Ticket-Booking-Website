@@ -38,6 +38,7 @@ public class SecurityConfig {
     private final OAuth2FailureHandler oAuth2FailureHandler;
     private final PasswordEncoder passwordEncoder;
     private final DynamicAdminAuthorizationManager dynamicAdminAuthManager;
+    private final AuthRateLimitFilter authRateLimitFilter;
     private final Environment environment;
 
     public SecurityConfig(
@@ -47,8 +48,9 @@ public class SecurityConfig {
             OAuth2SuccessHandler oAuth2SuccessHandler,
             OAuth2FailureHandler oAuth2FailureHandler,
             PasswordEncoder passwordEncoder,
-            DynamicAdminAuthorizationManager dynamicAdminAuthManager,
-            Environment environment
+        DynamicAdminAuthorizationManager dynamicAdminAuthManager,
+        AuthRateLimitFilter authRateLimitFilter,
+        Environment environment
     ) {
         this.jwtFilter = jwtFilter;
         this.userDetailsService = userDetailsService;
@@ -57,6 +59,7 @@ public class SecurityConfig {
         this.oAuth2FailureHandler = oAuth2FailureHandler;
         this.passwordEncoder = passwordEncoder;
         this.dynamicAdminAuthManager = dynamicAdminAuthManager;
+        this.authRateLimitFilter = authRateLimitFilter;
         this.environment = environment;
     }
 
@@ -147,7 +150,9 @@ public class SecurityConfig {
                         .failureHandler(oAuth2FailureHandler)
                 )
 
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                // Anchor phải là filter chuẩn của Spring Security (không dùng custom filter làm mốc)
+                .addFilterBefore(authRateLimitFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

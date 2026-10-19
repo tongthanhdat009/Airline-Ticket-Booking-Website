@@ -20,10 +20,10 @@ public class DangNhapAdminService {
 
     public String loginAdmin(String tenDangNhap, String matKhau) {
         TaiKhoanAdmin tk = taiKhoanAdminRepository.findByTenDangNhap(tenDangNhap)
-                .orElseThrow(() -> new IllegalArgumentException("Tài khoản này không tồn tại"));
+                .orElseThrow(() -> new IllegalArgumentException("Tên đăng nhập hoặc mật khẩu không đúng"));
 
         if(!passwordEncoder.matches(matKhau, tk.getMatKhauBam())){
-            throw new IllegalArgumentException("Mật khẩu không đúng");
+            throw new IllegalArgumentException("Tên đăng nhập hoặc mật khẩu không đúng");
         }
         // QUAN TRỌNG: sub = tenDangNhap, kèm claim role=ADMIN để JwtFilter chọn adminService
         Map<String, Object> claims = new HashMap<>();

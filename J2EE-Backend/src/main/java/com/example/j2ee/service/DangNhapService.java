@@ -19,12 +19,13 @@ public class DangNhapService {
     private final JwtUtil jwtUtil;
 
     // Đăng nhập USER: sub = email, claim role = USER
+    // Cố tình dùng chung 1 message cho cả 2 trường hợp để chống dò email đã đăng ký.
     public String login(String email, String matkhau) {
         TaiKhoan taikhoan = taikhoanRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("Email không tồn tại"));
+                .orElseThrow(() -> new IllegalArgumentException("Email hoặc mật khẩu không đúng"));
 
         if (!passwordEncoder.matches(matkhau, taikhoan.getMatKhauBam())) {
-            throw new IllegalArgumentException("Mật khẩu không đúng");
+            throw new IllegalArgumentException("Email hoặc mật khẩu không đúng");
         }
         // QUAN TRỌNG: thêm claim role=USER để JwtFilter chọn userService
         Map<String, Object> claims = new HashMap<>();
