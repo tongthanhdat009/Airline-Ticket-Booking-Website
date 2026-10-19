@@ -2,7 +2,6 @@ package com.example.j2ee.jwt;
 
 import com.example.j2ee.security.AdminUserDetails;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -124,20 +123,11 @@ public class JwtFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
-    /** Lấy token: ưu tiên Authorization header, fallback cookie */
+    /** Lấy token từ Authorization header (không đọc cookie để tránh CSRF). */
     private String resolveToken(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             return authHeader.substring(7).trim();
-        }
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie c : cookies) {
-                String name = c.getName();
-                if ("admin_access_token".equals(name) || "accessToken".equals(name)) {
-                    return c.getValue();
-                }
-            }
         }
         return null;
     }
