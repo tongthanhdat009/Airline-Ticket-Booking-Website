@@ -32,14 +32,13 @@ import ChinhSuaSoDoGhe from "./pages/QuanLy/ChinhSuaSoDoGhe"
 import XuatBaoCao from "./pages/QuanLy/XuatBaoCao"
 import DoiSoatGiaoDich from "./pages/QuanLy/DoiSoatGiaoDich"
 import QuanLyBannerTinTuc from "./pages/QuanLy/QuanLyBannerTinTuc"
-import QuanLyChat from "./pages/QuanLy/QuanLyChat"
 import DichVuChuyenBay from "./pages/KhachHang/DichVuChuyenBay"
 import DichVuKhac from "./pages/KhachHang/DichVuKhac"
 import TraCuuChuyenBay from "./pages/KhachHang/TraCuuChuyenBay"
 import OnlineCheckIn from "./pages/KhachHang/OnlineCheckIn"
 import SignupClient from "./pages/KhachHang/DangKy"
 import QuenMatKhau from "./pages/KhachHang/QuenMatKhau"
-// HoTro page removed - replaced by LiveChatWidget
+// Khung chat tư vấn AI (AdvisorChatWidget) hiển thị ở trang chủ khách hàng
 import OAuth2Callback from "./pages/OAuth2Callback"
 import CaNhan from "./pages/KhachHang/CaNhan"
 import QuanLyChuyenBayClient from "./pages/KhachHang/QuanLyChuyenBay"
@@ -165,7 +164,6 @@ function AppContent() {
             <Route path="XuatBaoCao" element={<XuatBaoCao />} />
             <Route path="DoiSoatGiaoDich" element={<DoiSoatGiaoDich />} />
             <Route path="BannerTinTuc" element={<QuanLyBannerTinTuc />} />
-            <Route path="QuanLyChat" element={<QuanLyChat />} />
           </Route>
         </Routes>
       </main>

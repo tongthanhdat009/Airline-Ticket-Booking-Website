@@ -120,8 +120,9 @@ public class SecurityConfig {
                         // ownership (đã đăng nhập) hoặc confirm token dùng 1 lần (khách vãng lai)
                         .requestMatchers(HttpMethod.POST, "/client/thanhtoan/*/xac-nhan").permitAll()
                         .requestMatchers("/checkin/**", "/client/khuyenmai/**", "/client/dichvu/**").permitAll()
-                        .requestMatchers("/api/chat/start", "/api/chat/message", "/api/chat/history/**", "/api/chat/session/**").permitAll()
-                        .requestMatchers("/api/chat/admin/**").access(dynamicAdminAuthManager)
+                        .requestMatchers("/chat/start", "/chat/message", "/chat/history/**", "/chat/session/**").permitAll()
+                        .requestMatchers("/advisor/**").permitAll()
+                        .requestMatchers("/chat/admin/**").access(dynamicAdminAuthManager)
                         // AI Chat suggestion (admin only)
                         .requestMatchers("/ai-chat/**").access(dynamicAdminAuthManager)
                         // Static resources

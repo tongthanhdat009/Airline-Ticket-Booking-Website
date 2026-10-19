@@ -108,7 +108,7 @@ const QLDatChoService = {
      * @returns {Promise} - Promise chứa danh sách hạng vé
      */
     getAvailableHangVe: async () => {
-        const response = await apiClient.get(`/api/admin/hangve`);
+        const response = await apiClient.get(`/hangve`);
         return response.data;
     },
 

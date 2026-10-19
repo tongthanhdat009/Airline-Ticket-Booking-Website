@@ -17,7 +17,7 @@ import java.util.List;
  * - Admin endpoints: /api/chat/admin/*
  */
 @RestController
-@RequestMapping("/api/chat")
+@RequestMapping("/chat")
 public class LiveChatController {
 
     private final LiveChatService liveChatService;

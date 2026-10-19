@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import Footer from "../../components/common/Footer";
-import LiveChatWidget from "../../components/common/LiveChatWidget";
+import AdvisorChatWidget from "../../components/common/AdvisorChatWidget";
 import ProfileCompleteBanner from "../../components/common/ProfileCompleteBanner";
 import TimChuyenBayForm from '../../components/KhachHang/TimChuyenBayForm'
 import useTitle from '../../hooks/useTitle';
@@ -490,8 +490,8 @@ function TrangChu() {
         </div>
       </div>
 
-      {/* Live Chat Widget */}
-      <LiveChatWidget />
+      {/* Khung chat tư vấn AI */}
+      <AdvisorChatWidget />
 
       {/* Footer */}
       <Footer />

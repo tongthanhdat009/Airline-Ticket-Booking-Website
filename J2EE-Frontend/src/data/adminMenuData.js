@@ -26,8 +26,7 @@ import {
   FaFileExport,
   FaBalanceScale,
   FaImage,
-  FaServer,
-  FaHeadset
+  FaServer
 } from 'react-icons/fa';
 import { MdLocalAirport } from 'react-icons/md';
 import MenuService from '../services/MenuService';
@@ -57,7 +56,6 @@ const iconMap = {
   FaBalanceScale,
   FaImage,
   FaServer,
-  FaHeadset,
   MdLocalAirport
 };
 
@@ -263,17 +261,6 @@ export const adminMenuItems = [
     description: 'Quản lý banner quảng cáo và tin tức trang chủ'
   },
   {
-    path: '/admin/dashboard/QuanLyChat',
-    text: 'Chat trực tuyến',
-    icon: FaHeadset,
-    permissionKey: 'SUPPORT_VIEW',
-    featureCode: 'SUPPORT',
-    featureName: 'Chat trực tuyến',
-    group: 'Dịch vụ',
-    color: 'from-sky-500 to-cyan-500',
-    description: 'Tiếp nhận và trả lời chat trực tuyến từ khách hàng'
-  },
-  {
     path: '/admin/dashboard/LichSuThaoTac',
     text: 'Lịch sử thao tác',
     icon: FaHistory,
@@ -345,7 +332,6 @@ export const permissionMapping = {
   EXPORT_REPORT: 'Xuất báo cáo',
   RECONCILIATION: 'Đối soát giao dịch',
   BANNER_NEWS: 'Banner & Tin tức',
-  SUPPORT: 'Chat trực tuyến',
 
   // Mapping cũ để tương thích (nếu cần)
   REPORT: 'Thống kê & Báo cáo',
@@ -512,8 +498,7 @@ const checkPermissionMatch = (menuItem, feature, action) => {
     'AUDITLOG': '/admin/dashboard/LichSuThaoTac',
     'EXPORT_REPORT': '/admin/dashboard/XuatBaoCao',
     'RECONCILIATION': '/admin/dashboard/DoiSoatGiaoDich',
-    'BANNER_NEWS': '/admin/dashboard/BannerTinTuc',
-    'SUPPORT': '/admin/dashboard/QuanLyChat'
+    'BANNER_NEWS': '/admin/dashboard/BannerTinTuc'
   };
 
   // Special cases
@@ -591,8 +576,7 @@ export const rolePermissions = {
     'AUDITLOG_MANAGE',
     'EXPORT_REPORT_MANAGE',
     'RECONCILIATION_MANAGE',
-    'BANNER_NEWS_MANAGE',
-    'SUPPORT_MANAGE'
+    'BANNER_NEWS_MANAGE'
   ],
 
   // QUAN_LY - Quản lý chính
@@ -606,8 +590,7 @@ export const rolePermissions = {
     'REPORT_VIEW', 'REPORT_EXPORT',
     'EXPORT_REPORT_VIEW', 'EXPORT_REPORT_EXPORT',
     'RECONCILIATION_VIEW',
-    'BANNER_NEWS_VIEW', 'BANNER_NEWS_CREATE', 'BANNER_NEWS_UPDATE', 'BANNER_NEWS_DELETE',
-    'SUPPORT_VIEW', 'SUPPORT_UPDATE'
+    'BANNER_NEWS_VIEW', 'BANNER_NEWS_CREATE', 'BANNER_NEWS_UPDATE', 'BANNER_NEWS_DELETE'
   ],
 
   // NHAN_VIEN_VE - Nhân viên bán vé
@@ -616,8 +599,7 @@ export const rolePermissions = {
     'ORDER_VIEW', 'ORDER_CREATE', 'ORDER_UPDATE',
     'CUSTOMER_VIEW', 'CUSTOMER_CREATE', 'CUSTOMER_UPDATE',
     'FLIGHT_VIEW',
-    'SERVICE_VIEW',
-    'SUPPORT_VIEW', 'SUPPORT_UPDATE'
+    'SERVICE_VIEW'
   ],
 
   // KE_TOAN - Kế toán
