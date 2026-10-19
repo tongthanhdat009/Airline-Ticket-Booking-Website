@@ -172,25 +172,50 @@ public class ClientDatChoController {
             return ResponseEntity.badRequest()
                 .body(ApiResponse.error(e.getMessage()));
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            // Fix D-30: trùng unique (kể cả race) → 409 sanitized, không lộ SQL.
+            // Fix D-30: trùng unique (kể cả race double-submit) → 409 sanitized, không lộ SQL.
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ApiResponse.error("Dữ liệu bị trùng lặp, vui lòng kiểm tra lại thông tin"));
+                .body(ApiResponse.error(resolveDuplicateMessage(e)));
         } catch (Exception e) {
             // Fix D-30: unwrap Duplicate/unique ở cause chain (commit-time) → 409; còn lại 500 generic.
-            Throwable t = e;
-            while (t != null) {
-                String m = t.getMessage();
-                if (m != null && (m.contains("Duplicate entry") || m.contains("UK_madinhdanh")
-                        || m.contains("unique") || m.contains("Unique"))) {
-                    return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body(ApiResponse.error("Dữ liệu bị trùng lặp, vui lòng kiểm tra lại thông tin"));
-                }
-                t = t.getCause();
+            String duplicateMessage = resolveDuplicateMessage(e);
+            if (duplicateMessage != null) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(ApiResponse.error(duplicateMessage));
             }
             org.slf4j.LoggerFactory.getLogger(ClientDatChoController.class)
                 .error("Lỗi khi tạo đặt chỗ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error("Đã xảy ra lỗi hệ thống, vui lòng thử lại sau"));
         }
+    }
+
+    /**
+     * Map lỗi trùng unique constraint sang thông báo thân thiện, không lộ SQL.
+     * Trả về null nếu không phải lỗi trùng lặp.
+     */
+    static String resolveDuplicateMessage(Throwable e) {
+        StringBuilder all = new StringBuilder();
+        for (Throwable t = e; t != null; t = t.getCause()) {
+            if (t.getMessage() != null) {
+                all.append(t.getMessage()).append('\n');
+            }
+        }
+        String m = all.toString();
+        if (!(m.contains("Duplicate entry") || m.contains("UK_") || m.contains("unique") || m.contains("Unique"))) {
+            return null;
+        }
+        if (m.contains("UK_madinhdanh") || (m.contains("madinhdanh") && m.contains("Duplicate"))) {
+            return "CCCD/CMND/Hộ chiếu này đã được sử dụng cho hành khách khác, vui lòng kiểm tra lại thông tin";
+        }
+        if (m.contains("UK_chuyenbay_ghe") || (m.contains("ghe_da_dat") && m.contains("Duplicate"))) {
+            return "Ghế vừa được giữ bởi một giao dịch khác (có thể do bấm thanh toán 2 lần), vui lòng kiểm tra lại đơn hàng của bạn";
+        }
+        if (m.contains("UK_pnr") || (m.contains("UK_") && m.contains("pnr"))) {
+            return "Mã đơn hàng bị trùng, vui lòng thử lại";
+        }
+        if (m.contains("UK_thanhtoan_donhang")) {
+            return "Đơn hàng này đã có thông tin thanh toán, vui lòng kiểm tra lại lịch sử giao dịch";
+        }
+        return "Dữ liệu bị trùng lặp, vui lòng kiểm tra lại thông tin";
     }
 }
