@@ -5,6 +5,16 @@ on:
     branches:
       - main
 
+# Ít đặc quyền nhất mà pipeline cần: checkout (read) + upload/download artifact (write)
+permissions:
+  contents: read
+  actions: write
+
+# Chống 2 lần deploy chồng nhau (rsync + restart giữa chừng)
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
 jobs:
   # ===== CI BACKEND =====
   ci-backend:
@@ -14,10 +24,10 @@ jobs:
         working-directory: J2EE-Backend
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Setup Java 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
         with:
           distribution: temurin
           java-version: '21'
@@ -33,7 +43,7 @@ jobs:
         run: ./mvnw -B -ntp package -DskipTests
 
       - name: Upload backend artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: backend-jar
           path: J2EE-Backend/target/*.jar
@@ -48,15 +58,15 @@ jobs:
         working-directory: J2EE-Frontend
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
         with:
           version: 9
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '20'
           cache: pnpm
@@ -77,7 +87,7 @@ jobs:
           VITE_APP_VERSION: ${{ github.sha }}
 
       - name: Upload frontend artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: frontend-dist
           path: J2EE-Frontend/dist
@@ -90,24 +100,24 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       # ===== DOWNLOAD ARTIFACTS FROM CI =====
       - name: Download Backend Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: backend-jar
           path: J2EE-Backend/target/
 
       - name: Download Frontend Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: frontend-dist
           path: J2EE-Frontend/dist/
 
       # ===== 1. PREPARE SERVER DIRECTORIES =====
       - name: Prepare Server Directories
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@029f5b4aeeeb58fdfe1410a5d17f967dacf36262 # v1.0.3
         with:
           host: ${{ secrets.PRODUCTION_HOST }}
           username: ${{ secrets.PRODUCTION_USER }}
@@ -116,14 +126,61 @@ jobs:
             sudo mkdir -p /opt/airline-prod/backend
             sudo mkdir -p /opt/airline-prod/frontend/dist
             sudo mkdir -p /opt/airline-deploy
+            sudo mkdir -p /opt/airline-deploy/backups
             sudo chown -R $USER:$USER /opt/airline-prod
             sudo chown -R $USER:$USER /opt/airline-deploy
 
+      # ===== 2. BACKUP TRƯỚC KHI GHI ĐÈ (rollback + DB dump) =====
+      # Backup nằm NGOÀI thư mục rsync để --delete không xóa mất.
+      - name: Backup Current Release
+        uses: appleboy/ssh-action@029f5b4aeeeb58fdfe1410a5d17f967dacf36262 # v1.0.3
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          script: |
+            set -e
+            STAMP=$(date +%Y%m%d-%H%M%S)
+            BACKUP_DIR="/opt/airline-deploy/backups"
+            # Backup JAR đang chạy (để rollback)
+            if [ -f /opt/airline-prod/backend/app.jar ]; then
+              cp /opt/airline-prod/backend/app.jar "$BACKUP_DIR/app-$STAMP.jar"
+              echo "✅ JAR backup: app-$STAMP.jar"
+            else
+              echo "⚠️  Chưa có app.jar (deploy lần đầu?)"
+            fi
+            # Giữ 5 bản backup gần nhất
+            ls -t "$BACKUP_DIR"/app-*.jar 2>/dev/null | tail -n +6 | xargs -r rm -f
+            # Dump DB trước khi Flyway migrate (best-effort: thiếu mysqldump/creds thì cảnh báo, deploy tiếp)
+            if command -v mysqldump >/dev/null 2>&1 && [ -f /opt/airline-prod/.env ]; then
+              set -a
+              # shellcheck disable=SC1091
+              . /opt/airline-prod/.env || echo "⚠️  Đọc server .env lỗi — bỏ qua DB backup"
+              set +a
+              DB_HOST=$(echo "$DB_URL" | sed -n 's|.*://\([^/:]*\).*|\1|p')
+              DB_PORT=$(echo "$DB_URL" | sed -n 's|.*://[^/:]*:\([0-9]*\)/.*|\1|p')
+              DB_NAME=$(echo "$DB_URL" | sed 's|?.*||; s|.*/||')
+              DB_PORT=${DB_PORT:-3306}
+              if [ -n "$DB_HOST" ] && [ -n "$DB_NAME" ] && [ -n "$DB_USERNAME" ]; then
+                if mysqldump -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USERNAME" -p"$DB_PASSWORD" "$DB_NAME" \
+                    | gzip > "$BACKUP_DIR/db-$STAMP.sql.gz"; then
+                  echo "✅ DB backup: db-$STAMP.sql.gz"
+                else
+                  echo "⚠️  mysqldump thất bại — deploy tiếp mà không có backup DB mới"
+                fi
+              else
+                echo "⚠️  Không parse được DB creds từ server .env — bỏ qua DB backup"
+              fi
+            else
+              echo "⚠️  Không có mysqldump hoặc server .env — bỏ qua DB backup"
+            fi
+            ls -t "$BACKUP_DIR"/db-*.sql.gz 2>/dev/null | tail -n +6 | xargs -r rm -f
+
       # ===== 3. UPLOAD BACKEND JAR =====
       - name: Upload Backend JAR
-        uses: burnett01/rsync-deployments@v8
+        uses: burnett01/rsync-deployments@70ff22f5b4c2bb0e08d0bf20de693389e5552047 # v8
         with:
-          switches: -avzr --delete
+          switches: -avzr --delete --exclude='*.backup'
           path: J2EE-Backend/target/
           remote_path: /opt/airline-prod/backend/
           remote_host: ${{ secrets.PRODUCTION_HOST }}
@@ -132,7 +189,7 @@ jobs:
 
       # ===== 4. PACKAGE & UPLOAD FRONTEND =====
       - name: Upload Frontend Dist
-        uses: burnett01/rsync-deployments@v8
+        uses: burnett01/rsync-deployments@70ff22f5b4c2bb0e08d0bf20de693389e5552047 # v8
         with:
           switches: -avzr --delete
           path: J2EE-Frontend/dist/
@@ -143,7 +200,7 @@ jobs:
 
       # ===== FINALIZE DEPLOY =====
       - name: Finalize Deployment
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@029f5b4aeeeb58fdfe1410a5d17f967dacf36262 # v1.0.3
         with:
             host: ${{ secrets.PRODUCTION_HOST }}
             username: ${{ secrets.PRODUCTION_USER }}
@@ -153,9 +210,6 @@ jobs:
               # ===== BACKEND =====
               BACKEND_DIR="/opt/airline-prod/backend"
               cd "$BACKEND_DIR"
-
-              # Backup JAR cũ
-              [ -f "app.jar" ] && cp app.jar app.jar.backup || true
 
               # Tìm JAR mới nhất (không phải backup) và rename
               NEW_JAR=$(ls -t *.jar 2>/dev/null | grep -v "backup" | head -1)
@@ -184,6 +238,42 @@ jobs:
               else
                 echo "❌ Service failed!"
                 sudo systemctl status airline --no-pager
+                exit 1
+              fi
+
+              # ===== HEALTH CHECK THẬT (app + DB đều sẵn sàng mới pass) =====
+              # is-active chỉ nói JVM lên; endpoint này chứng minh Flyway + DB + app OK.
+              echo "🏥 Health checking app..."
+              HEALTH_OK=0
+              for i in $(seq 1 12); do
+                if curl -sf -m 10 http://localhost:8080/api/sanbay -o /dev/null; then
+                  HEALTH_OK=1
+                  echo "✅ App healthy (thử lần $i)"
+                  break
+                fi
+                echo "⏳ Chưa healthy (lần $i/12), đợi 5s..."
+                sleep 5
+              done
+
+              if [ "$HEALTH_OK" -ne 1 ]; then
+                echo "❌ App không healthy sau 60s — ROLLBACK về bản backup!"
+                LATEST_BACKUP=$(ls -t /opt/airline-deploy/backups/app-*.jar 2>/dev/null | head -1)
+                if [ -n "$LATEST_BACKUP" ]; then
+                  cp "$LATEST_BACKUP" "$BACKEND_DIR/app.jar"
+                  chown airline:airline "$BACKEND_DIR/app.jar"
+                  chmod 644 "$BACKEND_DIR/app.jar"
+                  sudo systemctl restart airline
+                  sleep 10
+                  if sudo systemctl is-active --quiet airline \
+                    && curl -sf -m 10 http://localhost:8080/api/sanbay -o /dev/null; then
+                    echo "✅ Rollback OK — app cũ đã chạy lại"
+                  else
+                    echo "❌ Rollback cũng lỗi — cần can thiệp tay!"
+                  fi
+                else
+                  echo "❌ Không có bản backup để rollback!"
+                fi
+                sudo journalctl -u airline --since "5 minutes ago" --no-pager | tail -30
                 exit 1
               fi
 
