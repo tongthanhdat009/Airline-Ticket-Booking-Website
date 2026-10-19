@@ -20,8 +20,10 @@ public interface ChiTietChuyenBayRepository extends JpaRepository<ChiTietChuyenB
 
     /**
      * Lấy chuyến bay theo ngày đi (@SQLRestriction tự loại da_xoa = 1).
-     * Dùng cho job tự sinh lịch bay tương lai.
+     * Dùng cho job tự sinh lịch bay tương lai (fallback cold-start).
+     * Eager-load như findByNgayDiBetween để clone ngoài transaction không lỗi lazy.
      */
+    @EntityGraph(attributePaths = {"tuyenBay", "mayBay", "dichVuCungCap"})
     List<ChiTietChuyenBay> findByNgayDi(LocalDate ngayDi);
 
     /**
