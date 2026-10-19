@@ -23,6 +23,7 @@ function ThanhToan() {
     const [error, setError] = useState('');
     const [isValid, setIsValid] = useState(false);
     const [appliedDiscount, setAppliedDiscount] = useState(null);
+    const payingRef = React.useRef(false);
 
     useEffect(() => {
         // Fix: Chỉ validate khi có location.state (không phải lần đầu render)
@@ -50,6 +51,8 @@ function ThanhToan() {
     }
 
     const createBookingAndPayment = async () => {
+        if (payingRef.current) return;
+        payingRef.current = true;
         setIsProcessing(true);
         setError('');
 
@@ -117,24 +120,24 @@ function ThanhToan() {
                     const soTien = confirmResponse.data?.soTien ?? bookingData.totalAmount;
                     navigate(`/payment-result?success=true&message=${encodeURIComponent(confirmResponse.message || 'Thanh toán thành công')}&maThanhToan=${maThanhToan}&soTien=${soTien}`);
                 } else {
-                    setError(confirmResponse.message || t('booking_payment_errors.error_create_payment'));
-                    setIsProcessing(false);
+                    setError(confirmResponse.message || t('booking.booking_payment_errors.error_create_payment'));
+                    setIsProcessing(false); payingRef.current = false;
                 }
             } else {
-                setError(response.data.message || t('booking_payment_errors.error_create_booking'));
-                setIsProcessing(false);
+                setError(response.data.message || t('booking.booking_payment_errors.error_create_booking'));
+                setIsProcessing(false); payingRef.current = false;
             }
         } catch (err) {
             console.error('Error creating booking:', err);
-            const errorMessage = err.response?.data?.message || t('booking_payment_errors.error_processing_booking');
+            const errorMessage = err.response?.data?.message || t('booking.booking_payment_errors.error_processing_booking');
             setError(errorMessage);
-            setIsProcessing(false);
+            setIsProcessing(false); payingRef.current = false;
         }
     };
 
     const handlePayment = () => {
         if (!formData.passengerInfo || formData.passengerInfo.length === 0) {
-            setError(t('booking_payment_errors.error_missing_passenger_info'));
+            setError(t('booking.booking_payment_errors.error_missing_passenger_info'));
             return;
         }
         

@@ -5,6 +5,7 @@ import com.example.j2ee.dto.datcho.CreateBookingResponse;
 import com.example.j2ee.dto.khuyenmai.ApplyCouponRequest;
 import com.example.j2ee.model.*;
 import com.example.j2ee.repository.*;
+import com.example.j2ee.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,7 @@ public class BookingService {
 
     private final DonHangRepository donHangRepository;
     private final HanhKhachRepository hanhKhachRepository;
+    private final TaiKhoanRepository taiKhoanRepository;
     private final DatChoRepository datChoRepository;
     private final ChiTietGheRepository chiTietGheRepository;
     private final TrangThaiThanhToanRepository trangThaiThanhToanRepository;
@@ -90,7 +92,7 @@ public class BookingService {
             .filter(p -> p.isFromAccount())
             .findFirst()
             .orElse(request.getPassengerInfo().get(0));
-        HanhKhach hanhKhachNguoiDat = hanhKhachService.findOrCreateHanhKhach(nguoiDatInfo);
+        HanhKhach hanhKhachNguoiDat = resolveNguoiDat(nguoiDatInfo);
 
         // Bước 2: Insert hanhkhach (các hành khách bay)
         // Loop qua tất cả passengerInfo và tạo HanhKhach
@@ -175,6 +177,30 @@ public class BookingService {
         response.setConfirmToken(thanhToan.getTransactionCode());
 
         return response;
+    }
+
+    /**
+     * Xác định hành khách người đặt để gắn vào đơn hàng.
+     * Đã đăng nhập → gắn đúng hồ sơ của tài khoản (lịch sử mua mới hiện đủ);
+     * tài khoản chưa có hồ sơ thì tạo từ thông tin đặt vé và gắn vào tài khoản.
+     * Khách vãng lai → giữ nguyên tìm/gặp theo dữ liệu đã nhập.
+     */
+    private HanhKhach resolveNguoiDat(CreateBookingRequest.PassengerInfo nguoiDatInfo) {
+        String email = SecurityUtil.getCurrentCustomerEmail();
+        if (email == null) {
+            return hanhKhachService.findOrCreateHanhKhach(nguoiDatInfo);
+        }
+        HanhKhach accHk = taiKhoanRepository.findByEmail(email)
+                .map(TaiKhoan::getHanhKhach).orElse(null);
+        if (accHk != null) {
+            return accHk;
+        }
+        HanhKhach created = hanhKhachService.findOrCreateHanhKhach(nguoiDatInfo);
+        taiKhoanRepository.findByEmail(email).ifPresent(tk -> {
+            tk.setHanhKhach(created);
+            taiKhoanRepository.save(tk);
+        });
+        return created;
     }
 
     /**
