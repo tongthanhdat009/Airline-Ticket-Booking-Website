@@ -198,6 +198,63 @@ jobs:
           remote_user: ${{ secrets.PRODUCTION_USER }}
           remote_key: ${{ secrets.PRODUCTION_SSH_KEY }}
 
+      # ===== 5. SYNC .env TỪ GITHUB SECRETS (thay cho sửa tay trên VPS) =====
+      # File .env là nguồn duy nhất cho mọi biến prod. Service đọc lúc restart.
+      # Quyền 640 + group airline: app đọc được, user khác trên VPS không đọc được.
+      - name: Sync Production .env
+        uses: appleboy/ssh-action@029f5b4aeeeb58fdfe1410a5d17f967dacf36262 # v1.0.3
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          script: |
+            set -e
+            ENV_FILE="/opt/airline-prod/.env"
+            cat > "$ENV_FILE" <<'ENVEOF'
+            DB_URL=${{ secrets.DB_URL }}
+            DB_USERNAME=${{ secrets.DB_USERNAME }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            JWT_ACCESS_EXPIRATION=${{ secrets.JWT_ACCESS_EXPIRATION }}
+            JWT_REFRESH_EXPIRATION=${{ secrets.JWT_REFRESH_EXPIRATION }}
+            CORS_ALLOWED_ORIGINS=${{ secrets.CORS_ALLOWED_ORIGINS }}
+            FRONTEND_URL=${{ secrets.FRONTEND_URL }}
+            SERVER_PORT=${{ secrets.SERVER_PORT }}
+            SPRING_PROFILES_ACTIVE=${{ secrets.SPRING_PROFILES_ACTIVE }}
+            UPLOAD_DIR=${{ secrets.UPLOAD_DIR }}
+            AIRPORTDB_API_KEY=${{ secrets.AIRPORTDB_API_KEY }}
+            OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}
+            OPENROUTER_BASE_URL=${{ secrets.OPENROUTER_BASE_URL }}
+            OPENROUTER_MODEL=${{ secrets.OPENROUTER_MODEL }}
+            OPENROUTER_TEMPERATURE=${{ secrets.OPENROUTER_TEMPERATURE }}
+            OPENROUTER_MAX_TOKENS=${{ secrets.OPENROUTER_MAX_TOKENS }}
+            ADVISOR_API_KEY=${{ secrets.ADVISOR_API_KEY }}
+            ADVISOR_MODEL=${{ secrets.ADVISOR_MODEL }}
+            EMAIL_HOST=${{ secrets.EMAIL_HOST }}
+            EMAIL_PORT=${{ secrets.EMAIL_PORT }}
+            EMAIL_USERNAME=${{ secrets.EMAIL_USERNAME }}
+            EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}
+            EMAIL_SMTP_AUTH=${{ secrets.EMAIL_SMTP_AUTH }}
+            EMAIL_SMTP_STARTTLS_ENABLE=${{ secrets.EMAIL_SMTP_STARTTLS_ENABLE }}
+            EMAIL_SMTP_STARTTLS_REQUIRED=${{ secrets.EMAIL_SMTP_STARTTLS_REQUIRED }}
+            EMAIL_SMTP_TIMEOUT=${{ secrets.EMAIL_SMTP_TIMEOUT }}
+            EMAIL_SMTP_WRITETIMEOUT=${{ secrets.EMAIL_SMTP_WRITETIMEOUT }}
+            EMAIL_SMTP_CONNECTIONTIMEOUT=${{ secrets.EMAIL_SMTP_CONNECTIONTIMEOUT }}
+            GOOGLE_OAUTH_CLIENT_ID=${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+            GOOGLE_OAUTH_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+            GOOGLE_OAUTH_REDIRECT_URI=${{ secrets.GOOGLE_OAUTH_REDIRECT_URI }}
+            GOOGLE_OAUTH_SCOPE=${{ secrets.GOOGLE_OAUTH_SCOPE }}
+            VNPAY_TMN_CODE=${{ secrets.VNPAY_TMN_CODE }}
+            VNPAY_SECRET_KEY=${{ secrets.VNPAY_SECRET_KEY }}
+            VNPAY_PAY_URL=${{ secrets.VNPAY_PAY_URL }}
+            VNPAY_API_URL=${{ secrets.VNPAY_API_URL }}
+            VNPAY_RETURN_URL=${{ secrets.VNPAY_RETURN_URL }}
+            VNPAY_FRONTEND_URL=${{ secrets.VNPAY_FRONTEND_URL }}
+            ENVEOF
+            chown $USER:airline "$ENV_FILE"
+            chmod 640 "$ENV_FILE"
+            echo "✅ .env synced ($(wc -l < "$ENV_FILE") vars, 640 $USER:airline)"
+
       # ===== FINALIZE DEPLOY =====
       - name: Finalize Deployment
         uses: appleboy/ssh-action@029f5b4aeeeb58fdfe1410a5d17f967dacf36262 # v1.0.3
