@@ -193,6 +193,16 @@ public class BookingService {
         HanhKhach accHk = taiKhoanRepository.findByEmail(email)
                 .map(TaiKhoan::getHanhKhach).orElse(null);
         if (accHk != null) {
+            if (accHk.getEmail() == null || accHk.getEmail().isBlank()) {
+                // Tài khoản đăng ký trước khi DangKyService bổ sung email:
+                // vá từ thông tin đặt vé, nếu không donhang.email_nguoidat
+                // (NOT NULL) sẽ nổ DataIntegrityViolation.
+                accHk.setEmail(nguoiDatInfo.getEmail());
+                if (accHk.getSoDienThoai() == null || accHk.getSoDienThoai().isBlank()) {
+                    accHk.setSoDienThoai(nguoiDatInfo.getPhone());
+                }
+                accHk = hanhKhachRepository.save(accHk);
+            }
             return accHk;
         }
         HanhKhach created = hanhKhachService.findOrCreateHanhKhach(nguoiDatInfo);

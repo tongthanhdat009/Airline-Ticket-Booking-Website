@@ -136,9 +136,12 @@ public class DangKyService {
         }
 
         // 1) Tạo HanhKhach với đầy đủ thông tin
+        // Email bắt buộc: BookingService dùng email hanhkhach người đặt
+        // cho cột donhang.email_nguoidat (NOT NULL).
         HanhKhach hk = new HanhKhach();
-        hk.setHoVaTen(hoVaTen);
-        hk.setSoDienThoai(soDienThoai);
+        hk.setHoVaTen(hoVaTen.trim());
+        hk.setEmail(email.trim());
+        hk.setSoDienThoai(soDienThoai.trim());
         hk.setNgaySinh(birthDate);
 
         HanhKhach savedHK = hanhKhachRepository.save(hk);
