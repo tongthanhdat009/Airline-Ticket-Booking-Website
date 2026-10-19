@@ -181,6 +181,40 @@ public class RefreshTokenService {
     }
 
     /**
+     * Phát hiện tái sử dụng refresh token đã bị thu hồi (dấu hiệu token bị đánh cắp:
+     * kẻ tấn công dùng token cũ sau khi chủ sở hữu đã xoay vòng).
+     * Nếu phát hiện, thu hồi TOÀN BỘ phiên của chủ sở hữu để khóa kẻ tấn công.
+     *
+     * @return true nếu phát hiện tái sử dụng và đã thu hồi toàn bộ, false nếu không
+     */
+    @Transactional
+    public boolean handlePossibleReuse(String token) {
+        if (!jwtUtil.isRefreshToken(token)) {
+            return false;
+        }
+        if (refreshTokenRepository.findByTokenAndDaXoa(token, false).isPresent()) {
+            return false;
+        }
+        Optional<RefreshToken> any = refreshTokenRepository.findByToken(token);
+        if (any.isEmpty()) {
+            return false;
+        }
+        RefreshToken rt = any.get();
+        if (rt.getNgayHetHan().isBefore(LocalDateTime.now())) {
+            return false;
+        }
+        if (rt.getTaiKhoan() != null) {
+            revokeAllRefreshTokensForCustomer(rt.getTaiKhoan().getEmail());
+        } else if (rt.getTaiKhoanAdmin() != null) {
+            revokeAllRefreshTokensForAdmin(rt.getTaiKhoanAdmin().getTenDangNhap());
+        } else {
+            return false;
+        }
+        log.warn("Phát hiện tái sử dụng refresh token đã thu hồi — đã thu hồi toàn bộ phiên");
+        return true;
+    }
+
+    /**
      * Xóa các refresh token đã hết hạn và đã bị thu hồi
      * Chạy tự động vào lúc 2:00 AM mỗi ngày
      */

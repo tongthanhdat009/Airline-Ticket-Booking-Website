@@ -8,10 +8,12 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api
 // Detect production environment
 const isProduction = import.meta.env.VITE_APP_ENV === 'production' || typeof window !== 'undefined' && window.location.protocol === 'https:';
 
-// Cookie config cho production
+// Cookie chỉ là nơi lưu để JS đọc ra gắn vào Authorization header,
+// không dùng làm phương thức xác thực (backend không đọc cookie) nên
+// luôn dùng SameSite=strict để chống CSRF.
 const getCookieConfig = () => ({
   secure: isProduction,
-  sameSite: isProduction ? 'none' : 'strict',
+  sameSite: 'strict',
   path: '/'
 });
 
@@ -277,14 +279,14 @@ apiClient.interceptors.response.use(
         );
 
         const newAccessToken = data?.accessToken;
+        const newRefreshToken = data?.refreshToken;
 
         if (!newAccessToken) {
-          throw new Error("No accessToken in response");
+          throw new Error("No access token in response");
         }
 
-        // Lưu access token mới
-        // Refresh token vẫn giữ nguyên (không đổi) nên không cần update
-        setTokensByType(userType, newAccessToken, null);
+        // Lưu access token mới; nếu backend xoay vòng refresh token thì lưu luôn
+        setTokensByType(userType, newAccessToken, newRefreshToken || null);
 
         // Cập nhật userInfo trong cookie nếu có roles và permissions mới (cho admin)
         if (userType === 'admin' && (data.roles || data.permissions)) {

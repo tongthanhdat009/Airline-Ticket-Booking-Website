@@ -22,6 +22,12 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     Optional<RefreshToken> findByTokenAndDaXoa(String token, boolean daXoa);
 
     /**
+     * Tìm refresh token theo token string, bất kể đã thu hồi hay chưa.
+     * Dùng để phát hiện tái sử dụng token đã bị thu hồi (dấu hiệu bị đánh cắp).
+     */
+    Optional<RefreshToken> findByToken(String token);
+
+    /**
      * Tìm tất cả refresh token của một tài khoản khách hàng (chưa bị xóa)
      */
     List<RefreshToken> findByTaiKhoanAndDaXoa(TaiKhoan taiKhoan, boolean daXoa);

@@ -67,18 +67,26 @@ public class DangNhapController {
                     .body(ApiResponse.error("Refresh token không hợp lệ"));
             }
 
-            // Validate với database
-            if (!refreshTokenService.validateRefreshToken(refresh)) {
+        // Validate với database
+        if (!refreshTokenService.validateRefreshToken(refresh)) {
+            // Token cũ đã bị thu hồi nhưng chữ ký còn hạn → nghi bị đánh cắp:
+            // thu hồi toàn bộ phiên của chủ sở hữu.
+            if (refreshTokenService.handlePossibleReuse(refresh)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponse.error("Refresh token không hợp lệ hoặc đã hết hạn"));
+                    .body(ApiResponse.error("Phiên đăng nhập đã bị thu hồi vì phát hiện bất thường, vui lòng đăng nhập lại"));
             }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error("Refresh token không hợp lệ hoặc đã hết hạn"));
+        }
 
-            String email = jwtUtil.getSubject(refresh);
-            // Tạo access token mới với role CUSTOMER
-            String newAccess = jwtUtil.generateAccessToken(email, "CUSTOMER");
+        String email = jwtUtil.getSubject(refresh);
+        // Xoay vòng: thu hồi token cũ, cấp token mới (đánh cắp token cũ cũng vô dụng)
+        var newRefreshTokenEntity = refreshTokenService.rotateRefreshToken(refresh, email, false);
+        // Tạo access token mới với role CUSTOMER
+        String newAccess = jwtUtil.generateAccessToken(email, "CUSTOMER");
 
-            RefreshTokenResponse response = new RefreshTokenResponse(newAccess);
-            return ResponseEntity.ok(ApiResponse.success(response));
+        RefreshTokenResponse response = new RefreshTokenResponse(newAccess, newRefreshTokenEntity.getToken());
+        return ResponseEntity.ok(ApiResponse.success(response));
 
         } catch (io.jsonwebtoken.ExpiredJwtException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

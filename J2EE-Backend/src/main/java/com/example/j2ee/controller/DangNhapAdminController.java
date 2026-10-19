@@ -111,6 +111,11 @@ public class DangNhapAdminController {
 
         // Validate với database
         if (!refreshTokenService.validateRefreshToken(refreshToken)) {
+            if (refreshTokenService.handlePossibleReuse(refreshToken)) {
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("message", "Phiên đăng nhập đã bị thu hồi vì phát hiện bất thường, vui lòng đăng nhập lại");
+                return ResponseEntity.status(401).body(errorResponse);
+            }
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("message", "Refresh token không hợp lệ hoặc đã hết hạn");
             return ResponseEntity.status(401).body(errorResponse);
@@ -119,6 +124,9 @@ public class DangNhapAdminController {
         String adminUser = jwtUtil.getSubject(refreshToken);
 
         try {
+            // Xoay vòng refresh token: thu hồi token cũ, cấp token mới
+            var newRefreshTokenEntity = refreshTokenService.rotateRefreshToken(refreshToken, adminUser, true);
+
             // Load user details để lấy roles và permissions mới nhất
             AdminUserDetails userDetails = (AdminUserDetails) adminDetailsService.loadUserByUsername(adminUser);
 
@@ -130,6 +138,7 @@ public class DangNhapAdminController {
 
             Map<String, Object> response = new HashMap<>();
             response.put("accessToken", newAccessToken);
+            response.put("refreshToken", newRefreshTokenEntity.getToken());
             response.put("roles", roles);
             response.put("permissions", permissions);
 
