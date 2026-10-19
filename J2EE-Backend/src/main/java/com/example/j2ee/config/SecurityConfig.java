@@ -128,7 +128,10 @@ public class SecurityConfig {
                         // Static resources
                         .requestMatchers("/ai/**", "/static/**").permitAll()
                         .requestMatchers("/admin/dashboard/dichvu/anh/**", "/admin/dashboard/dichvu/luachon/anh/**").permitAll()
-                        .requestMatchers("/admin/dashboard/chuyenbay/**").permitAll()
+                        // NOTE: /admin/dashboard/chuyenbay/** KHÔNG permitAll ở đây:
+                        // mọi endpoint đều có @RequirePermission nên rule permitAll sẽ
+                        // chết (AOP chạy sau security filter). Quyền do
+                        // /admin/dashboard/** + DynamicAdminAuthorizationManager quyết định.
                         .requestMatchers("/ws/**", "/countries/**").permitAll()
                         // Admin endpoints (dynamic authorization based on roles in JWT)
                         .requestMatchers("/admin/dashboard/**", "/admin/datcho/**").access(dynamicAdminAuthManager)

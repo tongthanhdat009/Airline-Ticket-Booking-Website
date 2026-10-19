@@ -173,8 +173,17 @@ public class ClientDatChoController {
                 .body(ApiResponse.error(e.getMessage()));
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
             // Fix D-30: trùng unique (kể cả race double-submit) → 409 sanitized, không lộ SQL.
+            // Nếu KHÔNG phải lỗi trùng lặp (NOT NULL/FK/...) thì log + 500,
+            // tránh trả 409 với message null khiến client không hiểu gì.
+            String duplicateMessage = resolveDuplicateMessage(e);
+            if (duplicateMessage == null) {
+                org.slf4j.LoggerFactory.getLogger(ClientDatChoController.class)
+                    .error("Lỗi toàn vẹn dữ liệu (không phải trùng lặp) khi tạo đặt chỗ", e);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Đã xảy ra lỗi hệ thống, vui lòng thử lại sau"));
+            }
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ApiResponse.error(resolveDuplicateMessage(e)));
+                .body(ApiResponse.error(duplicateMessage));
         } catch (Exception e) {
             // Fix D-30: unwrap Duplicate/unique ở cause chain (commit-time) → 409; còn lại 500 generic.
             String duplicateMessage = resolveDuplicateMessage(e);
