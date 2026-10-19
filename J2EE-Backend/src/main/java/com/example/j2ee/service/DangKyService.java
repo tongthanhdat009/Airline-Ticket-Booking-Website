@@ -25,6 +25,7 @@ public class DangKyService {
     private final TaiKhoanRepository taiKhoanRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final EmailVerificationService emailVerificationService;
 
     // Regex cho mật khẩu mạnh:
     // - Ít nhất 8 ký tự
@@ -152,7 +153,14 @@ public class DangKyService {
 
         taiKhoanRepository.save(tk);
 
-        // 3) Gửi email chào mừng
+        // 3) Gửi email xác thực tài khoản (best-effort, không chặn đăng ký)
+        try {
+            emailVerificationService.sendVerificationEmail(email);
+        } catch (Exception e) {
+            System.err.println("Không thể gửi email xác thực: " + e.getMessage());
+        }
+
+        // 4) Gửi email chào mừng
         try {
             emailService.sendWelcomeEmail(email, hoVaTen);
         } catch (Exception e) {

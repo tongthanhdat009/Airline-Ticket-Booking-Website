@@ -19,12 +19,34 @@ public class EmailService {
     @org.springframework.beans.factory.annotation.Value("${app.frontend.url:http://localhost:5173}")
     private String frontendUrl;
 
+    @org.springframework.beans.factory.annotation.Value("${app.mail.from:noreply@jadtairline.com}")
+    private String fromEmail;
+
+    @org.springframework.beans.factory.annotation.Value("${app.mail.from-name:}")
+    private String fromName;
+
+    /**
+     * Gán địa chỉ người gửi theo cấu hình (EMAIL_FROM/EMAIL_FROM_NAME).
+     * Máy chủ SMTP ngoài thường từ chối From lạ domain nên không hard-code nữa.
+     */
+    private void setFromAddress(MimeMessageHelper helper) throws MessagingException {
+        try {
+            if (fromName == null || fromName.isBlank()) {
+                helper.setFrom(fromEmail);
+            } else {
+                helper.setFrom(fromEmail, fromName);
+            }
+        } catch (java.io.UnsupportedEncodingException e) {
+            helper.setFrom(fromEmail);
+        }
+    }
+
     public void sendOTPEmail(String toEmail, String otp) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             
-            helper.setFrom("noreply@jadtairline.com");
+            setFromAddress(helper);
             helper.setTo(toEmail);
             helper.setSubject("Mã OTP đặt lại mật khẩu - JadT Airline");
             
@@ -116,7 +138,7 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             
-            helper.setFrom("noreply@jadtairline.com");
+            setFromAddress(helper);
             helper.setTo(toEmail);
             helper.setSubject("Chào mừng đến với JadT Airline! ✈️");
             
@@ -217,7 +239,7 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             
-            helper.setFrom("noreply@jadtairline.com");
+            setFromAddress(helper);
             helper.setTo(toEmail);
             helper.setSubject("Mật khẩu đã được đặt lại thành công - JadT Airline");
             
@@ -292,7 +314,7 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             
-            helper.setFrom("noreply@jadtairline.com");
+            setFromAddress(helper);
             helper.setTo(toEmail);
             helper.setSubject("Xác nhận đặt vé thành công - JadT Airline ✈️");
             
@@ -428,7 +450,7 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             
-            helper.setFrom("noreply@jadtairline.com");
+            setFromAddress(helper);
             helper.setTo(toEmail);
             helper.setSubject("Xác nhận đặt vé thành công - JadT Airline ✈️");
             
@@ -593,7 +615,7 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             
-            helper.setFrom("noreply@jadtairline.com");
+            setFromAddress(helper);
             helper.setTo(toEmail);
             helper.setSubject("Thông báo thay đổi ghế - JadT Airline ✈️");
             
@@ -693,7 +715,7 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             
-            helper.setFrom("noreply@jadtairline.com");
+            setFromAddress(helper);
             helper.setTo(toEmail);
             helper.setSubject("Thông báo thay đổi chuyến bay - JadT Airline ✈️");
             
@@ -830,7 +852,7 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom("noreply@jadtairline.com");
+            setFromAddress(helper);
             helper.setTo(toEmail);
             helper.setSubject("[JadT Airline] Đã nhận yêu cầu hỗ trợ - " + ticketCode);
 
@@ -912,7 +934,7 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom("noreply@jadtairline.com");
+            setFromAddress(helper);
             helper.setTo(toEmail);
             helper.setSubject("[JadT Airline] Phản hồi yêu cầu hỗ trợ - " + ticketCode);
 
