@@ -6,6 +6,7 @@ import com.example.j2ee.model.RefreshToken;
 import com.example.j2ee.model.TaiKhoan;
 import com.example.j2ee.repository.HanhKhachRepository;
 import com.example.j2ee.repository.TaiKhoanRepository;
+import com.example.j2ee.service.OAuth2CodeService;
 import com.example.j2ee.service.RefreshTokenService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,6 +32,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final HanhKhachRepository hanhKhachRepository;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
+    private final OAuth2CodeService oAuth2CodeService;
 
     @org.springframework.beans.factory.annotation.Value("${app.frontend.url}")
     private String frontendUrl;
@@ -39,12 +41,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                                 TaiKhoanRepository taiKhoanRepository,
                                 HanhKhachRepository hanhKhachRepository,
                                 PasswordEncoder passwordEncoder,
-                                RefreshTokenService refreshTokenService) {
+                                RefreshTokenService refreshTokenService,
+                                OAuth2CodeService oAuth2CodeService) {
         this.jwtUtil = jwtUtil;
         this.taiKhoanRepository = taiKhoanRepository;
         this.hanhKhachRepository = hanhKhachRepository;
         this.passwordEncoder = passwordEncoder;
         this.refreshTokenService = refreshTokenService;
+        this.oAuth2CodeService = oAuth2CodeService;
     }
 
     @Override
@@ -57,6 +61,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String email = (String) attributes.get("email");
         String name = (String) attributes.get("name");
         String picture = (String) attributes.get("picture");
+
+        // Không tin claim email khi nhà cung cấp chưa xác thực — chống liên kết nhầm tài khoản.
+        if (!Boolean.TRUE.equals(attributes.get("email_verified"))) {
+            throw new org.springframework.security.authentication.AuthenticationServiceException(
+                    "Email chưa được xác thực bởi nhà cung cấp OAuth2");
+        }
         
         // Tìm hoặc tạo tài khoản
         Optional<TaiKhoan> existingAccount = taiKhoanRepository.findByEmail(email);
@@ -95,11 +105,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         RefreshToken refreshTokenEntity = refreshTokenService.createRefreshTokenForCustomer(email);
         String refreshToken = refreshTokenEntity.getToken();
         
-        // Redirect về frontend với tokens (hỗ trợ cả dev và production)
+        // Cấp mã dùng 1 lần (2 phút) thay vì gắn token trực tiếp lên URL —
+        // tránh lộ token qua browser history, server log và Referer.
+        String code = oAuth2CodeService.create(accessToken, refreshToken, email);
         String targetUrl = UriComponentsBuilder.fromUriString(frontendUrl + "/oauth2/callback")
-                .queryParam("accessToken", accessToken)
-                .queryParam("refreshToken", refreshToken)
-                .queryParam("email", email)
+                .queryParam("code", code)
                 .build().toUriString();
         
         getRedirectStrategy().sendRedirect(request, response, targetUrl);

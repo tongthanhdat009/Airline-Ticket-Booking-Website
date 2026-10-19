@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import apiClient from '../services/apiClient';
 import { loginAndSetTokens } from '../services/apiClient';
 import { setClientUserEmail } from '../utils/cookieUtils';
 import TaiKhoanService from '../services/TaiKhoanService';
@@ -10,21 +11,40 @@ function OAuth2Callback() {
     const [message, setMessage] = useState('Đang xử lý đăng nhập...');
 
     useEffect(() => {
-        const handleOAuth2Callback = async () => {
-            const accessToken = searchParams.get('accessToken');
-            const refreshToken = searchParams.get('refreshToken');
-            const email = searchParams.get('email');
-            const error = searchParams.get('error');
+    const handleOAuth2Callback = async () => {
+        const error = searchParams.get('error');
+        if (error) {
+            setMessage('❌ Đăng nhập thất bại! ' + (searchParams.get('message') || ''));
+            setTimeout(() => {
+                navigate('/dang-nhap-client');
+            }, 2000);
+            return;
+        }
 
-            if (error) {
-                setMessage('❌ Đăng nhập thất bại! ' + (searchParams.get('message') || ''));
+        let accessToken = searchParams.get('accessToken');
+        let refreshToken = searchParams.get('refreshToken');
+        let email = searchParams.get('email');
+
+        // Luồng mới: đổi one-time code lấy token (token không bao giờ lên URL)
+        const code = searchParams.get('code');
+        if (code) {
+            try {
+                const { data } = await apiClient.post('/oauth2/exchange', { code });
+                accessToken = data?.accessToken;
+                refreshToken = data?.refreshToken;
+                email = data?.email;
+                // Xóa code khỏi URL để không lưu lại trong browser history
+                window.history.replaceState(null, '', window.location.pathname);
+                } catch {
+                setMessage('❌ Mã xác thực không hợp lệ hoặc đã hết hạn!');
                 setTimeout(() => {
                     navigate('/dang-nhap-client');
                 }, 2000);
                 return;
             }
+        }
 
-            if (accessToken && refreshToken && email) {
+        if (accessToken && refreshToken && email) {
                 // Lưu tokens - access token vào cookie, refresh token vào memory
                 loginAndSetTokens('customer', accessToken, refreshToken);
                 setClientUserEmail(email);
