@@ -73,6 +73,9 @@ const AdvisorChatWidget = () => {
   const [error, setError] = useState(null);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  // Khóa đồng bộ chống gửi trùng (double-Enter/double-click):
+  // state `sending` cập nhật bất đồng bộ nên 2 lần gọi sát nhau đều lọt qua.
+  const sendingRef = useRef(false);
 
   // Khôi phục lịch sử từ localStorage
   useEffect(() => {
@@ -110,7 +113,8 @@ const AdvisorChatWidget = () => {
 
   const doSend = async (text) => {
     const content = text.trim();
-    if (!content || sending) return;
+    if (!content || sendingRef.current) return;
+    sendingRef.current = true;
     setInputValue('');
     setError(null);
 
@@ -119,8 +123,19 @@ const AdvisorChatWidget = () => {
       .filter((m) => m !== WELCOME_MESSAGE)
       .slice(-MAX_HISTORY_TURNS)
       .map((m) => ({ role: m.role, content: m.content }));
-    // Thêm chỗ trống cho câu trả lời, token stream sẽ điền dần vào đây
-    setMessages((prev) => [...prev, userMsg, { role: 'assistant', content: '' }]);
+    // Thêm chỗ trống cho câu trả lời, token stream sẽ điền dần vào đây.
+    // Gỡ bubble assistant trống còn sót (nếu có) để không bao giờ hiện 2 loading.
+    setMessages((prev) => {
+      const next = [...prev];
+      while (
+        next.length > 0 &&
+        next[next.length - 1].role === 'assistant' &&
+        !next[next.length - 1].content
+      ) {
+        next.pop();
+      }
+      return [...next, userMsg, { role: 'assistant', content: '' }];
+    });
     setSending(true);
 
     try {
@@ -146,6 +161,7 @@ const AdvisorChatWidget = () => {
       setMessages((prev) => prev.slice(0, -1));
       setError(e.message || 'Không thể kết nối tới trợ lý AI. Vui lòng thử lại sau.');
     } finally {
+      sendingRef.current = false;
       setSending(false);
       inputRef.current?.focus();
     }
