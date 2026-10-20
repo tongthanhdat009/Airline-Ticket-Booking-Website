@@ -569,20 +569,29 @@ public class ThongKeService {
         Long buoc4 = jdbcTemplate.queryForObject(sqlBuoc4, Long.class, startDate, endDate);
         if (buoc4 == null) buoc4 = 0L;
 
-        // Tính tỷ lệ chuyển đổi
-        BigDecimal base = BigDecimal.valueOf(buoc1 > 0 ? buoc1 : 1);
+        // Tính tỷ lệ chuyển đổi (guard buoc1 == 0 để tránh Infinity -> BigDecimal crash 500)
+        if (buoc1 == 0) {
+            BigDecimal zero = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+            results.add(new ThongKeTyLeChuyenDoiDTO("Tìm kiếm chuyến bay", 0L, zero, 1));
+            results.add(new ThongKeTyLeChuyenDoiDTO("Điền thông tin hành khách", 0L, zero, 2));
+            results.add(new ThongKeTyLeChuyenDoiDTO("Thanh toán thành công", 0L, zero, 3));
+            results.add(new ThongKeTyLeChuyenDoiDTO("Xuất vé thành công", 0L, zero, 4));
+            return results;
+        }
+
+        BigDecimal base = BigDecimal.valueOf(buoc1);
 
         results.add(new ThongKeTyLeChuyenDoiDTO("Tìm kiếm chuyến bay", buoc1,
                 BigDecimal.valueOf(100).setScale(2, RoundingMode.HALF_UP), 1));
 
         results.add(new ThongKeTyLeChuyenDoiDTO("Điền thông tin hành khách", buoc2,
-                BigDecimal.valueOf(buoc2 * 100.0 / buoc1).setScale(2, RoundingMode.HALF_UP), 2));
+                BigDecimal.valueOf(buoc2 * 100.0 / base.doubleValue()).setScale(2, RoundingMode.HALF_UP), 2));
 
         results.add(new ThongKeTyLeChuyenDoiDTO("Thanh toán thành công", buoc3,
-                BigDecimal.valueOf(buoc3 * 100.0 / buoc1).setScale(2, RoundingMode.HALF_UP), 3));
+                BigDecimal.valueOf(buoc3 * 100.0 / base.doubleValue()).setScale(2, RoundingMode.HALF_UP), 3));
 
         results.add(new ThongKeTyLeChuyenDoiDTO("Xuất vé thành công", buoc4,
-                BigDecimal.valueOf(buoc4 * 100.0 / buoc1).setScale(2, RoundingMode.HALF_UP), 4));
+                BigDecimal.valueOf(buoc4 * 100.0 / base.doubleValue()).setScale(2, RoundingMode.HALF_UP), 4));
 
         return results;
     }
