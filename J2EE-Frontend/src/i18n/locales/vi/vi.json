@@ -197,6 +197,7 @@
       "title": "Dịch vụ chuyến bay",
       "subtitle": "Nâng cao trải nghiệm bay của bạn với các dịch vụ bổ sung",
       "label_booking_code": "Mã đặt chỗ",
+      "error_empty": "Vui lòng nhập đầy đủ mã đặt chỗ và tên hành khách",
       "placeholder_booking_code": "Nhập mã đặt chỗ của bạn",
       "search_btn": "Tìm dịch vụ",
       "searching": "Đang tìm kiếm...",

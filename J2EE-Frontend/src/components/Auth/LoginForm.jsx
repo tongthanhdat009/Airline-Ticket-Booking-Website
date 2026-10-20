@@ -160,7 +160,7 @@ const LoginForm = ({ onSubmit, onGoogleLogin, isLoading }) => {
 
         <div className="flex items-center text-center my-6">
           <div className="flex-1 border-b border-slate-200"></div>
-          <span className="px-4 text-slate-400 text-sm font-medium">{t('common.or')}</span>
+          <span className="px-4 text-slate-400 text-sm font-medium">{t('common_extra.or')}</span>
           <div className="flex-1 border-b border-slate-200"></div>
         </div>
 

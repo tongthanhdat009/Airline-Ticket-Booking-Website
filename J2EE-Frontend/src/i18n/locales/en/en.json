@@ -197,6 +197,7 @@
       "title": "Flight Services",
       "subtitle": "Enhance your flight experience with add-on services",
       "label_booking_code": "Booking Code",
+      "error_empty": "Please enter both booking code and passenger name",
       "placeholder_booking_code": "Enter your booking code",
       "search_btn": "Search Services",
       "searching": "Searching...",
@@ -500,6 +501,7 @@
       "status_success": "Payment Successful",
       "status_failed": "Payment Failed",
       "transaction_id": "Transaction ID",
+      "payment_details": "Payment details",
       "normal_title": "Standard payment",
       "normal_desc": "Confirm payment directly, e-tickets are emailed immediately"
     },
