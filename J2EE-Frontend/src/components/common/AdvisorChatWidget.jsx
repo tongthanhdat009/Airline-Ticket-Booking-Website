@@ -234,6 +234,13 @@ const AdvisorChatWidget = () => {
                   </div>
                 );
               }
+              // Bong bóng trả lời còn trống (đang chờ token đầu tiên):
+              // không render gì cả để chỉ còn 1 indicator duy nhất là
+              // cụm 3 chấm bên dưới. Render bong bóng rỗng sẽ tạo ra
+              // 1 cái "pill" trống + 3 chấm = trông như 2 loading.
+              if (!msg.content && sending && index === messages.length - 1) {
+                return null;
+              }
               return (
                 <div key={index} className="flex justify-start gap-2">
                   <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center flex-shrink-0 mt-0.5">
