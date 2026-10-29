@@ -234,6 +234,13 @@ jobs:
             EMAIL_PORT=${{ secrets.EMAIL_PORT }}
             EMAIL_USERNAME=${{ secrets.EMAIL_USERNAME }}
             EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}
+            EMAIL_SMTP_HOST=${{ secrets.EMAIL_SMTP_HOST }}
+            EMAIL_SMTP_PORT=${{ secrets.EMAIL_SMTP_PORT }}
+            EMAIL_ENABLE_SSL=${{ secrets.EMAIL_ENABLE_SSL }}
+            EMAIL_FROM=${{ secrets.EMAIL_FROM }}
+            EMAIL_FROM_NAME=${{ secrets.EMAIL_FROM_NAME }}
+            EMAIL_IMAP_HOST=${{ secrets.EMAIL_IMAP_HOST }}
+            EMAIL_IMAP_PORT=${{ secrets.EMAIL_IMAP_PORT }}
             EMAIL_SMTP_AUTH=${{ secrets.EMAIL_SMTP_AUTH }}
             EMAIL_SMTP_STARTTLS_ENABLE=${{ secrets.EMAIL_SMTP_STARTTLS_ENABLE }}
             EMAIL_SMTP_STARTTLS_REQUIRED=${{ secrets.EMAIL_SMTP_STARTTLS_REQUIRED }}
