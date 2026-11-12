@@ -8,6 +8,7 @@ import org.springframework.core.io.ByteArrayResource;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -1011,6 +1012,33 @@ public class EmailService {
 
         } catch (MessagingException e) {
             throw new RuntimeException("Không thể gửi email phản hồi ticket: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Gửi mail cảnh báo đối soát lệch cho kế toán (dùng bởi ReconciliationScheduler).
+     */
+    public void sendReconciliationAlert(String toEmail, LocalDate ngay, long unmatchedCount, long total) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            setFromAddress(helper);
+            helper.setTo(toEmail);
+            helper.setSubject("[JadT Airline] Cảnh báo đối soát lệch ngày " + ngay);
+
+            String htmlContent = String.format("""
+                <p>Xin chào,</p>
+                <p>Hệ thống đối soát tự động phát hiện <strong>%d/%d</strong> giao dịch lệch trong ngày <strong>%s</strong>.</p>
+                <p>Vui lòng kiểm tra màn hình đối soát giao dịch để xử lý.</p>
+                <p style="margin-top: 20px;">Trân trọng,<br><strong>Hệ thống JadT Airline</strong></p>
+                """, unmatchedCount, total, ngay);
+
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+
+        } catch (MessagingException e) {
+            throw new RuntimeException("Không thể gửi email cảnh báo đối soát: " + e.getMessage());
         }
     }
 }

@@ -4,6 +4,7 @@ import com.example.j2ee.dto.ApiResponse;
 import com.example.j2ee.model.DatCho;
 import com.example.j2ee.model.HanhKhach;
 import com.example.j2ee.model.TaiKhoan;
+import com.example.j2ee.model.TinTuc;
 import com.example.j2ee.repository.ChiTietGheRepository;
 import com.example.j2ee.repository.DatChoRepository;
 import com.example.j2ee.repository.DonHangRepository;
@@ -14,6 +15,7 @@ import com.example.j2ee.repository.TrangThaiThanhToanRepository;
 import com.example.j2ee.service.BookingService;
 import com.example.j2ee.service.DatChoService;
 import com.example.j2ee.service.HanhKhachService;
+import com.example.j2ee.service.TinTucService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,6 +69,10 @@ class ClientIdorTest {
     private BookingService bookingService;
     @InjectMocks
     private ClientDatChoController datChoController;
+    @Mock
+    private TinTucService tinTucService;
+    @InjectMocks
+    private ClientTinTucController tinTucController;
 
     @AfterEach
     void clearContext() {
@@ -183,5 +189,64 @@ class ClientIdorTest {
         ResponseEntity<ApiResponse<Void>> res = datChoController.huyDatCho(5);
         assertEquals(HttpStatus.FORBIDDEN, res.getStatusCode());
         verify(datChoService, never()).huyDatCho(anyInt());
+    }
+
+    // ---------- ClientTinTucController (public, chi bai da xuat ban) ----------
+
+    private TinTuc publishedArticle(int id) {
+        TinTuc t = new TinTuc();
+        t.setMaTinTuc(id);
+        t.setTieuDe("Bai viet " + id);
+        t.setTrangThai("da_xuat_ban");
+        return t;
+    }
+
+    private TinTuc draftArticle(int id) {
+        TinTuc t = new TinTuc();
+        t.setMaTinTuc(id);
+        t.setTieuDe("Bai nhap " + id);
+        t.setTrangThai("ban_nhap");
+        return t;
+    }
+
+    @Test
+    void publicList_returnsPublished() {
+        when(tinTucService.getPublishedTinTuc())
+                .thenReturn(List.of(publishedArticle(1)));
+        ResponseEntity<ApiResponse<List<TinTuc>>> res = tinTucController.getPublished();
+        assertEquals(HttpStatus.OK, res.getStatusCode());
+        assertEquals(1, res.getBody().getData().size());
+    }
+
+    @Test
+    void publicDetail_published_allowed() {
+        when(tinTucService.getPublishedById(1)).thenReturn(publishedArticle(1));
+        ResponseEntity<ApiResponse<TinTuc>> res = tinTucController.getPublishedById(1);
+        assertEquals(HttpStatus.OK, res.getStatusCode());
+    }
+
+    @Test
+    void publicDetail_draft_notFound() {
+        when(tinTucService.getPublishedById(2)).thenReturn(null);
+        ResponseEntity<ApiResponse<TinTuc>> res = tinTucController.getPublishedById(2);
+        assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
+        verify(tinTucService, never()).incrementLuotXem(anyInt());
+    }
+
+    @Test
+    void publicIncrementView_published_allowed() {
+        when(tinTucService.getPublishedById(1)).thenReturn(publishedArticle(1));
+        when(tinTucService.incrementLuotXem(1)).thenReturn(publishedArticle(1));
+        ResponseEntity<ApiResponse<TinTuc>> res = tinTucController.incrementView(1);
+        assertEquals(HttpStatus.OK, res.getStatusCode());
+        verify(tinTucService).incrementLuotXem(1);
+    }
+
+    @Test
+    void publicIncrementView_draft_notFound() {
+        when(tinTucService.getPublishedById(2)).thenReturn(null);
+        ResponseEntity<ApiResponse<TinTuc>> res = tinTucController.incrementView(2);
+        assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
+        verify(tinTucService, never()).incrementLuotXem(anyInt());
     }
 }

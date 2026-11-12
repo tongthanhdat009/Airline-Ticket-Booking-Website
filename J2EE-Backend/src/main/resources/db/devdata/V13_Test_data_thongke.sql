@@ -1,4 +1,20 @@
 -- ========================================
+-- ⚠️ DEV-ONLY SAMPLE DATA — KHÔNG CHẠY TỰ ĐỘNG, KHÔNG CHẠY TRONG PRODUCTION
+-- ========================================
+-- File này từng nằm trong db/migration/ với tên `V13_Test_data_thongke.sql`.
+-- Tên đó dùng MỘT dấu gạch dưới nên KHÔNG khớp quy ước Flyway `V<n>__<desc>.sql`,
+-- nên Flyway bỏ qua nó một cách âm thầm (không báo lỗi) — tức là nó chưa từng
+-- chạy trên bất kỳ database nào.
+--
+-- Đã chuyển ra khỏi db/migration/ để:
+--   1. Không bao giờ bị Flyway chạy tự động (kể cả trong production).
+--   2. Không còn phụ thuộc vào hành vi "bỏ qua âm thầm" của Flyway.
+--
+-- CÁCH CHẠY (chỉ development/testing):
+--   mysql -u root -p datvemaybay < src/main/resources/db/devdata/V13_Test_data_thongke.sql
+-- Dọn dẹp dữ liệu test: xem V19__Remove_Test_Data.sql trong db/migration/.
+-- ========================================
+-- ========================================
 -- DỮ LIỆU MẪU ĐỂ TEST CHỨC NĂNG THỐNG KÊ
 -- ========================================
 -- Chạy script này để thêm dữ liệu mẫu cho thống kê

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +29,13 @@ public interface HoanTienRepository extends JpaRepository<HoanTien, Integer>, Jp
      * Tìm hoàn tiền theo mã thanh toán
      */
     List<HoanTien> findByTrangThaiThanhToan_MaThanhToan(int maThanhToan);
+
+    /**
+     * Hoàn tiền đã xử lý, kèm ghế + đơn (PNR) để gom theo đơn khi export cho Odoo.
+     */
+    @Query("select h from HoanTien h join fetch h.datCho d join fetch d.donHang o "
+            + "where h.trangThai = :status and (:since is null or h.ngayHoan > :since) order by h.ngayHoan")
+    List<HoanTien> findRefundedForExport(@Param("status") String status, @Param("since") LocalDateTime since);
 
     // ==================== SOFT DELETE METHODS ====================
     /**

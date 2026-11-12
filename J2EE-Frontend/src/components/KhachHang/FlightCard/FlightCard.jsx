@@ -5,6 +5,7 @@ import { FaCheckCircle, FaCheck } from 'react-icons/fa';
 import { AiFillCloseCircle } from 'react-icons/ai';
 import { formatTime, formatDateType, formatCurrency, calcFlightDuration } from '../../../services/utils';
 import { twToCss, twGradientToCss } from '../../../utils/tailwindColorUtils';
+import { useTranslation } from 'react-i18next';
 
 /**
  * FlightCard - Component hiển thị thẻ chuyến bay có thể thu gọn
@@ -18,6 +19,7 @@ const FlightCard = ({
     onHangVeClick,
     selectedTuyenBay, // Thay đổi từ selectedHangVe sang selectedTuyenBay
 }) => {
+    const { t } = useTranslation();
     const [isExpanded, setIsExpanded] = useState(false);
 
     const handleToggle = () => {
@@ -83,7 +85,7 @@ const FlightCard = ({
                                 </div>
                                 <div className="w-2 h-2 rounded-full bg-blue-400"></div>
                             </div>
-                            <div className="text-xs text-gray-500 mt-1 hidden sm:block">Bay thẳng</div>
+                            <div className="text-xs text-gray-500 mt-1 hidden sm:block">{t('booking.flight_selection.direct_flight')}</div>
                         </div>
 
                         {/* Arrival */}
@@ -96,7 +98,7 @@ const FlightCard = ({
 
                     {/* Center: Flight Details - Full width on mobile */}
                     <div className="flex flex-row md:flex-col items-center justify-between md:justify-center px-4 md:px-6 border-t md:border-t-0 border-b md:border-b-0 md:border-l md:border-r border-gray-200 py-2 md:py-0 mx-0 md:mx-4 w-full md:w-auto">
-                        <div className="text-xs md:text-sm text-gray-500">Số hiệu</div>
+                        <div className="text-xs md:text-sm text-gray-500">{t('booking.flight_selection.flight_number')}</div>
                         <div className="text-base md:text-xl font-bold text-blue-600">{chuyenBay.soHieuChuyenBay}</div>
                         <div className="text-xs md:text-sm text-gray-500 hidden md:block">{formatDateType(chuyenBay.ngayDi)}</div>
                     </div>
@@ -174,7 +176,7 @@ const FlightCard = ({
                                                         {isSelected && (
                                                             <div className="flex items-center gap-1">
                                                                 <FaCheck className="text-white text-lg" />
-                                                                <span className="text-xs text-white/90 font-medium hidden sm:inline">ĐÃ CHỌN</span>
+                                                                <span className="text-xs text-white/90 font-medium hidden sm:inline">{t('booking.fare_card.selected')}</span>
                                                             </div>
                                                         )}
                                                     </div>
@@ -188,19 +190,19 @@ const FlightCard = ({
                                                         <span className="text-xs md:text-sm font-normal text-gray-500"> VND</span>
                                                     </div>
                                                 ) : (
-                                                    <div className="text-sm text-red-500">Hết chỗ</div>
+                                                    <div className="text-sm text-red-500">{t('booking.flight_selection.sold_out')}</div>
                                                 )}
                                                 {isPremium && (
                                                     <div className="mt-1 inline-block text-xs font-semibold px-2 py-0.5 rounded-full"
                                                         style={{ backgroundColor: config.badgeBg, color: config.textColor }}>
-                                                        Cao cấp
+                                                        {t('booking.fare_card.premium')}
                                                     </div>
                                                 )}
                                             </div>
 
                                             {/* 70% - Benefits */}
                                             <div className={`w-full md:w-[70%] p-3 relative z-10 ${isSelected ? 'bg-white/60' : ''}`}>
-                                                <div className="text-xs md:text-sm font-semibold text-gray-700 mb-2">Lợi ích:</div>
+                                                <div className="text-xs md:text-sm font-semibold text-gray-700 mb-2">{t('booking.fare_card.benefits')}</div>
                                                 {benefits.length > 0 ? (
                                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs md:text-sm">
                                                         {benefits.map((benefit, idx) => (
@@ -217,7 +219,7 @@ const FlightCard = ({
                                                         ))}
                                                     </div>
                                                 ) : (
-                                                    <p className="text-sm text-gray-400 italic">Chưa có thông tin lợi ích</p>
+                                                    <p className="text-sm text-gray-400 italic">{t('booking.fare_card.no_benefits')}</p>
                                                 )}
                                             </div>
                                         </div>
@@ -226,7 +228,7 @@ const FlightCard = ({
                             </div>
                         ) : (
                             <div className="text-center py-4 text-gray-500">
-                                Không có hạng vé nào khả dụng
+                                {t('booking.fare_card.no_fares')}
                             </div>
                         )}
                     </div>

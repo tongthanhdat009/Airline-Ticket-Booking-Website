@@ -235,6 +235,7 @@ function QuenMatKhau() {
                       <input
                         key={index}
                         id={`otp-${index}`}
+                        aria-label={`OTP digit ${index + 1}`}
                         type="text"
                         maxLength="1"
                         className="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-200 rounded-xl bg-gray-50 transition-all focus:outline-none focus:border-[#1E88E5] focus:bg-white focus:shadow-[0_0_0_3px_rgba(30,136,229,0.1)]"

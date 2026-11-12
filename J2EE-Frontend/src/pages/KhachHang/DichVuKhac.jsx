@@ -33,9 +33,9 @@ function DichVuKhac() {
             {otherServices.map((service, index) => (
               <div key={index} className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 p-6">
                 <div className="text-5xl mb-4">{service.icon}</div>
-                <h3 className="text-lg font-bold text-gray-800 mb-2">{t(`pages.other_services_list.${service.key}.title`)}</h3>
+                <h2 className="text-lg font-bold text-gray-800 mb-2">{t(`pages.other_services_list.${service.key}.title`)}</h2>
                 <p className="text-sm text-gray-600 mb-4">{t(`pages.other_services_list.${service.key}.desc`)}</p>
-                <a href={service.link} className="text-[#1E88E5] font-semibold hover:underline text-sm">
+                <a href={service.link} className="text-[#1565C0] font-semibold hover:underline text-sm">
                   {t('pages.dich_vu_khac.learn_more')}
                 </a>
               </div>
@@ -47,25 +47,25 @@ function DichVuKhac() {
             <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">{t('pages.dich_vu_khac.partners_title')}</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div className="flex items-center justify-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#1E88E5] transition-colors">
-                <span className="text-2xl font-bold text-gray-400">Agoda</span>
+                <span className="text-2xl font-bold text-gray-500">Agoda</span>
               </div>
               <div className="flex items-center justify-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#1E88E5] transition-colors">
-                <span className="text-2xl font-bold text-gray-400">Booking.com</span>
+                <span className="text-2xl font-bold text-gray-500">Booking.com</span>
               </div>
               <div className="flex items-center justify-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#1E88E5] transition-colors">
-                <span className="text-2xl font-bold text-gray-400">Grab</span>
+                <span className="text-2xl font-bold text-gray-500">Grab</span>
               </div>
               <div className="flex items-center justify-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#1E88E5] transition-colors">
-                <span className="text-2xl font-bold text-gray-400">Klook</span>
+                <span className="text-2xl font-bold text-gray-500">Klook</span>
               </div>
             </div>
           </div>
 
           {/* CTA Banner */}
-          <div className="bg-linear-to-r from-[#1E88E5] to-[#1565C0] rounded-2xl p-8 text-white text-center">
+          <div className="bg-linear-to-r from-[#1565C0] to-[#0D47A1] rounded-2xl p-8 text-white text-center">
             <h2 className="text-2xl font-bold mb-4">{t('pages.dich_vu_khac.cta_title')}</h2>
             <p className="text-lg mb-6">{t('pages.dich_vu_khac.cta_desc')}</p>
-            <button className="px-8 py-3 bg-[#FF7043] text-white rounded-xl font-bold hover:bg-[#F4511E] transition-colors">
+            <button className="px-8 py-3 bg-[#C2410C] text-white rounded-xl font-bold hover:bg-[#9A3412] transition-colors">
               {t('pages.dich_vu_khac.cta_btn')}
             </button>
           </div>

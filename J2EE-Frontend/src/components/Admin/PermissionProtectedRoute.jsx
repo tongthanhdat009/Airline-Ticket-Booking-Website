@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import { hasPermission, hasFeatureAction } from '../utils/permissionUtils';
+import { hasPermission, hasFeatureAction } from '../../utils/permissionUtils';
 
 /**
  * PermissionProtectedRoute Component - Bảo vệ route bằng permission

@@ -1,37 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
- LayoutDashboard,
- Plane,
- Users,
- Calendar,
- ShoppingCart,
- Undo,
- Tag,
- BarChart3,
- UserCog,
- Shield,
- Map,
- Building,
- Car,
- Wrench,
- DollarSign,
- Menu,
- X,
- ChevronDown,
- History
-} from 'lucide-react';
+ FaTachometerAlt,
+ FaPlane,
+ FaUsers,
+ FaCalendarAlt,
+ FaShoppingCart,
+ FaUndoAlt,
+ FaTag,
+ FaChartBar,
+ FaUserCog,
+ FaShieldAlt,
+ FaMapMarkerAlt,
+ FaBuilding,
+ FaCar,
+ FaWrench,
+ FaDollarSign,
+ FaBars,
+ FaTimes,
+ FaChevronDown,
+ FaHistory
+} from 'react-icons/fa';
 import { hasPermission } from '../../utils/permissionUtils';
-import { useSidebar } from '../../context/SidebarContext';
 
 /**
  * Sidebar Component - Hiển thị menu navigation với permissions
  * Các menu items được ẩn/hiện dựa trên permissions của user
- * State được quản lý bằng Context để không bị reset khi URL thay đổi
+ * State mở/đóng được giữ cục bộ để không bị reset khi URL thay đổi
  */
 const Sidebar = ({ collapsed, setCollapsed }) => {
  const location = useLocation();
- const { toggleMenu, isMenuOpen } = useSidebar();
+ // Menu open/close state is local: the app has no sidebar context provider.
+ const [openMenus, setOpenMenus] = useState({});
+ const toggleMenu = (menuKey) => setOpenMenus((prev) => ({ ...prev, [menuKey]: !prev[menuKey] }));
+ const isMenuOpen = (menuKey) => Boolean(openMenus[menuKey]);
 
  // Toggle menu con - chỉ thay đổi state, không navigate
  const handleToggleMenu = (menuKey, e) => {
@@ -51,19 +53,19 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
  const menuItems = [
  {
  title: 'Dashboard',
- icon: LayoutDashboard,
+ icon: FaTachometerAlt,
  path: '/dashboard',
  permission: null, // Ai cũng thấy
  },
  {
  title: 'Quản lý Vai trò',
- icon: Shield,
+ icon: FaShieldAlt,
  permission: 'ROLE_MANAGE',
  path: '/dashboard/vai-tro',
  },
  {
  title: 'Chuyến Bay',
- icon: Plane,
+ icon: FaPlane,
  permission: 'FLIGHT_VIEW',
  path: '/dashboard/chuyenbay',
  children: [
@@ -73,7 +75,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
  },
  {
  title: 'Đặt Chỗ',
- icon: Calendar,
+ icon: FaCalendarAlt,
  permission: 'BOOKING_VIEW',
  path: '/dashboard/dat-cho',
  children: [
@@ -83,79 +85,79 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
  },
  {
  title: 'Đơn Hàng',
- icon: ShoppingCart,
+ icon: FaShoppingCart,
  permission: 'ORDER_VIEW',
  path: '/dashboard/don-hang',
  },
  {
  title: 'Hoàn Tiền',
- icon: Undo,
+ icon: FaUndoAlt,
  permission: 'REFUND_VIEW',
  path: '/dashboard/hoan-tien',
  },
  {
  title: 'Khuyến Mãi',
- icon: Tag,
+ icon: FaTag,
  permission: 'PROMOTION_VIEW',
  path: '/dashboard/khuyen-mai',
  },
  {
  title: 'Khách Hàng',
- icon: Users,
+ icon: FaUsers,
  permission: 'CUSTOMER_VIEW',
  path: '/dashboard/khach-hang',
  },
  {
  title: 'Báo Cáo',
- icon: BarChart3,
+ icon: FaChartBar,
  permission: 'REPORT_VIEW',
  path: '/dashboard/bao-cao',
  },
  {
  title: 'Người Dùng',
- icon: UserCog,
+ icon: FaUserCog,
  permission: 'USER_VIEW',
  path: '/dashboard/users',
  },
  {
  title: 'Phân Quyền',
- icon: Shield,
+ icon: FaShieldAlt,
  permission: 'PERMISSION_VIEW',
  path: '/dashboard/permissions',
  },
  {
  title: 'Tuyến Bay',
- icon: Map,
+ icon: FaMapMarkerAlt,
  permission: 'ROUTE_VIEW',
  path: '/dashboard/tuyen-bay',
  },
  {
  title: 'Sân Bay',
- icon: Building,
+ icon: FaBuilding,
  permission: 'AIRPORT_VIEW',
  path: '/dashboard/san-bay',
  },
  {
  title: 'Máy Bay',
- icon: Car,
+ icon: FaCar,
  permission: 'AIRCRAFT_VIEW',
  path: '/dashboard/may-bay',
  },
  {
  title: 'Dịch Vụ',
- icon: Wrench,
+ icon: FaWrench,
  permission: 'SERVICE_VIEW',
  path: '/dashboard/dich-vu',
  },
  {
  title: 'Giá Vé',
- icon: DollarSign,
+ icon: FaDollarSign,
  permission: 'PRICE_VIEW',
  path: '/dashboard/gia-ve',
  },
  {
  title: 'Lịch sử thao tác',
- icon: History,
+ icon: FaHistory,
  permission: 'AUDITLOG_VIEW',
  path: '/dashboard/LichSuThaoTac',
  },
@@ -196,7 +198,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
  {!collapsed && <span className="font-medium">{item.title}</span>}
  </div>
  {!collapsed && (
- <ChevronDown
+ <FaChevronDown
  size={16}
  className={`transition-transform duration-200 ${isMenuItemOpen ? 'rotate-180' : ''}`}
  />
@@ -272,7 +274,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
  onClick={() => setCollapsed(!collapsed)}
  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
  >
- {collapsed ? <Menu size={20} /> : <X size={20} />}
+ {collapsed ? <FaBars size={20} /> : <FaTimes size={20} />}
  </button>
  </div>
 

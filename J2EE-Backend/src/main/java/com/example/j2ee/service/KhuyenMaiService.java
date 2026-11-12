@@ -16,13 +16,13 @@ import com.example.j2ee.repository.KhuyenMaiRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -79,16 +79,6 @@ public class KhuyenMaiService {
         }
 
         return response;
-    }
-
-    /**
-     * Áp dụng mã khuyến mãi trong transaction mới (REQUIRES_NEW).
-     * Dùng khi gọi từ bên trong một transaction khác (ví dụ: BookingService.createBooking)
-     * để tránh lỗi "rollback-only" khi mã KM không hợp lệ.
-     */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public ApplyCouponResponse applyCouponNewTx(ApplyCouponRequest request) {
-        return applyCoupon(request);
     }
 
     /**
@@ -302,6 +292,9 @@ public class KhuyenMaiService {
         khuyenMaiDatCho.setSoTienGiam(giaTriGiam);
         khuyenMaiDatCho.setNgaySuDung(LocalDateTime.now());
 
+        if (datCho.getDanhSachKhuyenMai() == null) {
+            datCho.setDanhSachKhuyenMai(new HashSet<>());
+        }
         datCho.getDanhSachKhuyenMai().add(khuyenMaiDatCho);
     }
 

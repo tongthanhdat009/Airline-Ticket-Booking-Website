@@ -1,55 +1,63 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 
 /**
  * Banner content cho trang đăng nhập
  */
-export const LoginBannerContent = () => (
-  <>
-    <div className="inline-block px-4 py-1.5 bg-white/20 rounded-full text-sm font-medium mb-6 backdrop-blur-sm">
-      ✈️ JadT Airline 2026
-    </div>
-    <h2 className="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">
-      Chào mừng trở lại!
-    </h2>
-    <p className="text-lg text-blue-100 mb-8 leading-relaxed">
-      Đăng nhập để trải nghiệm dịch vụ hàng không tốt nhất với giá vé ưu đãi
-    </p>
+export const LoginBannerContent = () => {
+  const { t } = useTranslation();
+  return (
+    <>
+      <div className="inline-block px-4 py-1.5 bg-white/20 rounded-full text-sm font-medium mb-6 backdrop-blur-sm">
+        ✈️ JadT Airline 2026
+      </div>
+      <h2 className="text-3xl md:text-4xl font-extrabold mb-6 leading-tight whitespace-nowrap">
+        {t('auth.banner_login_title')}
+      </h2>
+      <p className="text-lg text-blue-100 mb-8 leading-relaxed">
+        {t('auth.banner_login_desc')}
+      </p>
 
-    <div className="space-y-4">
-      {[
-        { icon: "🎁", title: "Ưu đãi độc quyền", desc: "Nhận ngay ưu đãi đặc biệt cho thành viên" },
-        { icon: "⭐", title: "Tích lũy điểm thưởng", desc: "Đổi điểm lấy vé miễn phí" },
-        { icon: "💬", title: "Hỗ trợ 24/7", desc: "Luôn sẵn sàng hỗ trợ bạn mọi lúc" }
-      ].map((item, idx) => (
-        <motion.div
-          key={idx}
-          whileHover={{ x: 5 }}
-          className="flex items-start gap-4 p-4 bg-white/10 rounded-2xl backdrop-blur-sm"
-        >
-          <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-xl shrink-0">
-            {item.icon}
-          </div>
-          <div>
-            <h3 className="font-bold mb-1">{item.title}</h3>
-            <p className="text-sm text-blue-100">{item.desc}</p>
-          </div>
-        </motion.div>
-      ))}
-    </div>
-  </>
-);
+      <div className="space-y-4">
+        {[
+          { icon: "🎁", title: t('auth.banner_b1_title'), desc: t('auth.banner_b1_desc') },
+          { icon: "⭐", title: t('auth.banner_b2_title'), desc: t('auth.banner_b2_desc') },
+          { icon: "💬", title: t('auth.banner_b3_title'), desc: t('auth.banner_b3_desc') }
+        ].map((item, idx) => (
+          <motion.div
+            key={idx}
+            whileHover={{ x: 5 }}
+            className="flex items-start gap-4 p-4 bg-white/10 rounded-2xl backdrop-blur-sm"
+          >
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-xl shrink-0">
+              {item.icon}
+            </div>
+            <div>
+              <h3 className="font-bold mb-1">{item.title}</h3>
+              <p className="text-sm text-blue-100">{item.desc}</p>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </>
+  );
+};
 
 /**
  * Banner content cho trang đăng ký với progress steps
  */
 export const RegisterBannerContent = ({ currentStep = 1, showVerificationPrompt = false }) => {
+  const { t } = useTranslation();
   const STEPS = [
-    { id: 1, title: 'Thông tin cá nhân', icon: '👤' },
-    { id: 2, title: 'Liên hệ', icon: '📞' },
-    { id: 3, title: 'Bảo mật', icon: '🔒' }
+    { id: 1, title: t('auth.banner_step1'), icon: '👤' },
+    { id: 2, title: t('auth.banner_step2'), icon: '📞' },
+    { id: 3, title: t('auth.banner_step3'), icon: '🔒' }
   ];
+
+  const stepStatus = (step) =>
+    currentStep > step.id ? t('auth.banner_done') : currentStep === step.id ? t('auth.banner_active') : t('auth.banner_wait');
 
   return (
     <>
@@ -57,10 +65,10 @@ export const RegisterBannerContent = ({ currentStep = 1, showVerificationPrompt 
         ✈️ JadT Airline 2026
       </div>
       <h2 className="text-3xl font-extrabold mb-4 leading-tight">
-        Tham gia cùng chúng tôi!
+        {t('auth.banner_reg_title')}
       </h2>
       <p className="text-base text-blue-100 mb-6">
-        Đăng ký ngay để nhận ưu đãi đặc biệt
+        {t('auth.banner_reg_desc')}
       </p>
 
       {/* Progress Steps */}
@@ -89,7 +97,7 @@ export const RegisterBannerContent = ({ currentStep = 1, showVerificationPrompt 
               <div>
                 <p className="font-semibold text-sm">{step.title}</p>
                 <p className="text-xs text-blue-100 opacity-80">
-                  {currentStep > step.id ? 'Hoàn thành' : currentStep === step.id ? 'Đang điền' : 'Chờ'}
+                  {stepStatus(step)}
                 </p>
               </div>
             </motion.div>
@@ -101,9 +109,9 @@ export const RegisterBannerContent = ({ currentStep = 1, showVerificationPrompt 
       {showVerificationPrompt && (
         <div className="space-y-3 mt-4">
           {[
-            { icon: "🔒", title: "Bảo mật tài khoản" },
-            { icon: "📩", title: "Nhận thông báo" },
-            { icon: "🎁", title: "Ưu đãi độc quyền" }
+            { icon: "🔒", title: t('auth.banner_v1') },
+            { icon: "📩", title: t('auth.banner_v2') },
+            { icon: "🎁", title: t('auth.banner_v3') }
           ].map((item, idx) => (
             <div key={idx} className="flex items-center gap-3 p-3 bg-white/10 rounded-xl">
               <span className="text-xl">{item.icon}</span>

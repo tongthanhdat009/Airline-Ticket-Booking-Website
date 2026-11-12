@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, Search, LogOut, User } from 'lucide-react';
+import { FaBell, FaSearch, FaSignOutAlt, FaUser } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { getAdminUserInfo, getCurrentUsername } from '../../utils/permissionUtils';
@@ -29,7 +29,7 @@ const Header = () => {
  {/* Left: Search bar */}
  <div className="flex items-center gap-4">
  <div className="relative">
- <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+ <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
  <input maxLength={100}
  type="text"
  placeholder="Tìm kiếm..."
@@ -42,7 +42,7 @@ const Header = () => {
  <div className="flex items-center gap-4">
  {/* Notifications */}
  <button className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors">
- <Bell size={20} className="text-gray-600" />
+ <FaBell size={20} className="text-gray-600" />
  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
  </button>
 
@@ -50,7 +50,7 @@ const Header = () => {
  <div className="flex items-center gap-3">
  <div className="flex items-center gap-2">
  <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
- <User size={20} className="text-white" />
+ <FaUser size={20} className="text-white" />
  </div>
  <div className="hidden md:block">
  <p className="text-sm font-medium text-gray-900">{username}</p>
@@ -66,7 +66,7 @@ const Header = () => {
  className="p-2 rounded-lg hover:bg-red-100 transition-colors group"
  title="Đăng xuất"
  >
- <LogOut size={20} className="text-gray-600 group-hover:text-red-600" />
+ <FaSignOutAlt size={20} className="text-gray-600 group-hover:text-red-600" />
  </button>
  </div>
  </div>

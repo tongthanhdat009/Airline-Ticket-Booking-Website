@@ -131,7 +131,7 @@ function TimChuyenBayForm() {
             {/* Điểm khởi hành và điểm đến */}
             <div className="grid md:grid-cols-2 gap-3">
                 <div className="relative">
-                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                    <label htmlFor="departure" className="block text-[11px] font-semibold text-slate-700 mb-1">
                         {t('booking.search_form.from')}
                     </label>
                     <div className="relative">
@@ -159,7 +159,7 @@ function TimChuyenBayForm() {
                 </div>
 
                 <div className="relative">
-                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                    <label htmlFor="arrival" className="block text-[11px] font-semibold text-slate-700 mb-1">
                         {t('booking.search_form.to')}
                     </label>
                     <div className="relative">
@@ -220,12 +220,13 @@ function TimChuyenBayForm() {
                 )}
                 
                 <div>
-                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                    <label htmlFor="passengers" className="block text-[11px] font-semibold text-slate-700 mb-1">
                         {t('booking.search_form.passengers')}
                     </label>
                     <div className="relative">
                         <HiUser className='absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm' />
                         <select
+                            id="passengers"
                             value={passengers}
                             onChange={(e) => setPassengers(e.target.value)}
                             className="w-full pl-8 pr-7 py-1.5 text-xs border border-slate-200 rounded-lg bg-white/90 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all appearance-none cursor-pointer text-slate-700"

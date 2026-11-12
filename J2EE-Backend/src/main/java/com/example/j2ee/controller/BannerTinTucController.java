@@ -5,6 +5,7 @@ import com.example.j2ee.dto.ApiResponse;
 import com.example.j2ee.model.Banner;
 import com.example.j2ee.model.TinTuc;
 import com.example.j2ee.service.BannerService;
+import com.example.j2ee.service.TinTucCrawlService;
 import com.example.j2ee.service.TinTucService;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -24,22 +25,25 @@ public class BannerTinTucController {
 
     private final BannerService bannerService;
     private final TinTucService tinTucService;
+    private final TinTucCrawlService tinTucCrawlService;
 
-    public BannerTinTucController(BannerService bannerService, TinTucService tinTucService) {
+    public BannerTinTucController(BannerService bannerService, TinTucService tinTucService,
+                                  TinTucCrawlService tinTucCrawlService) {
         this.bannerService = bannerService;
         this.tinTucService = tinTucService;
+        this.tinTucCrawlService = tinTucCrawlService;
     }
 
     // ==================== BANNER ENDPOINTS ====================
 
     @GetMapping("/banners")
-    @RequirePermission(feature = "BANNER", action = "VIEW")
+    @RequirePermission(feature = "BANNER_NEWS", action = "VIEW")
     public ResponseEntity<ApiResponse<List<Banner>>> getAllBanners() {
         return ResponseEntity.ok(ApiResponse.success(bannerService.getAllBanners()));
     }
 
     @GetMapping("/banners/{id}")
-    @RequirePermission(feature = "BANNER", action = "VIEW")
+    @RequirePermission(feature = "BANNER_NEWS", action = "VIEW")
     public ResponseEntity<ApiResponse<Banner>> getBannerById(@PathVariable int id) {
         Banner banner = bannerService.getBannerById(id);
         if (banner == null) {
@@ -49,7 +53,7 @@ public class BannerTinTucController {
     }
 
     @PostMapping("/banners")
-    @RequirePermission(feature = "BANNER", action = "CREATE")
+    @RequirePermission(feature = "BANNER_NEWS", action = "CREATE")
     public ResponseEntity<ApiResponse<Banner>> createBanner(@RequestBody Banner banner) {
         try {
             Banner created = bannerService.createBanner(banner);
@@ -60,7 +64,7 @@ public class BannerTinTucController {
     }
 
     @PutMapping("/banners/{id}")
-    @RequirePermission(feature = "BANNER", action = "UPDATE")
+    @RequirePermission(feature = "BANNER_NEWS", action = "UPDATE")
     public ResponseEntity<ApiResponse<Banner>> updateBanner(@PathVariable int id, @RequestBody Banner banner) {
         try {
             Banner updated = bannerService.updateBanner(id, banner);
@@ -74,7 +78,7 @@ public class BannerTinTucController {
     }
 
     @DeleteMapping("/banners/{id}")
-    @RequirePermission(feature = "BANNER", action = "DELETE")
+    @RequirePermission(feature = "BANNER_NEWS", action = "DELETE")
     public ResponseEntity<ApiResponse<Void>> deleteBanner(@PathVariable int id) {
         boolean deleted = bannerService.deleteBanner(id);
         if (!deleted) {
@@ -84,7 +88,7 @@ public class BannerTinTucController {
     }
 
     @PatchMapping("/banners/{id}/toggle-status")
-    @RequirePermission(feature = "BANNER", action = "UPDATE")
+    @RequirePermission(feature = "BANNER_NEWS", action = "UPDATE")
     public ResponseEntity<ApiResponse<Banner>> toggleBannerStatus(@PathVariable int id) {
         try {
             Banner banner = bannerService.getBannerById(id);
@@ -94,6 +98,19 @@ public class BannerTinTucController {
             banner.setTrangThai(!banner.getTrangThai());
             Banner updated = bannerService.updateBanner(id, banner);
             return ResponseEntity.ok(ApiResponse.success("Thay đổi trạng thái banner thành công", updated));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    @PatchMapping("/banners/{id}/thu-tu")
+    @RequirePermission(feature = "BANNER_NEWS", action = "UPDATE")
+    public ResponseEntity<ApiResponse<Banner>> updateBannerOrder(
+            @PathVariable int id,
+            @RequestParam int thuTu) {
+        try {
+            Banner updated = bannerService.updateThuTu(id, thuTu);
+            return ResponseEntity.ok(ApiResponse.success("Cập nhật thứ tự banner thành công", updated));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
@@ -112,13 +129,13 @@ public class BannerTinTucController {
     // ==================== BANNER SOFT DELETE ENDPOINTS ====================
 
     @GetMapping("/banners/deleted")
-    @RequirePermission(feature = "BANNER", action = "VIEW")
+    @RequirePermission(feature = "BANNER_NEWS", action = "VIEW")
     public ResponseEntity<ApiResponse<List<Banner>>> getDeletedBanners() {
         return ResponseEntity.ok(ApiResponse.success(bannerService.getAllDeleted()));
     }
 
     @PostMapping("/banners/{id}/restore")
-    @RequirePermission(feature = "BANNER", action = "RESTORE")
+    @RequirePermission(feature = "BANNER_NEWS", action = "RESTORE")
     public ResponseEntity<ApiResponse<Banner>> restoreBanner(@PathVariable int id) {
         try {
             bannerService.restoreBanner(id);
@@ -130,7 +147,7 @@ public class BannerTinTucController {
     }
 
     @DeleteMapping("/banners/{id}/hard")
-    @RequirePermission(feature = "BANNER", action = "DELETE")
+    @RequirePermission(feature = "BANNER_NEWS", action = "DELETE")
     public ResponseEntity<ApiResponse<Void>> hardDeleteBanner(@PathVariable int id) {
         try {
             bannerService.hardDeleteBanner(id);
@@ -143,13 +160,13 @@ public class BannerTinTucController {
     // ==================== NEWS (TIN TUC) ENDPOINTS ====================
 
     @GetMapping("/tintuc")
-    @RequirePermission(feature = "NEWS", action = "VIEW")
+    @RequirePermission(feature = "BANNER_NEWS", action = "VIEW")
     public ResponseEntity<ApiResponse<List<TinTuc>>> getAllTinTuc() {
         return ResponseEntity.ok(ApiResponse.success(tinTucService.getAllTinTuc()));
     }
 
     @GetMapping("/tintuc/{id}")
-    @RequirePermission(feature = "NEWS", action = "VIEW")
+    @RequirePermission(feature = "BANNER_NEWS", action = "VIEW")
     public ResponseEntity<ApiResponse<TinTuc>> getTinTucById(@PathVariable int id) {
         TinTuc tinTuc = tinTucService.getTinTucById(id);
         if (tinTuc == null) {
@@ -159,7 +176,7 @@ public class BannerTinTucController {
     }
 
     @PostMapping("/tintuc")
-    @RequirePermission(feature = "NEWS", action = "CREATE")
+    @RequirePermission(feature = "BANNER_NEWS", action = "CREATE")
     public ResponseEntity<ApiResponse<TinTuc>> createTinTuc(@RequestBody TinTuc tinTuc) {
         try {
             TinTuc created = tinTucService.createTinTuc(tinTuc);
@@ -170,7 +187,7 @@ public class BannerTinTucController {
     }
 
     @PutMapping("/tintuc/{id}")
-    @RequirePermission(feature = "NEWS", action = "UPDATE")
+    @RequirePermission(feature = "BANNER_NEWS", action = "UPDATE")
     public ResponseEntity<ApiResponse<TinTuc>> updateTinTuc(@PathVariable int id, @RequestBody TinTuc tinTuc) {
         try {
             TinTuc updated = tinTucService.updateTinTuc(id, tinTuc);
@@ -184,7 +201,7 @@ public class BannerTinTucController {
     }
 
     @DeleteMapping("/tintuc/{id}")
-    @RequirePermission(feature = "NEWS", action = "DELETE")
+    @RequirePermission(feature = "BANNER_NEWS", action = "DELETE")
     public ResponseEntity<ApiResponse<Void>> deleteTinTuc(@PathVariable int id) {
         boolean deleted = tinTucService.deleteTinTuc(id);
         if (!deleted) {
@@ -194,7 +211,7 @@ public class BannerTinTucController {
     }
 
     @PatchMapping("/tintuc/{id}/publish")
-    @RequirePermission(feature = "NEWS", action = "UPDATE")
+    @RequirePermission(feature = "BANNER_NEWS", action = "UPDATE")
     public ResponseEntity<ApiResponse<TinTuc>> publishTinTuc(@PathVariable int id) {
         try {
             TinTuc tinTuc = tinTucService.getTinTucById(id);
@@ -226,7 +243,7 @@ public class BannerTinTucController {
     }
 
     @PostMapping(value = "/tintuc/{id}/anh", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @RequirePermission(feature = "NEWS", action = "UPDATE")
+    @RequirePermission(feature = "BANNER_NEWS", action = "UPDATE")
     public ResponseEntity<ApiResponse<TinTuc>> uploadTinTucAnh(
             @PathVariable("id") int tinTucId,
             @RequestPart("anh") MultipartFile anh) {
@@ -284,16 +301,33 @@ public class BannerTinTucController {
         }
     }
 
+    // ==================== AUTO-CRAWL TIN TUC (RSS + LLM) ====================
+
+    @PostMapping("/tintuc/crawl-now")
+    @RequirePermission(feature = "BANNER_NEWS", action = "CREATE")
+    public ResponseEntity<ApiResponse<TinTucCrawlService.CrawlSummary>> crawlTinTucNow() {
+        try {
+            TinTucCrawlService.CrawlSummary summary = tinTucCrawlService.crawlNow();
+            return ResponseEntity.ok(ApiResponse.success(
+                    "Crawl xong: " + summary.created() + " bài mới, "
+                            + summary.skippedDuplicate() + " trùng, "
+                            + summary.skippedIrrelevant() + " không liên quan máy bay, "
+                            + summary.failed() + " lỗi", summary));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.error("Lỗi khi crawl tin tức: " + e.getMessage()));
+        }
+    }
+
     // ==================== NEWS (TIN TUC) SOFT DELETE ENDPOINTS ====================
 
     @GetMapping("/tintuc/deleted")
-    @RequirePermission(feature = "NEWS", action = "VIEW")
+    @RequirePermission(feature = "BANNER_NEWS", action = "VIEW")
     public ResponseEntity<ApiResponse<List<TinTuc>>> getDeletedTinTuc() {
         return ResponseEntity.ok(ApiResponse.success(tinTucService.getAllDeletedTinTuc()));
     }
 
     @PostMapping("/tintuc/{id}/restore")
-    @RequirePermission(feature = "NEWS", action = "RESTORE")
+    @RequirePermission(feature = "BANNER_NEWS", action = "RESTORE")
     public ResponseEntity<ApiResponse<TinTuc>> restoreTinTuc(@PathVariable int id) {
         try {
             TinTuc restored = tinTucService.restoreTinTuc(id);
@@ -304,13 +338,30 @@ public class BannerTinTucController {
     }
 
     @DeleteMapping("/tintuc/{id}/hard")
-    @RequirePermission(feature = "NEWS", action = "DELETE")
+    @RequirePermission(feature = "BANNER_NEWS", action = "DELETE")
     public ResponseEntity<ApiResponse<Void>> hardDeleteTinTuc(@PathVariable int id) {
         try {
             tinTucService.hardDeleteTinTuc(id);
             return ResponseEntity.ok(ApiResponse.successMessage("Xóa vĩnh viễn tin tức thành công"));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    // ==================== AUTO CRAWL TIN TUC (LLM) ====================
+
+    @PostMapping("/tintuc/crawl")
+    @RequirePermission(feature = "BANNER_NEWS", action = "CREATE")
+    public ResponseEntity<ApiResponse<TinTucCrawlService.CrawlSummary>> crawlTinTuc() {
+        try {
+            TinTucCrawlService.CrawlSummary summary = tinTucCrawlService.crawlNow();
+            return ResponseEntity.ok(ApiResponse.success(
+                    String.format("Crawl xong: %d tin mới, %d trùng, %d lỗi (trên %d tin RSS)",
+                            summary.created(), summary.skippedDuplicate(), summary.failed(), summary.fetched()),
+                    summary));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Lỗi khi crawl tin tức: " + e.getMessage()));
         }
     }
 }

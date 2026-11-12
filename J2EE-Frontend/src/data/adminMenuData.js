@@ -26,6 +26,7 @@ import {
   FaFileExport,
   FaBalanceScale,
   FaImage,
+  FaNewspaper,
   FaServer
 } from 'react-icons/fa';
 import { MdLocalAirport } from 'react-icons/md';
@@ -55,6 +56,7 @@ const iconMap = {
   FaFileExport,
   FaBalanceScale,
   FaImage,
+  FaNewspaper,
   FaServer,
   MdLocalAirport
 };
@@ -251,14 +253,14 @@ export const adminMenuItems = [
   },
   {
     path: '/admin/dashboard/BannerTinTuc',
-    text: 'Banner & Tin tức',
-    icon: FaImage,
+    text: 'Tin tức',
+    icon: FaNewspaper,
     permissionKey: 'BANNER_NEWS_VIEW',
     featureCode: 'BANNER_NEWS',
-    featureName: 'Quản lý Banner & Tin tức',
+    featureName: 'Quản lý Tin tức',
     group: 'Marketing',
     color: 'from-fuchsia-500 to-pink-500',
-    description: 'Quản lý banner quảng cáo và tin tức trang chủ'
+    description: 'Tin tức trang chủ (crawl tự động + LLM viết lại)'
   },
   {
     path: '/admin/dashboard/LichSuThaoTac',

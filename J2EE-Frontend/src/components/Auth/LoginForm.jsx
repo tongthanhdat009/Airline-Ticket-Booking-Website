@@ -24,21 +24,21 @@ const LoginForm = ({ onSubmit, onGoogleLogin, isLoading }) => {
     setMessage("");
 
     if (!email.trim()) {
-      setError("Email không được để trống!");
+      setError(t('auth.login_err_empty_email'));
       return;
     }
     if (!validateEmail(email)) {
-      setError("Định dạng email không hợp lệ!");
+      setError(t('auth.login_err_invalid_email'));
       return;
     }
     if (!matKhau.trim()) {
-      setError("Mật khẩu không được để trống!");
+      setError(t('auth.login_err_empty_password'));
       return;
     }
 
     try {
       await onSubmit({ email, matKhau });
-      setMessage("🎉 Đăng nhập thành công!");
+      setMessage(`🎉 ${t('auth.login_success')}`);
       setEmail("");
       setMatKhau("");
 
@@ -46,7 +46,7 @@ const LoginForm = ({ onSubmit, onGoogleLogin, isLoading }) => {
         navigate("/");
       }, 1500);
     } catch (err) {
-      setError(`❌ ${err.message || "Đã có lỗi xảy ra. Vui lòng thử lại."}`);
+      setError(`❌ ${err.message || t('auth.login_error')}`);
     }
   };
 
@@ -108,7 +108,7 @@ const LoginForm = ({ onSubmit, onGoogleLogin, isLoading }) => {
         <div className="flex justify-between items-center">
           <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
             <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
-            <span>Ghi nhớ đăng nhập</span>
+            <span>{t('auth.remember_me')}</span>
           </label>
           <a href="/quen-mat-khau" className="text-sm text-blue-600 hover:text-blue-700 font-medium hover:underline">
             {t('auth.forgot_password')}
@@ -170,10 +170,10 @@ const LoginForm = ({ onSubmit, onGoogleLogin, isLoading }) => {
           className="w-full py-3.5 bg-white border-2 border-slate-200 rounded-2xl text-sm font-bold text-slate-700 flex items-center justify-center gap-3 transition-all hover:border-slate-300 hover:bg-slate-50 hover:-translate-y-px hover:shadow-lg"
         >
           <svg className="w-5 h-5" viewBox="0 0 48 48">
-            <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z" />
-            <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z" />
-            <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z" />
-            <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C44.438,36.338,48,30.638,48,24c0-2.659-0.238-5.35-0.689-7.917H43.611z" />
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
           </svg>
           <span>{t('auth.login_google')}</span>
         </button>

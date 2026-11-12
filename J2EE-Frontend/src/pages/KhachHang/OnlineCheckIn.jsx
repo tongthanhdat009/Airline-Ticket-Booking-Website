@@ -38,7 +38,7 @@ function OnlineCheckIn() {
     } catch (err) {
       console.error("Search error:", err);
       if (err.response?.status === 429) {
-        setError("Bạn đã gửi quá nhiều yêu cầu. Vui lòng đợi một lát rồi thử lại.");
+        setError(t('pages.online_checkin.error_too_many'));
       } else {
         setError(err.response?.data?.message || t('pages.online_checkin.error_connection'));
       }
@@ -62,7 +62,7 @@ function OnlineCheckIn() {
     } catch (err) {
       console.error("Check-in error:", err);
       if (err.response?.status === 429) {
-        setError("Bạn đã gửi quá nhiều yêu cầu. Vui lòng đợi một lát rồi thử lại.");
+        setError(t('pages.online_checkin.error_too_many'));
       } else {
         setError(err.response?.data?.message || t('pages.online_checkin.error_connection'));
       }

@@ -1,7 +1,10 @@
 import { useRef, useState, useEffect, useMemo} from "react";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
+import { useTranslation } from 'react-i18next';
 
 function DanhSachNgayBay({ ngayChon, onSelect = () => {} }) {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
   const soNgay = 30;
   const soHienThi = 5;
   const itemWidth = 110;
@@ -16,13 +19,13 @@ function DanhSachNgayBay({ ngayChon, onSelect = () => {} }) {
       const d = new Date(startDate);
       d.setDate(startDate.getDate() + i);
       return {
-        weekday: d.toLocaleDateString("vi-VN", { weekday: "long" }),
+        weekday: d.toLocaleDateString(locale, { weekday: "long" }),
         day: d.getDate(),
         month: d.getMonth() + 1,
         dateStr: d.toISOString().split("T")[0],
       };
     });
-  }, [startDate]);
+  }, [startDate, locale]);
 
   const totalItemWidth = itemWidth + gap;
   const leadingPlaceholders = 2;
@@ -113,7 +116,7 @@ function DanhSachNgayBay({ ngayChon, onSelect = () => {} }) {
               {d.weekday}
             </div>
             <div className="text-sm select-none">
-              {d.day} tháng {d.month}
+              {t('booking.date_strip.day_month', { day: d.day, month: d.month })}
             </div>
           </div>
         ))}

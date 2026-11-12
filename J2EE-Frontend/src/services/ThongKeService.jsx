@@ -108,6 +108,26 @@ const ThongKeService = {
         }
     },
 
+    // Xuất báo cáo Excel từ backend (xlsx)
+    // type: doanh_thu | hanh_khach | chuyen_bay | tong_hop
+    exportExcel: async (startDate, endDate, type = 'tong_hop') => {
+        try {
+            const params = { type };
+            if (startDate) params.startDate = startDate;
+            if (endDate) params.endDate = endDate;
+
+            const response = await apiClient.get('/admin/dashboard/thongke/export-excel', {
+                params,
+                responseType: 'blob' // Quan trọng: để nhận file binary
+            });
+
+            return response.data;
+        } catch (error) {
+            console.error('Error exporting Excel:', error);
+            throw error;
+        }
+    },
+
     // ========================================
     // CAC API MOI - BO SUNG
     // ========================================

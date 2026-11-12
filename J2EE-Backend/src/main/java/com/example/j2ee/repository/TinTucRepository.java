@@ -11,6 +11,21 @@ import org.springframework.data.repository.query.Param;
 
 public interface TinTucRepository extends JpaRepository<TinTuc, Integer> {
 
+    /**
+     * Kiểm tra tiêu đề đã tồn tại chưa (dedup chính xác khi crawl)
+     */
+    boolean existsByTieuDe(String tieuDe);
+
+    /**
+     * Tin da xuat ban, moi nhat truoc (trang customer, khong can dang nhap).
+     */
+    List<TinTuc> findByTrangThaiOrderByMaTinTucDesc(String trangThai);
+
+    /**
+     * Lấy tin mới nhất để so trùng mờ (dedup) khi crawl
+     */
+    List<TinTuc> findTop200ByOrderByMaTinTucDesc();
+
     // ==================== SOFT DELETE METHODS ====================
     /**
      * Tìm tất cả tin tức bao gồm cả đã xóa mềm
@@ -44,3 +59,4 @@ public interface TinTucRepository extends JpaRepository<TinTuc, Integer> {
     @Query(value = "DELETE FROM tin_tuc WHERE matintuc = :id", nativeQuery = true)
     void hardDeleteById(@Param("id") int id);
 }
+

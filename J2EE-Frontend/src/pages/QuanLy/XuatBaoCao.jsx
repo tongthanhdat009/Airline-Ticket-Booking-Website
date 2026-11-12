@@ -180,6 +180,22 @@ const XuatBaoCao = () => {
  setIsExporting(true);
 
  try {
+ if (exportFormat === 'excel') {
+ // Xuất Excel đúng loại báo cáo đã chọn
+ const excelBlob = await ThongKeService.exportExcel(tuNgay, denNgay, selectedReportType);
+ const url = window.URL.createObjectURL(new Blob([excelBlob], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+ const link = document.createElement('a');
+ link.href = url;
+ const typeLabel = reportTypes.find(r => r.key === selectedReportType)?.label || 'BaoCao';
+ const safeLabel = String(typeLabel).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+ link.setAttribute('download', `${safeLabel}_${tuNgay}_${denNgay}.xlsx`);
+ document.body.appendChild(link);
+ link.click();
+ link.remove();
+ window.URL.revokeObjectURL(url);
+ showToast(`Đã xuất ${typeLabel} định dạng Excel thành công!`, 'success');
+ return;
+ }
  if (selectedReportType === 'doanh_thu' || selectedReportType === 'tong_hop') {
  // Xuất PDF thông qua ThongKeService
  const pdfBlob = await ThongKeService.exportPdf(tuNgay, denNgay);

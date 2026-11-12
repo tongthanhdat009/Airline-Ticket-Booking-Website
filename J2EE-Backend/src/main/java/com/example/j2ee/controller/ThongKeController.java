@@ -13,6 +13,9 @@ import com.example.j2ee.dto.ThongKeKhungGioDTO;
 import com.example.j2ee.dto.ThongKeTyLeChuyenDoiDTO;
 import com.example.j2ee.dto.ThongKeSoSanhCungKyDTO;
 import com.example.j2ee.annotation.RequirePermission;
+import com.example.j2ee.model.HanhKhach;
+import com.example.j2ee.service.ExcelExportService;
+import com.example.j2ee.service.HanhKhachService;
 import com.example.j2ee.service.JasperRevenueReportService;
 import com.example.j2ee.service.ThongKeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +40,16 @@ public class ThongKeController {
 
     private final ThongKeService thongKeService;
     private final JasperRevenueReportService jasperRevenueReportService;
+    private final ExcelExportService excelExportService;
+    private final HanhKhachService hanhKhachService;
 
     @Autowired
-    public ThongKeController(ThongKeService thongKeService, @Lazy JasperRevenueReportService jasperRevenueReportService) {
+    public ThongKeController(ThongKeService thongKeService, @Lazy JasperRevenueReportService jasperRevenueReportService,
+                             ExcelExportService excelExportService, HanhKhachService hanhKhachService) {
         this.thongKeService = thongKeService;
         this.jasperRevenueReportService = jasperRevenueReportService;
+        this.excelExportService = excelExportService;
+        this.hanhKhachService = hanhKhachService;
     }
 
     /**
@@ -198,6 +206,68 @@ public class ThongKeController {
             headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
 
             return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        } catch (Exception ex) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    /**
+     * GET: /admin/dashboard/thongke/export-excel
+     * Xuất báo cáo thống kê ra file Excel (xlsx).
+     * type: doanh_thu | hanh_khach | chuyen_bay | tong_hop (mặc định tong_hop)
+     */
+    @GetMapping("/export-excel")
+    @RequirePermission(feature = "REPORT", action = "EXPORT")
+    public ResponseEntity<byte[]> exportStatisticsToExcel(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false, defaultValue = "tong_hop") String type) {
+        try {
+            if (startDate == null) {
+                startDate = LocalDate.now().minusDays(29);
+            }
+            if (endDate == null) {
+                endDate = LocalDate.now();
+            }
+
+            ThongKeTongQuanDTO tongQuan = null;
+            List<ThongKeDoanhThuNgayDTO> doanhThuNgay = null;
+            List<ThongKeChangBayDTO> topChangBay = null;
+            List<ThongKeHangVeDTO> hangVe = null;
+            List<ThongKeTrangThaiDonHangDTO> trangThaiDonHang = null;
+            List<HanhKhach> hanhKhach = null;
+
+            switch (type) {
+                case "doanh_thu":
+                    tongQuan = thongKeService.getThongKeTongQuan(startDate, endDate);
+                    doanhThuNgay = thongKeService.getDoanhThuTheoNgay(startDate, endDate);
+                    break;
+                case "hanh_khach":
+                    hanhKhach = hanhKhachService.getAllHanhKhach();
+                    break;
+                case "chuyen_bay":
+                    tongQuan = thongKeService.getThongKeTongQuan(startDate, endDate);
+                    topChangBay = thongKeService.getTopChangBay(startDate, endDate, 20);
+                    break;
+                case "tong_hop":
+                default:
+                    tongQuan = thongKeService.getThongKeTongQuan(startDate, endDate);
+                    doanhThuNgay = thongKeService.getDoanhThuTheoNgay(startDate, endDate);
+                    hangVe = thongKeService.getDoanhThuTheoHangVe(startDate, endDate);
+                    trangThaiDonHang = thongKeService.getThongKeTrangThaiDonHang(startDate, endDate);
+                    break;
+            }
+
+            byte[] excelBytes = excelExportService.exportThongKeToExcel(
+                    tongQuan, doanhThuNgay, topChangBay, hangVe, trangThaiDonHang, hanhKhach);
+
+            String fileName = "bao-cao-" + type + "-" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + ".xlsx";
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+            headers.setContentDispositionFormData("attachment", fileName);
+            headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+
+            return new ResponseEntity<>(excelBytes, headers, HttpStatus.OK);
         } catch (Exception ex) {
             return ResponseEntity.status(500).body(null);
         }

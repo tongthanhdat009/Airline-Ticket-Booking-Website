@@ -34,7 +34,7 @@ public class AdvisorChatController {
     public ResponseEntity<ApiResponse<AdvisorChatResponse>> chat(
             @Valid @RequestBody AdvisorChatRequest request) {
         AdvisorChatService.AdvisorReply reply = advisorChatService.ask(
-                request.getMessage(), request.getHistory());
+                request.getMessage(), request.getHistory(), request.getLanguage());
         return ResponseEntity.ok(ApiResponse.success(
                 "Tư vấn thành công",
                 new AdvisorChatResponse(reply.reply(), reply.model())));
@@ -45,7 +45,7 @@ public class AdvisorChatController {
      */
     @PostMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> chatStream(@Valid @RequestBody AdvisorChatRequest request) {
-        return advisorChatService.streamAsk(request.getMessage(), request.getHistory());
+        return advisorChatService.streamAsk(request.getMessage(), request.getHistory(), request.getLanguage());
     }
 
     @Getter
@@ -57,6 +57,12 @@ public class AdvisorChatController {
 
         @Size(max = 20, message = "Lịch sử tối đa 20 turns")
         private List<AdvisorChatService.ChatTurn> history;
+
+        /**
+         * Ngôn ngữ trả lời mong muốn ("vi" hoặc "en", mặc định "vi").
+         * Frontend gửi kèm theo ngôn ngữ web đang chọn.
+         */
+        private String language;
     }
 
     public record AdvisorChatResponse(String reply, String model) {}

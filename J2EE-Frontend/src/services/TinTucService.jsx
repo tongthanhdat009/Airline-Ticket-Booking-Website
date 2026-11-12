@@ -1,6 +1,7 @@
 import apiClient from "./apiClient";
 
 const BASE_URL = "/admin/dashboard/tintuc";
+const CLIENT_BASE_URL = "/tintuc";
 
 /**
  * Service cho Quản lý Tin tức
@@ -22,13 +23,11 @@ const TinTucService = {
   },
 
   /**
-   * Lấy tin tức theo ID
-   * @param {number} id - ID của tin tức
-   * @returns {Promise<Object>} Thông tin tin tức
+   * Lấy chi tiết 1 tin đã xuất bản (trang khách hàng, không cần đăng nhập admin).
    */
-  getById: async (id) => {
+  getPublishedById: async (id) => {
     try {
-      const response = await apiClient.get(`${BASE_URL}/${id}`);
+      const response = await apiClient.get(`${CLIENT_BASE_URL}/${id}`);
       return response.data.data;
     } catch (error) {
       console.error(`Lỗi khi lấy tin tức ${id}:`, error);
@@ -98,16 +97,28 @@ const TinTucService = {
   },
 
   /**
-   * Tăng lượt xem
-   * @param {number} id - ID của tin tức
-   * @returns {Promise<Object>} Tin tức đã cập nhật
+   * Tăng lượt xem (trang khách hàng, không cần đăng nhập admin).
    */
   incrementView: async (id) => {
     try {
-      const response = await apiClient.patch(`${BASE_URL}/${id}/increment-view`);
+      const response = await apiClient.post(`${CLIENT_BASE_URL}/${id}/view`);
       return response.data.data;
     } catch (error) {
       console.error(`Lỗi khi tăng lượt xem ${id}:`, error);
+      throw error;
+    }
+  },
+
+  /**
+   * Kích hoạt crawl tin tức ngay (RSS + LLM viết lại + dedup).
+   * @returns {Object} Tóm tắt {fetched, created, skippedDuplicate, failed}
+   */
+  crawlNow: async () => {
+    try {
+      const response = await apiClient.post(`${BASE_URL}/crawl-now`);
+      return response.data.data;
+    } catch (error) {
+      console.error("Lỗi khi crawl tin tức:", error);
       throw error;
     }
   },
@@ -138,6 +149,19 @@ const TinTucService = {
       return response.data.data;
     } catch (error) {
       console.error(`Lỗi khi lấy tin tức trạng thái ${trangThai}:`, error);
+      throw error;
+    }
+  },
+
+  /**
+   * Lấy tin đã xuất bản cho trang khách hàng (không cần đăng nhập admin).
+   */
+  getPublished: async () => {
+    try {
+      const response = await apiClient.get(`${CLIENT_BASE_URL}/published`);
+      return response.data.data;
+    } catch (error) {
+      console.error("Lỗi khi lấy tin tức đã xuất bản:", error);
       throw error;
     }
   },

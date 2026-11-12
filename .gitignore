@@ -18,6 +18,9 @@ logs/security/
 /deploy
 J2EE-Frontend/.env.production
 
+# Runtime uploads (ảnh dịch vụ do admin upload, không commit)
+J2EE-Backend/uploads/
+
 # Package managers: chuẩn pnpm, chặn npm lockfile gây nhiễu
 J2EE-Frontend/package-lock.json
 package-lock.json

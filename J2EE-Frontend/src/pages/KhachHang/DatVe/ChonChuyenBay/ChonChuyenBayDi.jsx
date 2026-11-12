@@ -15,7 +15,7 @@ import useTitle from '../../../../hooks/useTitle';
 
 function ChonChuyenBay() {
     const { t } = useTranslation();
-    useTitle('Chọn chuyến bay đi - Đặt vé máy bay | Airline Booking');
+    useTitle(t('booking.page_title_outbound'));
     const navigate = useNavigate();
     const location = useLocation();
     const [formData, setFormData] = useState(location.state);
@@ -214,7 +214,7 @@ function ChonChuyenBay() {
                         </div>
                     ):(
                         <div className="w-full flex justify-center items-center h-64">
-                        Không có chuyến bay
+                        {t('booking.no_flights')}
                         </div>
                     )}
                 </div>
@@ -238,7 +238,7 @@ function ChonChuyenBay() {
                     <span className="text-base md:text-xl">{t('common.total_price')}</span>
                     <span className="text-xl md:text-2xl font-bold">{selectedTuyenBayDi ? formatCurrencyWithCommas(calcTotalPrice())+ " VND" : "0 VND"}</span>
                 </div>
-                <span className="bg-linear-to-bl from-[#FF7043] to-[#F4511E] rounded-xl flex items-center justify-center px-6 md:px-10 py-2 text-black cursor-pointer" onClick={() => tiepTucOnClick()}>Đi tiếp</span>
+                <span className="bg-linear-to-bl from-[#FF7043] to-[#F4511E] rounded-xl flex items-center justify-center px-6 md:px-10 py-2 text-black cursor-pointer" onClick={() => tiepTucOnClick()}>{t('common.continue')}</span>
             </div>
             </div>
         </div>

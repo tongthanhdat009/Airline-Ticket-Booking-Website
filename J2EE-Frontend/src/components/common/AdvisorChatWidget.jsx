@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { FaTimes, FaPaperPlane, FaTrash, FaHeadset } from 'react-icons/fa';
@@ -6,18 +7,6 @@ import { sendAdvisorMessageStream } from '../../services/AdvisorChatService';
 
 const STORAGE_KEY = 'advisor_chat_history';
 const MAX_HISTORY_TURNS = 10;
-
-const WELCOME_MESSAGE = {
-  role: 'assistant',
-  content: 'Xin chào! Tôi là trợ lý AI của JadT Airline. Bạn cần hỗ trợ gì về đặt vé, hành lý, check-in hay khuyến mãi?',
-};
-
-const QUICK_QUESTIONS = [
-  'Cách đặt vé máy bay?',
-  'Hành lý được mang bao nhiêu kg?',
-  'Cách check-in online?',
-  'Chính sách hoàn/hủy vé?',
-];
 
 /**
  * Style các thẻ markdown trong bong bóng chat (react-markdown không render
@@ -66,8 +55,13 @@ const markdownComponents = {
  * Nút float góc phải dưới, mở panel chat, không cần đăng nhập hay nhập thông tin.
  */
 const AdvisorChatWidget = () => {
+  const { t, i18n } = useTranslation();
+  // Ngôn ngữ web đang chọn (vi|en) — gửi kèm mỗi request để LLM trả lời đúng ngôn ngữ.
+  const language = (i18n.language || 'vi').startsWith('en') ? 'en' : 'vi';
+  const welcomeMessage = { role: 'assistant', content: t('advisor.welcome'), welcome: true };
+  const quickQuestions = [t('advisor.q1'), t('advisor.q2'), t('advisor.q3'), t('advisor.q4')];
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([WELCOME_MESSAGE]);
+  const [messages, setMessages] = useState([welcomeMessage]);
   const [sending, setSending] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState(null);
@@ -95,7 +89,7 @@ const AdvisorChatWidget = () => {
   // Lưu lịch sử (bỏ qua khi chỉ còn tin chào)
   useEffect(() => {
     try {
-      if (messages.length === 1 && messages[0] === WELCOME_MESSAGE) return;
+      if (messages.length === 1 && messages[0].welcome) return;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-MAX_HISTORY_TURNS)));
     } catch {
       // Bỏ qua lỗi quota localStorage
@@ -120,7 +114,7 @@ const AdvisorChatWidget = () => {
 
     const userMsg = { role: 'user', content };
     const history = messages
-      .filter((m) => m !== WELCOME_MESSAGE)
+      .filter((m) => !m.welcome && m.content?.trim())
       .slice(-MAX_HISTORY_TURNS)
       .map((m) => ({ role: m.role, content: m.content }));
     // Thêm chỗ trống cho câu trả lời, token stream sẽ điền dần vào đây.
@@ -141,7 +135,7 @@ const AdvisorChatWidget = () => {
     try {
       let acc = '';
       await sendAdvisorMessageStream(
-        { message: content, history },
+        { message: content, history, language },
         {
           onToken: (token) => {
             acc += token;
@@ -154,12 +148,12 @@ const AdvisorChatWidget = () => {
           },
         },
       );
-      if (!acc.trim()) throw new Error('empty');
+      if (!acc.trim()) throw new Error('advisor.err_empty');
     } catch (e) {
       console.error('Lỗi chat tư vấn:', e);
-      // Gỡ bubble trống, báo lỗi gọn
+      // Gỡ bubble trống, báo lỗi gọn (service ném i18n key + e.status nếu có)
       setMessages((prev) => prev.slice(0, -1));
-      setError(e.message || 'Không thể kết nối tới trợ lý AI. Vui lòng thử lại sau.');
+      setError(t(e.message || 'advisor.err_connect', { status: e.status, defaultValue: e.message || t('advisor.err_connect') }));
     } finally {
       sendingRef.current = false;
       setSending(false);
@@ -175,7 +169,7 @@ const AdvisorChatWidget = () => {
   };
 
   const handleClear = () => {
-    setMessages([WELCOME_MESSAGE]);
+    setMessages([{ role: 'assistant', content: t('advisor.welcome'), welcome: true }]);
     setError(null);
     localStorage.removeItem(STORAGE_KEY);
   };
@@ -195,26 +189,26 @@ const AdvisorChatWidget = () => {
                 <FaHeadset className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-[15px] leading-tight">Trợ lý đặt vé AI</h3>
+                <h3 className="font-bold text-[15px] leading-tight">{t('advisor.title')}</h3>
                 <p className="text-xs text-blue-100 flex items-center gap-1.5">
                   <span className="relative flex w-2 h-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75" />
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-300" />
                   </span>
-                  {sending ? 'Đang trả lời...' : 'Trực tuyến · JadT Airline'}
+                  {sending ? t('advisor.typing') : t('advisor.online')}
                 </p>
               </div>
               <button
                 onClick={handleClear}
                 className="p-2 hover:bg-white/20 rounded-xl transition-colors"
-                title="Xóa lịch sử chat"
+                title={t('advisor.clear_history')}
               >
                 <FaTrash className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setIsOpen(false)}
                 className="p-2 hover:bg-white/20 rounded-xl transition-colors"
-                title="Đóng chat"
+                title={t('advisor.close_chat')}
               >
                 <FaTimes className="w-4 h-4" />
               </button>
@@ -261,7 +255,7 @@ const AdvisorChatWidget = () => {
             {/* Gợi ý câu hỏi nhanh */}
             {showQuickQuestions && (
               <div className="flex flex-wrap gap-2 pl-9">
-                {QUICK_QUESTIONS.map((q) => (
+                {quickQuestions.map((q) => (
                   <button
                     key={q}
                     onClick={() => doSend(q)}
@@ -308,7 +302,7 @@ const AdvisorChatWidget = () => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Hỏi về vé, hành lý, check-in..."
+                placeholder={t('advisor.input_placeholder')}
                 rows={1}
                 maxLength={2000}
                 className="flex-1 resize-none bg-transparent px-2.5 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none max-h-20 overflow-y-auto"
@@ -317,8 +311,9 @@ const AdvisorChatWidget = () => {
               <button
                 onClick={() => doSend(inputValue)}
                 disabled={!inputValue.trim() || sending}
+                aria-label={t('advisor.send_message')}
                 className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0 shadow-md shadow-blue-200"
-                title="Gửi tin nhắn"
+                title={t('advisor.send_message')}
               >
                 {sending ? (
                   <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
@@ -331,7 +326,7 @@ const AdvisorChatWidget = () => {
               </button>
             </div>
             <p className="text-[10px] text-slate-400 mt-1.5 px-1 text-center">
-              Trợ lý AI chỉ tư vấn trong phạm vi dịch vụ hàng không
+              {t('advisor.disclaimer')}
             </p>
           </div>
         </div>
@@ -341,7 +336,7 @@ const AdvisorChatWidget = () => {
       <button
         onClick={() => setIsOpen((prev) => !prev)}
         className="group fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex items-center gap-2 bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-500 hover:from-blue-800 hover:to-cyan-600 text-white rounded-full shadow-[0_10px_30px_rgba(37,99,235,0.45)] hover:shadow-[0_14px_36px_rgba(37,99,235,0.55)] hover:scale-105 transition-all duration-200 pl-4 pr-4 sm:pl-5 sm:pr-6 py-3 sm:py-3.5"
-        aria-label="Mở chat tư vấn AI"
+        aria-label={isOpen ? t('advisor.close_chat') : t('advisor.ask_ai')}
       >
         {isOpen ? (
           <FaTimes className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -351,7 +346,7 @@ const AdvisorChatWidget = () => {
               <FaHeadset className="w-5 h-5 sm:w-6 sm:h-6" />
               <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-blue-600" />
             </span>
-            <span className="text-sm font-semibold whitespace-nowrap">Hỏi đáp AI</span>
+            <span className="text-sm font-semibold whitespace-nowrap">{t('advisor.ask_ai')}</span>
           </>
         )}
       </button>

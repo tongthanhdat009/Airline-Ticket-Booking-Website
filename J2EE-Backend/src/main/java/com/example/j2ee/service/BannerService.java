@@ -115,6 +115,16 @@ public class BannerService {
         return true;
     }
 
+    /**
+     * Cập nhật thứ tự hiển thị banner
+     */
+    public Banner updateThuTu(int id, int thuTu) {
+        Banner banner = bannerRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Banner không tồn tại"));
+        banner.setThuTu(thuTu);
+        return bannerRepository.save(banner);
+    }
+
     // ==================== BUSINESS QUERY METHODS ====================
 
     /**

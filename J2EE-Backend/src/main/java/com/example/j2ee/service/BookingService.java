@@ -62,6 +62,10 @@ public class BookingService {
             throw new IllegalArgumentException("Vui lòng cung cấp thông tin hành khách");
         }
 
+        if (request.getTotalAmount() == null || request.getTotalAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Tổng tiền không hợp lệ");
+        }
+
         if (request.getFlightInfo() == null || request.getFlightInfo().getOutbound() == null) {
             throw new IllegalArgumentException("Vui lòng cung cấp thông tin chuyến bay");
         }
@@ -156,7 +160,7 @@ public class BookingService {
                 ApplyCouponRequest couponRequest = new ApplyCouponRequest();
                 couponRequest.setMaKM(request.getMaKhuyenMai());
                 couponRequest.setDanhSachMaDatCho(danhSachMaDatCho);
-                khuyenMaiService.applyCouponNewTx(couponRequest);
+                khuyenMaiService.applyCoupon(couponRequest);
                 logger.info("Đã áp dụng mã khuyến mãi {} cho đơn hàng {}", request.getMaKhuyenMai(), donHang.getPnr());
             } catch (Exception e) {
                 logger.warn("Không thể áp dụng mã khuyến mãi {}: {}", request.getMaKhuyenMai(), e.getMessage());

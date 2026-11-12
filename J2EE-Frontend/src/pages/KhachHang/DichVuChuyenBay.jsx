@@ -304,6 +304,10 @@ function DichVuChuyenBay() {
                           <img
                             src={getServiceImageUrl(service.anh)}
                             alt={service.tenDichVu}
+                        loading="lazy"
+                        decoding="async"
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-contain"
                           />
                         </div>
@@ -344,6 +348,10 @@ function DichVuChuyenBay() {
                                 <img
                                   src={getServiceOptionImageUrl(option.anh)}
                                   alt={option.tenLuaChon}
+                        loading="lazy"
+                        decoding="async"
+                                  loading="lazy"
+                                  decoding="async"
                                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                 />
                               </div>

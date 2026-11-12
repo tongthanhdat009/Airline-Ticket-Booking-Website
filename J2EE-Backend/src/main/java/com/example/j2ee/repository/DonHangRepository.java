@@ -1,6 +1,7 @@
 package com.example.j2ee.repository;
 
 import com.example.j2ee.model.DonHang;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -87,4 +89,21 @@ public interface DonHangRepository extends JpaRepository<DonHang, Integer>, JpaS
     @Modifying
     @Query(value = "DELETE FROM donhang WHERE madonhang = :id", nativeQuery = true)
     void hardDeleteById(@Param("id") int id);
+
+    // ==================== EXPORT CHO ODOO CONNECTOR ====================
+    /**
+     * Đơn đã thanh toán để xuất cho odoo-connector-service (batch reconcile).
+     * Lọc theo trạng thái đơn + thời điểm cập nhật (cursor 'since').
+     */
+    @EntityGraph(attributePaths = {
+            "danhSachDatCho",
+            "danhSachDatCho.chuyenBay",
+            "danhSachDatCho.hangVe",
+            "danhSachDatCho.danhSachDichVu",
+            "danhSachDatCho.danhSachDichVu.luaChonDichVu",
+            "danhSachDatCho.danhSachKhuyenMai",
+            "trangThaiThanhToan"
+    })
+    @Query("select distinct d from DonHang d where d.trangThai = :status and d.updatedAt > :since order by d.updatedAt")
+    List<DonHang> findPaidForExport(@Param("status") String status, @Param("since") LocalDateTime since);
 }

@@ -32,6 +32,7 @@ public class ThanhToanThuongService {
     private final JasperTicketService jasperTicketService;
     private final EmailService emailService;
     private final DonHangService donHangService;
+    private final OdooHookService odooHookService;
 
     @Auditable(action = "THANH_TOÁN_THƯỜNG", table = "trangthaithanhtoan",
                description = "Xác nhận thanh toán thường", accountType = "CUSTOMER")
@@ -63,6 +64,9 @@ public class ThanhToanThuongService {
 
         donHang.setTrangThai("ĐÃ THANH TOÁN");
         donHangRepository.save(donHang);
+        // ponytail: chạm LAZY danhSachDatCho trong @Transactional để firePaidAsync (chạy ngoài tx) khỏi LazyInitializationException
+        if (donHang.getDanhSachDatCho() != null) donHang.getDanhSachDatCho().size();
+        try { odooHookService.firePaidAsync(donHang, thanhToan); } catch (Exception ignored) {}
 
         try {
             HoaDon hoaDon = donHangService.taoHoaDon(donHang);

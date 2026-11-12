@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react"
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom"
 import Home from "./pages/KhachHang/TrangChu"
 import Admin, { AdminSidebarProvider } from "./pages/QuanLy/TrangChuAdmin"
@@ -8,51 +9,54 @@ import { LoginGuard, RegisterGuard, AdminLoginGuard } from "./components/common/
 import ScrollToTop from "./components/common/ScrollToTop"
 import ErrorBoundary from "./components/common/ErrorBoundary"
 
-import ThongKeDoanhThu from './pages/QuanLy/ThongKeDoanhThu';
-import QuanLyKhachHang from './pages/QuanLy/QuanLyKhachHang';
-import QuanLyTuyenBay from './pages/QuanLy/QuanLyTuyenBay';
-import QuanLyChuyenBay from './pages/QuanLy/QuanLyChuyenBay';
-import ThemChuyenBay from './pages/QuanLy/ChuyenBay/ThemChuyenBay';
-import SuaChuyenBay from './pages/QuanLy/ChuyenBay/SuaChuyenBay';
-import QuanLyDichVu from './pages/QuanLy/QuanLyDichVu';
-import QuanLySanBay from "./pages/QuanLy/QuanLySanBay"
-import QuanLyTKAdmin from "./pages/QuanLy/QuanLyTKAdmin"
-import QuanLyGiaBay from "./pages/QuanLy/QuanLyGiaBay"
-import QuanLyKhuyenMai from "./pages/QuanLy/QuanLyKhuyenMai"
-import QuanLyMayBay from "./pages/QuanLy/QuanLyMayBay"
-import QuanLyDonHang from "./pages/QuanLy/QuanLyDonHang"
-import QuanLyDatCho from "./pages/QuanLy/QuanLyDatCho"
-import QuanLyHoaDon from "./pages/QuanLy/QuanLyHoaDon"
-import QuanLyHoanTien from "./pages/QuanLy/QuanLyHoanTien"
-import QuanLyLichSuThaoTac from "./pages/QuanLy/QuanLyLichSuThaoTac"
-import QuanLyVaiTro from "./pages/QuanLy/QuanLyVaiTro"
-import QuanLyPhanQuyen from "./pages/QuanLy/QuanLyPhanQuyen"
-import QuanLyHangVe from "./pages/QuanLy/QuanLyHangVe"
-import ChinhSuaSoDoGhe from "./pages/QuanLy/ChinhSuaSoDoGhe"
-import XuatBaoCao from "./pages/QuanLy/XuatBaoCao"
-import DoiSoatGiaoDich from "./pages/QuanLy/DoiSoatGiaoDich"
-import QuanLyBannerTinTuc from "./pages/QuanLy/QuanLyBannerTinTuc"
-import DichVuChuyenBay from "./pages/KhachHang/DichVuChuyenBay"
-import DichVuKhac from "./pages/KhachHang/DichVuKhac"
-import TraCuuChuyenBay from "./pages/KhachHang/TraCuuChuyenBay"
-import OnlineCheckIn from "./pages/KhachHang/OnlineCheckIn"
-import SignupClient from "./pages/KhachHang/DangKy"
-import QuenMatKhau from "./pages/KhachHang/QuenMatKhau"
-// Khung chat tư vấn AI (AdvisorChatWidget) hiển thị ở trang chủ khách hàng
-import OAuth2Callback from "./pages/OAuth2Callback"
-import CaNhan from "./pages/KhachHang/CaNhan"
-import QuanLyChuyenBayClient from "./pages/KhachHang/QuanLyChuyenBay"
-import LichSuGiaoDich from "./pages/KhachHang/LichSuGiaoDich"
-import VerifyEmail from "./pages/KhachHang/VerifyEmail"
-import PaymentResult from "./pages/KhachHang/PaymentResult"
-import HoanThienThongTin from "./pages/KhachHang/HoanThienThongTin"
-import RequireCompleteProfile from "./components/common/RequireCompleteProfile"
+// Customer pages are lazy-loaded so the homepage ships minimal JS.
+// Home (trang chủ) stays eager; everything else splits into per-route chunks.
+const SignupClient = lazy(() => import("./pages/KhachHang/DangKy"));
+const QuenMatKhau = lazy(() => import("./pages/KhachHang/QuenMatKhau"));
+const OAuth2Callback = lazy(() => import("./pages/OAuth2Callback"));
+const CaNhan = lazy(() => import("./pages/KhachHang/CaNhan"));
+const QuanLyChuyenBayClient = lazy(() => import("./pages/KhachHang/QuanLyChuyenBay"));
+const LichSuGiaoDich = lazy(() => import("./pages/KhachHang/LichSuGiaoDich"));
+const VerifyEmail = lazy(() => import("./pages/KhachHang/VerifyEmail"));
+const PaymentResult = lazy(() => import("./pages/KhachHang/PaymentResult"));
+const HoanThienThongTin = lazy(() => import("./pages/KhachHang/HoanThienThongTin"));
+const TraCuuChuyenBay = lazy(() => import("./pages/KhachHang/TraCuuChuyenBay"));
+const OnlineCheckIn = lazy(() => import("./pages/KhachHang/OnlineCheckIn"));
+const DichVuChuyenBay = lazy(() => import("./pages/KhachHang/DichVuChuyenBay"));
+const DichVuKhac = lazy(() => import("./pages/KhachHang/DichVuKhac"));
+const TinTuc = lazy(() => import("./pages/KhachHang/TinTuc"));
+const TinTucChiTiet = lazy(() => import("./pages/KhachHang/TinTucChiTiet"));
+const ChonChuyenBay = lazy(() => import("./pages/KhachHang/DatVe/ChonChuyenBay/ChonChuyenBayDi"));
+const ChonChuyenBayVe = lazy(() => import("./pages/KhachHang/DatVe/ChonChuyenBay/ChonChuyenBayVe"));
+const NhapThongTin = lazy(() => import("./pages/KhachHang/DatVe/NhapThongTin"));
+const ChonDichVu = lazy(() => import("./pages/KhachHang/DatVe/ChonDichVu"));
+const ThanhToan = lazy(() => import("./pages/KhachHang/DatVe/ThanhToan"));
 
-import ChonChuyenBay from "./pages/KhachHang/DatVe/ChonChuyenBay/ChonChuyenBayDi"
-import ChonChuyenBayVe from "./pages/KhachHang/DatVe/ChonChuyenBay/ChonChuyenBayVe"
-import NhapThongTin from "./pages/KhachHang/DatVe/NhapThongTin"
-import ChonDichVu from "./pages/KhachHang/DatVe/ChonDichVu"
-import ThanhToan from "./pages/KhachHang/DatVe/ThanhToan"
+const ThongKeDoanhThu = lazy(() => import('./pages/QuanLy/ThongKeDoanhThu'));
+const QuanLyKhachHang = lazy(() => import('./pages/QuanLy/QuanLyKhachHang'));
+const QuanLyTuyenBay = lazy(() => import('./pages/QuanLy/QuanLyTuyenBay'));
+const QuanLyChuyenBay = lazy(() => import('./pages/QuanLy/QuanLyChuyenBay'));
+const ThemChuyenBay = lazy(() => import('./pages/QuanLy/ChuyenBay/ThemChuyenBay'));
+const SuaChuyenBay = lazy(() => import('./pages/QuanLy/ChuyenBay/SuaChuyenBay'));
+const QuanLyDichVu = lazy(() => import('./pages/QuanLy/QuanLyDichVu'));
+const QuanLySanBay = lazy(() => import("./pages/QuanLy/QuanLySanBay"));
+const QuanLyTKAdmin = lazy(() => import("./pages/QuanLy/QuanLyTKAdmin"));
+const QuanLyGiaBay = lazy(() => import("./pages/QuanLy/QuanLyGiaBay"));
+const QuanLyKhuyenMai = lazy(() => import("./pages/QuanLy/QuanLyKhuyenMai"));
+const QuanLyMayBay = lazy(() => import("./pages/QuanLy/QuanLyMayBay"));
+const QuanLyDonHang = lazy(() => import("./pages/QuanLy/QuanLyDonHang"));
+const QuanLyDatCho = lazy(() => import("./pages/QuanLy/QuanLyDatCho"));
+const QuanLyHoaDon = lazy(() => import("./pages/QuanLy/QuanLyHoaDon"));
+const QuanLyHoanTien = lazy(() => import("./pages/QuanLy/QuanLyHoanTien"));
+const QuanLyLichSuThaoTac = lazy(() => import("./pages/QuanLy/QuanLyLichSuThaoTac"));
+const QuanLyVaiTro = lazy(() => import("./pages/QuanLy/QuanLyVaiTro"));
+const QuanLyPhanQuyen = lazy(() => import("./pages/QuanLy/QuanLyPhanQuyen"));
+const QuanLyHangVe = lazy(() => import("./pages/QuanLy/QuanLyHangVe"));
+const ChinhSuaSoDoGhe = lazy(() => import("./pages/QuanLy/ChinhSuaSoDoGhe"));
+const XuatBaoCao = lazy(() => import("./pages/QuanLy/XuatBaoCao"));
+const DoiSoatGiaoDich = lazy(() => import("./pages/QuanLy/DoiSoatGiaoDich"));
+const QuanLyBannerTinTuc = lazy(() => import("./pages/QuanLy/QuanLyBannerTinTuc"));
+import RequireCompleteProfile from "./components/common/RequireCompleteProfile"
 import Navbar from "./components/common/Navbar"
 
 function AppContent() {
@@ -62,6 +66,7 @@ function AppContent() {
     <>
       {showNavbar && <Navbar />}
       <main>
+        <Suspense fallback={<div className="p-8 text-center text-gray-500">Đang tải…</div>}>
         <Routes>
           {/*public Routes */}
           <Route path="/" element={<Home />} />
@@ -93,6 +98,8 @@ function AppContent() {
           <Route path="/online-check-in" element={<OnlineCheckIn/>}/>
           <Route path="/dich-vu-chuyen-bay" element={<DichVuChuyenBay/>}/>
           <Route path="/dich-vu-khac" element={<DichVuKhac/>}/>
+          <Route path="/tin-tuc" element={<TinTuc/>}/>
+          <Route path="/tin-tuc/:id" element={<TinTucChiTiet/>}/>
           {/* /ho-tro route removed - live chat widget is available on all pages */}
           
           {/* Trang cá nhân - Yêu cầu hoàn thiện thông tin */}
@@ -166,6 +173,7 @@ function AppContent() {
             <Route path="BannerTinTuc" element={<QuanLyBannerTinTuc />} />
           </Route>
         </Routes>
+        </Suspense>
       </main>
     </>
   )

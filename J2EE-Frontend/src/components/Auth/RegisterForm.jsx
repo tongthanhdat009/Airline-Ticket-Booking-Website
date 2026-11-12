@@ -4,13 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { validatePassword, validateBirthDate, calculateAge } from '../../services/validationService';
 import apiClient from '../../services/apiClient';
-import { isValidVnPhone, VN_PHONE_MESSAGE, VN_PHONE_MAX_LENGTH } from '../../utils/phoneValidation';
+import { isValidVnPhone, VN_PHONE_MAX_LENGTH } from '../../utils/phoneValidation';
 
-// Steps configuration
+// Steps configuration (titles via t('register.step<id>'))
 const STEPS = [
-  { id: 1, title: 'Thông tin cá nhân', icon: '👤' },
-  { id: 2, title: 'Liên hệ', icon: '📞' },
-  { id: 3, title: 'Bảo mật', icon: '🔒' }
+  { id: 1, icon: '👤' },
+  { id: 2, icon: '📞' },
+  { id: 3, icon: '🔒' }
 ];
 
 // Debounce hook
@@ -162,24 +162,24 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
       else {
         const birthDateValidation = validateBirthDate(ngaySinh);
         if (!birthDateValidation.valid) {
-          errors.ngaySinh = birthDateValidation.error;
+          errors.ngaySinh = t(birthDateValidation.error, { age: birthDateValidation.age });
         }
       }
     } else if (step === 2) {
       if (!email.trim()) errors.email = t('validation.required');
       else if (!validateEmailFormat(email)) errors.email = t('validation.invalid_email');
-      else if (emailExists) errors.email = 'Email đã được sử dụng';
+      else if (emailExists) errors.email = t('register.email_used');
 
       if (!soDienThoai.trim()) errors.soDienThoai = t('validation.required');
-      else if (soDienThoai.trim().length > VN_PHONE_MAX_LENGTH) errors.soDienThoai = 'Số điện thoại tối đa 20 ký tự';
-      else if (!isValidVnPhone(soDienThoai)) errors.soDienThoai = VN_PHONE_MESSAGE;
-      else if (phoneExists) errors.soDienThoai = 'Số điện thoại đã được sử dụng';
+      else if (soDienThoai.trim().length > VN_PHONE_MAX_LENGTH) errors.soDienThoai = t('register.phone_max');
+      else if (!isValidVnPhone(soDienThoai)) errors.soDienThoai = t('register.phone_invalid');
+      else if (phoneExists) errors.soDienThoai = t('register.phone_used');
     } else if (step === 3) {
       if (!matKhau.trim()) errors.matKhau = t('validation.required');
-      else if (!passwordStrength.valid) errors.matKhau = passwordStrength.errors[0];
+      else if (!passwordStrength.valid) errors.matKhau = t(passwordStrength.errors[0]);
 
       if (!xacNhanMatKhau) errors.xacNhanMatKhau = t('validation.required');
-      else if (matKhau !== xacNhanMatKhau) errors.xacNhanMatKhau = 'Mật khẩu xác nhận không khớp';
+      else if (matKhau !== xacNhanMatKhau) errors.xacNhanMatKhau = t('register.confirm_mismatch');
     }
 
     setFieldErrors(errors);
@@ -214,7 +214,7 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
       await onSubmit(userData);
       setShowVerificationPrompt(true);
     } catch (err) {
-      setError(`❌ ${err.message || "Đã có lỗi xảy ra. Vui lòng thử lại."}`);
+      setError(`❌ ${err.message || t('register.submit_error')}`);
     }
   };
 
@@ -235,9 +235,9 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
 
   const getPasswordStrengthText = () => {
     if (!matKhau) return '';
-    if (passwordStrength.valid) return 'Mạnh';
-    if (passwordStrength.errors.length <= 1) return 'Trung bình';
-    return 'Yếu';
+    if (passwordStrength.valid) return t('register.strength_strong');
+    if (passwordStrength.errors.length <= 1) return t('register.strength_medium');
+    return t('register.strength_weak');
   };
 
   if (showVerificationPrompt) {
@@ -253,12 +253,12 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
               <span className="text-4xl">📧</span>
             </div>
           </motion.div>
-          <h3 className="text-2xl font-extrabold text-slate-800 mb-3">Xác thực email</h3>
+          <h3 className="text-2xl font-extrabold text-slate-800 mb-3">{t('register.verify_title')}</h3>
           <p className="text-sm text-slate-600 mb-2">
-            Gửi đến <strong className="text-blue-600">{email}</strong>
+            {t('register.verify_sent_to')} <strong className="text-blue-600">{email}</strong>
           </p>
           <p className="text-xs text-slate-500 mb-6">
-            Xác thực email giúp bảo mật tài khoản
+            {t('register.verify_desc')}
           </p>
 
           <AnimatePresence>
@@ -287,12 +287,12 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Đang gửi...
+                  {t('register.sending')}
                 </>
               ) : (
                 <>
                   <span>📩</span>
-                  Gửi xác thực
+                  {t('register.send_verify')}
                 </>
               )}
             </button>
@@ -306,13 +306,13 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
     <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 p-6 md:p-8">
       <div className="mb-6">
         <h1 className="text-2xl font-extrabold text-slate-800 mb-2">{t('common.register')}</h1>
-        <p className="text-sm text-slate-600">Bước {currentStep}/3 - {STEPS[currentStep - 1].title}</p>
+        <p className="text-sm text-slate-600">{t('register.step_of', { current: currentStep, title: t(`register.step${currentStep}`) })}</p>
       </div>
 
       {/* Progress Bar */}
       <div className="mb-6">
         <div className="flex justify-between mb-2">
-          <span className="text-xs font-medium text-slate-500">Tiến độ</span>
+          <span className="text-xs font-medium text-slate-500">{t('register.progress')}</span>
           <span className="text-xs font-bold text-blue-600">{Math.round((currentStep / 3) * 100)}%</span>
         </div>
         <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
@@ -366,7 +366,7 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
                 <div>
                   <label htmlFor="dob" className="block text-sm font-bold text-slate-700 mb-2">
                     {t('auth.dob')} <span className="text-red-500">*</span>
-                    <span className="text-slate-400 font-normal ml-2">(Từ 18 tuổi)</span>
+                    <span className="text-slate-400 font-normal ml-2">{t('register.age_hint')}</span>
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -390,7 +390,7 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
                   {fieldErrors.ngaySinh ? (
                     <p className="text-red-500 text-xs mt-1">{fieldErrors.ngaySinh}</p>
                   ) : ngaySinh ? (
-                    <p className="text-green-600 text-xs mt-1">Tuổi của bạn: {calculateAge(ngaySinh)} tuổi</p>
+                    <p className="text-green-600 text-xs mt-1">{t('register.your_age', { age: calculateAge(ngaySinh) })}</p>
                   ) : null}
                 </div>
               </div>
@@ -438,9 +438,9 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
                   {fieldErrors.email ? (
                     <p className="text-red-500 text-xs mt-1">{fieldErrors.email}</p>
                   ) : emailExists ? (
-                    <p className="text-orange-500 text-xs mt-1">Email đã được sử dụng</p>
+                    <p className="text-orange-500 text-xs mt-1">{t('register.email_used')}</p>
                   ) : checkingEmail ? (
-                    <p className="text-slate-400 text-xs mt-1">Đang kiểm tra email...</p>
+                    <p className="text-slate-400 text-xs mt-1">{t('register.checking_email')}</p>
                   ) : null}
                 </div>
 
@@ -488,9 +488,9 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
                   {fieldErrors.soDienThoai ? (
                     <p className="text-red-500 text-xs mt-1">{fieldErrors.soDienThoai}</p>
                   ) : phoneExists ? (
-                    <p className="text-orange-500 text-xs mt-1">Số điện thoại đã được sử dụng</p>
+                    <p className="text-orange-500 text-xs mt-1">{t('register.phone_used')}</p>
                   ) : checkingPhone ? (
-                    <p className="text-slate-400 text-xs mt-1">Đang kiểm tra số điện thoại...</p>
+                    <p className="text-slate-400 text-xs mt-1">{t('register.checking_phone')}</p>
                   ) : null}
                 </div>
               </div>
@@ -501,7 +501,7 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
               <div className="space-y-4">
                 <div>
                   <label htmlFor="password" className="block text-sm font-bold text-slate-700 mb-2">
-                    Mật khẩu <span className="text-red-500">*</span>
+                    {t('register.password_label')} <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -519,7 +519,7 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
                       className={`w-full pl-12 pr-12 py-3.5 bg-slate-50/50 border-2 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-slate-700 font-medium ${
                         fieldErrors.matKhau ? 'border-red-300' : 'border-slate-200'
                       }`}
-                      placeholder="Tối thiểu 8 ký tự, viết hoa đầu, có ký tự đặc biệt"
+                      placeholder={t('register.password_placeholder')}
                       autoComplete="new-password"
                     />
                     <button
@@ -535,7 +535,7 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
                   {matKhau && (
                     <div className="mt-2 p-3 bg-slate-50 rounded-xl">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-medium text-slate-600">Độ mạnh mật khẩu:</span>
+                        <span className="text-xs font-medium text-slate-600">{t('register.password_strength')}</span>
                         <div className="flex items-center gap-2">
                           <div className="h-1.5 w-16 bg-slate-200 rounded-full overflow-hidden">
                             <motion.div
@@ -554,9 +554,9 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
                       </div>
                       <ul className="space-y-1">
                         {[
-                          { text: 'Ít nhất 8 ký tự', valid: matKhau.length >= 8 },
-                          { text: 'Ký tự đầu viết hoa', valid: /^[A-Z]/.test(matKhau) },
-                          { text: 'Có ký tự đặc biệt (@#$%^&+=!)', valid: /[@#$%^&+=!]/.test(matKhau) }
+                          { text: t('register.req_len'), valid: matKhau.length >= 8 },
+                          { text: t('register.req_upper'), valid: /^[A-Z]/.test(matKhau) },
+                          { text: t('register.req_special'), valid: /[@#$%^&+=!]/.test(matKhau) }
                         ].map((req, idx) => (
                           <li key={idx} className="flex items-center gap-2 text-xs">
                             <span className={req.valid ? 'text-green-500' : 'text-slate-400'}>
@@ -592,7 +592,7 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
                       className={`w-full pl-12 pr-10 py-3.5 bg-slate-50/50 border-2 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-slate-700 font-medium ${
                         fieldErrors.xacNhanMatKhau ? 'border-red-300' : xacNhanMatKhau && matKhau === xacNhanMatKhau ? 'border-green-300' : 'border-slate-200'
                       }`}
-                      placeholder="Nhập lại mật khẩu"
+                      placeholder={t('register.confirm_placeholder')}
                       autoComplete="new-password"
                     />
                     {xacNhanMatKhau && matKhau === xacNhanMatKhau && (
@@ -604,7 +604,7 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
                   {fieldErrors.xacNhanMatKhau ? (
                     <p className="text-red-500 text-xs mt-1">{fieldErrors.xacNhanMatKhau}</p>
                   ) : xacNhanMatKhau && matKhau === xacNhanMatKhau ? (
-                    <p className="text-green-500 text-xs mt-1">Mật khẩu khớp</p>
+                    <p className="text-green-500 text-xs mt-1">{t('register.passwords_match')}</p>
                   ) : null}
                 </div>
               </div>
@@ -637,7 +637,7 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
               whileTap={{ scale: 0.98 }}
               className="px-6 py-3.5 bg-slate-100 text-slate-700 rounded-2xl font-bold hover:bg-slate-200 transition-all flex items-center gap-2"
             >
-              <span>←</span> Quay lại
+              <span>←</span> {t('register.back')}
             </motion.button>
           )}
           <motion.button
@@ -657,7 +657,7 @@ const RegisterForm = ({ onSubmit, onVerificationSent, isLoading: externalLoading
               </>
             ) : currentStep < 3 ? (
               <>
-                Tiếp tục <span>→</span>
+                {t('register.continue')} <span>→</span>
               </>
             ) : (
               <>

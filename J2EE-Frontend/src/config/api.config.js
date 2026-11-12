@@ -3,8 +3,10 @@
  * Sử dụng biến môi trường để dễ dàng deploy lên các môi trường khác nhau
  */
 
-// Lấy API Base URL từ biến môi trường, fallback về localhost khi phát triển
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+// Lấy API Base URL từ biến môi trường, fallback về localhost khi phát triển.
+// Base URL PHẢI bao gồm context path `/api` của backend (server.servlet.context-path=/api),
+// vì mọi endpoint gọi qua đây đều là path không có prefix (vd: /admin/dashboard/...).
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
 
 // Lấy WebSocket URL từ biến môi trường, fallback về localhost khi phát triển
 // IMPORTANT: Must include /api prefix because server.servlet.context-path=/api
@@ -41,9 +43,9 @@ export const getAssetUrl = (path) => {
     return path;
   }
 
-  // Development hoặc path không bắt đầu bằng /
+  // Development: Vite phục vụ thư mục public/ ở root, nên path giữ nguyên
   if (path.startsWith('/')) {
-    return `${API_BASE_URL}${path}`;
+    return path;
   }
   return `${API_BASE_URL}/${path}`;
 };

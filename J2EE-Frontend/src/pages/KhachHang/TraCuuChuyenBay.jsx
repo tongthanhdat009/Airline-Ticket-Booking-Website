@@ -299,7 +299,7 @@ function TraCuuChuyenBay() {
               <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-2xl mb-4">
                 {card.icon}
               </div>
-              <h3 className="font-bold text-slate-800 mb-2 text-lg">{card.title}</h3>
+              <h2 className="font-bold text-slate-800 mb-2 text-lg">{card.title}</h2>
               <p className="text-sm text-slate-500 leading-relaxed">{card.desc}</p>
             </motion.div>
           ))}

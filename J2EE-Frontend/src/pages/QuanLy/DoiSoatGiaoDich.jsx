@@ -540,14 +540,28 @@ const DoiSoatGiaoDich = () => {
 
  {/* Phân trang phía dưới */}
  {!loading && filteredData.length > 0 && Math.ceil(filteredData.length / itemsPerPage) > 1 && (
- <div className="flex justify-center mt-4">
- <nav>
- <ul className="flex gap-2">
- <li><button onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} className="px-3 py-1.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium">← Trước</button></li>
- {[...Array(Math.ceil(filteredData.length / itemsPerPage))].map((_, i) => (
- <li key={i}><button onClick={() => setCurrentPage(i + 1)} className={`px-3 py-1.5 rounded-lg text-sm font-medium ${currentPage === i + 1 ? 'bg-blue-600 text-white shadow' : 'bg-white border border-gray-300 hover:bg-gray-100'}`}>{i + 1}</button></li>
- ))}
- <li><button onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage === Math.ceil(filteredData.length / itemsPerPage)} className="px-3 py-1.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium">Sau →</button></li>
+ <div className="flex justify-center mt-4 px-2">
+ <nav className="max-w-full overflow-x-auto">
+ <ul className="flex gap-2 items-center whitespace-nowrap">
+ <li><button onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} className="px-3 py-1.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium shrink-0">← Trước</button></li>
+ {(() => {
+ const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+ const maxButtons = 5;
+ let start = 1;
+ if (totalPages > maxButtons) {
+ if (currentPage <= 3) start = 1;
+ else if (currentPage >= totalPages - 2) start = totalPages - maxButtons + 1;
+ else start = currentPage - 2;
+ }
+ const end = Math.min(totalPages, start + maxButtons - 1);
+ return [...Array(end - start + 1)].map((_, i) => {
+ const pageNum = start + i;
+ return (
+ <li key={pageNum}><button onClick={() => setCurrentPage(pageNum)} className={`px-3 py-1.5 rounded-lg text-sm font-medium shrink-0 ${currentPage === pageNum ? 'bg-blue-600 text-white shadow' : 'bg-white border border-gray-300 hover:bg-gray-100'}`}>{pageNum}</button></li>
+ );
+ });
+ })()}
+ <li><button onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage === Math.ceil(filteredData.length / itemsPerPage)} className="px-3 py-1.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium shrink-0">Sau →</button></li>
  </ul>
  </nav>
  </div>

@@ -83,13 +83,13 @@ function Navbar() {
       <div className="bg-slate-900 text-slate-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-1.5 flex justify-end items-center gap-4 text-[11px] sm:text-[12px] font-medium tracking-wide">
           <Link to="/" className="hover:text-white transition-colors flex items-center gap-1.5">
-            <span className="text-blue-400">🏠</span>
+            <span className="text-blue-300" aria-hidden="true">🏠</span>
             <span>{t('common.support')}</span>
           </Link>
 
           {isLoggedIn ? (
             <>
-              <span className="text-slate-600">|</span>
+              <span className="text-slate-400">|</span>
               <Link
                 to="/ca-nhan"
                 className="hover:text-white transition-colors flex items-center gap-1.5"
@@ -97,7 +97,7 @@ function Navbar() {
                 <span className="text-blue-400">👤</span>
                 <span className="font-semibold text-white">{userName}</span>
               </Link>
-              <span className="text-slate-600">|</span>
+              <span className="text-slate-400">|</span>
               <button
                 onClick={handleLogout}
                 className="hover:text-red-400 transition-colors font-semibold"
@@ -107,14 +107,14 @@ function Navbar() {
             </>
           ) : (
             <>
-              <span className="text-slate-600">|</span>
+              <span className="text-slate-400">|</span>
               <Link
                 to="/dang-ky-client"
                 className="hover:text-white transition-colors font-semibold"
               >
                 {t('common.register')}
               </Link>
-              <span className="text-slate-600">|</span>
+              <span className="text-slate-400">|</span>
               <Link
                 to="/dang-nhap-client"
                 className="hover:text-white transition-colors font-semibold"
@@ -124,12 +124,13 @@ function Navbar() {
             </>
           )}
 
-          <span className="text-slate-600">|</span>
+          <span className="text-slate-400">|</span>
           <div className="flex items-center gap-1.5">
-            <span className="text-blue-400">🌐</span>
+            <span className="text-blue-300">🌐</span>
             <select
               value={currentLanguage}
               onChange={handleLanguageChange}
+              aria-label="Chọn ngôn ngữ / Select language"
               className="bg-transparent text-slate-300 text-xs border border-slate-700 rounded-md px-2 py-1 focus:outline-none focus:border-slate-800 cursor-pointer hover:text-white transition-colors"
             >
               <option value="vi" className="bg-slate-800">Tiếng Việt</option>
@@ -182,6 +183,14 @@ function Navbar() {
               className="text-slate-700 no-underline font-bold text-[11px] uppercase tracking-wider hover:text-slate-900 transition-colors relative after:content-[''] after:absolute after:-bottom-1.5 after:left-0 after:w-0 after:h-0.5 after:bg-slate-900 hover:after:w-full after:transition-all after:duration-300"
             >
               {t('navbar.other_services')}
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/tin-tuc"
+              className="text-slate-700 no-underline font-bold text-[11px] uppercase tracking-wider hover:text-slate-900 transition-colors relative after:content-[''] after:absolute after:-bottom-1.5 after:left-0 after:w-0 after:h-0.5 after:bg-slate-900 hover:after:w-full after:transition-all after:duration-300"
+            >
+              {t('navbar.news')}
             </Link>
           </li>
         </ul>
@@ -303,6 +312,15 @@ function Navbar() {
                 onClick={closeMobileMenu}
               >
                 {t('navbar.other_services')}
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/tin-tuc"
+                className="block text-slate-800 py-3 px-4 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-colors font-bold uppercase text-sm tracking-wide"
+                onClick={closeMobileMenu}
+              >
+                {t('navbar.news')}
               </Link>
             </li>
           </ul>

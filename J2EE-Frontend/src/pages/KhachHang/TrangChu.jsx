@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import Footer from "../../components/common/Footer";
-import AdvisorChatWidget from "../../components/common/AdvisorChatWidget";
+const AdvisorChatWidget = lazy(() => import("../../components/common/AdvisorChatWidget"));
 import ProfileCompleteBanner from "../../components/common/ProfileCompleteBanner";
 import TimChuyenBayForm from '../../components/KhachHang/TimChuyenBayForm'
 import useTitle from '../../hooks/useTitle';
@@ -18,21 +18,21 @@ function TrangChu() {
   const slides = [
     {
       id: 1,
-      image: "/banner/1topbannerpc-1756961025580.jpg",
-      title: "Khám phá thế giới",
-      subtitle: "Cùng JadT Airline"
+      image: "/banner/jadt-hero-kham-pha.jpg",
+      title: t('home_page.hero_slide1_title'),
+      subtitle: t('home_page.hero_slide1_sub')
     },
     {
       id: 2,
-      image: "/banner/1websitetopbanner1920x960saleskybossvn-1761643850128.jpg",
-      title: "Trải nghiệm đẳng cấp",
-      subtitle: "Dịch vụ SkyBoss"
+      image: "/banner/jadt-hero-skyboss.jpg",
+      title: t('home_page.hero_slide2_title'),
+      subtitle: t('home_page.hero_slide2_sub')
     },
     {
       id: 3,
-      image: "/banner/4websitetopbanner1920x960salephilipinesob-1762138731074.jpg",
-      title: "Bay xa hơn nữa",
-      subtitle: "Ưu đãi ngập tràn"
+      image: "/banner/jadt-hero-uu-dai.jpg",
+      title: t('home_page.hero_slide3_title'),
+      subtitle: t('home_page.hero_slide3_sub')
     }
   ];
 
@@ -64,7 +64,7 @@ function TrangChu() {
   };
 
   return (
-    <div className="bg-[#F8FAFC] overflow-hidden">
+    <div className="bg-[#F8FAFC] overflow-x-clip">
       {/* Profile Complete Banner */}
       <ProfileCompleteBanner />
       
@@ -75,7 +75,7 @@ function TrangChu() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="relative isolate flex items-center gap-x-6 overflow-hidden bg-linear-to-r from-indigo-600 via-blue-600 to-indigo-600 px-6 py-3 sm:px-3.5 sm:before:flex-1 shadow-md z-50"
+            className="sticky top-0 isolate flex items-center gap-x-6 overflow-hidden bg-linear-to-r from-indigo-600 via-blue-600 to-indigo-600 px-6 py-3 sm:px-3.5 sm:before:flex-1 shadow-md z-50"
           >
             <div className="absolute left-[max(-7rem,calc(50%-52rem))] top-1/2 -z-10 -translate-y-1/2 transform-gpu blur-2xl" aria-hidden="true">
               <div className="aspect-[577/310] w-[36.0625rem] bg-linear-to-r from-cyan-400 to-blue-500 opacity-40" style={{ clipPath: 'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)' }}></div>
@@ -132,9 +132,9 @@ function TrangChu() {
             className="w-full lg:w-5/12 text-white space-y-6"
           >
             <div className="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-sm font-medium tracking-wider mb-2">
-              ✈️ JadT AIRLINE 2026
+              ✈️ {t('home_page.hero_badge')}
             </div>
-            <h1 className="text-5xl lg:text-7xl font-extrabold leading-tight tracking-tight">
+            <h1 className="text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight">
               <AnimatePresence mode="wait">
                 <motion.span
                   key={currentSlide}
@@ -150,7 +150,7 @@ function TrangChu() {
               <span className="block mt-2">{slides[currentSlide].subtitle}</span>
             </h1>
             <p className="text-lg text-slate-300 max-w-md leading-relaxed">
-              Trải nghiệm hành trình tuyệt vời với dịch vụ đẳng cấp, giá vé ưu đãi và hàng ngàn điểm đến hấp dẫn đang chờ đón bạn.
+              {t('home_page.hero_desc')}
             </p>
             
             {/* Custom Slider Controls */}
@@ -159,6 +159,7 @@ function TrangChu() {
                 <button
                   key={index}
                   onClick={() => setCurrentSlide(index)}
+                  aria-label={slides[index].title}
                   className={`h-2 rounded-full transition-all duration-500 ${
                     index === currentSlide
                       ? "w-12 bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.8)]"
@@ -176,7 +177,7 @@ function TrangChu() {
             transition={{ duration: 1, delay: 0.4 }}
             className="w-full lg:w-7/12"
           >
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2.5rem] p-6 lg:p-8 shadow-2xl relative overflow-hidden">
+            <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-6 lg:p-8 shadow-2xl relative overflow-hidden">
               {/* Decorative blur blobs inside form */}
               <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/30 rounded-full blur-3xl"></div>
               <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-cyan-500/30 rounded-full blur-3xl"></div>
@@ -234,15 +235,15 @@ function TrangChu() {
       >
         <div className="text-center mb-12">
           <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-black text-slate-800 mb-4 tracking-tight">
-            Ưu đãi <span className="text-blue-600">Độc Quyền</span>
+            {t('home_page.promo_section_title')} <span className="text-blue-600">{t('home_page.promo_section_highlight')}</span>
           </motion.h2>
-          <motion.p variants={fadeInUp} className="text-slate-500 text-lg max-w-2xl mx-auto">Khám phá những chương trình khuyến mãi hấp dẫn nhất chỉ có tại JadT Airline.</motion.p>
+          <motion.p variants={fadeInUp} className="text-slate-500 text-lg max-w-2xl mx-auto">{t('home_page.promo_section_desc')}</motion.p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[280px]">
           {/* Large Banner - Spans 2 columns on desktop */}
           <motion.div variants={fadeInUp} className="md:col-span-2 relative rounded-[2rem] overflow-hidden shadow-lg group">
-            <img src="/artboard/1200x600vn1647922449867-1695094342588.webp" alt="Promo" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <img src="/artboard/jadt-ve-may-bay.webp" alt="Promo" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
             <div className="absolute inset-0 bg-linear-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
             <div className="absolute bottom-0 left-0 p-8 w-full">
               <div className="inline-block px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full mb-3 uppercase tracking-wider">Hot Deal</div>
@@ -256,7 +257,7 @@ function TrangChu() {
 
           {/* Small Banner 1 */}
           <motion.div variants={fadeInUp} className="relative rounded-[2rem] overflow-hidden shadow-lg group">
-            <img src="/artboard/swift2471592284169014-1695094650429.webp" alt="Fast" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <img src="/artboard/jadt-swift.webp" alt="Fast" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
             <div className="absolute inset-0 bg-linear-to-t from-blue-900/90 to-transparent"></div>
             <div className="absolute bottom-0 left-0 p-6 w-full">
               <h3 className="text-xl font-bold text-white mb-2">{t('home_page.promo_fast_title')}</h3>
@@ -268,7 +269,7 @@ function TrangChu() {
 
           {/* Small Banner 2 */}
           <motion.div variants={fadeInUp} className="relative rounded-[2rem] overflow-hidden shadow-lg group">
-            <img src="/artboard/anhviber20240917110241588-1727233373363.jpg" alt="Card" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <img src="/artboard/jadt-hibank.webp" alt="Card" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
             <div className="absolute inset-0 bg-linear-to-t from-purple-900/90 to-transparent"></div>
             <div className="absolute bottom-0 left-0 p-6 w-full">
               <h3 className="text-xl font-bold text-white mb-2">{t('home_page.promo_card_title')}</h3>
@@ -280,13 +281,13 @@ function TrangChu() {
 
           {/* Small Banner 3 */}
           <motion.div variants={fadeInUp} className="md:col-span-2 relative rounded-[2rem] overflow-hidden shadow-lg group">
-            <img src="/artboard/artboard216418031278341695094349731-1715833806513.webp" alt="Hotel" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <img src="/artboard/jadt-hotel-combo.webp" alt="Hotel" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
             <div className="absolute inset-0 bg-linear-to-r from-slate-900/80 to-transparent"></div>
             <div className="absolute bottom-0 left-0 p-8 w-full h-full flex flex-col justify-center">
-              <h3 className="text-3xl font-bold text-white mb-2">Combo Khách Sạn & Vé Máy Bay</h3>
-              <p className="text-slate-200 mb-4 max-w-sm">Tiết kiệm lên đến 30% khi đặt trọn gói hành trình của bạn.</p>
+              <h3 className="text-3xl font-bold text-white mb-2">{t('home_page.promo_combo_title')}</h3>
+              <p className="text-slate-200 mb-4 max-w-sm">{t('home_page.promo_combo_desc')}</p>
               <button className="w-fit px-6 py-2.5 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-colors shadow-lg">
-                Khám phá ngay
+                {t('home_page.promo_combo_cta')}
               </button>
             </div>
           </motion.div>
@@ -369,14 +370,6 @@ function TrangChu() {
                 {t('home_page.popular_destinations_desc')}
               </p>
             </motion.div>
-            <motion.button 
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="px-6 py-3 rounded-full border border-slate-700 text-white hover:bg-white hover:text-slate-900 transition-colors font-medium whitespace-nowrap"
-            >
-              Xem tất cả điểm đến
-            </motion.button>
           </div>
 
           <motion.div 
@@ -398,7 +391,7 @@ function TrangChu() {
                 variants={fadeInUp}
                 className={`relative isolate flex flex-col justify-end overflow-hidden rounded-[2rem] bg-slate-800 group ${dest.span} min-h-[300px] lg:min-h-[400px]`}
               >
-                <img src={`/destination/${dest.img}`} alt={t(`home_page.destinations.${dest.id}.title`)} className="absolute inset-0 -z-10 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                <img src={`/destination/${dest.img}`} alt={t(`home_page.destinations.${dest.id}.title`)} loading="lazy" decoding="async" className="absolute inset-0 -z-10 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div className="absolute inset-0 -z-10 bg-linear-to-t from-slate-900 via-slate-900/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
                 
                 <div className="absolute top-6 left-6">
@@ -490,8 +483,10 @@ function TrangChu() {
         </div>
       </div>
 
-      {/* Khung chat tư vấn AI */}
-      <AdvisorChatWidget />
+      {/* Khung chat tư vấn AI (lazy để nhẹ bundle trang chủ) */}
+      <Suspense fallback={null}>
+        <AdvisorChatWidget />
+      </Suspense>
 
       {/* Footer */}
       <Footer />

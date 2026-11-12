@@ -139,6 +139,11 @@ public class SecurityConfig {
                         // Public API endpoints (dropdown data, no auth required)
                         .requestMatchers("/sanbay/**").permitAll()
                         .requestMatchers("/hangve/**").permitAll()
+                        // Tin tức công khai cho trang customer (chỉ bài đã xuất bản)
+                        .requestMatchers(HttpMethod.GET, "/tintuc/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/tintuc/*/view").permitAll()
+                        // Export read-only cho odoo-connector-service (tự kiểm tra X-Source-Token trong controller)
+                        .requestMatchers("/internal/export/**").permitAll()
                         .anyRequest().authenticated()
                 )
 

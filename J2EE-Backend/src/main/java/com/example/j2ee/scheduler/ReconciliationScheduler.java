@@ -3,8 +3,10 @@ package com.example.j2ee.scheduler;
 import com.example.j2ee.dto.doi_soat.DoiSoatResponse;
 import com.example.j2ee.dto.doi_soat.RunReconciliationRequest;
 import com.example.j2ee.service.DoiSoatGiaoDichService;
+import com.example.j2ee.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +23,10 @@ import java.util.List;
 public class ReconciliationScheduler {
 
     private final DoiSoatGiaoDichService doiSoatGiaoDichService;
+    private final EmailService emailService;
+
+    @Value("${app.reconciliation.alert-email:}")
+    private String alertEmail;
 
     /**
      * Chạy đối soát tự động mỗi ngày lúc 2:00 AM
@@ -63,8 +69,16 @@ public class ReconciliationScheduler {
             // TODO: Gửi email thông báo cho kế toán nếu có giao dịch lệch
             if (unmatchedCount > 0) {
                 log.warn("CÓ {} GIAO DỊCH LỆCH CẦN XỬ LÝ!", unmatchedCount);
-                // Có thể tích hợp với EmailService ở đây
-                // emailService.sendReconciliationAlert(results, unmatchedCount);
+                if (alertEmail != null && !alertEmail.isBlank()) {
+                    try {
+                        emailService.sendReconciliationAlert(alertEmail, yesterday, unmatchedCount, results.size());
+                        log.info("Đã gửi mail cảnh báo đối soát tới {}", alertEmail);
+                    } catch (Exception e) {
+                        log.error("Gửi mail cảnh báo đối soát thất bại: {}", e.getMessage());
+                    }
+                } else {
+                    log.warn("Bỏ qua gửi mail cảnh báo: chưa cấu hình app.reconciliation.alert-email");
+                }
             } else {
                 log.info("TẤT CẢ GIAO DỊCH ĐỀU KHỚP!");
             }

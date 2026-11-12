@@ -22,28 +22,28 @@ export const checkPhoneExists = async (soDienThoai) => {
   }
 };
 
-// Validate mật khẩu mạnh
+// Validate mật khẩu mạnh — trả về i18n key (hiển thị bằng t(key) ở component)
 export const validatePassword = (password) => {
   const errors = [];
 
   if (!password) {
-    errors.push('Mật khẩu không được để trống');
+    errors.push('register.err_pw_empty');
     return { valid: false, errors };
   }
 
   // Ít nhất 8 ký tự
   if (password.length < 8) {
-    errors.push('Mật khẩu phải có ít nhất 8 ký tự');
+    errors.push('register.err_pw_len');
   }
 
   // Ký tự đầu tiên viết hoa
   if (!/^[A-Z]/.test(password)) {
-    errors.push('Ký tự đầu tiên phải viết hoa');
+    errors.push('register.err_pw_upper');
   }
 
   // Ít nhất 1 ký tự đặc biệt
   if (!/[@#$%^&+=!]/.test(password)) {
-    errors.push('Mật khẩu phải có ít nhất 1 ký tự đặc biệt (@#$%^&+=!)');
+    errors.push('register.err_pw_special');
   }
 
   return {
@@ -66,20 +66,20 @@ export const calculateAge = (birthDate) => {
   return age;
 };
 
-// Validate ngày sinh (>= 18 tuổi)
+// Validate ngày sinh (>= 18 tuổi) — error là i18n key, age dùng cho nội suy t(key, { age })
 export const validateBirthDate = (ngaySinh) => {
   if (!ngaySinh) {
-    return { valid: false, error: 'Ngày sinh không được để trống' };
+    return { valid: false, error: 'register.err_dob_empty' };
   }
 
   const age = calculateAge(ngaySinh);
 
   if (age < 18) {
-    return { valid: false, error: `Bạn phải từ 18 tuổi trở lên. Hiện tại bạn ${age} tuổi.` };
+    return { valid: false, error: 'register.err_dob_age', age };
   }
 
   if (age > 120) {
-    return { valid: false, error: 'Ngày sinh không hợp lệ' };
+    return { valid: false, error: 'register.err_dob_invalid' };
   }
 
   return { valid: true, age };

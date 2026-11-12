@@ -33,6 +33,24 @@ public class TinTucService {
         return tinTucRepository.findById(id).orElse(null);
     }
 
+    /**
+     * Tin đã xuất bản, mới nhất trước (trang customer, không cần đăng nhập).
+     */
+    public List<TinTuc> getPublishedTinTuc() {
+        return tinTucRepository.findByTrangThaiOrderByMaTinTucDesc("da_xuat_ban");
+    }
+
+    /**
+     * Chi tiết 1 tin đã xuất bản; tra ve null neu la ban nhap (khong lo thong tin chua duyet).
+     */
+    public TinTuc getPublishedById(int id) {
+        TinTuc tinTuc = tinTucRepository.findById(id).orElse(null);
+        if (tinTuc == null || !"da_xuat_ban".equals(tinTuc.getTrangThai())) {
+            return null;
+        }
+        return tinTuc;
+    }
+
     public TinTuc createTinTuc(TinTuc tinTuc) {
         if (tinTuc.getTieuDe() == null || tinTuc.getTieuDe().trim().isEmpty()) {
             throw new IllegalArgumentException("Không được để trống tiêu đề");

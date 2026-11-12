@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, createContext, useContext } from 'react';
+﻿import React, { useState, useEffect, createContext, useContext, Suspense } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import { FaSignOutAlt, FaBars, FaTimes, FaUserCircle, FaChevronDown, FaChevronRight, FaPlaneDeparture } from 'react-icons/fa';
 import { logout } from '../../services/AuthService';
@@ -333,7 +333,9 @@ function TrangChuAdmin() {
 
                 {/* Page Content */}
                 <div className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-                    <Outlet />
+                    <Suspense fallback={<div className="p-8 text-center text-gray-500">Đang tải…</div>}>
+                        <Outlet />
+                    </Suspense>
                 </div>
             </main>
         </div>
