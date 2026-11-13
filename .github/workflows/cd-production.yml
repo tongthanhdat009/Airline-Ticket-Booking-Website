@@ -378,6 +378,19 @@ jobs:
             # theo đúng thứ tự include = thứ tự ưu tiên). Prod đang có DUPLICATE
             # server_name (nginx warn "conflicting server name ... ignored") nên
             # sửa 1 file không đủ — phải dọn file thừa, chỉ giữ 1 file canonical.
+            STAMP=$(date +%Y%m%d-%H%M%S)
+            NGINX_BAK_DIR="/opt/airline-deploy/backups/nginx"
+            sudo mkdir -p "$NGINX_BAK_DIR"
+            # Dọn rác: backup/disabled của các lần chạy trước còn nằm TRONG thư
+            # mục nginx sẽ vẫn bị include (nginx load mọi file, không lọc đuôi).
+            for d in /etc/nginx/sites-enabled /etc/nginx/sites-available /etc/nginx/conf.d; do
+              [ -d "$d" ] || continue
+              for junk in "$d"/*.bak.* "$d"/*.disabled-*; do
+                [ -e "$junk" ] || continue
+                sudo mv "$junk" "$NGINX_BAK_DIR/$(basename "$junk").$STAMP"
+                echo "🧹 Dọn file rác khỏi nginx dir: $junk"
+              done
+            done
             CANDIDATES=$(sudo nginx -T 2>/dev/null | awk '
               /^# configuration file / { f=$4; sub(/:$/, "", f); FILE=f; next }
               /^[[:space:]]*#/ { next }
@@ -442,14 +455,15 @@ jobs:
               exit 1
             fi
 
-            STAMP=$(date +%Y%m%d-%H%M%S)
-            sudo cp "$TARGET" "$TARGET.bak.$STAMP"
-            DISABLED=""
+            TARGET_BAK="$NGINX_BAK_DIR/$(basename "$TARGET").bak.$STAMP"
+            sudo cp "$TARGET" "$TARGET_BAK"
+            DISABLED_PAIRS=""
             restore_all() {
               echo "♻️  Khôi phục config cũ..."
-              sudo cp "$(ls -t "$TARGET".bak.* | head -1)" "$TARGET"
-              for d in $DISABLED; do
-                sudo mv "$d" "${d%.disabled-*}"
+              sudo cp "$TARGET_BAK" "$TARGET"
+              for p in $DISABLED_PAIRS; do
+                b="${p%%>*}"; o="${p##*>}"
+                sudo mv "$b" "$o"
               done
               sudo nginx -t && sudo systemctl reload nginx
             }
@@ -464,9 +478,10 @@ jobs:
                 echo "   -> Dọn tay duplicate server_name rồi chạy lại"
                 exit 1
               fi
-              sudo mv "$f" "$f.disabled-$STAMP"
-              DISABLED="$DISABLED $f.disabled-$STAMP"
-              echo "🚫 Đã vô hiệu hoá duplicate (có backup): $f"
+              B="$NGINX_BAK_DIR/$(basename "$f").disabled-$STAMP"
+              sudo mv "$f" "$B"
+              DISABLED_PAIRS="$DISABLED_PAIRS $B>$f"
+              echo "🚫 Đã vô hiệu hoá duplicate (chuyển ra $NGINX_BAK_DIR): $f"
             done
 
             # Render template -> file winner (canonical)
@@ -489,8 +504,8 @@ jobs:
             sudo systemctl reload nginx
             echo "✅ nginx config updated, verifying at origin..."
 
-            # Giữ 5 bản backup gần nhất
-            ls -t "$TARGET".bak.* 2>/dev/null | tail -n +6 | xargs -r rm -f
+            # Giữ 5 bản backup gần nhất (trong backup dir, NGOÀI nginx)
+            ls -t "$NGINX_BAK_DIR/$(basename "$TARGET").bak."* 2>/dev/null | tail -n +6 | xargs -r rm -f
 
             # Tự kiểm tra TRỰC TIẾP tại origin (bypass Cloudflare).
             R="--resolve jadt-airline.io.vn:443:127.0.0.1"
