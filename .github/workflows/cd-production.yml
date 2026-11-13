@@ -508,18 +508,28 @@ jobs:
             ls -t "$NGINX_BAK_DIR/$(basename "$TARGET").bak."* 2>/dev/null | tail -n +6 | xargs -r rm -f
 
             # Tự kiểm tra TRỰC TIẾP tại origin (bypass Cloudflare).
+            # Reload cần vài giây để lan tỏa: thử lại tới 5 lần, mỗi lần cách 2s.
             R="--resolve jadt-airline.io.vn:443:127.0.0.1"
-            ORIGIN_CHECK="$(curl -sk -m 10 $R https://jadt-airline.io.vn/index.html -o /dev/null -D - || true)"
-            if [ -z "$ORIGIN_CHECK" ]; then
-              echo "❌ Không curl được origin local — khôi phục"
+            ORIGIN_OK=""
+            for i in 1 2 3 4 5; do
+              ORIGIN_CHECK="$(curl -sk -m 10 $R https://jadt-airline.io.vn/index.html -o /dev/null -D - || true)"
+              if [ -z "$ORIGIN_CHECK" ]; then
+                echo "⏳ Không curl được origin local (lần $i/5), đợi 2s..."
+              elif echo "$ORIGIN_CHECK" | grep -qi 'cache-control:.*no-cache'; then
+                ORIGIN_OK=1
+                break
+              else
+                echo "⏳ Chưa thấy header mới (lần $i/5), đợi 2s..."
+              fi
+              sleep 2
+            done
+            if [ -z "$ORIGIN_OK" ]; then
+              echo "❌ Origin không trả Cache-Control: no-cache cho /index.html sau 5 lần thử"
+              echo "--- Headers nhận được: ---"
+              echo "$ORIGIN_CHECK"
               restore_all
               exit 1
             fi
-            echo "$ORIGIN_CHECK" | grep -qi 'cache-control:.*no-cache' || {
-              echo "❌ Origin không trả Cache-Control: no-cache cho /index.html"
-              restore_all
-              exit 1
-            }
             ASSET_NAME="$(ls /opt/airline-prod/frontend/dist/assets/*.js 2>/dev/null | head -1 | xargs -n1 basename 2>/dev/null || true)"
             if [ -n "$ASSET_NAME" ]; then
               curl -sk -m 10 $R "https://jadt-airline.io.vn/assets/$ASSET_NAME" -o /dev/null -D - \
@@ -542,7 +552,9 @@ jobs:
               restore_all
               exit 1
             }
-            # SockJS info (warning-only)
+            # SockJS info (warning-only — cả 2 path legacy /ws và /api/ws)
+            curl -sk -m 10 $R https://jadt-airline.io.vn/ws/info -o /dev/null -f \
+              || echo "⚠️  /ws/info chưa 200 (kiểm tra tay WebSocket sau deploy)"
             curl -sk -m 10 $R https://jadt-airline.io.vn/api/ws/info -o /dev/null -f \
               || echo "⚠️  /api/ws/info chưa 200 (kiểm tra tay WebSocket sau deploy)"
             echo "✅ nginx canonical + headers + api + redirect verified live at origin"
