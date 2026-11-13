@@ -15,12 +15,18 @@
 # backup and continues the deploy, so a bad config never takes the site down.
 # ============================================================
 
-# HTTP -> HTTPS
+# HTTP -> HTTPS (giữ acme-challenge cho certbot renew)
 server {
     listen 80;
     listen [::]:80;
     server_name jadt-airline.io.vn www.jadt-airline.io.vn;
-    return 301 https://$host$request_uri;
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+        try_files $uri =404;
+    }
+    location / {
+        return 301 https://$host$request_uri;
+    }
 }
 
 server {

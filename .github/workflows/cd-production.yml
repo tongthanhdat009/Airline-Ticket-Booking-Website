@@ -374,88 +374,161 @@ jobs:
               exit 0
             fi
 
-            # Tìm file config nginx THỰC SỰ được load cho domain (parse `nginx -T`
-            # theo đúng thứ tự include = thứ tự ưu tiên). Lần trước grep thô
-            # sites-available/conf.d đã sửa nhầm file không được enable.
+            # Tìm MỌI file config nginx thực sự được load cho domain (parse `nginx -T`
+            # theo đúng thứ tự include = thứ tự ưu tiên). Prod đang có DUPLICATE
+            # server_name (nginx warn "conflicting server name ... ignored") nên
+            # sửa 1 file không đủ — phải dọn file thừa, chỉ giữ 1 file canonical.
             CANDIDATES=$(sudo nginx -T 2>/dev/null | awk '
               /^# configuration file / { f=$4; sub(/:$/, "", f); FILE=f; next }
               /^[[:space:]]*#/ { next }
               /server_name/ && /jadt-airline/ { if (!seen[FILE]++) print FILE }')
-            CURRENT=""
+            SITE_FILES=""
             for f in $CANDIDATES; do
               if [ -f "$f" ] && grep -q "ssl_certificate" "$f" && grep -q "proxy_pass" "$f"; then
-                CURRENT="$f"
-                break
+                SITE_FILES="$SITE_FILES $f"
               fi
             done
-            if [ -z "$CURRENT" ]; then
+            SITE_FILES=$(echo "$SITE_FILES" | xargs)
+            if [ -z "$SITE_FILES" ]; then
               echo "⚠️  Không tìm thấy site config phù hợp trong nginx -T — bỏ qua (cài tay theo infra/nginx/airline.conf.template)"
               exit 0
             fi
+            # File đầu tiên theo thứ tự include = file đang WIN (nginx dùng nó).
+            TARGET=$(echo "$SITE_FILES" | awk '{print $1}')
+            echo "📄 Site config đang serve (winner): $TARGET"
+            echo "📄 Mọi file trùng domain: $SITE_FILES"
 
-            CERT=$(grep -v '^\s*#' "$CURRENT" | grep -oP 'ssl_certificate\s+\K[^;]+' | head -1 | tr -d ' ')
-            KEY=$(grep -v '^\s*#' "$CURRENT" | grep -oP 'ssl_certificate_key\s+\K[^;]+' | head -1 | tr -d ' ')
-            UPSTREAM=$(grep -v '^\s*#' "$CURRENT" | grep -oP 'proxy_pass\s+\K[^;]+' | head -1 | tr -d ' ')
+            # Proxy cho từng location (lấy đúng trong block location, không lấy global).
+            proxy_in() {
+              awk -v loc="$1" '
+                $1 == "location" && $2 == loc { inloc=1 }
+                inloc && /proxy_pass/ { line=$0; gsub(/^.*proxy_pass[ \t]+/, "", line); gsub(/[ \t;].*$/, "", line); print line; exit }
+                inloc && /}/ { exit }
+              ' "$TARGET"
+            }
+            RAW_WS=$(proxy_in "/api/ws" || true)
+            RAW_API=$(proxy_in "/api/" || true)
+            RAW_ANY=$(grep -v '^\s*#' "$TARGET" | grep -oP 'proxy_pass\s+\K[^;]+' | head -1 | tr -d ' ' || true)
+            # Chuẩn hoá về bare host (location đã giữ prefix /api nên tương đương,
+            # tránh nhân đôi path kiểu /api/api/...).
+            for RAW in "$RAW_WS" "$RAW_API" "$RAW_ANY"; do
+              UPSTREAM=$(echo "$RAW" | grep -oP '^https?://[^/]+' || true)
+              if [ -n "$UPSTREAM" ]; then break; fi
+            done
+            UPSTREAM="${UPSTREAM:-http://127.0.0.1:8080}"
+            CERT=$(grep -v '^\s*#' "$TARGET" | grep -oP 'ssl_certificate\s+\K[^;]+' | head -1 | tr -d ' ')
+            KEY=$(grep -v '^\s*#' "$TARGET" | grep -oP 'ssl_certificate_key\s+\K[^;]+' | head -1 | tr -d ' ')
             UPLOAD_DIR=$(grep -v '^\s*#' /opt/airline-prod/.env 2>/dev/null | grep -oP 'UPLOAD_DIR=\K.*' | head -1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | tr -d "\"'")
             case "$UPLOAD_DIR" in
               /*) ;;
               *) UPLOAD_DIR="/opt/airline-prod/backend/${UPLOAD_DIR:-uploads}" ;;
             esac
             UPLOAD_DIR="${UPLOAD_DIR%/}"
-            UPSTREAM="${UPSTREAM:-http://127.0.0.1:8080}"
 
-            echo "📄 Site config: $CURRENT"
             echo "🔐 Cert: $CERT"
             echo "🔑 Key:  $KEY"
-            echo "⬆️  Upstream: $UPSTREAM"
+            echo "⬆️  Upstream (bare host): $UPSTREAM"
             echo "📁 Uploads: $UPLOAD_DIR"
 
-            # Backup config hiện tại
-            sudo cp "$CURRENT" "$CURRENT.bak.$(date +%Y%m%d-%H%M%S)"
+            only_our_domain() {
+              awk '$1 == "server_name" { for (i=2; i<=NF; i++) { n=$i; sub(/;$/, "", n); print n } }' "$1" \
+                | sort -u | grep -vx -e "jadt-airline.io.vn" -e "www.jadt-airline.io.vn" || true
+            }
+            # File winner mà còn serve domain khác -> KHÔNG dám ghi đè.
+            TARGET_FOREIGN=$(only_our_domain "$TARGET")
+            if [ -n "$TARGET_FOREIGN" ]; then
+              echo "❌ File winner $TARGET còn serve domain khác — KHÔNG dám ghi đè:"
+              echo "$TARGET_FOREIGN" | sed 's/^/   - /'
+              exit 1
+            fi
 
-            # Render template -> site config
+            STAMP=$(date +%Y%m%d-%H%M%S)
+            sudo cp "$TARGET" "$TARGET.bak.$STAMP"
+            DISABLED=""
+            restore_all() {
+              echo "♻️  Khôi phục config cũ..."
+              sudo cp "$(ls -t "$TARGET".bak.* | head -1)" "$TARGET"
+              for d in $DISABLED; do
+                sudo mv "$d" "${d%.disabled-*}"
+              done
+              sudo nginx -t && sudo systemctl reload nginx
+            }
+
+            # Dọn duplicate: chỉ vô hiệu hoá file CHỈ serve domain này.
+            for f in $SITE_FILES; do
+              if [ "$f" = "$TARGET" ]; then continue; fi
+              FOREIGN=$(only_our_domain "$f")
+              if [ -n "$FOREIGN" ]; then
+                echo "❌ File $f còn serve domain khác, KHÔNG dám tự dọn:"
+                echo "$FOREIGN" | sed 's/^/   - /'
+                echo "   -> Dọn tay duplicate server_name rồi chạy lại"
+                exit 1
+              fi
+              sudo mv "$f" "$f.disabled-$STAMP"
+              DISABLED="$DISABLED $f.disabled-$STAMP"
+              echo "🚫 Đã vô hiệu hoá duplicate (có backup): $f"
+            done
+
+            # Render template -> file winner (canonical)
             sudo sed -e "s|__SSL_CERT__|$CERT|g" \
                      -e "s|__SSL_KEY__|$KEY|g" \
                      -e "s|__UPSTREAM__|$UPSTREAM|g" \
                      -e "s|__UPLOAD_DIR__|$UPLOAD_DIR|g" \
-                     "$TEMPLATE" | sudo tee "$CURRENT" > /dev/null
+                     "$TEMPLATE" | sudo tee "$TARGET" > /dev/null
 
-            if sudo nginx -t; then
-              sudo systemctl reload nginx
-              echo "✅ nginx config updated, verifying headers at origin..."
-            else
-              echo "❌ nginx -t thất bại — khôi phục config cũ"
-              sudo cp "$(ls -t "$CURRENT".bak.* | head -1)" "$CURRENT"
-              sudo nginx -t && sudo systemctl reload nginx
-              echo "⚠️  Đã khôi phục config cũ; deploy tiếp tục"
-              exit 0
+            if ! sudo nginx -t; then
+              echo "❌ nginx -t thất bại"
+              restore_all
+              exit 1
             fi
+            if sudo nginx -T 2>&1 | grep -q 'conflicting server name'; then
+              echo "❌ Vẫn còn conflicting server name sau khi dọn"
+              restore_all
+              exit 1
+            fi
+            sudo systemctl reload nginx
+            echo "✅ nginx config updated, verifying at origin..."
 
-            # Giữ 5 bản backup config gần nhất
-            ls -t "$CURRENT".bak.* 2>/dev/null | tail -n +6 | xargs -r rm -f
+            # Giữ 5 bản backup gần nhất
+            ls -t "$TARGET".bak.* 2>/dev/null | tail -n +6 | xargs -r rm -f
 
-            # Tự kiểm tra header TRỰC TIẾP tại origin (bypass Cloudflare).
-            # Nếu sửa nhầm file/không có tác dụng -> restore + fail LOUD thay vì im lặng.
-            ORIGIN_CHECK="$(curl -sk -m 10 --resolve jadt-airline.io.vn:443:127.0.0.1 https://jadt-airline.io.vn/index.html -o /dev/null -D - || true)"
+            # Tự kiểm tra TRỰC TIẾP tại origin (bypass Cloudflare).
+            R="--resolve jadt-airline.io.vn:443:127.0.0.1"
+            ORIGIN_CHECK="$(curl -sk -m 10 $R https://jadt-airline.io.vn/index.html -o /dev/null -D - || true)"
             if [ -z "$ORIGIN_CHECK" ]; then
-              echo "⚠️  Không curl được origin local (127.0.0.1:443) — bỏ qua tự kiểm, giữ config mới"
-              exit 0
+              echo "❌ Không curl được origin local — khôi phục"
+              restore_all
+              exit 1
             fi
             echo "$ORIGIN_CHECK" | grep -qi 'cache-control:.*no-cache' || {
-              echo "❌ Origin không trả Cache-Control: no-cache cho /index.html — khôi phục config cũ"
-              sudo cp "$(ls -t "$CURRENT".bak.* | head -1)" "$CURRENT"
-              sudo nginx -t && sudo systemctl reload nginx
+              echo "❌ Origin không trả Cache-Control: no-cache cho /index.html"
+              restore_all
               exit 1
             }
             ASSET_NAME="$(ls /opt/airline-prod/frontend/dist/assets/*.js 2>/dev/null | head -1 | xargs -n1 basename 2>/dev/null || true)"
             if [ -n "$ASSET_NAME" ]; then
-              curl -sk -m 10 --resolve jadt-airline.io.vn:443:127.0.0.1 "https://jadt-airline.io.vn/assets/$ASSET_NAME" -o /dev/null -D - \
+              curl -sk -m 10 $R "https://jadt-airline.io.vn/assets/$ASSET_NAME" -o /dev/null -D - \
                 | grep -qi 'x-content-type-options:.*nosniff' || {
-                echo "❌ Origin không trả X-Content-Type-Options cho /assets/ — khôi phục config cũ"
-                sudo cp "$(ls -t "$CURRENT".bak.* | head -1)" "$CURRENT"
-                sudo nginx -t && sudo systemctl reload nginx
+                echo "❌ Origin không trả X-Content-Type-Options cho /assets/"
+                restore_all
                 exit 1
               }
             fi
-            echo "✅ nginx headers verified live at origin"
+            # API vẫn sống sau khi đổi config?
+            curl -sk -m 10 $R https://jadt-airline.io.vn/api/sanbay -o /dev/null -f || {
+              echo "❌ /api/sanbay không reachable qua config mới"
+              restore_all
+              exit 1
+            }
+            # HTTP -> HTTPS redirect còn không? (certbot renew cần :80)
+            curl -sk -m 10 --resolve jadt-airline.io.vn:80:127.0.0.1 http://jadt-airline.io.vn/ -o /dev/null -D - \
+              | grep -qi '^location: https://' || {
+              echo "❌ Redirect :80 -> https hỏng"
+              restore_all
+              exit 1
+            }
+            # SockJS info (warning-only)
+            curl -sk -m 10 $R https://jadt-airline.io.vn/api/ws/info -o /dev/null -f \
+              || echo "⚠️  /api/ws/info chưa 200 (kiểm tra tay WebSocket sau deploy)"
+            echo "✅ nginx canonical + headers + api + redirect verified live at origin"
             exit 0
