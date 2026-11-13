@@ -359,7 +359,7 @@ jobs:
               sudo systemctl reload nginx
               echo "✅ Deploy completed!"
 
-      # ===== 6. NGINX CONFIG (cache/asset fixes, safe rollback) =====
+      # ===== 6. NGINX CONFIG (cache/asset fixes, safe rollback + origin verify) =====
       - name: Install nginx config
         uses: appleboy/ssh-action@029f5b4aeeeb58fdfe1410a5d17f967dacf36262 # v1.0.3
         with:
@@ -374,16 +374,22 @@ jobs:
               exit 0
             fi
 
-            # Tìm site config đang serve domain (ưu tiên file có ssl + proxy_pass)
+            # Tìm file config nginx THỰC SỰ được load cho domain (parse `nginx -T`
+            # theo đúng thứ tự include = thứ tự ưu tiên). Lần trước grep thô
+            # sites-available/conf.d đã sửa nhầm file không được enable.
+            CANDIDATES=$(sudo nginx -T 2>/dev/null | awk '
+              /^# configuration file / { f=$4; sub(/:$/, "", f); FILE=f; next }
+              /^[[:space:]]*#/ { next }
+              /server_name/ && /jadt-airline/ { if (!seen[FILE]++) print FILE }')
             CURRENT=""
-            for f in $(grep -rl "jadt-airline.io.vn" /etc/nginx/sites-available /etc/nginx/conf.d 2>/dev/null || true); do
-              if grep -q "ssl_certificate" "$f" && grep -q "proxy_pass" "$f"; then
+            for f in $CANDIDATES; do
+              if [ -f "$f" ] && grep -q "ssl_certificate" "$f" && grep -q "proxy_pass" "$f"; then
                 CURRENT="$f"
                 break
               fi
             done
             if [ -z "$CURRENT" ]; then
-              echo "⚠️  Không tìm thấy site config phù hợp — bỏ qua (cài tay theo infra/nginx/airline.conf.template)"
+              echo "⚠️  Không tìm thấy site config phù hợp trong nginx -T — bỏ qua (cài tay theo infra/nginx/airline.conf.template)"
               exit 0
             fi
 
@@ -416,11 +422,40 @@ jobs:
 
             if sudo nginx -t; then
               sudo systemctl reload nginx
-              echo "✅ nginx config updated"
+              echo "✅ nginx config updated, verifying headers at origin..."
             else
               echo "❌ nginx -t thất bại — khôi phục config cũ"
               sudo cp "$(ls -t "$CURRENT".bak.* | head -1)" "$CURRENT"
               sudo nginx -t && sudo systemctl reload nginx
               echo "⚠️  Đã khôi phục config cũ; deploy tiếp tục"
+              exit 0
             fi
+
+            # Giữ 5 bản backup config gần nhất
+            ls -t "$CURRENT".bak.* 2>/dev/null | tail -n +6 | xargs -r rm -f
+
+            # Tự kiểm tra header TRỰC TIẾP tại origin (bypass Cloudflare).
+            # Nếu sửa nhầm file/không có tác dụng -> restore + fail LOUD thay vì im lặng.
+            ORIGIN_CHECK="$(curl -sk -m 10 --resolve jadt-airline.io.vn:443:127.0.0.1 https://jadt-airline.io.vn/index.html -o /dev/null -D - || true)"
+            if [ -z "$ORIGIN_CHECK" ]; then
+              echo "⚠️  Không curl được origin local (127.0.0.1:443) — bỏ qua tự kiểm, giữ config mới"
+              exit 0
+            fi
+            echo "$ORIGIN_CHECK" | grep -qi 'cache-control:.*no-cache' || {
+              echo "❌ Origin không trả Cache-Control: no-cache cho /index.html — khôi phục config cũ"
+              sudo cp "$(ls -t "$CURRENT".bak.* | head -1)" "$CURRENT"
+              sudo nginx -t && sudo systemctl reload nginx
+              exit 1
+            }
+            ASSET_NAME="$(ls /opt/airline-prod/frontend/dist/assets/*.js 2>/dev/null | head -1 | xargs -n1 basename 2>/dev/null || true)"
+            if [ -n "$ASSET_NAME" ]; then
+              curl -sk -m 10 --resolve jadt-airline.io.vn:443:127.0.0.1 "https://jadt-airline.io.vn/assets/$ASSET_NAME" -o /dev/null -D - \
+                | grep -qi 'x-content-type-options:.*nosniff' || {
+                echo "❌ Origin không trả X-Content-Type-Options cho /assets/ — khôi phục config cũ"
+                sudo cp "$(ls -t "$CURRENT".bak.* | head -1)" "$CURRENT"
+                sudo nginx -t && sudo systemctl reload nginx
+                exit 1
+              }
+            fi
+            echo "✅ nginx headers verified live at origin"
             exit 0
