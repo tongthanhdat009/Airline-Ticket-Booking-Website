@@ -198,6 +198,17 @@ jobs:
           remote_user: ${{ secrets.PRODUCTION_USER }}
           remote_key: ${{ secrets.PRODUCTION_SSH_KEY }}
 
+      # ===== UPLOAD NGINX CONFIG TEMPLATE =====
+      - name: Upload nginx config template
+        uses: burnett01/rsync-deployments@70ff22f5b4c2bb0e08d0bf20de693389e5552047 # v8
+        with:
+          switches: -avzr
+          path: infra/nginx/
+          remote_path: /opt/airline-deploy/nginx/
+          remote_host: ${{ secrets.PRODUCTION_HOST }}
+          remote_user: ${{ secrets.PRODUCTION_USER }}
+          remote_key: ${{ secrets.PRODUCTION_SSH_KEY }}
+
       # ===== 5. SYNC .env TỪ GITHUB SECRETS (thay cho sửa tay trên VPS) =====
       # File .env là nguồn duy nhất cho mọi biến prod. Service đọc lúc restart.
       # Quyền 640 + group airline: app đọc được, user khác trên VPS không đọc được.
@@ -347,3 +358,69 @@ jobs:
 
               sudo systemctl reload nginx
               echo "✅ Deploy completed!"
+
+      # ===== 6. NGINX CONFIG (cache/asset fixes, safe rollback) =====
+      - name: Install nginx config
+        uses: appleboy/ssh-action@029f5b4aeeeb58fdfe1410a5d17f967dacf36262 # v1.0.3
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          script: |
+            set -e
+            TEMPLATE="/opt/airline-deploy/nginx/airline.conf.template"
+            if [ ! -f "$TEMPLATE" ]; then
+              echo "⚠️  Không có template nginx — bỏ qua"
+              exit 0
+            fi
+
+            # Tìm site config đang serve domain (ưu tiên file có ssl + proxy_pass)
+            CURRENT=""
+            for f in $(grep -rl "jadt-airline.io.vn" /etc/nginx/sites-available /etc/nginx/conf.d 2>/dev/null || true); do
+              if grep -q "ssl_certificate" "$f" && grep -q "proxy_pass" "$f"; then
+                CURRENT="$f"
+                break
+              fi
+            done
+            if [ -z "$CURRENT" ]; then
+              echo "⚠️  Không tìm thấy site config phù hợp — bỏ qua (cài tay theo infra/nginx/airline.conf.template)"
+              exit 0
+            fi
+
+            CERT=$(grep -v '^\s*#' "$CURRENT" | grep -oP 'ssl_certificate\s+\K[^;]+' | head -1 | tr -d ' ')
+            KEY=$(grep -v '^\s*#' "$CURRENT" | grep -oP 'ssl_certificate_key\s+\K[^;]+' | head -1 | tr -d ' ')
+            UPSTREAM=$(grep -v '^\s*#' "$CURRENT" | grep -oP 'proxy_pass\s+\K[^;]+' | head -1 | tr -d ' ')
+            UPLOAD_DIR=$(grep -v '^\s*#' /opt/airline-prod/.env 2>/dev/null | grep -oP 'UPLOAD_DIR=\K.*' | head -1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | tr -d "\"'")
+            case "$UPLOAD_DIR" in
+              /*) ;;
+              *) UPLOAD_DIR="/opt/airline-prod/backend/${UPLOAD_DIR:-uploads}" ;;
+            esac
+            UPLOAD_DIR="${UPLOAD_DIR%/}"
+            UPSTREAM="${UPSTREAM:-http://127.0.0.1:8080}"
+
+            echo "📄 Site config: $CURRENT"
+            echo "🔐 Cert: $CERT"
+            echo "🔑 Key:  $KEY"
+            echo "⬆️  Upstream: $UPSTREAM"
+            echo "📁 Uploads: $UPLOAD_DIR"
+
+            # Backup config hiện tại
+            sudo cp "$CURRENT" "$CURRENT.bak.$(date +%Y%m%d-%H%M%S)"
+
+            # Render template -> site config
+            sudo sed -e "s|__SSL_CERT__|$CERT|g" \
+                     -e "s|__SSL_KEY__|$KEY|g" \
+                     -e "s|__UPSTREAM__|$UPSTREAM|g" \
+                     -e "s|__UPLOAD_DIR__|$UPLOAD_DIR|g" \
+                     "$TEMPLATE" | sudo tee "$CURRENT" > /dev/null
+
+            if sudo nginx -t; then
+              sudo systemctl reload nginx
+              echo "✅ nginx config updated"
+            else
+              echo "❌ nginx -t thất bại — khôi phục config cũ"
+              sudo cp "$(ls -t "$CURRENT".bak.* | head -1)" "$CURRENT"
+              sudo nginx -t && sudo systemctl reload nginx
+              echo "⚠️  Đã khôi phục config cũ; deploy tiếp tục"
+            fi
+            exit 0

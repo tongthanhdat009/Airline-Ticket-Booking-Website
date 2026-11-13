@@ -1,5 +1,8 @@
 import React from 'react';
 
+// Nhận diện lỗi tải chunk lazy (stale hash sau deploy, mạng/525) để xử lý phù hợp.
+const CHUNK_ERROR_RE = /(loading chunk|dynamically imported|module script|failed to fetch|networkerror|cannot find module|error loading|preload)/i;
+
 /**
  * Error Boundary component để bắt và xử lý lỗi trong React component tree
  * Giúp ứng dụng không bị crash hoàn toàn khi có lỗi xảy ra
@@ -7,7 +10,7 @@ import React from 'react';
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, error: null, errorInfo: null };
+    this.state = { hasError: false, error: null, errorInfo: null, isChunkError: false };
   }
 
   static getDerivedStateFromError(error) {
@@ -16,11 +19,18 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     console.error('Error caught by boundary:', error, errorInfo);
-    this.setState({ errorInfo });
+    const text = `${error?.message || ''} ${errorInfo?.componentStack || ''}`;
+    this.setState({ errorInfo, isChunkError: CHUNK_ERROR_RE.test(text) });
   }
 
   handleReset = () => {
-    this.setState({ hasError: false, error: null, errorInfo: null });
+    // Chunk lazy lỗi không thể phục hồi bằng cách re-render: import vẫn bị reject.
+    // Tải lại trang để trình duyệt lấy build mới (và chunk hash mới).
+    if (this.state.isChunkError) {
+      window.location.reload();
+      return;
+    }
+    this.setState({ hasError: false, error: null, errorInfo: null, isChunkError: false });
   };
 
   handleReload = () => {

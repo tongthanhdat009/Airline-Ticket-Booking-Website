@@ -1,0 +1,101 @@
+# ============================================================
+# JadT Airline - production nginx config (TEMPLATE)
+# Domain:    jadt-airline.io.vn
+# Frontend:  /opt/airline-prod/frontend/dist
+# Backend:   127.0.0.1:8080 (Spring Boot, context path /api)
+#
+# Placeholders rendered by cd-production.yml before install:
+#   __SSL_CERT__    -> ssl_certificate (full chain)   [detected from current config]
+#   __SSL_KEY__     -> ssl_certificate_key           [detected from current config]
+#   __UPSTREAM__    -> proxy_pass target              [detected from current config]
+#   __UPLOAD_DIR__  -> absolute UPLOAD_DIR            [from /opt/airline-prod/.env]
+#
+# The deploy step backs up the active site config, renders this template,
+# runs `nginx -t`, and only then reloads nginx. On failure it restores the
+# backup and continues the deploy, so a bad config never takes the site down.
+# ============================================================
+
+# HTTP -> HTTPS
+server {
+    listen 80;
+    listen [::]:80;
+    server_name jadt-airline.io.vn www.jadt-airline.io.vn;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name jadt-airline.io.vn www.jadt-airline.io.vn;
+
+    ssl_certificate     __SSL_CERT__;
+    ssl_certificate_key __SSL_KEY__;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    # Service images are uploaded by admin; allow large multipart bodies.
+    client_max_body_size 50m;
+
+    root /opt/airline-prod/frontend/dist;
+    index index.html;
+
+    # --- Fix #1: index.html must always be revalidated -------------------
+    # No explicit Cache-Control before -> browser heuristic caching (~hours).
+    # After a deploy, rsync --delete removes old hashed chunks, so a cached
+    # index.html points at chunks that no longer exist -> lazy import fails
+    # -> "Đã xảy ra lỗi" (ErrorBoundary).
+    location = /index.html {
+        add_header Cache-Control "no-cache, must-revalidate";
+        add_header X-Content-Type-Options "nosniff";
+        try_files $uri =404;
+    }
+
+    # --- Fix #2: hashed assets are immutable; missing asset -> real 404 --
+    # Never fall back to index.html for /assets/*, otherwise the browser gets
+    # HTML where it expects JS and the module parse fails.
+    location /assets/ {
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        add_header X-Content-Type-Options "nosniff";
+        try_files $uri =404;
+    }
+
+    # Uploaded service images (served by nginx in production)
+    location /uploads/ {
+        alias __UPLOAD_DIR__/;
+        add_header Cache-Control "public, max-age=86400";
+        try_files $uri =404;
+    }
+
+    # WebSocket / STOMP broker
+    location /api/ws {
+        proxy_pass __UPSTREAM__;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+    }
+
+    # Backend API
+    location /api/ {
+        proxy_pass __UPSTREAM__;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 120s;
+    }
+
+    # SPA fallback
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
